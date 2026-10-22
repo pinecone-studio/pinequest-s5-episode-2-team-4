@@ -1,4 +1,4 @@
-import type { Subtopic, SubtopicProgress, Topic } from "@/lib/types";
+import type { Subtopic, Topic } from "@/lib/types";
 
 export const topics: Topic[] = [
   {
@@ -42,12 +42,4 @@ export const subtopics: Subtopic[] = [
     title: "Холимог тоо",
     lessonTitle: "Холимог тоо ба зөв биш бутархай",
   },
-];
-
-/** The demo student's progress after the diagnostic test (5/8). */
-export const progress: SubtopicProgress[] = [
-  { subtopicId: "same-denominator", status: "mastered" },
-  { subtopicId: "different-denominator", status: "weak" },
-  { subtopicId: "simplify", status: "weak" },
-  { subtopicId: "mixed-numbers", status: "good" },
 ];

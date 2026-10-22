@@ -34,7 +34,8 @@ export default async function LessonPage({
     getCurrentPet(),
     getHelperConversation(),
   ]);
-  if (result.topicId !== topic) notFound();
+  // TODO(#60): send users who haven't taken the test to /test.
+  if (!result || result.topicId !== topic) notFound();
 
   const titles = new Map(subtopics.map((s) => [s.id, s.title]));
   const scores = result.subtopics.map((s) => ({

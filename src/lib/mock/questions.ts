@@ -1,4 +1,4 @@
-import type { Question, TestResult } from "@/lib/types";
+import type { Question } from "@/lib/types";
 import { blank, equals, f, frac, plus } from "./helpers";
 
 /** Diagnostic test for the fractions topic: 2 questions per subtopic. */
@@ -68,19 +68,6 @@ export const testQuestions: Question[] = [
     correctIndex: 3,
   },
 ];
-
-/** Result shown on the lesson page after the demo test. */
-export const testResult: TestResult = {
-  topicId: "fractions",
-  correct: 5,
-  total: 8,
-  subtopics: [
-    { subtopicId: "different-denominator", status: "weak", correct: 0, total: 2 },
-    { subtopicId: "simplify", status: "weak", correct: 1, total: 2 },
-    { subtopicId: "same-denominator", status: "good", correct: 2, total: 2 },
-    { subtopicId: "mixed-numbers", status: "good", correct: 2, total: 2 },
-  ],
-};
 
 /** Score on the 5-question retest that masters a subtopic. */
 export const masteryScore = { correct: 4, total: 5 };

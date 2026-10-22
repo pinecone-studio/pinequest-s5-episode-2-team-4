@@ -6,6 +6,7 @@
 // (pages, layouts) and pass the result to Client Components as props.
 
 import { nextEvolutionLevel, petStage } from "./pets";
+import { readSession } from "./session";
 import type {
   Lesson,
   MasteryResult,
@@ -14,6 +15,7 @@ import type {
   SubtopicProgress,
   TestResult,
   Topic,
+  User,
 } from "./types";
 import {
   helperConversation,
@@ -22,7 +24,7 @@ import {
   helperSuggestions,
   lessons,
 } from "./mock/lessons";
-import { masteryScore, testQuestions, testResult } from "./mock/questions";
+import { masteryScore, testQuestions } from "./mock/questions";
 import {
   assignmentDraft,
   classOverview,
@@ -30,13 +32,21 @@ import {
   notifications,
 } from "./mock/teacher";
 import { petLines } from "./mock/pets";
-import { progress, subtopics, topics } from "./mock/topics";
-import { currentUser } from "./mock/users";
+import { subtopics, topics } from "./mock/topics";
 
 // Student
 
-export async function getCurrentUser() {
-  return currentUser;
+/** The logged-in user from the mock session, or undefined when logged out. */
+export async function getCurrentUser(): Promise<User | undefined> {
+  const session = await readSession();
+  if (!session) return undefined;
+  return {
+    id: `user-${session.username}`,
+    username: session.username,
+    role: session.role,
+    classCode: session.classCode,
+    pet: session.pet,
+  };
 }
 
 // Pets
@@ -51,7 +61,7 @@ export async function getPetLine(id: string): Promise<PetLine | undefined> {
 
 /** The current user's pet with its line and the stage for its level. */
 export async function getCurrentPet() {
-  const pet = currentUser.pet;
+  const pet = (await readSession())?.pet;
   const line = pet && petLines.find((l) => l.id === pet.lineId);
   if (!pet || !line) return undefined;
   return { ...pet, line, stage: petStage(line, pet.level) };
@@ -77,8 +87,13 @@ export async function getSubtopic(id: string): Promise<Subtopic | undefined> {
   return subtopics.find((s) => s.id === id);
 }
 
+/** Every subtopic is "new" until the diagnostic test is taken. */
 export async function getProgress(): Promise<SubtopicProgress[]> {
-  return progress;
+  const result = await getTestResult();
+  if (result) {
+    return result.subtopics.map(({ subtopicId, status }) => ({ subtopicId, status }));
+  }
+  return subtopics.map((s) => ({ subtopicId: s.id, status: "new" }));
 }
 
 export async function getTestQuestions(topicId: string) {
@@ -87,8 +102,40 @@ export async function getTestQuestions(topicId: string) {
   );
 }
 
-export async function getTestResult(): Promise<TestResult> {
-  return testResult;
+/**
+ * Scores the current user's saved test answers per subtopic, weakest first.
+ * Undefined until the test is taken.
+ */
+export async function getTestResult(): Promise<TestResult | undefined> {
+  const answers = (await readSession())?.testAnswers;
+  const answered = testQuestions.filter((q) => answers?.[q.id] !== undefined);
+  if (!answers || answered.length === 0) return undefined;
+
+  const topicId =
+    topics.find((t) => t.subtopicIds.includes(answered[0].subtopicId))?.id ?? "";
+  const scores = subtopics
+    .filter((s) => s.topicId === topicId)
+    .sort((a, b) => a.order - b.order)
+    .map((s) => {
+      const questions = testQuestions.filter((q) => q.subtopicId === s.id);
+      const correct = questions.filter((q) => answers[q.id] === q.correctIndex).length;
+      return {
+        subtopicId: s.id,
+        status: correct === questions.length ? ("good" as const) : ("weak" as const),
+        correct,
+        total: questions.length,
+      };
+    })
+    .filter((s) => s.total > 0)
+    // Stable sort keeps the topic order for equal scores.
+    .sort((a, b) => a.correct / a.total - b.correct / b.total);
+
+  return {
+    topicId,
+    correct: scores.reduce((sum, s) => sum + s.correct, 0),
+    total: scores.reduce((sum, s) => sum + s.total, 0),
+    subtopics: scores,
+  };
 }
 
 /**
@@ -99,7 +146,7 @@ export async function getTestResult(): Promise<TestResult> {
 export async function getMasteryResult(
   subtopicId: string,
 ): Promise<MasteryResult | undefined> {
-  const pet = await getCurrentPet();
+  const [pet, progress] = await Promise.all([getCurrentPet(), getProgress()]);
   if (!pet || !subtopics.some((s) => s.id === subtopicId)) return undefined;
 
   const level = pet.level + 1;
