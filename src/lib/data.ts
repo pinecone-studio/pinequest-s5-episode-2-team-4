@@ -87,13 +87,12 @@ export async function getSubtopic(id: string): Promise<Subtopic | undefined> {
   return subtopics.find((s) => s.id === id);
 }
 
-/** Every subtopic is "new" until the diagnostic test is taken. */
+/** Empty until the diagnostic test is taken ("new" means just mastered). */
 export async function getProgress(): Promise<SubtopicProgress[]> {
   const result = await getTestResult();
-  if (result) {
-    return result.subtopics.map(({ subtopicId, status }) => ({ subtopicId, status }));
-  }
-  return subtopics.map((s) => ({ subtopicId: s.id, status: "new" }));
+  return (
+    result?.subtopics.map(({ subtopicId, status }) => ({ subtopicId, status })) ?? []
+  );
 }
 
 export async function getTestQuestions(topicId: string) {

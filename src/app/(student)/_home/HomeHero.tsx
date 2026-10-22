@@ -21,10 +21,12 @@ const hexagon = "[clip-path:polygon(50%_0,100%_25%,100%_75%,50%_100%,0_75%,0_25%
 
 type HomeHeroProps = {
   pet: { stage: PetStage; level: number };
+  /** Before the diagnostic test the play button starts it. */
+  testTaken: boolean;
   orbitPets: PetStage[];
 };
 
-export function HomeHero({ pet, orbitPets }: HomeHeroProps) {
+export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
   const words = ["Ойлгоогүйгээ", "ичихгүйгээр"];
   return (
     <section
@@ -53,7 +55,7 @@ export function HomeHero({ pet, orbitPets }: HomeHeroProps) {
           className="order-last w-full pr-10 pl-8 md:order-none md:w-auto"
         >
           {PlayIcon}
-          Тоглох
+          {testTaken ? "Тоглох" : "Тест эхлэх"}
         </ButtonLink>
       </div>
 

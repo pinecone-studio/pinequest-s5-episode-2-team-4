@@ -1,28 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { ElementBadge } from "@/components/pet/ElementBadge";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass, Card } from "@/components/ui";
+import { signUp } from "@/lib/actions";
 import { cn } from "@/lib/cn";
 import type { PetLine } from "@/lib/types";
+import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
 export function SignupForm({ petLines }: { petLines: PetLine[] }) {
-  const router = useRouter();
   const [role, setRole] = useState<Role>("student");
   const [petId, setPetId] = useState("wrougon");
+  const [taken, setTaken] = useState(false);
+  const [pending, startTransition] = useTransition();
   const pet = petLines.find((l) => l.id === petId) ?? petLines[0];
   const isStudent = role === "student";
+  const takenProps = {
+    "aria-invalid": taken,
+    "aria-describedby": taken ? "signup-error" : undefined,
+    onChange: () => setTaken(false),
+  };
 
-  function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // TODO: no backend yet; the mock user is fixed, so just go on.
-    router.push(isStudent ? "/" : "/teacher");
+    const form = new FormData(e.currentTarget);
+    // The password isn't stored: accounts are mocked in this browser.
+    startTransition(async () => {
+      const result = await signUp({
+        username: String(form.get("username") ?? ""),
+        role,
+        classCode: String(form.get("classCode") ?? ""),
+        petLineId: isStudent ? pet.id : undefined,
+      });
+      setTaken(result?.error === "taken");
+    });
   }
 
   return (
@@ -115,14 +131,42 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
           )}
           <form onSubmit={submit} className="flex flex-col gap-4">
             {isStudent ? (
-              <TextField id="su-user" label="Нэвтрэх нэр" type="text" autoComplete="username" required />
+              <TextField
+                id="su-user"
+                name="username"
+                label="Нэвтрэх нэр"
+                type="text"
+                autoComplete="username"
+                required
+                {...takenProps}
+              />
             ) : (
-              <TextField id="su-mail" label="Имэйл" type="email" autoComplete="email" required />
+              <TextField
+                id="su-mail"
+                name="username"
+                label="Имэйл"
+                type="email"
+                autoComplete="email"
+                required
+                {...takenProps}
+              />
             )}
             <PasswordField id="su-pass" label="Нууц үг" autoComplete="new-password" required />
-            {isStudent && <ClassCodeField id="su-code" label="Ангийн код" hint="заавал биш" />}
+            {isStudent && (
+              <ClassCodeField id="su-code" name="classCode" label="Ангийн код" hint="заавал биш" />
+            )}
+            {taken && (
+              <FormError id="signup-error">
+                Энэ нэр бүртгэлтэй байна.{" "}
+                <Link href="/login" className="font-bold">
+                  Нэвтрэх
+                </Link>
+              </FormError>
+            )}
             <button
               type="submit"
+              disabled={pending}
+              aria-busy={pending}
               className={buttonClass({ size: "lg", className: "mt-2 w-full" })}
             >
               {isStudent ? "Эхлэх" : "Бүртгүүлэх"}

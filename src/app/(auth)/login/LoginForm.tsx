@@ -1,25 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
+import { logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
+import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
 export function LoginForm({ pet }: { pet: PetStage }) {
-  const router = useRouter();
   const [role, setRole] = useState<Role>("student");
   const [showCode, setShowCode] = useState(false);
+  const [unknown, setUnknown] = useState(false);
+  const [pending, startTransition] = useTransition();
   const isStudent = role === "student";
 
-  function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // TODO: no backend yet; the mock user is fixed, so just go on.
-    router.push(isStudent ? "/" : "/teacher");
+    const form = new FormData(e.currentTarget);
+    // The password isn't checked: accounts are mocked in this browser.
+    startTransition(async () => {
+      const result = await logIn({
+        username: String(form.get("username") ?? ""),
+        role,
+        classCode: String(form.get("classCode") ?? ""),
+      });
+      setUnknown(result?.error === "unknown");
+    });
   }
 
   return (
@@ -39,10 +49,14 @@ export function LoginForm({ pet }: { pet: PetStage }) {
       <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
         <TextField
           id="login-user"
+          name="username"
           label="Нэвтрэх нэр"
           type="text"
           autoComplete="username"
           required
+          aria-invalid={unknown}
+          aria-describedby={unknown ? "login-error" : undefined}
+          onChange={() => setUnknown(false)}
         />
         <PasswordField
           id="login-pass"
@@ -52,7 +66,7 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         />
         {isStudent &&
           (showCode ? (
-            <ClassCodeField id="login-code" label="Ангийн код" autoFocus />
+            <ClassCodeField id="login-code" name="classCode" label="Ангийн код" autoFocus />
           ) : (
             <button
               type="button"
@@ -73,7 +87,20 @@ export function LoginForm({ pet }: { pet: PetStage }) {
               Ангийн код
             </button>
           ))}
-        <button type="submit" className={buttonClass({ size: "lg", className: "mt-2 w-full" })}>
+        {unknown && (
+          <FormError id="login-error">
+            Бүртгэлгүй нэр.{" "}
+            <Link href="/signup" className="font-bold">
+              Бүртгүүлэх
+            </Link>
+          </FormError>
+        )}
+        <button
+          type="submit"
+          disabled={pending}
+          aria-busy={pending}
+          className={buttonClass({ size: "lg", className: "mt-2 w-full" })}
+        >
           Нэвтрэх
           {ArrowIcon}
         </button>

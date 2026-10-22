@@ -5,9 +5,12 @@ import { StatusBadge } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { PetStage, Subtopic, SubtopicStatus } from "@/lib/types";
 
-export type MapNode = Subtopic & { status: SubtopicStatus };
+/** "untested": the diagnostic test hasn't been taken yet. */
+export type MapStatus = SubtopicStatus | "untested";
+export type MapNode = Subtopic & { status: MapStatus };
 
-const STATUS_LABELS: Record<SubtopicStatus, string> = {
+const STATUS_LABELS: Record<MapStatus, string> = {
+  untested: "шалгаагүй",
   weak: "сул",
   learning: "нөхөж буй",
   good: "сайн",
@@ -16,7 +19,8 @@ const STATUS_LABELS: Record<SubtopicStatus, string> = {
 };
 
 // Circle look per status; the current node overrides it.
-const circleStyles: Record<SubtopicStatus, string> = {
+const circleStyles: Record<MapStatus, string> = {
+  untested: "bg-surface shadow-[0_8px_0_var(--color-lavender)]",
   mastered: "bg-sky shadow-[0_8px_0_var(--color-sky-dark)]",
   new: "bg-sky shadow-[0_8px_0_var(--color-sky-dark)]",
   weak: "border-4 border-magenta bg-pink shadow-[0_8px_0_#f3b8e0]",
@@ -56,7 +60,7 @@ const BookIcon = (
 
 type TopicMapProps = {
   title: string;
-  /** Lesson link for every node */
+  /** Link for every node: the lesson, or the test before it is taken */
   href: string;
   nodes: MapNode[];
   pet: PetStage;
@@ -117,7 +121,9 @@ export function TopicMap({ title, href, nodes, pet }: TopicMapProps) {
                   </span>
                   <span className="flex flex-col items-start gap-1 md:items-center md:gap-3">
                     <span className="text-[17px] font-bold">{node.title}</span>
-                    {!finished && <StatusBadge status={node.status} />}
+                    {!finished && node.status !== "untested" && (
+                      <StatusBadge status={node.status} />
+                    )}
                   </span>
                 </Link>
               </li>
