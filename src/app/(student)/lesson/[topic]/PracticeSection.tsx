@@ -2,16 +2,11 @@
 
 import { useState } from "react";
 import { Expression, Fraction, sayFraction } from "@/components/Fraction";
-import { PetSprite } from "@/components/pet/PetSprite";
-import { ButtonLink } from "@/components/ui";
-import type { PetStage, Question } from "@/lib/types";
+import type { Question } from "@/lib/types";
 import "./practice.css";
 
 type PracticeSectionProps = {
   questions: Question[];
-  /** Where "Дахин шалгуулах" goes. */
-  retestHref: string;
-  petStage?: PetStage;
 };
 
 /** Last pick per question id, and how many tries it took (to replay the shake). */
@@ -136,12 +131,8 @@ function PracticeRow({
   );
 }
 
-/** Practice questions with feedback, then the call to retest. */
-export function PracticeSection({
-  questions,
-  retestHref,
-  petStage,
-}: PracticeSectionProps) {
+/** Practice questions with correct / try-again feedback. */
+export function PracticeSection({ questions }: PracticeSectionProps) {
   const [picks, setPicks] = useState<Picks>({});
   const solvedCount = questions.filter(
     (q) => picks[q.id]?.index === q.correctIndex,
@@ -155,65 +146,41 @@ export function PracticeSection({
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-4 md:mt-6 md:gap-6">
-      <section
-        aria-labelledby="practice-title"
-        className="rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-7"
-      >
-        <div className="flex items-center justify-between gap-2 md:gap-3">
-          <h3
-            id="practice-title"
-            className="text-2xl leading-tight font-bold md:text-[28px]"
+    <section
+      aria-labelledby="practice-title"
+      className="rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-7"
+    >
+      <div className="flex items-center justify-between gap-2 md:gap-3">
+        <h3
+          id="practice-title"
+          className="text-2xl leading-tight font-bold md:text-[28px]"
+        >
+          Дасгал
+        </h3>
+        <span
+          aria-label={`${questions.length}-аас ${solvedCount} бодсон`}
+          className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-sm font-bold md:px-3.5 md:py-1.5 md:text-[15px]"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="size-3.5 fill-primary md:size-4"
           >
-            Дасгал
-          </h3>
-          <span
-            aria-label={`${questions.length}-аас ${solvedCount} бодсон`}
-            className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-sm font-bold md:px-3.5 md:py-1.5 md:text-[15px]"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="size-3.5 fill-primary md:size-4"
-            >
-              <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" />
-            </svg>
-            {solvedCount}/{questions.length}
-          </span>
-        </div>
-        <ul className="mt-3.5 flex flex-col gap-3 md:mt-5 md:gap-3.5">
-          {questions.map((q) => (
-            <PracticeRow
-              key={q.id}
-              question={q}
-              pick={picks[q.id]}
-              onPick={(index) => pick(q.id, index)}
-            />
-          ))}
-        </ul>
-      </section>
-
-      <div className="flex flex-col gap-3.5 rounded-[25px] bg-ink p-5 text-white md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-5 md:rounded-panel md:px-8 md:py-6">
-        <div className="flex items-center gap-3 md:gap-4">
-          {petStage ? (
-            <PetSprite
-              stage={petStage}
-              size={64}
-              className="rounded-card bg-white"
-            />
-          ) : null}
-          <h3 className="text-2xl leading-tight font-bold md:text-[28px]">
-            Бэлэн үү?
-          </h3>
-        </div>
-        <ButtonLink href={retestHref} variant="white" className="w-full md:w-auto">
-          Дахин шалгуулах
-          <svg {...iconProps} strokeWidth={2.6} className="size-5">
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
+            <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" />
           </svg>
-        </ButtonLink>
+          {solvedCount}/{questions.length}
+        </span>
       </div>
-    </div>
+      <ul className="mt-3.5 flex flex-col gap-3 md:mt-5 md:gap-3.5">
+        {questions.map((q) => (
+          <PracticeRow
+            key={q.id}
+            question={q}
+            pick={picks[q.id]}
+            onPick={(index) => pick(q.id, index)}
+          />
+        ))}
+      </ul>
+    </section>
   );
 }
