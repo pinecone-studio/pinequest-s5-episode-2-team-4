@@ -45,11 +45,26 @@ export type Question = {
   correctIndex: number;
 };
 
+export type SubtopicScore = SubtopicProgress & {
+  correct: number;
+  total: number;
+};
+
 export type TestResult = {
   topicId: string;
   correct: number;
   total: number;
+  /** Weakest first, as shown on the results page. */
+  subtopics: SubtopicScore[];
+};
+
+/** Result of the retest that mastered a subtopic (mastered page). */
+export type MasteryResult = {
+  subtopicId: string;
+  score: { correct: number; total: number };
+  /** Topic progress after mastering; the mastered subtopic is "new". */
   progress: SubtopicProgress[];
+  pet: PetLevelUp;
 };
 
 export type Lesson = {
@@ -88,6 +103,19 @@ export type PetLine = {
   id: string;
   element: PetElement;
   stages: [PetStage, PetStage, PetStage];
+};
+
+/** A pet gaining a level after a mastery. */
+export type PetLevelUp = {
+  lineId: string;
+  from: { stage: PetStage; level: number };
+  to: { stage: PetStage; level: number };
+  mood: string;
+  /** XP towards the next level after the level-up, 0–100 */
+  xp: number;
+  xpGained: number;
+  /** Level of the next evolution, or undefined at the last stage */
+  nextEvolutionLevel?: number;
 };
 
 export type UserPet = {

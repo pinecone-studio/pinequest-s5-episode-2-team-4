@@ -9,6 +9,11 @@ export function stageIndex(level: number): 0 | 1 | 2 {
   return 0;
 }
 
+/** The next level where the pet evolves, or undefined at the last stage. */
+export function nextEvolutionLevel(level: number): number | undefined {
+  return EVOLVE_LEVELS.find((l) => l > level);
+}
+
 /** The pet's look and name at a given level. */
 export function petStage(line: PetLine, level: number): PetStage {
   return line.stages[stageIndex(level)];
