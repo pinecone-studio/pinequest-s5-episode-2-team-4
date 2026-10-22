@@ -35,6 +35,11 @@ Each person owns their routes. Do not edit another person's routes; if a shared 
 | BaskaLemon | Learning flow | `/test`, `/lesson/[topic]`, AI helper panel |
 | azaanm7 | Rewards and teacher | `/mastered/[topic]`, `/pets`, `/teacher` |
 
+Route layout:
+
+- Student pages (`/`, `/test`, `/lesson`, `/mastered`, `/pets`) go in `src/app/(student)/`, which adds the shared header, footer and mobile bottom nav.
+- `/login` and `/signup` go in `src/app/(auth)/`; `/teacher` goes in `src/app/teacher/` with its own header. Reuse `Logo` and `SiteFooter` from `src/components/layout/`.
+
 The foundation PR is merged first; until then, others build their page markup without depending on it.
 
 The planned issues for each owner are in `docs/backlog.md`. When a team member asks to create their issues, follow the instructions at the top of that file. When they start an issue, read it with `gh issue view <n>` and open the matching design screen first.
