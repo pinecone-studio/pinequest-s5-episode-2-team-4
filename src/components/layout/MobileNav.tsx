@@ -1,0 +1,72 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const HomeIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    className="size-[22px]"
+  >
+    <path d="M3 10.5 12 3l9 7.5" />
+    <path d="M5 9.5V21h14V9.5" />
+  </svg>
+);
+
+const PlayIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    className="size-[22px]"
+  >
+    <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" />
+  </svg>
+);
+
+// TODO(#9): use the current pet's PetSprite instead of this placeholder.
+const PetIcon = (
+  <span aria-hidden="true" className="size-6 rounded-full bg-lavender" />
+);
+
+const LINKS = [
+  { href: "/", label: "Нүүр", icon: HomeIcon },
+  { href: "/test", label: "Тоглох", icon: PlayIcon },
+  { href: "/pets", label: "Тэжээвэр", icon: PetIcon },
+];
+
+/** Sticky bottom navigation for student pages on small screens. */
+export function MobileNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav
+      aria-label="Үндсэн цэс"
+      className="sticky bottom-0 z-10 grid grid-cols-3 gap-1.5 bg-white px-3 pt-2 pb-3 shadow-[0_-8px_24px_rgb(63_7_145/0.1)] md:hidden"
+    >
+      {LINKS.map((link) => {
+        const active =
+          link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            aria-current={active ? "page" : undefined}
+            className={`flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-card text-xs font-bold text-ink no-underline hover:text-ink ${
+              active ? "bg-lavender" : ""
+            }`}
+          >
+            {link.icon}
+            {link.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
