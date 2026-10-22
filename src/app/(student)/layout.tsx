@@ -1,14 +1,20 @@
 import { MobileNav } from "@/components/layout/MobileNav";
-import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { getCurrentPet } from "@/lib/data";
+import { StudentFooter } from "@/components/layout/StudentFooter";
+import { getCurrentPet, getPetLines } from "@/lib/data";
+
+const FOOTER_PET_IDS = ["dollfin", "agnite", "wrougon"];
 
 export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pet = await getCurrentPet();
+  const [pet, petLines] = await Promise.all([getCurrentPet(), getPetLines()]);
+  const footerPets = FOOTER_PET_IDS.flatMap((id) => {
+    const line = petLines.find((l) => l.id === id);
+    return line ? [line.stages[0]] : [];
+  });
 
   return (
     <>
@@ -23,9 +29,7 @@ export default async function StudentLayout({
         }
       />
       <main className="flex-1">{children}</main>
-      <div className="mt-16">
-        <SiteFooter />
-      </div>
+      <StudentFooter pets={footerPets} />
       <MobileNav petSprite={pet?.stage.sprite} />
     </>
   );
