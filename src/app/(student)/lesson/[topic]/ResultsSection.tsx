@@ -1,23 +1,38 @@
+import { PetSprite } from "@/components/pet/PetSprite";
 import { StatusBadge } from "@/components/ui";
-import type { LessonResult } from "./results";
+import type { PetStage, SubtopicScore, TestResult } from "@/lib/types";
+
+export type SubtopicResult = SubtopicScore & { title: string };
 
 type ResultsSectionProps = {
-  result: LessonResult;
+  result: Pick<TestResult, "correct" | "total">;
+  /** Weakest first. */
+  subtopics: SubtopicResult[];
+  petStage?: PetStage;
 };
 
 /** Diagnostic test score and the weak/strong subtopic list. */
-export function ResultsSection({ result }: ResultsSectionProps) {
+export function ResultsSection({
+  result,
+  subtopics,
+  petStage,
+}: ResultsSectionProps) {
   return (
     <section
       aria-labelledby="results-title"
       className="rounded-[25px] bg-white p-5 shadow-card md:flex md:flex-wrap md:items-center md:gap-x-14 md:gap-y-8 md:rounded-panel md:px-9 md:py-7"
     >
       <div className="flex items-center gap-3 md:shrink-0 md:gap-5">
-        {/* TODO(#9): use the current pet's PetSprite. */}
-        <span
-          aria-hidden="true"
-          className="size-16 shrink-0 animate-bob rounded-full bg-lavender md:size-32"
-        />
+        {petStage ? (
+          <span className="shrink-0 animate-bob">
+            <PetSprite stage={petStage} size={64} className="md:hidden" />
+            <PetSprite
+              stage={petStage}
+              size={128}
+              className="hidden md:block"
+            />
+          </span>
+        ) : null}
         <div className="contents md:block">
           <h1
             id="results-title"
@@ -38,7 +53,7 @@ export function ResultsSection({ result }: ResultsSectionProps) {
       </div>
 
       <ul className="mt-4 flex min-w-0 flex-col gap-3 md:mt-0 md:flex-[1_1_520px] md:gap-3.5">
-        {result.subtopics.map((s) => {
+        {subtopics.map((s) => {
           const percent = s.total ? (s.correct / s.total) * 100 : 0;
           return (
             <li
