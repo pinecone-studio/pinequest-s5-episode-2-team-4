@@ -2,14 +2,18 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getCurrentPet,
+  getHelperConversation,
   getLesson,
   getSubtopics,
   getTestResult,
   getTopics,
 } from "@/lib/data";
 import { ExplanationSection } from "./ExplanationSection";
+import { HelperPanel } from "./HelperPanel";
+import { LessonSection } from "./LessonSection";
 import { PracticeSection } from "./PracticeSection";
 import { ResultsSection } from "./ResultsSection";
+import { RetestCard } from "./RetestCard";
 
 export const metadata: Metadata = {
   title: "Үр дүн ба хичээл — LevelUp",
@@ -24,10 +28,11 @@ export default async function LessonPage({
   params,
 }: PageProps<"/lesson/[topic]">) {
   const { topic } = await params;
-  const [result, subtopics, pet] = await Promise.all([
+  const [result, subtopics, pet, helper] = await Promise.all([
     getTestResult(),
     getSubtopics(topic),
     getCurrentPet(),
+    getHelperConversation(),
   ]);
   if (result.topicId !== topic) notFound();
 
@@ -44,16 +49,25 @@ export default async function LessonPage({
     <div className="mx-auto max-w-7xl px-4 pt-4 md:px-[clamp(16px,4vw,40px)]">
       <ResultsSection result={result} subtopics={scores} petStage={pet?.stage} />
       {lesson ? (
-        <>
+        <LessonSection
+          lesson={lesson}
+          helper={
+            <HelperPanel
+              initialMessages={helper.messages}
+              suggestions={helper.suggestions}
+            />
+          }
+          footer={
+            <RetestCard
+              href={`/mastered/${lesson.subtopicId}`}
+              petStage={pet?.stage}
+            />
+          }
+        >
           <ExplanationSection lesson={lesson} />
-          <PracticeSection
-            questions={lesson.practice}
-            retestHref={`/mastered/${lesson.subtopicId}`}
-            petStage={pet?.stage}
-          />
-        </>
+          <PracticeSection questions={lesson.practice} />
+        </LessonSection>
       ) : null}
-      {/* AI helper (#24) goes beside the lesson. */}
     </div>
   );
 }

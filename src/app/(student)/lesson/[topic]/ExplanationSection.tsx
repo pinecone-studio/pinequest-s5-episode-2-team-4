@@ -115,167 +115,138 @@ const ArrowIcon = (
 const conversionRowClass =
   "grid gap-3 md:grid-cols-[minmax(0,1fr)_32px_minmax(0,1fr)] md:items-center md:gap-4";
 
-/** The lesson title, the typical mistake and a step-by-step explanation. */
+/** The typical mistake and a step-by-step explanation. */
 export function ExplanationSection({ lesson }: ExplanationSectionProps) {
   const { expression, explanation } = lesson.mistake;
   const visual = commonDenominator(expression);
 
   return (
-    <section aria-labelledby="lesson-title" className="mt-6 md:mt-14">
-      <div className="flex flex-col items-start gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4">
-        <h2
-          id="lesson-title"
-          className="text-[32px] leading-[1.05] font-bold tracking-[-0.02em] md:text-[40px]"
+    <>
+      <div className="flex flex-col items-center justify-center gap-3.5 rounded-[25px] bg-pink px-4 py-6 md:flex-row md:flex-wrap md:gap-x-10 md:gap-y-5 md:rounded-panel md:px-8 md:py-7">
+        <div
+          role="img"
+          aria-label={`${sayExpression(expression)} гэж бодсон, зөв биш`}
+          className="flex items-center gap-3 text-[34px] leading-none font-bold md:gap-4 md:text-[44px]"
         >
-          {lesson.title}
-        </h2>
-        {lesson.approvedByTeacher ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-0.75 text-xs font-bold md:px-3 md:py-[5px] md:text-[13px]">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="size-3 md:size-3.5"
-            >
-              <path d="M12 22c5.5-2.5 8-6.5 8-12V5l-8-3-8 3v5c0 5.5 2.5 9.5 8 12z" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
-            Багш баталсан
-          </span>
-        ) : null}
-      </div>
-
-      <div className="mt-4 flex flex-col gap-4 md:mt-7 md:gap-6">
-        <div className="flex flex-col items-center justify-center gap-3.5 rounded-[25px] bg-pink px-4 py-6 md:flex-row md:flex-wrap md:gap-x-10 md:gap-y-5 md:rounded-panel md:px-8 md:py-7">
-          <div
-            role="img"
-            aria-label={`${sayExpression(expression)} гэж бодсон, зөв биш`}
-            className="flex items-center gap-3 text-[34px] leading-none font-bold md:gap-4 md:text-[44px]"
-          >
-            {expression.map((token, i) => {
-              const isAnswer = i === expression.length - 1;
-              if (token.kind === "fraction" && isAnswer) {
-                return (
+          {expression.map((token, i) => {
+            const isAnswer = i === expression.length - 1;
+            if (token.kind === "fraction" && isAnswer) {
+              return (
+                <span
+                  key={i}
+                  className="relative rounded-tile border-3 border-magenta bg-white px-2.5 py-1.5 md:px-3 md:py-2"
+                >
+                  <Fraction value={token.value} />
                   <span
-                    key={i}
-                    className="relative rounded-tile border-3 border-magenta bg-white px-2.5 py-1.5 md:px-3 md:py-2"
+                    aria-hidden="true"
+                    className="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full bg-magenta text-white md:-top-3.5 md:-right-3.5 md:size-8"
                   >
-                    <Fraction value={token.value} />
-                    <span
-                      aria-hidden="true"
-                      className="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full bg-magenta text-white md:-top-3.5 md:-right-3.5 md:size-8"
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="size-3.5 md:size-4"
                     >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="size-3.5 md:size-4"
-                      >
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                      </svg>
-                    </span>
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
                   </span>
-                );
-              }
-              if (token.kind === "fraction") {
-                return <Fraction key={i} value={token.value} />;
-              }
-              if (token.kind === "op") {
-                return (
-                  <span key={i} className="text-primary">
-                    {token.op === "=" ? "≠" : token.op}
-                  </span>
-                );
-              }
-              return null;
-            })}
-          </div>
-          <p className="text-center text-base font-bold md:max-w-[280px] md:text-left md:text-lg">
-            {explanation}
-          </p>
+                </span>
+              );
+            }
+            if (token.kind === "fraction") {
+              return <Fraction key={i} value={token.value} />;
+            }
+            if (token.kind === "op") {
+              return (
+                <span key={i} className="text-primary">
+                  {token.op === "=" ? "≠" : token.op}
+                </span>
+              );
+            }
+            return null;
+          })}
         </div>
-
-        {visual ? (
-          <div className="flex flex-col gap-3 rounded-[25px] bg-white p-5 shadow-card md:gap-[18px] md:rounded-panel md:px-8 md:py-7">
-            <div className={conversionRowClass}>
-              <BarRow value={visual.a}>
-                <FractionBar total={visual.a.den} filled={visual.a.num} />
-              </BarRow>
-              {ArrowIcon}
-              <BarRow value={visual.aScaled}>
-                <FractionBar total={visual.den} filled={visual.aScaled.num} />
-              </BarRow>
-            </div>
-            <div
-              className={`${conversionRowClass} border-t-2 border-dashed border-line pt-3 md:border-0 md:pt-0`}
-            >
-              <BarRow value={visual.b}>
-                <FractionBar total={visual.b.den} hatched={visual.b.num} />
-              </BarRow>
-              {ArrowIcon}
-              <BarRow value={visual.bScaled}>
-                <FractionBar total={visual.den} hatched={visual.bScaled.num} />
-              </BarRow>
-            </div>
-            <div
-              className={`${conversionRowClass} border-t-2 border-dashed border-line pt-3 md:pt-[18px]`}
-            >
-              <p className="hidden items-center gap-2.5 justify-self-end text-xl leading-none font-bold md:flex">
-                <Fraction value={visual.aScaled} />
-                <span className="text-primary">+</span>
-                <Fraction value={visual.bScaled} />
-              </p>
-              <span
-                aria-hidden="true"
-                className="hidden text-center text-[28px] font-bold text-primary md:block"
-              >
-                =
-              </span>
-              <BarRow
-                value={{
-                  num: visual.aScaled.num + visual.bScaled.num,
-                  den: visual.den,
-                }}
-                highlight
-              >
-                <FractionBar
-                  total={visual.den}
-                  filled={visual.aScaled.num}
-                  hatched={visual.bScaled.num}
-                />
-              </BarRow>
-            </div>
-          </div>
-        ) : null}
-
-        <ol
-          aria-label="Алхмууд"
-          className="flex flex-col gap-2 md:grid md:grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] md:gap-3"
-        >
-          {lesson.steps.map((step, i) => (
-            <li
-              key={step}
-              className="flex items-center gap-3 rounded-card bg-surface px-3.5 py-3 font-bold md:p-4"
-            >
-              <span
-                aria-hidden="true"
-                className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-white md:size-10"
-              >
-                {i + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ol>
+        <p className="text-center text-base font-bold md:max-w-[280px] md:text-left md:text-lg">
+          {explanation}
+        </p>
       </div>
-    </section>
+
+      {visual ? (
+        <div className="flex flex-col gap-3 rounded-[25px] bg-white p-5 shadow-card md:gap-[18px] md:rounded-panel md:px-8 md:py-7">
+          <div className={conversionRowClass}>
+            <BarRow value={visual.a}>
+              <FractionBar total={visual.a.den} filled={visual.a.num} />
+            </BarRow>
+            {ArrowIcon}
+            <BarRow value={visual.aScaled}>
+              <FractionBar total={visual.den} filled={visual.aScaled.num} />
+            </BarRow>
+          </div>
+          <div
+            className={`${conversionRowClass} border-t-2 border-dashed border-line pt-3 md:border-0 md:pt-0`}
+          >
+            <BarRow value={visual.b}>
+              <FractionBar total={visual.b.den} hatched={visual.b.num} />
+            </BarRow>
+            {ArrowIcon}
+            <BarRow value={visual.bScaled}>
+              <FractionBar total={visual.den} hatched={visual.bScaled.num} />
+            </BarRow>
+          </div>
+          <div
+            className={`${conversionRowClass} border-t-2 border-dashed border-line pt-3 md:pt-[18px]`}
+          >
+            <p className="hidden items-center gap-2.5 justify-self-end text-xl leading-none font-bold md:flex">
+              <Fraction value={visual.aScaled} />
+              <span className="text-primary">+</span>
+              <Fraction value={visual.bScaled} />
+            </p>
+            <span
+              aria-hidden="true"
+              className="hidden text-center text-[28px] font-bold text-primary md:block"
+            >
+              =
+            </span>
+            <BarRow
+              value={{
+                num: visual.aScaled.num + visual.bScaled.num,
+                den: visual.den,
+              }}
+              highlight
+            >
+              <FractionBar
+                total={visual.den}
+                filled={visual.aScaled.num}
+                hatched={visual.bScaled.num}
+              />
+            </BarRow>
+          </div>
+        </div>
+      ) : null}
+
+      <ol
+        aria-label="Алхмууд"
+        className="flex flex-col gap-2 md:grid md:grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] md:gap-3"
+      >
+        {lesson.steps.map((step, i) => (
+          <li
+            key={step}
+            className="flex items-center gap-3 rounded-card bg-surface px-3.5 py-3 font-bold md:p-4"
+          >
+            <span
+              aria-hidden="true"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-white md:size-10"
+            >
+              {i + 1}
+            </span>
+            {step}
+          </li>
+        ))}
+      </ol>
+    </>
   );
 }
