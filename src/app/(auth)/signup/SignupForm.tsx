@@ -8,11 +8,9 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass, Card } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { PetLine } from "@/lib/types";
+import { PetAvatar } from "../_components/PetAvatar";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
-
-const avatarClass =
-  "flex items-center justify-center overflow-hidden rounded-full border-6 border-white bg-[radial-gradient(circle_at_50%_42%,#fff_0%,var(--color-surface)_55%,var(--color-lavender)_100%)] shadow-float";
 
 export function SignupForm({ petLines }: { petLines: PetLine[] }) {
   const router = useRouter();
@@ -48,10 +46,10 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
               Тэжээвэрээ сонго
             </h2>
             <div className="mt-4 flex h-52 items-center justify-center md:h-62">
-              <div className={cn(avatarClass, "size-44 md:size-54")}>
+              <PetAvatar className="size-44 md:size-54">
                 <PetSprite stage={pet.stages[0]} size={160} className="animate-bob md:hidden" />
                 <PetSprite stage={pet.stages[0]} size={192} className="hidden animate-bob md:block" />
-              </div>
+              </PetAvatar>
             </div>
             <p aria-live="polite" className="mt-4 flex items-center justify-center gap-3">
               <span className="text-[28px] leading-tight font-bold">{pet.stages[0].name}</span>
@@ -111,12 +109,9 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
           )}
         >
           {!isStudent && (
-            <div
-              aria-hidden="true"
-              className={cn(avatarClass, "absolute -top-18 left-1/2 size-36 -translate-x-1/2")}
-            >
+            <PetAvatar className="absolute -top-18 left-1/2 size-36 -translate-x-1/2">
               <PetSprite stage={pet.stages[0]} size={128} className="animate-bob" />
-            </div>
+            </PetAvatar>
           )}
           <form onSubmit={submit} className="flex flex-col gap-4">
             {isStudent ? (
