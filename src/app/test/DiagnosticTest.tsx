@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Expression, Fraction, sayFraction } from "@/components/Fraction";
 import { PetSprite } from "@/components/pet/PetSprite";
+import { Button } from "@/components/ui";
 import type { PetStage, Question } from "@/lib/types";
 
 type DiagnosticTestProps = {
@@ -94,11 +95,13 @@ export function DiagnosticTest({
     return () => window.removeEventListener("beforeunload", warn);
   }, [started]);
 
+  // An in-page dialog, not window.confirm: embedded previews and blocked
+  // pop-ups make confirm() return false without showing anything.
+  const exitDialog = useRef<HTMLDialogElement>(null);
+
   function exit() {
-    if (started && !window.confirm("Тестээс гарах уу? Хариултууд хадгалагдахгүй.")) {
-      return;
-    }
-    router.push(exitHref);
+    if (started) exitDialog.current?.showModal();
+    else router.push(exitHref);
   }
 
   function finish() {
@@ -269,6 +272,31 @@ export function DiagnosticTest({
           </button>
         )}
       </div>
+
+      <dialog
+        ref={exitDialog}
+        aria-labelledby="exit-title"
+        className="fixed inset-0 m-auto h-fit w-[min(420px,calc(100%-32px))] rounded-panel bg-white p-6 text-ink shadow-float backdrop:bg-ink/40 md:p-8"
+      >
+        <h2 id="exit-title" className="text-xl leading-tight font-bold md:text-2xl">
+          Тестээс гарах уу?
+        </h2>
+        <p className="mt-2 text-ink-muted">Хариултууд хадгалагдахгүй.</p>
+        <div className="mt-6 flex flex-col-reverse gap-3 md:flex-row md:justify-end">
+          {/* Staying is the safe choice, so it gets the focus. */}
+          <Button
+            variant="secondary"
+            size="sm"
+            autoFocus
+            onClick={() => exitDialog.current?.close()}
+          >
+            Үргэлжлүүлэх
+          </Button>
+          <Button size="sm" onClick={() => router.push(exitHref)}>
+            Гарах
+          </Button>
+        </div>
+      </dialog>
     </div>
   );
 }
