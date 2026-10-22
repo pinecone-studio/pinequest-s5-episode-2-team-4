@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { FractionText, sayFraction } from "./FractionText";
-import type { ExpressionPart, TestQuestion } from "./questions";
+import { Expression, Fraction, sayFraction } from "@/components/Fraction";
+import { PetSprite } from "@/components/pet/PetSprite";
+import type { PetStage, Question } from "@/lib/types";
 
 type DiagnosticTestProps = {
-  questions: TestQuestion[];
+  questions: Question[];
+  /** The current pet, shown above the current question. */
+  petStage?: PetStage;
+  // TODO: pass the answers to the results page once there is an API.
+  resultsHref: string;
 };
 
 /** Selected option index per question id. */
 type Answers = Record<string, number>;
-
-// TODO(#21): pass the answers to the results page.
-const RESULTS_HREF = "/lesson/fractions";
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -52,21 +54,14 @@ const CheckIcon = (
   </svg>
 );
 
-function describeExpression(parts: ExpressionPart[]) {
-  const words = parts.flatMap((part) => {
-    if (part.kind === "fraction") return [sayFraction(part.value)];
-    if (part.kind === "operator") {
-      return [part.symbol === "+" ? "нэмэх" : "тэнцүү"];
-    }
-    return [];
-  });
-  return `${words.join(" ")} хэд вэ`;
-}
-
 const primaryButtonClass =
   "flex min-h-[60px] flex-1 items-center justify-center gap-2.5 rounded-full bg-primary px-9 text-lg font-bold text-white no-underline shadow-[0_5px_0_var(--color-primary-dark)] transition hover:text-white hover:brightness-110 active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-primary-dark)] md:flex-none md:shadow-3d";
 
-export function DiagnosticTest({ questions }: DiagnosticTestProps) {
+export function DiagnosticTest({
+  questions,
+  petStage,
+  resultsHref,
+}: DiagnosticTestProps) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
 
@@ -103,12 +98,15 @@ export function DiagnosticTest({ questions }: DiagnosticTestProps) {
                 key={q.id}
                 className="relative flex h-[60px] flex-col justify-end md:h-16"
               >
-                {isCurrent ? (
-                  // TODO(#9): use the current pet's PetSprite.
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0.5 left-1/2 -ml-3 size-6 animate-bob rounded-full bg-lavender md:-top-0.5 md:-ml-6 md:size-12"
-                  />
+                {isCurrent && petStage ? (
+                  <span className="absolute top-0.5 left-1/2 -ml-3 animate-bob md:-top-0.5 md:-ml-6">
+                    <PetSprite stage={petStage} size={24} className="md:hidden" />
+                    <PetSprite
+                      stage={petStage}
+                      size={48}
+                      className="hidden md:block"
+                    />
+                  </span>
                 ) : null}
                 <button
                   type="button"
@@ -151,34 +149,10 @@ export function DiagnosticTest({ questions }: DiagnosticTestProps) {
           {question.prompt}
         </h1>
 
-        <div
-          role="img"
-          aria-label={describeExpression(question.expression)}
-          className="flex items-center gap-3 text-[40px] leading-none font-bold md:gap-5 md:text-[56px]"
-        >
-          {question.expression.map((part, i) => {
-            if (part.kind === "fraction") {
-              return (
-                <FractionText key={i} value={part.value} size="expression" />
-              );
-            }
-            if (part.kind === "operator") {
-              return (
-                <span key={i} className="text-primary">
-                  {part.symbol}
-                </span>
-              );
-            }
-            return (
-              <span
-                key={i}
-                className="inline-flex h-[76px] w-14 items-center justify-center rounded-tile border-3 border-dashed border-primary bg-surface text-[32px] text-primary md:h-[104px] md:w-20 md:rounded-card md:text-[44px]"
-              >
-                ?
-              </span>
-            );
-          })}
-        </div>
+        <Expression
+          tokens={question.expression}
+          className="text-[40px] font-bold md:text-[56px]"
+        />
 
         <div className="grid grid-cols-2 gap-3 self-stretch md:grid-cols-4 md:gap-4">
           {question.options.map((option, i) => {
@@ -206,9 +180,10 @@ export function DiagnosticTest({ questions }: DiagnosticTestProps) {
                     </svg>
                   </span>
                 ) : null}
-                <span className="text-[32px] leading-none font-bold md:text-[40px]">
-                  <FractionText value={option} size="option" />
-                </span>
+                <Fraction
+                  value={option}
+                  className="text-[32px] font-bold md:text-[40px]"
+                />
               </button>
             );
           })}
@@ -240,7 +215,7 @@ export function DiagnosticTest({ questions }: DiagnosticTestProps) {
             {ArrowRightIcon}
           </button>
         ) : isComplete ? (
-          <Link href={RESULTS_HREF} className={primaryButtonClass}>
+          <Link href={resultsHref} className={primaryButtonClass}>
             Дуусгах
             {CheckIcon}
           </Link>

@@ -1,5 +1,5 @@
+import { Fraction, sayExpression, sayFraction } from "@/components/Fraction";
 import type { ExpressionToken, FractionValue, Lesson } from "@/lib/types";
-import { LessonFraction, fractionLabel } from "./LessonFraction";
 
 type ExplanationSectionProps = {
   lesson: Lesson;
@@ -30,17 +30,6 @@ function commonDenominator(expression: ExpressionToken[]) {
     bScaled: scale(b.value),
     den,
   };
-}
-
-function describeMistake(expression: ExpressionToken[]) {
-  const words = expression.flatMap((t) => {
-    if (t.kind === "fraction") return [fractionLabel(t.value)];
-    if (t.kind === "op") {
-      return [t.op === "+" ? "нэмэх" : t.op === "=" ? "тэнцүү" : "хасах"];
-    }
-    return [];
-  });
-  return `${words.join(" ")} гэж бодсон, зөв биш`;
 }
 
 const hatch = {
@@ -95,12 +84,12 @@ function BarRow({
     <div className="flex items-center gap-2.5 md:gap-3.5">
       <span
         role="img"
-        aria-label={fractionLabel(value)}
-        className={`w-7 shrink-0 text-center text-[17px] leading-none font-bold md:w-9 md:text-xl ${
+        aria-label={sayFraction(value)}
+        className={`w-7 shrink-0 text-center text-[17px] font-bold md:w-9 md:text-xl ${
           highlight ? "text-primary" : ""
         }`}
       >
-        <LessonFraction value={value} size="sm" />
+        <Fraction value={value} />
       </span>
       {children}
     </div>
@@ -164,7 +153,7 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
         <div className="flex flex-col items-center justify-center gap-3.5 rounded-[25px] bg-pink px-4 py-6 md:flex-row md:flex-wrap md:gap-x-10 md:gap-y-5 md:rounded-panel md:px-8 md:py-7">
           <div
             role="img"
-            aria-label={describeMistake(expression)}
+            aria-label={`${sayExpression(expression)} гэж бодсон, зөв биш`}
             className="flex items-center gap-3 text-[34px] leading-none font-bold md:gap-4 md:text-[44px]"
           >
             {expression.map((token, i) => {
@@ -175,7 +164,7 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
                     key={i}
                     className="relative rounded-tile border-3 border-magenta bg-white px-2.5 py-1.5 md:px-3 md:py-2"
                   >
-                    <LessonFraction value={token.value} size="lg" />
+                    <Fraction value={token.value} />
                     <span
                       aria-hidden="true"
                       className="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full bg-magenta text-white md:-top-3.5 md:-right-3.5 md:size-8"
@@ -197,7 +186,7 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
                 );
               }
               if (token.kind === "fraction") {
-                return <LessonFraction key={i} value={token.value} size="lg" />;
+                return <Fraction key={i} value={token.value} />;
               }
               if (token.kind === "op") {
                 return (
@@ -240,9 +229,9 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
               className={`${conversionRowClass} border-t-2 border-dashed border-line pt-3 md:pt-[18px]`}
             >
               <p className="hidden items-center gap-2.5 justify-self-end text-xl leading-none font-bold md:flex">
-                <LessonFraction value={visual.aScaled} size="sm" />
+                <Fraction value={visual.aScaled} />
                 <span className="text-primary">+</span>
-                <LessonFraction value={visual.bScaled} size="sm" />
+                <Fraction value={visual.bScaled} />
               </p>
               <span
                 aria-hidden="true"
