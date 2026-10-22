@@ -12,23 +12,6 @@ export function StarIcon({ className }: IconProps) {
   );
 }
 
-export function CheckIcon({ className }: IconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={className}
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  );
-}
-
 export function ArrowUpIcon({ className }: IconProps) {
   return (
     <svg
@@ -82,17 +65,5 @@ export function SmileIcon({ className }: IconProps) {
       <path d="M9 9h.01" />
       <path d="M15 9h.01" />
     </svg>
-  );
-}
-
-// TODO(#9): replace with the shared PetSprite component.
-export function PetPlaceholder({ className }: IconProps) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`flex items-center justify-center ${className ?? ""}`}
-    >
-      <span className="size-3/5 rounded-full bg-lavender" />
-    </span>
   );
 }
