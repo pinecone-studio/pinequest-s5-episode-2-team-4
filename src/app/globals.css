@@ -31,6 +31,36 @@
 
   --animate-bob: bob 2.4s ease-in-out infinite;
   --animate-flow: flow 18s ease-in-out infinite alternate;
+  --animate-word: word 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pulse-ring: pulse-ring 1.8s ease-in-out infinite;
+
+  @keyframes word {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  /* expanding ring around the "you are here" node; keeps the 3D shadow */
+  @keyframes pulse-ring {
+    0%,
+    100% {
+      box-shadow:
+        0 8px 0 var(--color-primary-dark),
+        0 0 0 0 rgb(91 0 237 / 0.35);
+    }
+    50% {
+      box-shadow:
+        0 8px 0 var(--color-primary-dark),
+        0 0 0 14px rgb(91 0 237 / 0);
+    }
+  }
 
   @keyframes bob {
     0%,

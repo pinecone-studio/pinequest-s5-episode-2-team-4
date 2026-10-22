@@ -22,7 +22,7 @@ export function SiteHeader({ pet }: SiteHeaderProps) {
   const pathname = usePathname();
 
   return (
-    <header className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
+    <header className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
       <div className="flex items-center gap-6">
         <Link
           href="/"
