@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import {
+  getAssignmentDraft,
   getClassOverview,
   getHeatmap,
   getNotifications,
   getSubtopics,
 } from "@/lib/data";
+import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { StatCards } from "./StatCards";
 
@@ -17,10 +19,11 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications] = await Promise.all([
+  const [subtopics, heatmap, notifications, draft] = await Promise.all([
     getSubtopics(overview.topicId),
     getHeatmap(),
     getNotifications(),
+    getAssignmentDraft(),
   ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
@@ -50,6 +53,13 @@ export default async function TeacherPage() {
         testedCount={overview.testedCount}
         highlight={HIGHLIGHTED_STUDENT}
       />
+      <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
+        <AssignmentDraftCard
+          draft={draft}
+          subtopicTitle={subtopicById.get(draft.subtopicId)?.title ?? ""}
+          className="md:flex-[3_1_560px]"
+        />
+      </div>
     </div>
   );
 }
