@@ -5,8 +5,16 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
-import { petStage } from "./pets";
-import type { Lesson, PetLine, Subtopic, SubtopicProgress, Topic } from "./types";
+import { nextEvolutionLevel, petStage } from "./pets";
+import type {
+  Lesson,
+  MasteryResult,
+  PetLine,
+  Subtopic,
+  SubtopicProgress,
+  TestResult,
+  Topic,
+} from "./types";
 import {
   helperConversation,
   helperFallbackReply,
@@ -14,7 +22,7 @@ import {
   helperSuggestions,
   lessons,
 } from "./mock/lessons";
-import { testQuestions, testResult } from "./mock/questions";
+import { masteryScore, testQuestions, testResult } from "./mock/questions";
 import {
   assignmentDraft,
   classOverview,
@@ -79,8 +87,38 @@ export async function getTestQuestions(topicId: string) {
   );
 }
 
-export async function getTestResult() {
+export async function getTestResult(): Promise<TestResult> {
   return testResult;
+}
+
+/**
+ * What happens when the current user masters a subtopic: the pet gains a
+ * level (and may evolve) and the subtopic becomes "new" in the progress.
+ * Returns undefined for an unknown subtopic.
+ */
+export async function getMasteryResult(
+  subtopicId: string,
+): Promise<MasteryResult | undefined> {
+  const pet = await getCurrentPet();
+  if (!pet || !subtopics.some((s) => s.id === subtopicId)) return undefined;
+
+  const level = pet.level + 1;
+  return {
+    subtopicId,
+    score: masteryScore,
+    progress: progress.map((p) =>
+      p.subtopicId === subtopicId ? { ...p, status: "new" } : p,
+    ),
+    pet: {
+      lineId: pet.lineId,
+      from: { stage: pet.stage, level: pet.level },
+      to: { stage: petStage(pet.line, level), level },
+      mood: "Баяртай",
+      xp: pet.xp,
+      xpGained: 100,
+      nextEvolutionLevel: nextEvolutionLevel(level),
+    },
+  };
 }
 
 export async function getLesson(subtopicId: string): Promise<Lesson | undefined> {

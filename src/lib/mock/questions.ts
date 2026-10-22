@@ -74,10 +74,13 @@ export const testResult: TestResult = {
   topicId: "fractions",
   correct: 5,
   total: 8,
-  progress: [
-    { subtopicId: "different-denominator", status: "weak" },
-    { subtopicId: "simplify", status: "weak" },
-    { subtopicId: "same-denominator", status: "good" },
-    { subtopicId: "mixed-numbers", status: "good" },
+  subtopics: [
+    { subtopicId: "different-denominator", status: "weak", correct: 0, total: 2 },
+    { subtopicId: "simplify", status: "weak", correct: 1, total: 2 },
+    { subtopicId: "same-denominator", status: "good", correct: 2, total: 2 },
+    { subtopicId: "mixed-numbers", status: "good", correct: 2, total: 2 },
   ],
 };
+
+/** Score on the 5-question retest that masters a subtopic. */
+export const masteryScore = { correct: 4, total: 5 };
