@@ -1,7 +1,8 @@
+import { ElementBadge } from "@/components/pet/ElementBadge";
 import { cn } from "@/lib/cn";
-import { ElementBadge } from "./ElementBadge";
-import { STAGE_LEVELS, type PetLine } from "./pet-lines";
-import { PetSprite, SleepyZz } from "./PetSprite";
+import { STAGE_LEVEL_LABELS } from "@/lib/pets";
+import type { PetLine } from "@/lib/types";
+import { AnimatedSprite, SleepyZz } from "./AnimatedSprite";
 
 type PetLineCardProps = {
   line: PetLine;
@@ -30,17 +31,20 @@ export function PetLineCard({ line, index, myStage }: PetLineCardProps) {
           id={`line-${line.id}`}
           className="text-[22px] leading-[1.1] font-bold md:text-[32px]"
         >
-          {line.stages[0]}
+          {line.stages[0].name}
         </h2>
-        <ElementBadge element={line.element} />
+        <ElementBadge
+          element={line.element}
+          className="md:px-[18px] md:py-2 md:text-[15px]"
+        />
       </div>
 
       <div className="mt-3.5 flex gap-1 md:mt-6 md:gap-2">
-        {line.stages.map((name, stage) => {
-          const mine = stage === myStage;
+        {line.stages.map((stage, i) => {
+          const mine = i === myStage;
           return (
-            <div key={name} className="contents">
-              {stage > 0 && (
+            <div key={stage.name} className="contents">
+              {i > 0 && (
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -69,19 +73,19 @@ export function PetLineCard({ line, index, myStage }: PetLineCardProps) {
                       Чиний
                     </span>
                   )}
-                  <PetSprite
-                    className="size-16 md:size-32"
-                    delay={(index * 0.7 + stage * 0.6) % 2}
+                  <AnimatedSprite
+                    stage={stage}
+                    mobile={64}
+                    desktop={128}
+                    delay={(index * 0.7 + i * 0.6) % 2}
                   />
                   <SleepyZz className="top-2 right-2 text-[11px] md:top-3.5 md:right-3.5 md:text-[13px]" />
                 </div>
                 <p className="mt-1.5 max-w-full truncate text-sm font-bold md:mt-2 md:text-xl">
-                  {name}
+                  {stage.name}
                 </p>
                 <p className="text-xs text-ink-muted md:text-[15px]">
-                  <span className="md:hidden">Түв.</span>
-                  <span className="hidden md:inline">Түвшин</span>{" "}
-                  {STAGE_LEVELS[stage]}
+                  {STAGE_LEVEL_LABELS[i]}
                 </p>
               </div>
             </div>

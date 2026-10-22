@@ -14,7 +14,9 @@
   background: radial-gradient(circle at 50% 45%, #ffffff 0%, #dad9ff 100%);
 }
 
+/* Block so the mood transforms apply (they are ignored on inline boxes) */
 .pets-sprite {
+  display: block;
   transform-origin: 50% 100%;
 }
 

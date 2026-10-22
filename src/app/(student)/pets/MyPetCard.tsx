@@ -1,7 +1,7 @@
+import { ElementBadge } from "@/components/pet/ElementBadge";
 import { cn } from "@/lib/cn";
-import { ElementBadge } from "./ElementBadge";
-import type { PetElement } from "./pet-lines";
-import { PetSprite, SleepyZz } from "./PetSprite";
+import type { PetElement, PetStage } from "@/lib/types";
+import { AnimatedSprite, SleepyZz } from "./AnimatedSprite";
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -47,14 +47,14 @@ const MOODS = [
 ];
 
 type MyPetCardProps = {
-  name: string;
+  stage: PetStage;
   level: number;
   element: PetElement;
   className?: string;
 };
 
 /** The student's pet with the mood picker that drives every sprite on the page. */
-export function MyPetCard({ name, level, element, className }: MyPetCardProps) {
+export function MyPetCard({ stage, level, element, className }: MyPetCardProps) {
   return (
     <div
       className={cn(
@@ -63,20 +63,20 @@ export function MyPetCard({ name, level, element, className }: MyPetCardProps) {
       )}
     >
       <div className="pets-hero relative flex h-[216px] items-center justify-center overflow-hidden rounded-card md:h-60 md:flex-[0_0_240px]">
-        <PetSprite className="size-48" />
+        <AnimatedSprite stage={stage} mobile={192} desktop={192} />
         <SleepyZz className="top-7 right-12 text-base md:top-[30px] md:right-7 md:text-lg" />
       </div>
 
       <div className="flex min-w-0 flex-col gap-3.5 md:flex-[1_1_240px] md:gap-4">
         <div className="flex flex-wrap items-center gap-2 md:gap-2.5">
           <h2 className="text-2xl leading-[1.15] font-bold md:text-[32px] md:leading-[1.1]">
-            {name}
+            {stage.name}
             <span className="sr-only">, чиний тэжээвэр</span>
           </h2>
           <span className="rounded-full bg-primary px-2.5 py-[3px] text-xs font-bold text-white md:px-3 md:py-1 md:text-[13px]">
             Түв. {level}
           </span>
-          <ElementBadge element={element} size="sm" />
+          <ElementBadge element={element} />
         </div>
 
         {/* Three columns at every width: in a row the labels wrap on desktop */}
