@@ -67,6 +67,29 @@ export type ChatMessage = {
   text: string;
 };
 
+export type PetElement =
+  | "water"
+  | "fire"
+  | "wood"
+  | "ice"
+  | "sky"
+  | "metal"
+  | "earth"
+  | "shadow";
+
+export type PetStage = {
+  name: string;
+  /** Path under /public, e.g. /pets/wrougon.png */
+  sprite: string;
+};
+
+/** A pet and its evolutions: levels 1–2, 3–5, 6+. */
+export type PetLine = {
+  id: string;
+  element: PetElement;
+  stages: [PetStage, PetStage, PetStage];
+};
+
 export type UserPet = {
   /** Pet line id, e.g. "wrougon" (see pet data) */
   lineId: string;
