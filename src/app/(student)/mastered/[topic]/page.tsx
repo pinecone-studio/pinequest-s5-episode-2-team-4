@@ -55,7 +55,7 @@ export default async function MasteredPage({
         score={result.score}
         pet={result.pet}
         heading={subtopic.lessonTitle}
-        nextHref={next ? `/lesson/${next.id}` : "/"}
+        nextHref={next ? `/lesson/${subtopic.topicId}?sub=${next.id}` : "/"}
       />
       <aside
         aria-label="Миний явц"

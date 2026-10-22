@@ -21,6 +21,20 @@ export type Account = {
   pet?: UserPet;
   /** Selected option index per diagnostic test question id. */
   testAnswers?: Record<string, number>;
+  /** Practice question ids answered correctly at least once. */
+  practiceSolved?: string[];
+  /** Subtopic ids mastered by passing their retest. */
+  mastered?: string[];
+  /** The latest retest, for the mastered page. */
+  lastRetest?: {
+    subtopicId: string;
+    correct: number;
+    total: number;
+    passed: boolean;
+    /** Pet level before and after the retest. */
+    fromLevel: number;
+    toLevel: number;
+  };
 };
 
 /** The logged-in user's account. */

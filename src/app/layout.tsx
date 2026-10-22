@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Poppins } from "next/font/google";
 import { Suspense } from "react";
+import { PageLoading } from "@/components/PageLoading";
 import "./globals.css";
 
 // Poppins has no Cyrillic, so Mongolian text falls back to Montserrat.
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       {/* Pages read the session cookie, which streams in at request time. */}
       <body className="min-h-full flex flex-col">
-        <Suspense>{children}</Suspense>
+        <Suspense fallback={<PageLoading />}>{children}</Suspense>
       </body>
     </html>
   );

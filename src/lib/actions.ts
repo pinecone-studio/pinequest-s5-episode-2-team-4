@@ -4,8 +4,12 @@
 // these directly; they run on the server.
 
 import { redirect } from "next/navigation";
+import { getRetestQuestions } from "./data";
+import { lessons } from "./mock/lessons";
 import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
+import { subtopics } from "./mock/topics";
+import { XP_PER_LEVEL, addXp } from "./pets";
 import { clearSession, findAccount, readSession, writeSession } from "./session";
 import type { User } from "./types";
 
@@ -76,4 +80,68 @@ export async function submitTest(answers: Record<string, number>) {
     }
   }
   await writeSession({ ...session, testAnswers });
+}
+
+/** XP for the first correct answer to a practice question. */
+const PRACTICE_XP = 10;
+
+/** Records a correct practice answer and gives XP the first time. */
+export async function savePractice(questionId: string, index: number) {
+  const session = await readSession();
+  if (!session) redirect("/login");
+  const question = lessons
+    .flatMap((l) => l.practice)
+    .find((q) => q.id === questionId);
+  const solved = session.practiceSolved ?? [];
+  if (!question || index !== question.correctIndex || solved.includes(questionId)) {
+    return;
+  }
+
+  await writeSession({
+    ...session,
+    practiceSolved: [...solved, questionId],
+    pet: session.pet && addXp(session.pet, PRACTICE_XP),
+  });
+}
+
+/** Retest score needed to master a subtopic: all but one correct. */
+const passMark = (total: number) => Math.max(1, total - 1);
+
+/**
+ * Scores a subtopic's retest. Passing masters the subtopic (the pet gains a
+ * level the first time) and opens the mastered page; otherwise the lesson
+ * opens again with the score.
+ */
+export async function submitRetest(subtopicId: string, answers: Record<string, number>) {
+  const session = await readSession();
+  if (!session) redirect("/login");
+  const subtopic = subtopics.find((s) => s.id === subtopicId);
+  const questions = await getRetestQuestions(subtopicId);
+  if (!subtopic || questions.length === 0) redirect("/");
+
+  const correct = questions.filter((q) => answers[q.id] === q.correctIndex).length;
+  const passed = correct >= passMark(questions.length);
+  const mastered = session.mastered ?? [];
+  const firstTime = passed && !mastered.includes(subtopicId);
+  const pet = session.pet && firstTime ? addXp(session.pet, XP_PER_LEVEL) : session.pet;
+  const level = session.pet?.level ?? 1;
+
+  await writeSession({
+    ...session,
+    pet,
+    mastered: firstTime ? [...mastered, subtopicId] : mastered,
+    lastRetest: {
+      subtopicId,
+      correct,
+      total: questions.length,
+      passed,
+      fromLevel: level,
+      toLevel: pet?.level ?? level,
+    },
+  });
+  redirect(
+    passed
+      ? `/mastered/${subtopicId}`
+      : `/lesson/${subtopic.topicId}?sub=${subtopicId}&retest=failed`,
+  );
 }

@@ -68,6 +68,3 @@ export const testQuestions: Question[] = [
     correctIndex: 3,
   },
 ];
-
-/** Score on the 5-question retest that masters a subtopic. */
-export const masteryScore = { correct: 4, total: 5 };

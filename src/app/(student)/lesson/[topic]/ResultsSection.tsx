@@ -1,8 +1,15 @@
+import Link from "next/link";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { StatusBadge } from "@/components/ui";
 import type { PetStage, SubtopicScore, TestResult } from "@/lib/types";
 
-export type SubtopicResult = SubtopicScore & { title: string };
+export type SubtopicResult = SubtopicScore & {
+  title: string;
+  /** Opens this subtopic's lesson. */
+  href: string;
+  /** The lesson shown below. */
+  selected: boolean;
+};
 
 type ResultsSectionProps = {
   result: Pick<TestResult, "correct" | "total">;
@@ -56,32 +63,37 @@ export function ResultsSection({
         {subtopics.map((s) => {
           const percent = s.total ? (s.correct / s.total) * 100 : 0;
           return (
-            <li
-              key={s.subtopicId}
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 md:grid-cols-[minmax(0,200px)_minmax(100px,1fr)_88px] md:gap-4"
-            >
-              <span className="text-[15px] font-bold md:text-base">
-                {s.title}
-                <span className="sr-only">
-                  , {s.total}-аас {s.correct} зөв
-                </span>
-              </span>
-              <StatusBadge
-                status={s.status}
-                size="sm"
-                className="justify-self-end md:col-start-3 md:row-start-1 md:px-3 md:text-[13px]"
-              />
-              <span
-                aria-hidden="true"
-                className="col-span-2 h-2.5 overflow-hidden rounded-full bg-surface md:col-span-1 md:col-start-2 md:row-start-1 md:h-3.5"
+            <li key={s.subtopicId}>
+              <Link
+                href={s.href}
+                aria-current={s.selected ? "true" : undefined}
+                className={`-mx-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1.5 rounded-tile px-2 py-1.5 text-ink no-underline hover:bg-surface/50 hover:text-ink md:-mx-3 md:grid-cols-[minmax(0,200px)_minmax(100px,1fr)_88px] md:gap-4 md:px-3 ${
+                  s.selected ? "ring-2 ring-primary" : ""
+                }`}
               >
-                <span
-                  className={`block h-full rounded-full ${
-                    s.status === "weak" ? "bg-magenta" : "bg-primary"
-                  }`}
-                  style={{ width: `${percent}%` }}
+                <span className="text-[15px] font-bold md:text-base">
+                  {s.title}
+                  <span className="sr-only">
+                    , {s.total}-аас {s.correct} зөв
+                  </span>
+                </span>
+                <StatusBadge
+                  status={s.status}
+                  size="sm"
+                  className="justify-self-end md:col-start-3 md:row-start-1 md:px-3 md:text-[13px]"
                 />
-              </span>
+                <span
+                  aria-hidden="true"
+                  className="col-span-2 h-2.5 overflow-hidden rounded-full bg-surface md:col-span-1 md:col-start-2 md:row-start-1 md:h-3.5"
+                >
+                  <span
+                    className={`block h-full rounded-full ${
+                      s.status === "weak" ? "bg-magenta" : "bg-primary"
+                    }`}
+                    style={{ width: `${percent}%` }}
+                  />
+                </span>
+              </Link>
             </li>
           );
         })}

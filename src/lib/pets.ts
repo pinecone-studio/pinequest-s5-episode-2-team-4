@@ -1,4 +1,4 @@
-import type { PetElement, PetLine, PetStage } from "./types";
+import type { PetElement, PetLine, PetStage, UserPet } from "./types";
 
 /** Levels where a pet evolves: 1–2 → stage 0, 3–5 → stage 1, 6+ → stage 2. */
 export const EVOLVE_LEVELS = [3, 6] as const;
@@ -12,6 +12,19 @@ export function stageIndex(level: number): 0 | 1 | 2 {
 /** The next level where the pet evolves, or undefined at the last stage. */
 export function nextEvolutionLevel(level: number): number | undefined {
   return EVOLVE_LEVELS.find((l) => l > level);
+}
+
+/** XP that fills one level; mastering a subtopic is a whole level. */
+export const XP_PER_LEVEL = 100;
+
+/** Adds XP, levelling up every XP_PER_LEVEL. */
+export function addXp(pet: UserPet, xp: number): UserPet {
+  const total = pet.xp + xp;
+  return {
+    ...pet,
+    level: pet.level + Math.floor(total / XP_PER_LEVEL),
+    xp: total % XP_PER_LEVEL,
+  };
 }
 
 /** The pet's look and name at a given level. */

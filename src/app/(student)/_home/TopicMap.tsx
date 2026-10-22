@@ -7,7 +7,11 @@ import type { PetStage, Subtopic, SubtopicStatus } from "@/lib/types";
 
 /** "untested": the diagnostic test hasn't been taken yet. */
 export type MapStatus = SubtopicStatus | "untested";
-export type MapNode = Subtopic & { status: MapStatus };
+export type MapNode = Subtopic & {
+  status: MapStatus;
+  /** The subtopic's lesson, or the test before it is taken */
+  href: string;
+};
 
 const STATUS_LABELS: Record<MapStatus, string> = {
   untested: "шалгаагүй",
@@ -60,14 +64,12 @@ const BookIcon = (
 
 type TopicMapProps = {
   title: string;
-  /** Link for every node: the lesson, or the test before it is taken */
-  href: string;
   nodes: MapNode[];
   pet: PetStage;
 };
 
 /** Path of subtopics: horizontal on desktop, vertical on phones. */
-export function TopicMap({ title, href, nodes, pet }: TopicMapProps) {
+export function TopicMap({ title, nodes, pet }: TopicMapProps) {
   const done = nodes.filter((n) => n.status === "mastered" || n.status === "new").length;
   // The pet stands on the first subtopic that still needs work.
   const currentId = nodes.find((n) => n.status === "weak" || n.status === "learning")?.id;
@@ -101,7 +103,7 @@ export function TopicMap({ title, href, nodes, pet }: TopicMapProps) {
               )}
               <li className="md:flex-none">
                 <Link
-                  href={href}
+                  href={node.href}
                   aria-label={`${node.order}. ${node.lessonTitle}, ${STATUS_LABELS[node.status]}${current ? ", одоо энд байна" : ""}`}
                   className="relative flex min-h-18 items-center gap-4 text-ink no-underline transition-transform hover:text-ink md:w-42 md:flex-col md:gap-3 md:hover:-translate-y-1"
                 >
