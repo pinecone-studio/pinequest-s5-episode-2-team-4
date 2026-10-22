@@ -10,6 +10,35 @@ This is a team project. Every team member works with Claude Code, so follow thes
 - npm only (`package-lock.json` is committed). Do not use yarn/pnpm/bun.
 - Before every commit run `npm run lint` and `npm run build`; both must pass.
 
+## Product and design
+
+LevelUp: students fill gaps in fractions through a diagnostic test, lessons and an AI helper, and level up a pet as they master subtopics. UI text is in Mongolian.
+
+- Design: https://claude.ai/artifact/RDFdbnCNpbGT2L7Wg3PXTc (every screen has a desktop 1440 and a mobile 390 version; build both, responsive).
+- Pet sprites come from Tuxemon (CC BY-SA 4.0); keep the attribution in the footer.
+
+## Data
+
+No backend yet. Use mock data only:
+
+- Types in `src/lib/types.ts`, mock data in `src/lib/mock/`.
+- Read data through small functions (e.g. `getTopics()`), never import mock arrays directly in components, so a real API can replace them later.
+- The AI helper returns canned mock replies for now.
+
+## Ownership
+
+Each person owns their routes. Do not edit another person's routes; if a shared change is needed, put it in `src/components/` or `src/lib/` in its own small PR.
+
+| Owner (GitHub) | Area | Routes |
+|---|---|---|
+| Nyamochir99 | Foundation, auth, home | shared tokens, header/footer, `src/components/ui/`, `Fraction`, `PetSprite`, pet data, mock data/types; `/signup`, `/login`, `/` |
+| BaskaLemon | Learning flow | `/test`, `/lesson/[topic]`, AI helper panel |
+| azaanm7 | Rewards and teacher | `/mastered/[topic]`, `/pets`, `/teacher` |
+
+The foundation PR is merged first; until then, others build their page markup without depending on it.
+
+The planned issues for each owner are in `docs/backlog.md`. When a team member asks to create their issues, follow the instructions at the top of that file. When they start an issue, read it with `gh issue view <n>` and open the matching design screen first.
+
 ## Always ask first
 
 Before any of these actions, stop, show exactly what you are about to do (title, name, message, target), and wait for explicit approval. Approval for one action does not cover the next one.

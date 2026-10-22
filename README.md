@@ -1,37 +1,60 @@
-# pinequest-s5-episode-2-team-4
+# LevelUp — pinequest-s5-episode-2-team-4
 
+Сурагчид бутархайн сул тал нөхөж, сурах тусам тэжээвэр нь өсдөг апп. Next.js + TypeScript + Tailwind, одоохондоо mock өгөгдөлтэй.
 
-## Getting Started
+- Дизайн: https://claude.ai/artifact/RDFdbnCNpbGT2L7Wg3PXTc
+- Хэн юу хийх: [CLAUDE.md](CLAUDE.md) → Ownership
+- Issue-ийн жагсаалт: [docs/backlog.md](docs/backlog.md)
 
-First, run the development server:
+## 1. Нэг удаа тохируулах
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Node 20.19+** (Node 22 LTS зөвлөмжтэй): `node -v`
+2. **GitHub CLI** суулгах (Terminal дээр):
+   ```bash
+   curl -L -o /tmp/gh.pkg https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_macOS_universal.pkg
+   sudo installer -pkg /tmp/gh.pkg -target /
+   ```
+   Admin эрхгүй бол эхлээд `su <admin-нэр>` хийгээд суулгаад `exit`.
+3. **GitHub-д нэвтрэх** (VS Code-ийн терминал дээр, Claude чат дээр биш):
+   ```bash
+   gh auth login
+   ```
+   GitHub.com → HTTPS → Yes → Login with a web browser.
+4. **Төслөө татах:**
+   ```bash
+   git clone https://github.com/pinecone-studio/pinequest-s5-episode-2-team-4.git
+   cd pinequest-s5-episode-2-team-4
+   npm install
+   npm run dev
+   ```
+   http://localhost:3000 нээгдэнэ.
+5. VS Code-оо тэр хавтсанд нээгээд Claude Code-оо ажиллуул. Claude `CLAUDE.md`-г автоматаар уншдаг тул багийн дүрмийг өөрөө дагана.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 2. Issue үүсгэх (нэг удаа)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Claude-д ингэж бич:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> docs/backlog.md-ээс миний issue-нуудыг үүсгэ. Миний GitHub нэр BaskaLemon.
 
-## Learn More
+Claude жагсаалтаа харуулна → шалгаад **"tg"** гэж зөвшөөр.
 
-To learn more about Next.js, take a look at the following resources:
+## 3. Issue бүр дээр ажиллах
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Нэг issue = нэг branch = нэг PR. Claude алхам бүрийн өмнө асууна, чи зөвшөөрнө.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Алхам | Claude-д юу гэж хэлэх | Claude юу хийх |
+|---|---|---|
+| Эхлэх | `#12 issue дээр ажиллая` | `main`-ээ шинэчлээд `feat/12-...` branch үүсгэхийг асууна |
+| Хийх | `дизайны дагуу хуудсаа хий` | Код бичнэ. Чи `npm run dev` дээр шалгана |
+| Commit | `commit хий` | lint + build шалгаад `feat: ...` мессежийг асууна |
+| Push + PR | `push хийгээд PR нээ` | PR-ийн гарчиг, тайлбарыг харуулаад асууна (`Closes #12`) |
+| Merge | — | Багийн нэг гишүүн GitHub дээр харж, merge хийнэ |
+| Дараагийнх | `main-ээ шинэчлээд дараагийн issue` | `git switch main && git pull` → дахин эхнээс |
 
-## Deploy on Vercel
+## Дүрэм (товч)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `main` руу шууд push хийхгүй, зөвхөн PR-ээр.
+- Branch, commit, PR-ийн нэр **англиар**, богино: `feat/12-login-form`, `feat: add login form`.
+- Бусдын route/хуудсанд хүрэхгүй. Нийтлэг зүйл хэрэгтэй бол эзэнд нь хэл.
+- Commit, PR-д Claude-ийн нэр орохгүй.
+- Том ажлыг жижиг issue болгож хуваа.
