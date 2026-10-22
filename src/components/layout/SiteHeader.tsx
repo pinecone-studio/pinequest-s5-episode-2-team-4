@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logOut } from "@/lib/actions";
 import { Logo } from "./Logo";
 import { PetChip } from "./PetChip";
 
@@ -57,6 +58,30 @@ export function SiteHeader({ pet }: SiteHeaderProps) {
         >
           Багш
         </Link>
+        <form action={logOut}>
+          {/* Icon only on mobile, where the header is tight. */}
+          <button
+            type="submit"
+            aria-label="Гарах"
+            className={`${navLinkClass} inline-flex min-w-12 cursor-pointer justify-center gap-2 px-3 text-sm md:px-4`}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="size-5"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="m16 17 5-5-5-5" />
+              <path d="M21 12H9" />
+            </svg>
+            <span className="hidden md:inline">Гарах</span>
+          </button>
+        </form>
       </div>
     </header>
   );
