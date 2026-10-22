@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Poppins } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 
 // Poppins has no Cyrillic, so Mongolian text falls back to Montserrat.
@@ -27,7 +28,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="mn"
       className={`${poppins.variable} ${montserrat.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      {/* Pages read the session cookie, which streams in at request time. */}
+      <body className="min-h-full flex flex-col">
+        <Suspense>{children}</Suspense>
+      </body>
     </html>
   );
 }
