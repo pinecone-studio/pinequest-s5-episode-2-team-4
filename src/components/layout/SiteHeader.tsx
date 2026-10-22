@@ -10,18 +10,19 @@ const NAV_LINKS = [
   { href: "/pets", label: "Тэжээвэр" },
 ];
 
-// TODO(#8): read the current pet from mock data.
-const CURRENT_PET = { name: "Wrougon", level: 2, xpPercent: 60 };
-
 const navLinkClass =
   "inline-flex min-h-12 items-center rounded-full px-5 font-semibold text-ink no-underline hover:bg-white/60 hover:text-ink";
 
+type SiteHeaderProps = {
+  pet?: React.ComponentProps<typeof PetChip>;
+};
+
 /** Header for student pages. Nav links move to MobileNav below md. */
-export function SiteHeader() {
+export function SiteHeader({ pet }: SiteHeaderProps) {
   const pathname = usePathname();
 
   return (
-    <header className="mx-auto flex h-18 w-full max-w-[1280px] items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
+    <header className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
       <div className="flex items-center gap-6">
         <Link
           href="/"
@@ -47,7 +48,7 @@ export function SiteHeader() {
         </nav>
       </div>
       <div className="flex items-center gap-2">
-        <PetChip {...CURRENT_PET} />
+        {pet && <PetChip {...pet} />}
         <Link
           href="/teacher"
           className={`${navLinkClass} hidden px-4 text-sm md:inline-flex`}

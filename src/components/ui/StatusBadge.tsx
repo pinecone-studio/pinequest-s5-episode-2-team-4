@@ -1,6 +1,7 @@
 import { cn } from "@/lib/cn";
+import type { SubtopicStatus } from "@/lib/types";
 
-export type Status = "weak" | "learning" | "good" | "mastered" | "new";
+export type Status = SubtopicStatus;
 
 const styles: Record<Status, { label: string; className: string }> = {
   weak: { label: "Сул", className: "border-2 border-magenta bg-pink" },
