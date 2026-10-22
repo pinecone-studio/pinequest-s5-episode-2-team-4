@@ -1,0 +1,20 @@
+/* Shake on a wrong practice answer, from the design (3 · Үр дүн ба хичээл).
+   globals.css turns animations off for prefers-reduced-motion. */
+
+.practice-nudge {
+  animation: practice-nudge 0.36s ease-in-out both;
+}
+
+@keyframes practice-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25%,
+  75% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+}

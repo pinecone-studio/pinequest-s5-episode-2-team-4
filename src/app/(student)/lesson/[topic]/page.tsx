@@ -8,6 +8,7 @@ import {
   getTopics,
 } from "@/lib/data";
 import { ExplanationSection } from "./ExplanationSection";
+import { PracticeSection } from "./PracticeSection";
 import { ResultsSection } from "./ResultsSection";
 
 export const metadata: Metadata = {
@@ -42,8 +43,17 @@ export default async function LessonPage({
   return (
     <div className="mx-auto max-w-7xl px-4 pt-4 md:px-[clamp(16px,4vw,40px)]">
       <ResultsSection result={result} subtopics={scores} petStage={pet?.stage} />
-      {lesson ? <ExplanationSection lesson={lesson} /> : null}
-      {/* Practice (#23) and AI helper (#24) go below. */}
+      {lesson ? (
+        <>
+          <ExplanationSection lesson={lesson} />
+          <PracticeSection
+            questions={lesson.practice}
+            retestHref={`/mastered/${lesson.subtopicId}`}
+            petStage={pet?.stage}
+          />
+        </>
+      ) : null}
+      {/* AI helper (#24) goes beside the lesson. */}
     </div>
   );
 }
