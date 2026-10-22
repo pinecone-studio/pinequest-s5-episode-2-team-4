@@ -1,20 +1,26 @@
-import type { PetLevelUp } from "./data";
-import { PetPlaceholder, SmileIcon } from "./icons";
+import { PetSprite } from "@/components/pet/PetSprite";
+import type { PetLevelUp, PetStage } from "@/lib/types";
+import { SmileIcon } from "./icons";
+import { ResponsiveSprite } from "./ResponsiveSprite";
 import "./mastered.css";
 
-/** The pet after leveling up: XP bar and a silhouette of its next form. */
-export function PetProgressCard({ pet }: { pet: PetLevelUp }) {
-  const xpPercent = Math.round((pet.xp / pet.xpMax) * 100);
+type PetProgressCardProps = {
+  pet: PetLevelUp;
+  /** Shown as a silhouette; omitted at the last evolution. */
+  nextStage?: PetStage;
+};
 
+/** The pet after leveling up: XP bar and a silhouette of its next form. */
+export function PetProgressCard({ pet, nextStage }: PetProgressCardProps) {
   return (
     <div className="flex flex-col gap-3.5 rounded-[25px] bg-white p-5 shadow-card md:gap-[18px] md:rounded-panel md:p-6">
       <div className="flex items-center gap-3.5 md:gap-4">
         <div className="flex size-20 shrink-0 items-center justify-center rounded-card bg-surface md:size-32">
-          <PetPlaceholder className="size-16 md:size-32" />
+          <ResponsiveSprite stage={pet.to.stage} mobile={64} desktop={128} />
         </div>
         <div className="flex min-w-0 flex-col items-start gap-1.5 md:gap-2">
           <h2 className="text-[22px] leading-[1.15] font-bold md:text-2xl">
-            {pet.to.name}
+            {pet.to.stage.name}
           </h2>
           <div className="flex flex-wrap gap-1.5 md:flex-col md:items-start md:gap-2">
             <span className="rounded-full bg-primary px-2.5 py-[3px] text-xs font-bold text-white md:px-3 md:py-1 md:text-[13px]">
@@ -30,9 +36,7 @@ export function PetProgressCard({ pet }: { pet: PetLevelUp }) {
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2 text-[13px] font-bold md:text-sm">
-          <span>
-            {pet.xp} / {pet.xpMax} XP
-          </span>
+          <span>{pet.xp} / 100 XP</span>
           <span className="rounded-full bg-surface px-2.5 py-0.5 text-primary">
             +{pet.xpGained}
           </span>
@@ -41,26 +45,32 @@ export function PetProgressCard({ pet }: { pet: PetLevelUp }) {
           role="progressbar"
           aria-label="Туршлагын оноо"
           aria-valuemin={0}
-          aria-valuemax={pet.xpMax}
+          aria-valuemax={100}
           aria-valuenow={pet.xp}
           className="h-3 overflow-hidden rounded-full bg-surface md:h-3.5"
         >
           <div
             className="mastered-grow h-full rounded-full bg-primary"
-            style={{ width: `${xpPercent}%` }}
+            style={{ width: `${pet.xp}%` }}
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-3 rounded-card bg-surface p-2 md:p-2.5">
-        <div className="flex size-16 shrink-0 items-center justify-center rounded-tile bg-white">
-          <PetPlaceholder className="size-16 opacity-20 brightness-0" />
+      {nextStage && pet.nextEvolutionLevel && (
+        <div className="flex items-center gap-3 rounded-card bg-surface p-2 md:p-2.5">
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-tile bg-white">
+            <PetSprite
+              stage={nextStage}
+              size={64}
+              className="opacity-20 brightness-0"
+            />
+          </div>
+          <span className="text-sm font-bold md:text-[15px]">
+            <span className="sr-only">Дараагийн хувьсал: </span>? · Түв.{" "}
+            {pet.nextEvolutionLevel}
+          </span>
         </div>
-        <span className="text-sm font-bold md:text-[15px]">
-          <span className="sr-only">Дараагийн хувьсал: </span>? · Түв.{" "}
-          {pet.nextEvolutionLevel}
-        </span>
-      </div>
+      )}
     </div>
   );
 }

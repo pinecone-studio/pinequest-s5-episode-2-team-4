@@ -1,12 +1,8 @@
-import Link from "next/link";
 import type { CSSProperties } from "react";
-import type { MasteredResult } from "./data";
-import {
-  ArrowRightIcon,
-  ArrowUpIcon,
-  PetPlaceholder,
-  StarIcon,
-} from "./icons";
+import { ButtonLink } from "@/components/ui";
+import type { PetLevelUp } from "@/lib/types";
+import { ArrowRightIcon, ArrowUpIcon, StarIcon } from "./icons";
+import { ResponsiveSprite } from "./ResponsiveSprite";
 import "./mastered.css";
 
 type Confetto = {
@@ -42,13 +38,19 @@ const CONFETTI: Confetto[] = [
   { left: 68, top: 12, w: 6, h: 6, tone: "bg-magenta", dx: -144, dy: 190, r: 0 },
 ];
 
-const buttonBase =
-  "flex items-center justify-center rounded-full font-bold no-underline transition-[transform,box-shadow] duration-75 active:translate-y-[5px] md:inline-flex md:min-h-[60px] md:text-lg";
+type CelebrationProps = {
+  score: { correct: number; total: number };
+  pet: PetLevelUp;
+  /** Lesson title of the mastered subtopic */
+  heading: string;
+  /** Where "Дараагийн түвшин" leads */
+  nextHref: string;
+};
 
 /** Win panel: score, pet evolution, title and next actions. */
-export function Celebration({ result }: { result: MasteredResult }) {
-  const { score, pet, subtopic, nextHref } = result;
+export function Celebration({ score, pet, heading, nextHref }: CelebrationProps) {
   const percent = Math.round((score.correct / score.total) * 100);
+  const evolved = pet.from.stage.name !== pet.to.stage.name;
 
   return (
     <section
@@ -87,12 +89,21 @@ export function Celebration({ result }: { result: MasteredResult }) {
 
       <div
         role="img"
-        aria-label={`${pet.from.name} (түв. ${pet.from.level}) хувьсаж ${pet.to.name} (түв. ${pet.to.level}) боллоо.`}
+        aria-label={
+          evolved
+            ? `${pet.from.stage.name} (түв. ${pet.from.level}) хувьсаж ${pet.to.stage.name} (түв. ${pet.to.level}) боллоо.`
+            : `${pet.to.stage.name} ахилаа: түв. ${pet.from.level} → ${pet.to.level}.`
+        }
         className="relative mt-5 flex items-center justify-center gap-1.5 md:mt-6 md:flex-wrap md:gap-6"
       >
         <div className="flex flex-col items-center gap-1.5 md:gap-2">
           <div className="flex size-20 items-center justify-center rounded-card bg-white/70 md:size-[150px] md:rounded-[25px]">
-            <PetPlaceholder className="mastered-blink size-16 opacity-85 md:size-32" />
+            <ResponsiveSprite
+              stage={pet.from.stage}
+              mobile={64}
+              desktop={128}
+              className="mastered-blink opacity-85"
+            />
           </div>
           <span className="text-xs font-bold text-ink-muted md:text-sm">
             Түв. {pet.from.level}
@@ -138,19 +149,20 @@ export function Celebration({ result }: { result: MasteredResult }) {
             aria-hidden="true"
             className="mastered-flash absolute -inset-[30px] rounded-full md:-inset-10"
           />
-          <div
-            className="mastered-cheer absolute top-[-4px] left-0.5 size-48 md:top-6 md:left-8 md:size-64"
-          >
-            <PetPlaceholder className="mastered-evolve size-full" />
+          <div className="mastered-cheer absolute top-[-4px] left-0.5 size-48 md:top-6 md:left-8 md:size-64">
+            <ResponsiveSprite
+              stage={pet.to.stage}
+              mobile={192}
+              desktop={256}
+              className="mastered-evolve"
+            />
           </div>
-          <span
-            className="mastered-pop absolute top-[-6px] left-28 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-[7px] text-sm font-bold whitespace-nowrap text-white shadow-3d md:top-2 md:left-[212px] md:gap-1.5 md:px-4 md:py-2.5 md:text-base"
-          >
+          <span className="mastered-pop absolute top-[-6px] left-28 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-[7px] text-sm font-bold whitespace-nowrap text-white shadow-3d md:top-2 md:left-[212px] md:gap-1.5 md:px-4 md:py-2.5 md:text-base">
             <ArrowUpIcon className="size-[13px] md:size-4" />
             Түв. {pet.to.level}
           </span>
           <span className="absolute top-[178px] left-1/2 -translate-x-1/2 rounded-full bg-white px-3.5 py-1 text-sm font-bold whitespace-nowrap shadow-card md:top-[292px] md:px-4 md:py-1.5 md:text-[15px]">
-            {pet.to.name}
+            {pet.to.stage.name}
           </span>
         </div>
       </div>
@@ -162,24 +174,18 @@ export function Celebration({ result }: { result: MasteredResult }) {
         Эзэмшсэн!
       </h1>
       <p className="relative mt-2 text-center text-base font-bold text-primary md:mt-3 md:text-xl">
-        {subtopic.heading}
+        {heading}
       </p>
 
       {/* Primary action first for keyboard order; shown second on desktop */}
       <div className="relative mt-5 flex flex-col gap-3 self-stretch md:mt-7 md:flex-row-reverse md:flex-wrap md:justify-center md:gap-4 md:self-auto">
-        <Link
-          href={nextHref}
-          className={`${buttonBase} min-h-[60px] gap-2.5 bg-primary px-8 text-[17px] text-white shadow-3d hover:text-white hover:brightness-110 active:shadow-[0_1px_0_var(--color-primary-dark)]`}
-        >
+        <ButtonLink href={nextHref}>
           Дараагийн түвшин
           <ArrowRightIcon className="size-[18px] md:size-5" />
-        </Link>
-        <Link
-          href="/pets"
-          className={`${buttonBase} min-h-14 bg-white px-7 text-base text-ink shadow-3d-soft hover:text-ink active:shadow-[0_1px_0_var(--color-line)]`}
-        >
+        </ButtonLink>
+        <ButtonLink href="/pets" variant="white">
           Тэжээвэр
-        </Link>
+        </ButtonLink>
       </div>
     </section>
   );
