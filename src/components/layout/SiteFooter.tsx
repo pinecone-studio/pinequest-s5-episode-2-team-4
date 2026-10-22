@@ -30,7 +30,7 @@ type SiteFooterProps = {
 export function SiteFooter({ variant = "default" }: SiteFooterProps) {
   return (
     <footer className="bg-black text-[13px] text-lavender">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-[clamp(16px,4vw,40px)]">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-[clamp(16px,4vw,40px)]">
         {variant === "auth" ? (
           <span>© 2026 LevelUp баг</span>
         ) : (

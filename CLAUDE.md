@@ -22,8 +22,10 @@ LevelUp: students fill gaps in fractions through a diagnostic test, lessons and 
 No backend yet. Use mock data only:
 
 - Types in `src/lib/types.ts`, mock data in `src/lib/mock/`.
-- Read data through small functions (e.g. `getTopics()`), never import mock arrays directly in components, so a real API can replace them later.
-- The AI helper returns canned mock replies for now.
+- Read data only through the async functions in `src/lib/data.ts` (`getTopics()`, `getTestQuestions()`, `getLesson()`, `getHeatmap()`, ...). Never import `src/lib/mock` in pages or components, so a real API can replace it later.
+- Call these functions in Server Components (pages, layouts) and pass the data to Client Components as props.
+- Need new data? Add the type to `types.ts`, the mock to `src/lib/mock/`, and a function to `data.ts`, in a small separate PR.
+- The AI helper returns canned mock replies for now (`askHelper()`).
 
 ## Ownership
 
