@@ -8,6 +8,7 @@ import {
 } from "@/lib/data";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
+import { NotificationList } from "./NotificationList";
 import { StatCards } from "./StatCards";
 
 export const metadata: Metadata = {
@@ -58,6 +59,12 @@ export default async function TeacherPage() {
           draft={draft}
           subtopicTitle={subtopicById.get(draft.subtopicId)?.title ?? ""}
           className="md:flex-[3_1_560px]"
+        />
+        <NotificationList
+          notifications={notifications}
+          subtopicTitles={new Map(subtopics.map((s) => [s.id, s.title]))}
+          alertCount={alertCount}
+          className="md:flex-[2_1_340px]"
         />
       </div>
     </div>
