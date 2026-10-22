@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Design tokens from the LevelUp design. Light theme only. */
+@theme {
+  --color-primary: #5b00ed;
+  --color-primary-dark: #3f0791;
+  --color-ink: #3f0791;
+  --color-ink-muted: #6539a7;
+  --color-surface: #f2f1ff;
+  --color-surface-soft: #f5f4ff;
+  --color-lavender: #dad9ff;
+  --color-line: #cac4f4;
+  --color-sky: #bfefff;
+  --color-sky-dark: #9fd8ec;
+  --color-magenta: #e30ba6;
+  --color-pink: #fce7f6;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans:
+    var(--font-poppins), var(--font-montserrat), system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --radius-field: 10px;
+  --radius-tile: 15px;
+  --radius-card: 20px;
+  --radius-panel: 28px;
+
+  --shadow-card: rgba(0, 0, 0, 0.08) 0 15px 50px;
+  --shadow-float: rgba(0, 0, 0, 0.1) 0 20px 60px;
+  /* "3D" buttons: solid offset shadow that collapses on press */
+  --shadow-3d: 0 6px 0 var(--color-primary-dark);
+  --shadow-3d-soft: 0 6px 0 var(--color-line);
+
+  --animate-bob: bob 2.4s ease-in-out infinite;
+  --animate-flow: flow 18s ease-in-out infinite alternate;
+
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  @keyframes flow {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Soft multi-color hero background used on most screens */
+@utility bg-flow {
+  background-color: var(--color-surface-soft);
+  background-image:
+    radial-gradient(closest-side at 18% 24%, rgb(191 239 255 / 0.95), rgb(191 239 255 / 0)),
+    radial-gradient(closest-side at 84% 18%, rgb(202 196 244 / 0.95), rgb(202 196 244 / 0)),
+    radial-gradient(closest-side at 70% 80%, rgb(218 217 255), rgb(218 217 255 / 0)),
+    radial-gradient(closest-side at 22% 86%, rgb(227 11 166 / 0.12), rgb(227 11 166 / 0));
+  background-size: 180% 180%;
+}
+
+@layer base {
+  body {
+    @apply bg-white font-sans text-ink;
+  }
+
+  a {
+    @apply text-primary hover:text-primary-dark;
+  }
+
+  :focus-visible {
+    @apply outline-3 outline-offset-3 outline-primary;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 }
