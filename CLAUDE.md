@@ -37,6 +37,8 @@ Each person owns their routes. Do not edit another person's routes; if a shared 
 
 The foundation PR is merged first; until then, others build their page markup without depending on it.
 
+The planned issues for each owner are in `docs/backlog.md`. When a team member asks to create their issues, follow the instructions at the top of that file. When they start an issue, read it with `gh issue view <n>` and open the matching design screen first.
+
 ## Always ask first
 
 Before any of these actions, stop, show exactly what you are about to do (title, name, message, target), and wait for explicit approval. Approval for one action does not cover the next one.
