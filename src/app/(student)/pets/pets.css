@@ -1,0 +1,93 @@
+/* Pet moods from the design (Тэжээвэр). The mood picker is a radio group,
+   so :has() switches the animation of every sprite without JavaScript. */
+
+.pets-hero {
+  background: radial-gradient(
+    circle at 50% 45%,
+    #ffffff 0%,
+    #f2f1ff 50%,
+    #dad9ff 100%
+  );
+}
+
+.pets-mine {
+  background: radial-gradient(circle at 50% 45%, #ffffff 0%, #dad9ff 100%);
+}
+
+.pets-sprite {
+  transform-origin: 50% 100%;
+}
+
+.pets:has(#mood-awake:checked) .pets-sprite {
+  animation: pets-bob 2.4s ease-in-out infinite;
+}
+
+.pets:has(#mood-happy:checked) .pets-sprite {
+  animation: pets-hop 1.8s ease-in-out infinite;
+}
+
+.pets:has(#mood-sleepy:checked) .pets-sprite {
+  opacity: 0.55;
+  filter: saturate(0.7);
+  animation: pets-breathe 4s ease-in-out infinite;
+}
+
+.pets-zz {
+  display: none;
+}
+
+.pets:has(#mood-sleepy:checked) .pets-zz {
+  display: block;
+  animation: pets-zz 2.6s ease-in-out infinite;
+}
+
+@keyframes pets-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pets-hop {
+  0%,
+  34%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  6% {
+    transform: translateY(0) scale(1.06, 0.94);
+  }
+  17% {
+    transform: translateY(-14px) scale(0.97, 1.03);
+  }
+  28% {
+    transform: translateY(0) scale(1.04, 0.96);
+  }
+}
+
+@keyframes pets-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pets-zz {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
