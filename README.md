@@ -1,60 +1,50 @@
-# LevelUp — pinequest-s5-episode-2-team-4
+# LevelUp
 
-Сурагчид бутархайн сул тал нөхөж, сурах тусам тэжээвэр нь өсдөг апп. Next.js + TypeScript + Tailwind, одоохондоо mock өгөгдөлтэй.
+**Ойлгоогүйгээ ичихгүйгээр нөх.**
 
-- Дизайн: https://claude.ai/artifact/RDFdbnCNpbGT2L7Wg3PXTc
-- Хэн юу хийх: [CLAUDE.md](CLAUDE.md) → Ownership
-- Issue-ийн жагсаалт: [docs/backlog.md](docs/backlog.md)
+LevelUp бол сурагчдад математикийн ойлгоогүй үлдсэн сэдвээ олж, өөрийн хурдаар нөхөхөд тусалдаг вэб апп. Сурагч сэдэв эзэмших бүрт тэжээвэр нь түвшин ахиж, хувьсан өсдөг. Багш ангийнхаа аль сурагч, аль дэд сэдэв дээр сул байгааг нэг дор хардаг.
 
-## 1. Нэг удаа тохируулах
+> *LevelUp helps students find and close gaps in math at their own pace. Every subtopic they master levels up their pet, and teachers see at a glance where the class is struggling. Built for PineQuest S5 around UN SDG 4: Quality Education.*
 
-1. **Node 20.19+** (Node 22 LTS зөвлөмжтэй): `node -v`
-2. **GitHub CLI** суулгах (Terminal дээр):
-   ```bash
-   curl -L -o /tmp/gh.pkg https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_macOS_universal.pkg
-   sudo installer -pkg /tmp/gh.pkg -target /
-   ```
-   Admin эрхгүй бол эхлээд `su <admin-нэр>` хийгээд суулгаад `exit`.
-3. **GitHub-д нэвтрэх** (VS Code-ийн терминал дээр, Claude чат дээр биш):
-   ```bash
-   gh auth login
-   ```
-   GitHub.com → HTTPS → Yes → Login with a web browser.
-4. **Төслөө татах:**
-   ```bash
-   git clone https://github.com/pinecone-studio/pinequest-s5-episode-2-team-4.git
-   cd pinequest-s5-episode-2-team-4
-   npm install
-   npm run dev
-   ```
-   http://localhost:3000 нээгдэнэ.
-5. VS Code-оо тэр хавтсанд нээгээд Claude Code-оо ажиллуул. Claude `CLAUDE.md`-г автоматаар уншдаг тул багийн дүрмийг өөрөө дагана.
+<!-- Screenshots: add to docs/screenshots/ and uncomment
+![Нүүр хуудас](docs/screenshots/home.png)
+-->
 
-## 2. Issue үүсгэх (нэг удаа)
+## Хэрхэн ажилладаг вэ
 
-Claude-д ингэж бич:
+1. **Оношлох тест.** Сурагч 8 асуулттай богино тест өгнө. LevelUp дэд сэдэв бүрээр (ижил хуваарь, ялгаатай хуваарь, хураах, холимог тоо) сул ба сайн талыг нь тодорхойлно.
+2. **Хичээл ба дасгал.** Сул сэдэв бүрд түгээмэл алдааг харуулж, алхам алхмаар тайлбарлаад, дасгал ажиллуулна.
+3. **AI туслах.** Хариуг шууд хэлэхгүй. Асуулт асууж, жишээ, зургаар сурагчийг өөрөө олоход нь тусална.
+4. **Эзэмших.** Дахин шалгалтад тэнцвэл сэдвийг эзэмшсэнд тооцож, тэжээвэр нь түвшин ахина. 3 ба 6-р түвшинд тэжээвэр хувьсана. Тэжээвэр хэзээ ч үхэхгүй, тиймээс алдахаас айх шаардлагагүй.
+5. **Багшийн самбар.** Дэд сэдэв ба сурагчаар heatmap, AI-ийн бэлдсэн даалгаврын ноорог, "2 удаа тэнцээгүй" гэх мэт мэдэгдлүүд харагдана.
 
-> docs/backlog.md-ээс миний issue-нуудыг үүсгэ. Миний GitHub нэр BaskaLemon.
+## Технологи
 
-Claude жагсаалтаа харуулна → шалгаад **"tg"** гэж зөвшөөр.
+- [Next.js](https://nextjs.org) (App Router), React, TypeScript
+- Tailwind CSS
+- Одоогоор mock өгөгдөлтэй. Өгөгдлийн давхарга ([src/lib/data.ts](src/lib/data.ts)) нь жинхэнэ API-аар солигдохоор бэлдэгдсэн.
 
-## 3. Issue бүр дээр ажиллах
+## Ажиллуулах
 
-Нэг issue = нэг branch = нэг PR. Claude алхам бүрийн өмнө асууна, чи зөвшөөрнө.
+Node.js 20.19 буюу түүнээс дээш хувилбар шаардлагатай.
 
-| Алхам | Claude-д юу гэж хэлэх | Claude юу хийх |
-|---|---|---|
-| Эхлэх | `#12 issue дээр ажиллая` | `main`-ээ шинэчлээд `feat/12-...` branch үүсгэхийг асууна |
-| Хийх | `дизайны дагуу хуудсаа хий` | Код бичнэ. Чи `npm run dev` дээр шалгана |
-| Commit | `commit хий` | lint + build шалгаад `feat: ...` мессежийг асууна |
-| Push + PR | `push хийгээд PR нээ` | PR-ийн гарчиг, тайлбарыг харуулаад асууна (`Closes #12`) |
-| Merge | — | Багийн нэг гишүүн GitHub дээр харж, merge хийнэ |
-| Дараагийнх | `main-ээ шинэчлээд дараагийн issue` | `git switch main && git pull` → дахин эхнээс |
+```bash
+npm install
+npm run dev
+```
 
-## Дүрэм (товч)
+Дараа нь http://localhost:3000 нээнэ.
 
-- `main` руу шууд push хийхгүй, зөвхөн PR-ээр.
-- Branch, commit, PR-ийн нэр **англиар**, богино: `feat/12-login-form`, `feat: add login form`.
-- Бусдын route/хуудсанд хүрэхгүй. Нийтлэг зүйл хэрэгтэй бол эзэнд нь хэл.
-- Commit, PR-д Claude-ийн нэр орохгүй.
-- Том ажлыг жижиг issue болгож хуваа.
+## Баг
+
+PineQuest S5 · Episode 2 · Team 4
+
+- [Nyamochir99](https://github.com/Nyamochir99)
+- [BaskaLemon](https://github.com/BaskaLemon)
+- [azaanm7](https://github.com/azaanm7)
+
+Багийн гишүүдэд зориулсан ажлын заавар: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Лиценз ба талархал
+
+Тэжээврийн пиксел зургууд [Tuxemon](https://wiki.tuxemon.org/Completed_Tuxemon) төслөөс авсан бөгөөд [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) лицензтэй.
