@@ -40,6 +40,8 @@ Route layout:
 - Student pages (`/`, `/test`, `/lesson`, `/mastered`, `/pets`) go in `src/app/(student)/`, which adds the shared header, footer and mobile bottom nav.
 - `/login` and `/signup` go in `src/app/(auth)/`; `/teacher` goes in `src/app/teacher/` with its own header. Reuse `Logo` and `SiteFooter` from `src/components/layout/`.
 
+Shared UI: import `Button`, `ButtonLink`, `Card`, `ProgressBar`, `StatusBadge` from `@/components/ui` and use the design tokens in `src/app/globals.css` (`bg-primary`, `text-ink`, `rounded-card`, `shadow-card`, ...) instead of raw hex colors. Join class names with `cn` from `@/lib/cn`.
+
 The foundation PR is merged first; until then, others build their page markup without depending on it.
 
 The planned issues for each owner are in `docs/backlog.md`. When a team member asks to create their issues, follow the instructions at the top of that file. When they start an issue, read it with `gh issue view <n>` and open the matching design screen first.
