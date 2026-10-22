@@ -5,12 +5,13 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
-import { nextEvolutionLevel, petStage } from "./pets";
+import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
   Lesson,
   MasteryResult,
   PetLine,
+  Question,
   Subtopic,
   SubtopicProgress,
   TestResult,
@@ -24,7 +25,7 @@ import {
   helperSuggestions,
   lessons,
 } from "./mock/lessons";
-import { masteryScore, testQuestions } from "./mock/questions";
+import { testQuestions } from "./mock/questions";
 import {
   assignmentDraft,
   classOverview,
@@ -87,11 +88,18 @@ export async function getSubtopic(id: string): Promise<Subtopic | undefined> {
   return subtopics.find((s) => s.id === id);
 }
 
-/** Empty until the diagnostic test is taken ("new" means just mastered). */
+/**
+ * The test result per subtopic, with retest-passed subtopics "mastered".
+ * Empty until the diagnostic test is taken ("new" means just mastered).
+ */
 export async function getProgress(): Promise<SubtopicProgress[]> {
-  const result = await getTestResult();
+  const [result, session] = await Promise.all([getTestResult(), readSession()]);
+  const mastered = new Set(session?.mastered);
   return (
-    result?.subtopics.map(({ subtopicId, status }) => ({ subtopicId, status })) ?? []
+    result?.subtopics.map(({ subtopicId, status }) => ({
+      subtopicId,
+      status: mastered.has(subtopicId) ? "mastered" : status,
+    })) ?? []
   );
 }
 
@@ -138,33 +146,59 @@ export async function getTestResult(): Promise<TestResult | undefined> {
 }
 
 /**
- * What happens when the current user masters a subtopic: the pet gains a
- * level (and may evolve) and the subtopic becomes "new" in the progress.
- * Returns undefined for an unknown subtopic.
+ * The retest that just mastered `subtopicId`: its score and the pet's level
+ * before and after; the subtopic is "new" in the progress. Undefined unless
+ * the user's latest retest passed for this subtopic.
  */
 export async function getMasteryResult(
   subtopicId: string,
 ): Promise<MasteryResult | undefined> {
-  const [pet, progress] = await Promise.all([getCurrentPet(), getProgress()]);
-  if (!pet || !subtopics.some((s) => s.id === subtopicId)) return undefined;
+  const [session, pet, progress] = await Promise.all([
+    readSession(),
+    getCurrentPet(),
+    getProgress(),
+  ]);
+  const retest = session?.lastRetest;
+  if (!pet || !retest?.passed || retest.subtopicId !== subtopicId) return undefined;
 
-  const level = pet.level + 1;
   return {
     subtopicId,
-    score: masteryScore,
+    score: { correct: retest.correct, total: retest.total },
     progress: progress.map((p) =>
       p.subtopicId === subtopicId ? { ...p, status: "new" } : p,
     ),
     pet: {
       lineId: pet.lineId,
-      from: { stage: pet.stage, level: pet.level },
-      to: { stage: petStage(pet.line, level), level },
+      from: { stage: petStage(pet.line, retest.fromLevel), level: retest.fromLevel },
+      to: { stage: pet.stage, level: pet.level },
       mood: "Баяртай",
       xp: pet.xp,
-      xpGained: 100,
-      nextEvolutionLevel: nextEvolutionLevel(level),
+      xpGained: (retest.toLevel - retest.fromLevel) * XP_PER_LEVEL,
+      nextEvolutionLevel: nextEvolutionLevel(pet.level),
     },
   };
+}
+
+/**
+ * The retest that masters a subtopic: its 2 diagnostic test questions and
+ * its lesson's practice questions.
+ */
+export async function getRetestQuestions(subtopicId: string): Promise<Question[]> {
+  const lesson = lessons.find((l) => l.subtopicId === subtopicId);
+  return [
+    ...testQuestions.filter((q) => q.subtopicId === subtopicId),
+    ...(lesson?.practice ?? []),
+  ];
+}
+
+/** The current user's latest subtopic retest, passed or not. */
+export async function getLastRetest() {
+  return (await readSession())?.lastRetest;
+}
+
+/** Practice question ids the current user has solved. */
+export async function getSolvedPractice(): Promise<string[]> {
+  return (await readSession())?.practiceSolved ?? [];
 }
 
 export async function getLesson(subtopicId: string): Promise<Lesson | undefined> {

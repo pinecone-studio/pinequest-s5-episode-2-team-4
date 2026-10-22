@@ -1,19 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Expression, Fraction, sayFraction } from "@/components/Fraction";
 import { PetSprite } from "@/components/pet/PetSprite";
-import { submitTest } from "@/lib/actions";
 import type { PetStage, Question } from "@/lib/types";
 
 type DiagnosticTestProps = {
   questions: Question[];
   /** The current pet, shown above the current question. */
   petStage?: PetStage;
-  /** Where to go after the answers are saved. */
-  resultsHref: string;
+  /** Saves the answers (a Server Function); it may redirect itself. */
+  submit: (answers: Answers) => Promise<void>;
+  /** Where to go after saving, unless `submit` redirected. */
+  resultsHref?: string;
+  /** Where the ✕ button goes. */
+  exitHref?: string;
 };
 
 /** Selected option index per question id. */
@@ -62,7 +64,9 @@ const primaryButtonClass =
 export function DiagnosticTest({
   questions,
   petStage,
+  submit,
   resultsHref,
+  exitHref = "/",
 }: DiagnosticTestProps) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -80,26 +84,45 @@ export function DiagnosticTest({
     setAnswers((prev) => ({ ...prev, [question.id]: index }));
   }
 
+  const started = answeredCount > 0 && !finishing;
+
+  // Warn before a reload or tab close would lose the answers.
+  useEffect(() => {
+    if (!started) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [started]);
+
+  function exit() {
+    if (started && !window.confirm("Тестээс гарах уу? Хариултууд хадгалагдахгүй.")) {
+      return;
+    }
+    router.push(exitHref);
+  }
+
   function finish() {
     startFinishing(async () => {
-      await submitTest(answers);
-      router.push(resultsHref);
+      await submit(answers);
+      if (resultsHref) router.push(resultsHref);
     });
   }
 
   return (
     <div className="mx-auto max-w-[960px] px-4 pt-4 md:px-[clamp(16px,4vw,40px)] md:pt-6">
       <div className="flex items-end gap-2.5 md:gap-4">
-        <Link
-          href="/"
+        <button
+          type="button"
+          onClick={exit}
           aria-label="Тестээс гарах"
-          className="flex size-12 shrink-0 items-center justify-center rounded-full bg-surface text-ink hover:text-ink"
+          className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full bg-surface text-ink"
         >
           {CloseIcon}
-        </Link>
+        </button>
         <ol
           aria-label="Асуултууд"
-          className="grid flex-1 grid-cols-8 gap-1 md:gap-1.5"
+          className="grid flex-1 gap-1 md:gap-1.5"
+          style={{ gridTemplateColumns: `repeat(${total}, minmax(0, 1fr))` }}
         >
           {questions.map((q, i) => {
             const isCurrent = i === current;

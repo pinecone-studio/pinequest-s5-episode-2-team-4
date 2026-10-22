@@ -17,7 +17,9 @@ function commonDenominator(expression: ExpressionToken[]) {
     op.op !== "+" ||
     b?.kind !== "fraction" ||
     a.value.whole ||
-    b.value.whole
+    b.value.whole ||
+    // Already alike: nothing to convert.
+    a.value.den === b.value.den
   ) {
     return null;
   }

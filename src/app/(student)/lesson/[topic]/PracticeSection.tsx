@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { Expression, Fraction, sayFraction } from "@/components/Fraction";
+import { savePractice } from "@/lib/actions";
 import type { Question } from "@/lib/types";
 import "./practice.css";
 
 type PracticeSectionProps = {
   questions: Question[];
+  /** Question ids solved on an earlier visit. */
+  solvedIds: string[];
 };
 
 /** Last pick per question id, and how many tries it took (to replay the shake). */
@@ -132,17 +135,25 @@ function PracticeRow({
 }
 
 /** Practice questions with correct / try-again feedback. */
-export function PracticeSection({ questions }: PracticeSectionProps) {
-  const [picks, setPicks] = useState<Picks>({});
+export function PracticeSection({ questions, solvedIds }: PracticeSectionProps) {
+  const [picks, setPicks] = useState<Picks>(() =>
+    Object.fromEntries(
+      questions
+        .filter((q) => solvedIds.includes(q.id))
+        .map((q) => [q.id, { index: q.correctIndex, tries: 0 }]),
+    ),
+  );
   const solvedCount = questions.filter(
     (q) => picks[q.id]?.index === q.correctIndex,
   ).length;
 
-  function pick(questionId: string, index: number) {
+  function pick(question: Question, index: number) {
     setPicks((prev) => ({
       ...prev,
-      [questionId]: { index, tries: (prev[questionId]?.tries ?? 0) + 1 },
+      [question.id]: { index, tries: (prev[question.id]?.tries ?? 0) + 1 },
     }));
+    // Saved on the server, which gives XP the first time.
+    if (index === question.correctIndex) void savePractice(question.id, index);
   }
 
   return (
@@ -177,7 +188,7 @@ export function PracticeSection({ questions }: PracticeSectionProps) {
             key={q.id}
             question={q}
             pick={picks[q.id]}
-            onPick={(index) => pick(q.id, index)}
+            onPick={(index) => pick(q, index)}
           />
         ))}
       </ul>

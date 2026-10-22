@@ -27,6 +27,7 @@ export default async function HomePage() {
   const nodes = subtopics.map((s) => ({
     ...s,
     status: progress.find((p) => p.subtopicId === s.id)?.status ?? ("untested" as const),
+    href: testTaken ? `/lesson/${topic.id}?sub=${s.id}` : "/test",
   }));
   const orbitPets = ORBIT_PET_IDS.flatMap((id) => {
     const line = petLines.find((l) => l.id === id);
@@ -44,7 +45,6 @@ export default async function HomePage() {
         />
         <TopicMap
           title={topic.title}
-          href={testTaken ? `/lesson/${topic.id}` : "/test"}
           nodes={nodes}
           pet={pet.stage}
         />
