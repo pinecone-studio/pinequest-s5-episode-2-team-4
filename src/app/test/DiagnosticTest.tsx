@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { Expression, Fraction, sayFraction } from "@/components/Fraction";
 import { PetSprite } from "@/components/pet/PetSprite";
+import { submitTest } from "@/lib/actions";
 import type { PetStage, Question } from "@/lib/types";
 
 type DiagnosticTestProps = {
   questions: Question[];
   /** The current pet, shown above the current question. */
   petStage?: PetStage;
-  // TODO: pass the answers to the results page once there is an API.
+  /** Where to go after the answers are saved. */
   resultsHref: string;
 };
 
@@ -64,6 +66,8 @@ export function DiagnosticTest({
 }: DiagnosticTestProps) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
+  const [finishing, startFinishing] = useTransition();
+  const router = useRouter();
 
   const question = questions[current];
   const total = questions.length;
@@ -74,6 +78,13 @@ export function DiagnosticTest({
 
   function pick(index: number) {
     setAnswers((prev) => ({ ...prev, [question.id]: index }));
+  }
+
+  function finish() {
+    startFinishing(async () => {
+      await submitTest(answers);
+      router.push(resultsHref);
+    });
   }
 
   return (
@@ -215,10 +226,16 @@ export function DiagnosticTest({
             {ArrowRightIcon}
           </button>
         ) : isComplete ? (
-          <Link href={resultsHref} className={primaryButtonClass}>
+          <button
+            type="button"
+            onClick={finish}
+            disabled={finishing}
+            aria-busy={finishing}
+            className={`${primaryButtonClass} cursor-pointer disabled:cursor-wait disabled:opacity-70`}
+          >
             Дуусгах
             {CheckIcon}
-          </Link>
+          </button>
         ) : (
           <button
             type="button"

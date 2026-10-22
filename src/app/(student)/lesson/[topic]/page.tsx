@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   getCurrentPet,
   getHelperConversation,
@@ -34,8 +34,9 @@ export default async function LessonPage({
     getCurrentPet(),
     getHelperConversation(),
   ]);
-  // TODO(#60): send users who haven't taken the test to /test.
-  if (!result || result.topicId !== topic) notFound();
+  // No result yet: the lesson is picked from the test, so take it first.
+  if (!result) redirect("/test");
+  if (result.topicId !== topic) notFound();
 
   const titles = new Map(subtopics.map((s) => [s.id, s.title]));
   const scores = result.subtopics.map((s) => ({
