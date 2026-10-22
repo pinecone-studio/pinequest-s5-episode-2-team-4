@@ -10,8 +10,10 @@ const NAV_LINKS = [
   { href: "/pets", label: "Тэжээвэр" },
 ];
 
+// No display or padding here: each link sets its own, otherwise the
+// teacher link's `hidden` clashes with `inline-flex` and shows on mobile.
 const navLinkClass =
-  "inline-flex min-h-12 items-center rounded-full px-5 font-semibold text-ink no-underline hover:bg-white/60 hover:text-ink";
+  "min-h-12 items-center rounded-full font-semibold text-ink no-underline hover:bg-white/60 hover:text-ink";
 
 type SiteHeaderProps = {
   pet?: React.ComponentProps<typeof PetChip>;
@@ -39,7 +41,7 @@ export function SiteHeader({ pet }: SiteHeaderProps) {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`${navLinkClass} ${active ? "bg-lavender" : ""}`}
+                className={`${navLinkClass} inline-flex px-5 ${active ? "bg-lavender" : ""}`}
               >
                 {link.label}
               </Link>
