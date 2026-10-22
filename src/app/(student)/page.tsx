@@ -22,9 +22,11 @@ export default async function HomePage() {
   ]);
   if (!topic || !pet) notFound();
 
+  // No progress means the diagnostic test hasn't been taken yet.
+  const testTaken = progress.length > 0;
   const nodes = subtopics.map((s) => ({
     ...s,
-    status: progress.find((p) => p.subtopicId === s.id)?.status ?? "weak",
+    status: progress.find((p) => p.subtopicId === s.id)?.status ?? ("untested" as const),
   }));
   const orbitPets = ORBIT_PET_IDS.flatMap((id) => {
     const line = petLines.find((l) => l.id === id);
@@ -35,10 +37,14 @@ export default async function HomePage() {
     // The animated background runs up under the transparent header.
     <div className="relative -mt-18 animate-flow overflow-hidden bg-flow pt-18 pb-16 md:-mt-22 md:pt-22">
       <div className="mx-auto max-w-7xl px-4 md:px-[clamp(16px,4vw,40px)]">
-        <HomeHero pet={{ stage: pet.stage, level: pet.level }} orbitPets={orbitPets} />
+        <HomeHero
+          pet={{ stage: pet.stage, level: pet.level }}
+          testTaken={testTaken}
+          orbitPets={orbitPets}
+        />
         <TopicMap
           title={topic.title}
-          href={`/lesson/${topic.id}`}
+          href={testTaken ? `/lesson/${topic.id}` : "/test"}
           nodes={nodes}
           pet={pet.stage}
         />

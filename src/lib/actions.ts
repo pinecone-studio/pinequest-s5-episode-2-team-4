@@ -6,7 +6,7 @@
 import { redirect } from "next/navigation";
 import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
-import { clearSession, readSession, writeSession } from "./session";
+import { clearSession, findAccount, readSession, writeSession } from "./session";
 import type { User } from "./types";
 
 type Credentials = {
@@ -14,6 +14,9 @@ type Credentials = {
   role: User["role"];
   classCode?: string;
 };
+
+/** Returned instead of redirecting when the form needs to show an error. */
+export type AuthError = { error: "taken" | "unknown" };
 
 function clean(text: string | undefined, max: number) {
   return text?.trim().slice(0, max) || undefined;
@@ -24,9 +27,12 @@ function homeFor(role: User["role"]) {
 }
 
 /** A new account: the chosen pet starts at level 1 with no test taken. */
-export async function signUp(credentials: Credentials & { petLineId?: string }) {
+export async function signUp(
+  credentials: Credentials & { petLineId?: string },
+): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   if (!username) throw new Error("Username is required");
+  if (await findAccount(username)) return { error: "taken" };
   const role = credentials.role === "teacher" ? "teacher" : "student";
   const line = petLines.find((l) => l.id === credentials.petLineId);
 
@@ -39,23 +45,19 @@ export async function signUp(credentials: Credentials & { petLineId?: string }) 
   redirect(homeFor(role));
 }
 
-/**
- * No accounts are stored yet, so logging in starts a fresh session for that
- * name: no pet and no test taken.
- */
-export async function logIn(credentials: Credentials) {
+/** Logs in to an account signed up in this browser, with its pet and progress. */
+export async function logIn(credentials: Credentials): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   if (!username) throw new Error("Username is required");
-  const role = credentials.role === "teacher" ? "teacher" : "student";
+  const account = await findAccount(username);
+  if (!account) return { error: "unknown" };
 
-  await writeSession({
-    username,
-    role,
-    classCode: clean(credentials.classCode, 10),
-  });
-  redirect(homeFor(role));
+  const classCode = clean(credentials.classCode, 10);
+  await writeSession(classCode ? { ...account, classCode } : account);
+  redirect(homeFor(account.role));
 }
 
+/** Ends the session; the account stays so the user can log in again. */
 export async function logOut() {
   await clearSession();
   redirect("/login");
