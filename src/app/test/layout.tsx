@@ -1,9 +1,11 @@
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { requireStudent } from "@/lib/auth";
 import { getCurrentPet } from "@/lib/data";
 
 /** The test is a focused screen: no header or bottom nav on mobile. */
 export default async function TestLayout({ children }: LayoutProps<"/test">) {
+  await requireStudent();
   const pet = await getCurrentPet();
 
   return (

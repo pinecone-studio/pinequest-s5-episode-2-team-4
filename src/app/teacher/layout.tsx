@@ -1,8 +1,11 @@
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { requireTeacher } from "@/lib/auth";
 import { TeacherHeader } from "./TeacherHeader";
 import "./teacher.css";
 
-export default function TeacherLayout({ children }: LayoutProps<"/teacher">) {
+export default async function TeacherLayout({ children }: LayoutProps<"/teacher">) {
+  await requireTeacher();
+
   return (
     <>
       <TeacherHeader />

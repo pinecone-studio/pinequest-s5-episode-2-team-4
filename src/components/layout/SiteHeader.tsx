@@ -11,8 +11,8 @@ const NAV_LINKS = [
   { href: "/pets", label: "Тэжээвэр" },
 ];
 
-// No display or padding here: each link sets its own, otherwise the
-// teacher link's `hidden` clashes with `inline-flex` and shows on mobile.
+// No display or padding here: each link sets its own, so a `hidden`
+// never clashes with `inline-flex`.
 const navLinkClass =
   "min-h-12 items-center rounded-full font-semibold text-ink no-underline hover:bg-white/60 hover:text-ink";
 
@@ -52,12 +52,7 @@ export function SiteHeader({ pet }: SiteHeaderProps) {
       </div>
       <div className="flex items-center gap-2">
         {pet && <PetChip {...pet} />}
-        <Link
-          href="/teacher"
-          className={`${navLinkClass} hidden px-4 text-sm md:inline-flex`}
-        >
-          Багш
-        </Link>
+        {/* No teacher link: only students see this header, and /teacher sends them home. */}
         <form action={logOut}>
           {/* Icon only on mobile, where the header is tight. */}
           <button
