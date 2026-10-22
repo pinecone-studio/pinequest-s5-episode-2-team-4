@@ -31,7 +31,7 @@ export function Logo({ tone = "dark", size = "md" }: LogoProps) {
     >
       <LogoMark
         tone={tone}
-        className={size === "md" ? "size-[30px] md:size-[34px]" : "size-6"}
+        className={size === "md" ? "size-7.5 md:size-8.5" : "size-6"}
       />
       LevelUp
     </span>

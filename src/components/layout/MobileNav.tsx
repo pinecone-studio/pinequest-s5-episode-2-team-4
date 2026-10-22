@@ -12,7 +12,7 @@ const HomeIcon = (
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
-    className="size-[22px]"
+    className="size-5.5"
   >
     <path d="M3 10.5 12 3l9 7.5" />
     <path d="M5 9.5V21h14V9.5" />
@@ -24,7 +24,7 @@ const PlayIcon = (
     viewBox="0 0 24 24"
     fill="currentColor"
     aria-hidden="true"
-    className="size-[22px]"
+    className="size-5.5"
   >
     <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" />
   </svg>
