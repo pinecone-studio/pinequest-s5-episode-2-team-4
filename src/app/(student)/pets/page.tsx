@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getCurrentUser } from "@/lib/data";
+import { getCurrentPet, getPetLines } from "@/lib/data";
+import { stageIndex } from "@/lib/pets";
 import { MyPetCard } from "./MyPetCard";
-import { getPetLines, stageForLevel } from "./pet-lines";
 import { PetLineCard } from "./PetLineCard";
 import "./pets.css";
 
@@ -51,10 +51,8 @@ const RULES = [
 ];
 
 export default async function PetsPage() {
-  const [user, lines] = await Promise.all([getCurrentUser(), getPetLines()]);
-  const pet = user.pet;
-  const myLine = pet && lines.find((line) => line.id === pet.lineId);
-  const myStage = pet ? stageForLevel(pet.level) : undefined;
+  const [pet, lines] = await Promise.all([getCurrentPet(), getPetLines()]);
+  const myStage = pet ? stageIndex(pet.level) : undefined;
 
   return (
     <div className="pets mx-auto max-w-[1280px] px-4 pt-1 md:px-[clamp(16px,4vw,40px)] md:pt-2">
@@ -69,11 +67,11 @@ export default async function PetsPage() {
           Тэжээвэр
         </h1>
 
-        {pet && myLine && myStage !== undefined && (
+        {pet && (
           <MyPetCard
-            name={myLine.stages[myStage]}
+            stage={pet.stage}
             level={pet.level}
-            element={myLine.element}
+            element={pet.line.element}
             className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
           />
         )}
@@ -109,7 +107,7 @@ export default async function PetsPage() {
             key={line.id}
             line={line}
             index={index}
-            myStage={line.id === myLine?.id ? myStage : undefined}
+            myStage={line.id === pet?.lineId ? myStage : undefined}
           />
         ))}
       </section>
