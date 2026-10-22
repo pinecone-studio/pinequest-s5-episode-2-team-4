@@ -44,6 +44,8 @@ Route layout:
 
 Shared UI: import `Button`, `ButtonLink`, `Card`, `ProgressBar`, `StatusBadge` from `@/components/ui` and use the design tokens in `src/app/globals.css` (`bg-primary`, `text-ink`, `rounded-card`, `shadow-card`, ...) instead of raw hex colors. Join class names with `cn` from `@/lib/cn`.
 
+Fractions: use `Fraction` and `Expression` from `@/components/Fraction` (they scale with the parent font size). Pets: `PetSprite` and `ElementBadge` from `@/components/pet/`, evolution helpers (`petStage`, `stageIndex`) from `@/lib/pets`.
+
 The foundation PR is merged first; until then, others build their page markup without depending on it.
 
 The planned issues for each owner are in `docs/backlog.md`. When a team member asks to create their issues, follow the instructions at the top of that file. When they start an issue, read it with `gh issue view <n>` and open the matching design screen first.

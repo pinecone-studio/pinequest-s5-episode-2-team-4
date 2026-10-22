@@ -1,29 +1,32 @@
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { getCurrentUser } from "@/lib/data";
+import { getCurrentPet } from "@/lib/data";
 
 export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
-  const pet = user.pet && {
-    // TODO(#9): use the pet line's name for the current level.
-    name: "Wrougon",
-    level: user.pet.level,
-    xpPercent: user.pet.xp,
-  };
+  const pet = await getCurrentPet();
 
   return (
     <>
-      <SiteHeader pet={pet} />
+      <SiteHeader
+        pet={
+          pet && {
+            name: pet.stage.name,
+            level: pet.level,
+            xpPercent: pet.xp,
+            imageSrc: pet.stage.sprite,
+          }
+        }
+      />
       <main className="flex-1">{children}</main>
       <div className="mt-16">
         <SiteFooter />
       </div>
-      <MobileNav />
+      <MobileNav petSprite={pet?.stage.sprite} />
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PetSprite } from "@/components/pet/PetSprite";
 
 const HomeIcon = (
   <svg
@@ -30,20 +31,22 @@ const PlayIcon = (
   </svg>
 );
 
-// TODO(#9): use the current pet's PetSprite instead of this placeholder.
-const PetIcon = (
-  <span aria-hidden="true" className="size-6 rounded-full bg-lavender" />
-);
-
-const LINKS = [
-  { href: "/", label: "Нүүр", icon: HomeIcon },
-  { href: "/test", label: "Тоглох", icon: PlayIcon },
-  { href: "/pets", label: "Тэжээвэр", icon: PetIcon },
-];
+function petIcon(sprite?: string) {
+  return sprite ? (
+    <PetSprite stage={{ name: "", sprite }} size={24} />
+  ) : (
+    <span aria-hidden="true" className="size-6 rounded-full bg-lavender" />
+  );
+}
 
 /** Sticky bottom navigation for student pages on small screens. */
-export function MobileNav() {
+export function MobileNav({ petSprite }: { petSprite?: string }) {
   const pathname = usePathname();
+  const LINKS = [
+    { href: "/", label: "Нүүр", icon: HomeIcon },
+    { href: "/test", label: "Тоглох", icon: PlayIcon },
+    { href: "/pets", label: "Тэжээвэр", icon: petIcon(petSprite) },
+  ];
 
   return (
     <nav

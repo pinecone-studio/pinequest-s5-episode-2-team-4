@@ -5,7 +5,8 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
-import type { Lesson, Subtopic, SubtopicProgress, Topic } from "./types";
+import { petStage } from "./pets";
+import type { Lesson, PetLine, Subtopic, SubtopicProgress, Topic } from "./types";
 import {
   helperConversation,
   helperFallbackReply,
@@ -20,6 +21,7 @@ import {
   heatmap,
   notifications,
 } from "./mock/teacher";
+import { petLines } from "./mock/pets";
 import { progress, subtopics, topics } from "./mock/topics";
 import { currentUser } from "./mock/users";
 
@@ -28,6 +30,26 @@ import { currentUser } from "./mock/users";
 export async function getCurrentUser() {
   return currentUser;
 }
+
+// Pets
+
+export async function getPetLines(): Promise<PetLine[]> {
+  return petLines;
+}
+
+export async function getPetLine(id: string): Promise<PetLine | undefined> {
+  return petLines.find((l) => l.id === id);
+}
+
+/** The current user's pet with its line and the stage for its level. */
+export async function getCurrentPet() {
+  const pet = currentUser.pet;
+  const line = pet && petLines.find((l) => l.id === pet.lineId);
+  if (!pet || !line) return undefined;
+  return { ...pet, line, stage: petStage(line, pet.level) };
+}
+
+// Topics and progress
 
 export async function getTopics(): Promise<Topic[]> {
   return topics;
