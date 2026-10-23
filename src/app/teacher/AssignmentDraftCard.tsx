@@ -1,18 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import type { AssignmentDraft } from "@/lib/types";
-
-// TODO: the due date is not in the mock data yet.
-const DEFAULT_DUE = "2026-10-26";
+import type { ExerciseItem } from "@/lib/types";
+import { publishAssignment, suggestExercisesAction, unpublishAssignment } from "./actions";
 
 type Item = { id: number; question: string; answer: string };
 
 type AssignmentDraftCardProps = {
-  draft: AssignmentDraft;
+  classCode: string;
+  subtopicId: string;
   subtopicTitle: string;
+  /** The published exercises, or AI suggestions for a new draft */
+  initialItems: ExerciseItem[];
+  published: boolean;
+  initialDue: string;
+  /** How many students are weak in the subtopic; who they are isn't shown. */
+  targetCount: number;
+  /** False when Gemini isn't set up: suggestions are demo ones. */
+  aiEnabled: boolean;
   className?: string;
 };
 
@@ -28,19 +36,30 @@ const iconProps = {
   "aria-hidden": true,
 } as const;
 
-/** AI-drafted assignment the teacher edits, then publishes to weak students. */
+/**
+ * AI-drafted exercises the teacher reviews and edits, then sends to the
+ * class's students who are weak in the subtopic (counted, never named).
+ */
 export function AssignmentDraftCard({
-  draft,
+  classCode,
+  subtopicId,
   subtopicTitle,
+  initialItems,
+  published,
+  initialDue,
+  targetCount,
+  aiEnabled,
   className,
 }: AssignmentDraftCardProps) {
+  const router = useRouter();
   const [items, setItems] = useState<Item[]>(() =>
-    draft.items.map((item, i) => ({ id: i, ...item })),
+    initialItems.map((item, i) => ({ id: i, ...item })),
   );
-  const nextId = useRef(draft.items.length);
-  const [published, setPublished] = useState(draft.status === "published");
-  const [due, setDue] = useState(DEFAULT_DUE);
+  const nextId = useRef(initialItems.length);
+  const [due, setDue] = useState(initialDue);
   const [toast, setToast] = useState<string | null>(null);
+  const [suggesting, startSuggest] = useTransition();
+  const [saving, startSave] = useTransition();
 
   useEffect(() => {
     if (!toast) return;
@@ -48,8 +67,31 @@ export function AssignmentDraftCard({
     return () => clearTimeout(timer);
   }, [toast]);
 
-  const studentCount = draft.assignedTo.length;
-  const hasQuestions = items.some((item) => item.question.trim());
+  const hasQuestions = items.some((item) => item.question.trim() && item.answer.trim());
+
+  function suggest() {
+    startSuggest(async () => {
+      const suggested = await suggestExercisesAction(subtopicId);
+      setItems(suggested.map((item) => ({ id: nextId.current++, ...item })));
+      setToast(aiEnabled ? "AI шинэ дасгал санал болголоо" : "Жишээ дасгал (AI түлхүүргүй)");
+    });
+  }
+
+  function publish() {
+    startSave(async () => {
+      await publishAssignment({ classCode, subtopicId, items, due });
+      setToast(`${targetCount} сурагчид илгээгдлээ`);
+      router.refresh();
+    });
+  }
+
+  function unpublish() {
+    startSave(async () => {
+      await unpublishAssignment(classCode, subtopicId);
+      setToast("Ноорог болголоо, сурагчдад харагдахгүй");
+      router.refresh();
+    });
+  }
 
   function updateItem(id: number, change: Partial<Item>) {
     setItems((prev) =>
@@ -88,6 +130,24 @@ export function AssignmentDraftCard({
           </h2>
         </div>
         <StatusPill published={published} />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2.5">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={suggest}
+          disabled={suggesting}
+          aria-busy={suggesting}
+        >
+          <svg {...iconProps} strokeWidth="2.2" className="size-4.5">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+          </svg>
+          {suggesting ? "AI бодож байна…" : "AI-аар шинэ дасгал санал болгох"}
+        </Button>
+        <p className="text-xs font-semibold text-ink-muted">
+          AI-ийн саналыг шалгаж, засаад илгээнэ үү.
+        </p>
       </div>
 
       <div
@@ -187,50 +247,26 @@ export function AssignmentDraftCard({
           <div className="flex min-w-0 flex-col gap-1.5">
             <span className="text-xs font-bold text-ink-muted">Хэнд</span>
             <span
-              title={draft.assignedTo
-                .map((n) => `№${String(n).padStart(2, "0")}`)
-                .join(", ")}
+              title="Энэ сэдэв дээр хоцорсон сурагчид. Хэн болох нь харагдахгүй."
               className="flex h-12 items-center rounded-tile bg-surface px-3 text-[15px] font-bold md:px-4"
             >
-              {studentCount} сурагч
+              {targetCount} хоцорсон сурагч
             </span>
           </div>
         </div>
 
         <div className="flex flex-col gap-2.5 md:flex-row md:flex-wrap">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setToast("Ноорог хадгалагдлаа")}
-          >
-            Хадгалах
-          </Button>
-          {published ? (
-            <Button
-              variant="white"
-              size="sm"
-              onClick={() => {
-                setPublished(false);
-                setToast(null);
-              }}
-            >
+          {published && (
+            <Button variant="white" size="sm" onClick={unpublish} disabled={saving}>
               Ноорог болгох
             </Button>
-          ) : (
-            <Button
-              size="sm"
-              disabled={!hasQuestions}
-              onClick={() => {
-                setPublished(true);
-                setToast(`${studentCount} сурагчид оноогдлоо`);
-              }}
-            >
-              <svg {...iconProps} strokeWidth="2.6" className="size-[18px]">
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-              Батлаад ангид оноох
-            </Button>
           )}
+          <Button size="sm" disabled={!hasQuestions || saving} onClick={publish}>
+            <svg {...iconProps} strokeWidth="2.6" className="size-[18px]">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            {published ? "Шинэчилж илгээх" : "Батлаад илгээх"}
+          </Button>
         </div>
       </div>
 

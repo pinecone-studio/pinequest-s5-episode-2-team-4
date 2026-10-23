@@ -11,5 +11,7 @@ export const frac = (num: number, den: number, whole?: number): ExpressionToken 
 });
 
 export const plus: ExpressionToken = { kind: "op", op: "+" };
+export const minus: ExpressionToken = { kind: "op", op: "−" };
+export const times: ExpressionToken = { kind: "op", op: "×" };
 export const equals: ExpressionToken = { kind: "op", op: "=" };
 export const blank: ExpressionToken = { kind: "blank" };

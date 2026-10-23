@@ -9,6 +9,8 @@ export const topics: Topic[] = [
       "different-denominator",
       "simplify",
       "mixed-numbers",
+      "subtract-fractions",
+      "multiply-fractions",
     ],
   },
 ];
@@ -41,5 +43,19 @@ export const subtopics: Subtopic[] = [
     order: 4,
     title: "Холимог тоо",
     lessonTitle: "Холимог тоо ба зөв биш бутархай",
+  },
+  {
+    id: "subtract-fractions",
+    topicId: "fractions",
+    order: 5,
+    title: "Хасах",
+    lessonTitle: "Ялгаатай хуваарьтай хасах",
+  },
+  {
+    id: "multiply-fractions",
+    topicId: "fractions",
+    order: 6,
+    title: "Үржих",
+    lessonTitle: "Бутархай үржих",
   },
 ];

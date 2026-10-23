@@ -8,13 +8,13 @@ type ExplanationSectionProps = {
 const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
 const lcm = (a: number, b: number) => (a * b) / gcd(a, b);
 
-/** For a + b in the mistake, both addends over their common denominator. */
+/** For a + b or a − b in the mistake, both fractions over their common denominator. */
 function commonDenominator(expression: ExpressionToken[]) {
   const [a, op, b] = expression;
   if (
     a?.kind !== "fraction" ||
     op?.kind !== "op" ||
-    op.op !== "+" ||
+    (op.op !== "+" && op.op !== "−") ||
     b?.kind !== "fraction" ||
     a.value.whole ||
     b.value.whole ||
@@ -25,12 +25,19 @@ function commonDenominator(expression: ExpressionToken[]) {
   }
   const den = lcm(a.value.den, b.value.den);
   const scale = (f: FractionValue) => ({ num: (f.num * den) / f.den, den });
+  const aScaled = scale(a.value);
+  const bScaled = scale(b.value);
+  const subtract = op.op === "−";
   return {
     a: a.value,
     b: b.value,
-    aScaled: scale(a.value),
-    bScaled: scale(b.value),
+    aScaled,
+    bScaled,
     den,
+    op: op.op,
+    result: { num: subtract ? aScaled.num - bScaled.num : aScaled.num + bScaled.num, den },
+    // a − b: what's left is solid and the removed part striped.
+    resultFilled: subtract ? aScaled.num - bScaled.num : aScaled.num,
   };
 }
 
@@ -204,7 +211,7 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
           >
             <p className="hidden items-center gap-2.5 justify-self-end text-xl leading-none font-bold md:flex">
               <Fraction value={visual.aScaled} />
-              <span className="text-primary">+</span>
+              <span className="text-primary">{visual.op}</span>
               <Fraction value={visual.bScaled} />
             </p>
             <span
@@ -213,16 +220,10 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
             >
               =
             </span>
-            <BarRow
-              value={{
-                num: visual.aScaled.num + visual.bScaled.num,
-                den: visual.den,
-              }}
-              highlight
-            >
+            <BarRow value={visual.result} highlight>
               <FractionBar
                 total={visual.den}
-                filled={visual.aScaled.num}
+                filled={visual.resultFilled}
                 hatched={visual.bScaled.num}
               />
             </BarRow>

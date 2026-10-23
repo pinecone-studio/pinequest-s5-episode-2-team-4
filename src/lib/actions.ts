@@ -10,7 +10,17 @@ import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
 import { subtopics } from "./mock/topics";
 import { XP_PER_LEVEL, addXp } from "./pets";
-import { clearSession, findAccount, readSession, writeSession } from "./session";
+import { DEFAULT_GRADE, DEFAULT_SUBJECT, cleanSchool } from "./school";
+import { sameAnswer } from "./fractions";
+import {
+  clearSession,
+  findAccount,
+  listAssignments,
+  readSession,
+  readTeacherData,
+  writeSession,
+  writeTeacherData,
+} from "./session";
 import type { User } from "./types";
 
 type Credentials = {
@@ -32,7 +42,7 @@ function homeFor(role: User["role"]) {
 
 /** A new account: the chosen pet starts at level 1 with no test taken. */
 export async function signUp(
-  credentials: Credentials & { petLineId?: string },
+  credentials: Credentials & { petLineId?: string; grade?: number; subject?: string },
 ): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   if (!username) throw new Error("Username is required");
@@ -43,7 +53,8 @@ export async function signUp(
   await writeSession({
     username,
     role,
-    classCode: clean(credentials.classCode, 10),
+    classCode: clean(credentials.classCode, 10)?.toUpperCase(),
+    ...(role === "student" ? cleanSchool(credentials.grade, credentials.subject) : {}),
     pet: role === "student" && line ? { lineId: line.id, level: 1, xp: 0 } : undefined,
   });
   redirect(homeFor(role));
@@ -56,18 +67,50 @@ export async function logIn(credentials: Credentials): Promise<AuthError | void>
   const account = await findAccount(username);
   if (!account) return { error: "unknown" };
 
-  const classCode = clean(credentials.classCode, 10);
+  const classCode = clean(credentials.classCode, 10)?.toUpperCase();
   await writeSession(classCode ? { ...account, classCode } : account);
   redirect(homeFor(account.role));
 }
 
 const DEMO_USERNAME = "Демо";
+const DEMO_TEACHER = "Демо багш";
+/** The demo teacher's class; the demo student joins it. */
+const DEMO_CLASS_CODE = "DEMO7";
 
-/** Logs in a fresh demo student: Wrougon at level 1, no test taken yet. */
-export async function demoLogIn() {
+/**
+ * Demo login for the role picked on the login form. A student starts fresh
+ * (Wrougon at level 1, no test taken) in the demo class; a teacher gets the
+ * demo class, keeping any assignments already sent to it.
+ */
+export async function demoLogIn(formData: FormData) {
+  if (formData.get("role") === "teacher") {
+    const data = await readTeacherData(DEMO_TEACHER);
+    const hasClass = data.classes.some((c) => c.code === DEMO_CLASS_CODE);
+    await writeTeacherData(DEMO_TEACHER, {
+      ...data,
+      classes: hasClass
+        ? data.classes
+        : [
+            ...data.classes,
+            {
+              code: DEMO_CLASS_CODE,
+              name: "7А",
+              grade: DEFAULT_GRADE,
+              subject: DEFAULT_SUBJECT,
+              topicId: subtopics[0].topicId,
+            },
+          ],
+    });
+    await writeSession({ username: DEMO_TEACHER, role: "teacher" });
+    redirect(`/teacher?class=${DEMO_CLASS_CODE}`);
+  }
+
   await writeSession({
     username: DEMO_USERNAME,
     role: "student",
+    classCode: DEMO_CLASS_CODE,
+    grade: DEFAULT_GRADE,
+    subject: DEFAULT_SUBJECT,
     pet: { lineId: "wrougon", level: 1, xp: 0 },
   });
   redirect("/");
@@ -155,5 +198,24 @@ export async function submitRetest(subtopicId: string, answers: Record<string, n
     passed
       ? `/mastered/${subtopicId}`
       : `/lesson/${subtopic.topicId}?sub=${subtopicId}&retest=failed`,
+  );
+}
+
+/**
+ * Checks a student's answers to a teacher assignment of their class.
+ * Answers stay on the server; equal fractions count ("6/8" for "3/4").
+ */
+export async function checkAssignment(
+  assignmentId: string,
+  answers: string[],
+): Promise<boolean[]> {
+  const session = await readSession();
+  if (!session) redirect("/login");
+  const assignment = (await listAssignments()).find(
+    (a) => a.id === assignmentId && a.classCode === session.classCode?.toUpperCase(),
+  );
+  if (!assignment) return [];
+  return assignment.items.map((item, i) =>
+    sameAnswer(String(answers[i] ?? "").slice(0, 30), item.answer),
   );
 }

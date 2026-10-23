@@ -7,7 +7,9 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass, Card } from "@/components/ui";
 import { signUp } from "@/lib/actions";
 import { cn } from "@/lib/cn";
+import { DEFAULT_GRADE, DEFAULT_SUBJECT, GRADES, SUBJECTS } from "@/lib/school";
 import type { PetLine } from "@/lib/types";
+import { ChoiceChips } from "../_components/ChoiceChips";
 import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
@@ -16,6 +18,8 @@ import { type Role, RoleToggle } from "../_components/RoleToggle";
 export function SignupForm({ petLines }: { petLines: PetLine[] }) {
   const [role, setRole] = useState<Role>("student");
   const [petId, setPetId] = useState("wrougon");
+  const [grade, setGrade] = useState(DEFAULT_GRADE);
+  const [subject, setSubject] = useState(DEFAULT_SUBJECT);
   const [taken, setTaken] = useState(false);
   const [pending, startTransition] = useTransition();
   const pet = petLines.find((l) => l.id === petId) ?? petLines[0];
@@ -36,6 +40,8 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
         role,
         classCode: String(form.get("classCode") ?? ""),
         petLineId: isStudent ? pet.id : undefined,
+        grade,
+        subject,
       });
       setTaken(result?.error === "taken");
     });
@@ -153,7 +159,34 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
             )}
             <PasswordField id="su-pass" label="Нууц үг" autoComplete="new-password" required />
             {isStudent && (
-              <ClassCodeField id="su-code" name="classCode" label="Ангийн код" hint="заавал биш" />
+              <>
+                <ChoiceChips
+                  label="Анги"
+                  value={grade}
+                  onChange={setGrade}
+                  choices={GRADES.map((g) => ({
+                    value: g.grade,
+                    label: `${g.grade}-р анги`,
+                    available: g.available,
+                  }))}
+                />
+                <ChoiceChips
+                  label="Хичээл"
+                  value={subject}
+                  onChange={setSubject}
+                  choices={SUBJECTS.map((s) => ({
+                    value: s.id,
+                    label: s.label,
+                    available: s.available,
+                  }))}
+                />
+                <ClassCodeField
+                  id="su-code"
+                  name="classCode"
+                  label="Ангийн код"
+                  hint="багшаасаа ав · заавал биш"
+                />
+              </>
             )}
             {taken && (
               <FormError id="signup-error">

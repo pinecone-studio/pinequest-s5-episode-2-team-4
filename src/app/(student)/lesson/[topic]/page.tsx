@@ -32,13 +32,12 @@ export default async function LessonPage({
   searchParams,
 }: PageProps<"/lesson/[topic]">) {
   const [{ topic }, query] = await Promise.all([params, searchParams]);
-  const [result, progress, subtopics, pet, helper, solvedIds, lastRetest] =
+  const [result, progress, subtopics, pet, solvedIds, lastRetest] =
     await Promise.all([
       getTestResult(),
       getProgress(),
       getSubtopics(topic),
       getCurrentPet(),
-      getHelperConversation(),
       getSolvedPractice(),
       getLastRetest(),
     ]);
@@ -64,7 +63,10 @@ export default async function LessonPage({
     selected: s.subtopicId === selectedId,
   }));
 
-  const lesson = await getLesson(selectedId);
+  const [lesson, helper] = await Promise.all([
+    getLesson(selectedId),
+    getHelperConversation(selectedId),
+  ]);
   const failedRetest =
     query.retest === "failed" &&
     lastRetest?.subtopicId === selectedId &&
@@ -89,6 +91,8 @@ export default async function LessonPage({
           lesson={lesson}
           helper={
             <HelperPanel
+              key={lesson.subtopicId}
+              subtopicId={lesson.subtopicId}
               initialMessages={helper.messages}
               suggestions={helper.suggestions}
             />

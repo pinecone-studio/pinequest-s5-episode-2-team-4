@@ -108,11 +108,12 @@ export function LoginForm({ pet }: { pet: PetStage }) {
 
       {/* Its own form: forms can't be nested. Always a fresh demo student. */}
       <form action={demoLogIn} className="mt-3">
+        <input type="hidden" name="role" value={role} />
         <button
           type="submit"
           className={buttonClass({ variant: "secondary", className: "w-full" })}
         >
-          Демо нэвтрэх
+          {isStudent ? "Демо сурагчаар нэвтрэх" : "Демо багшаар нэвтрэх"}
         </button>
       </form>
 

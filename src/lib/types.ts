@@ -10,7 +10,7 @@ export type FractionValue = {
 /** One piece of a math expression, e.g. 1/2 + 1/3 = ? */
 export type ExpressionToken =
   | { kind: "fraction"; value: FractionValue }
-  | { kind: "op"; op: "+" | "−" | "=" }
+  | { kind: "op"; op: "+" | "−" | "×" | "=" }
   | { kind: "blank" };
 
 export type SubtopicStatus = "weak" | "learning" | "good" | "mastered" | "new";
@@ -30,6 +30,25 @@ export type Subtopic = {
   /** Longer name used as the lesson title */
   lessonTitle: string;
 };
+
+/** A textbook chapter on the year's roadmap. */
+export type Chapter = {
+  id: string;
+  /** 1-based; shown as a Roman numeral */
+  order: number;
+  title: string;
+  /** Textbook lesson titles, in order */
+  lessons: string[];
+  /** The topic whose subtopics are playable in this chapter, if any */
+  topicId?: string;
+  /** Playable subtopic ids per textbook lesson; other lessons are "coming soon" */
+  lessonSubtopics?: Record<string, string[]>;
+  /** Counts as done without playing (studied before LevelUp) */
+  assumedDone?: boolean;
+};
+
+/** done: finished; current: being learned; locked: under the clouds. */
+export type ChapterStatus = "done" | "current" | "locked";
 
 export type SubtopicProgress = {
   subtopicId: string;
@@ -131,34 +150,56 @@ export type User = {
   username: string;
   role: "student" | "teacher";
   classCode?: string;
+  grade: number;
+  /** Subject id, e.g. "math" (see src/lib/school.ts) */
+  subject: string;
   pet?: UserPet;
 };
 
-/** Teacher heatmap cell; "untested" = has not taken the test. */
+/** A student's status in a subtopic, as counted in the class report. */
 export type HeatmapStatus = "weak" | "learning" | "good" | "untested";
 
-export type ClassOverview = {
+/** A class a teacher created; students join with its code. */
+export type SchoolClass = {
   code: string;
+  name: string;
+  grade: number;
+  subject: string;
   topicId: string;
+};
+
+/**
+ * How many students in a class are at each status for one subtopic. Counts
+ * only: the teacher never sees which student is which.
+ */
+export type SubtopicCounts = {
+  subtopicId: string;
+  weak: number;
+  learning: number;
+  good: number;
+  untested: number;
+};
+
+export type ClassReport = {
+  schoolClass: SchoolClass;
   studentCount: number;
   testedCount: number;
-  weakestSubtopicId: string;
-  weakestCount: number;
+  /** Students who joined with the code in this browser (the rest is demo data) */
+  joinedCount: number;
+  /** Weakest first */
+  subtopics: SubtopicCounts[];
 };
 
-export type HeatmapRow = {
-  subtopicId: string;
-  /** One status per student, in student number order (№01, №02, …) */
-  cells: HeatmapStatus[];
-};
+export type ExerciseItem = { question: string; answer: string };
 
-export type AssignmentDraft = {
+/** Exercises a teacher sent to "the students weak in this subtopic" of a class. */
+export type Assignment = {
   id: string;
+  classCode: string;
   subtopicId: string;
-  status: "draft" | "published";
-  items: { question: string; answer: string }[];
-  /** Student numbers the assignment goes to */
-  assignedTo: number[];
+  items: ExerciseItem[];
+  /** yyyy-mm-dd */
+  due?: string;
 };
 
 export type TeacherNotification = {

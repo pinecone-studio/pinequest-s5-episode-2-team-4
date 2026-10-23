@@ -1,24 +1,33 @@
 import { notFound } from "next/navigation";
 import {
   getCurrentPet,
+  getCurrentUser,
+  getStudentAssignments,
   getPetLines,
   getProgress,
+  getRoadmap,
   getSubtopics,
   getTopic,
 } from "@/lib/data";
+import { subjectLabel } from "@/lib/school";
+import { AssignmentCard } from "./_home/AssignmentCard";
 import { HomeHero } from "./_home/HomeHero";
-import { TopicMap } from "./_home/TopicMap";
+import { GameMap } from "./_home/GameMap";
+import { buildMapStops, currentSubtopicId } from "./_home/mapStops";
 
 const TOPIC_ID = "fractions";
 const ORBIT_PET_IDS = ["dollfin", "agnite", "anoleaf", "tweesher", "cardiling"];
 
 export default async function HomePage() {
-  const [topic, subtopics, progress, pet, petLines] = await Promise.all([
+  const [topic, subtopics, progress, pet, petLines, user, assignments, roadmap] = await Promise.all([
     getTopic(TOPIC_ID),
     getSubtopics(TOPIC_ID),
     getProgress(),
     getCurrentPet(),
     getPetLines(),
+    getCurrentUser(),
+    getStudentAssignments(),
+    getRoadmap(),
   ]);
   if (!topic || !pet) notFound();
 
@@ -29,6 +38,21 @@ export default async function HomePage() {
     status: progress.find((p) => p.subtopicId === s.id)?.status ?? ("untested" as const),
     href: testTaken ? `/lesson/${topic.id}?sub=${s.id}` : "/test",
   }));
+  // Before the test the button starts it; after, it opens the lesson the pet
+  // stands on; with everything mastered it shows the year's map.
+  const currentId = currentSubtopicId(nodes);
+  const cta = !testTaken
+    ? { href: "/test", label: "Тест эхлэх" }
+    : currentId
+      ? { href: `/lesson/${topic.id}?sub=${currentId}`, label: "Үргэлжлүүлэх" }
+      : { href: "#map-title", label: "Жилийн зам" };
+  const school = [
+    `${user?.grade}-р анги`,
+    subjectLabel(user?.subject),
+    user?.classCode && `${user.classCode} анги`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const orbitPets = ORBIT_PET_IDS.flatMap((id) => {
     const line = petLines.find((l) => l.id === id);
     return line ? [line.stages[0]] : [];
@@ -40,13 +64,24 @@ export default async function HomePage() {
       <div className="mx-auto max-w-7xl px-4 md:px-[clamp(16px,4vw,40px)]">
         <HomeHero
           pet={{ stage: pet.stage, level: pet.level }}
-          testTaken={testTaken}
+          cta={cta}
+          school={school}
           orbitPets={orbitPets}
         />
-        <TopicMap
-          title={topic.title}
-          nodes={nodes}
+        {assignments.map((a) => (
+          <AssignmentCard
+            key={a.id}
+            id={a.id}
+            subtopicTitle={subtopics.find((s) => s.id === a.subtopicId)?.lessonTitle ?? ""}
+            questions={a.items.map((item) => item.question)}
+            due={a.due}
+          />
+        ))}
+        <GameMap
+          title={`${user?.grade}-р анги · ${subjectLabel(user?.subject)}`}
+          stops={buildMapStops(roadmap, nodes)}
           pet={pet.stage}
+          wildPets={orbitPets}
         />
       </div>
     </div>

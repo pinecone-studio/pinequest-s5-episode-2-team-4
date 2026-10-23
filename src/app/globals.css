@@ -33,6 +33,17 @@
   --animate-flow: flow 18s ease-in-out infinite alternate;
   --animate-word: word 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-pulse-ring: pulse-ring 1.8s ease-in-out infinite;
+  --animate-drift: drift 9s ease-in-out infinite alternate;
+
+  /* clouds over locked chapters */
+  @keyframes drift {
+    from {
+      transform: translateX(-12px);
+    }
+    to {
+      transform: translateX(12px);
+    }
+  }
 
   @keyframes word {
     from {

@@ -21,12 +21,14 @@ const hexagon = "[clip-path:polygon(50%_0,100%_25%,100%_75%,50%_100%,0_75%,0_25%
 
 type HomeHeroProps = {
   pet: { stage: PetStage; level: number };
-  /** Before the diagnostic test the play button starts it. */
-  testTaken: boolean;
+  /** The main button: start the test, or continue the current lesson. */
+  cta: { href: string; label: string };
   orbitPets: PetStage[];
+  /** e.g. "7-р анги · Математик · K7Q2M анги" */
+  school: string;
 };
 
-export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
+export function HomeHero({ pet, cta, orbitPets, school }: HomeHeroProps) {
   const words = ["Ойлгоогүйгээ", "ичихгүйгээр"];
   return (
     <section
@@ -34,6 +36,10 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
       className="flex flex-col gap-2 pt-3 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-10 md:pt-4"
     >
       <div className="contents md:flex md:max-w-135 md:min-w-0 md:flex-[1_1_420px] md:flex-col md:items-start md:gap-10">
+        <p className="inline-flex items-center gap-2 self-start rounded-full bg-white px-4 py-1.5 text-sm font-bold shadow-card">
+          <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
+          {school}
+        </p>
         <h1
           id="hero-title"
           className="px-1 text-[40px] leading-[1.05] font-bold tracking-tight text-balance md:px-0 md:text-6xl"
@@ -50,12 +56,12 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
           </span>
         </h1>
         <ButtonLink
-          href="/test"
+          href={cta.href}
           size="lg"
           className="order-last w-full pr-10 pl-8 md:order-none md:w-auto"
         >
           {PlayIcon}
-          {testTaken ? "Тоглох" : "Тест эхлэх"}
+          {cta.label}
         </ButtonLink>
       </div>
 

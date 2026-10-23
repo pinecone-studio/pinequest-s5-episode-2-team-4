@@ -4,20 +4,28 @@
 // storing anything private.
 
 import { cookies } from "next/headers";
-import type { User, UserPet } from "./types";
+import type { Assignment, SchoolClass, User, UserPet } from "./types";
 
 /** Who is logged in: just the username. */
 const SESSION_COOKIE_NAME = "levelup-session";
 /** Accounts signed up in this browser, so logging out keeps them. */
 const ACCOUNTS_COOKIE_NAME = "levelup-accounts";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+/** Teachers' classes and assignments, kept apart so accounts stay small. */
+const TEACHER_COOKIE_NAME = "levelup-teacher";
 /** Keeps the accounts cookie well under the 4 KB cookie limit. */
 const MAX_ACCOUNTS = 8;
+/** Keeps the teacher cookie under the limit too. */
+const MAX_CLASSES = 4;
+const MAX_ASSIGNMENTS = 6;
 
 export type Account = {
   username: string;
   role: User["role"];
   classCode?: string;
+  /** School grade and subject id (see src/lib/school.ts); default 7 / math. */
+  grade?: number;
+  subject?: string;
   pet?: UserPet;
   /** Selected option index per diagnostic test question id. */
   testAnswers?: Record<string, number>;
@@ -70,6 +78,11 @@ async function readAccounts(): Promise<Record<string, Account>> {
   return accounts && typeof accounts === "object" ? accounts : {};
 }
 
+/** Every account signed up in this browser. */
+export async function listAccounts(): Promise<Account[]> {
+  return Object.values(await readAccounts());
+}
+
 export async function findAccount(username: string): Promise<Account | undefined> {
   return (await readAccounts())[keyOf(username)];
 }
@@ -107,3 +120,41 @@ export async function clearSession() {
 
 /** For proxy.ts, which reads cookies from the request itself. */
 export const SESSION_COOKIE = SESSION_COOKIE_NAME;
+
+export type TeacherData = {
+  classes: SchoolClass[];
+  assignments: Assignment[];
+};
+
+async function readTeacherStore(): Promise<Record<string, TeacherData>> {
+  const store = decode<Record<string, TeacherData>>(
+    (await cookies()).get(TEACHER_COOKIE_NAME)?.value,
+  );
+  return store && typeof store === "object" ? store : {};
+}
+
+/** A teacher's classes and assignments; empty for a new teacher. */
+export async function readTeacherData(username: string): Promise<TeacherData> {
+  const data = (await readTeacherStore())[keyOf(username)];
+  return {
+    classes: Array.isArray(data?.classes) ? data.classes : [],
+    assignments: Array.isArray(data?.assignments) ? data.assignments : [],
+  };
+}
+
+/** Every teacher's assignments in this browser, for the students' side. */
+export async function listAssignments(): Promise<Assignment[]> {
+  return Object.values(await readTeacherStore()).flatMap((d) =>
+    Array.isArray(d?.assignments) ? d.assignments : [],
+  );
+}
+
+/** Saves a teacher's data, keeping the newest. Only call from Server Functions. */
+export async function writeTeacherData(username: string, data: TeacherData) {
+  const store = await readTeacherStore();
+  store[keyOf(username)] = {
+    classes: data.classes.slice(-MAX_CLASSES),
+    assignments: data.assignments.slice(-MAX_ASSIGNMENTS),
+  };
+  (await cookies()).set(TEACHER_COOKIE_NAME, encode(store), cookieOptions);
+}

@@ -15,7 +15,7 @@ export function sayExpression(tokens: ExpressionToken[]) {
     .map((t) => {
       if (t.kind === "fraction") return sayFraction(t.value);
       if (t.kind === "blank") return "хэд вэ";
-      return { "+": "нэмэх", "−": "хасах", "=": "тэнцүү" }[t.op];
+      return { "+": "нэмэх", "−": "хасах", "×": "үржих", "=": "тэнцүү" }[t.op];
     })
     .join(" ");
 }
