@@ -4,6 +4,7 @@ import { submitRetest } from "@/lib/actions";
 import {
   getCurrentPet,
   getRetestQuestions,
+  getSampleRetestAnswers,
   getSubtopic,
   getTestResult,
 } from "@/lib/data";
@@ -18,11 +19,12 @@ export default async function RetestPage({
   params,
 }: PageProps<"/test/retest/[subtopic]">) {
   const { subtopic: subtopicId } = await params;
-  const [subtopic, questions, result, pet] = await Promise.all([
+  const [subtopic, questions, result, pet, sampleAnswers] = await Promise.all([
     getSubtopic(subtopicId),
     getRetestQuestions(subtopicId),
     getTestResult(),
     getCurrentPet(),
+    getSampleRetestAnswers(subtopicId),
   ]);
   if (!subtopic || questions.length === 0) notFound();
   if (!result) redirect("/test");
@@ -41,6 +43,7 @@ export default async function RetestPage({
         petStage={pet?.stage}
         submit={submitRetest.bind(null, subtopic.id)}
         exitHref={lessonHref}
+        sampleAnswers={sampleAnswers}
       />
     </>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
-import { logIn } from "@/lib/actions";
+import { demoLogIn, logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { FormError } from "../_components/FormError";
@@ -103,6 +103,16 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         >
           Нэвтрэх
           {ArrowIcon}
+        </button>
+      </form>
+
+      {/* Its own form: forms can't be nested. Always a fresh demo student. */}
+      <form action={demoLogIn} className="mt-3">
+        <button
+          type="submit"
+          className={buttonClass({ variant: "secondary", className: "w-full" })}
+        >
+          Демо нэвтрэх
         </button>
       </form>
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCurrentPet, getPetLines } from "@/lib/data";
 import { stageIndex } from "@/lib/pets";
-import { MyPetCard } from "./MyPetCard";
+import { EvolutionPreview } from "./EvolutionPreview";
 import { PetCollection } from "./PetCollection";
 import "./pets.css";
 
@@ -68,10 +68,9 @@ export default async function PetsPage() {
         </h1>
 
         {pet && (
-          <MyPetCard
-            stage={pet.stage}
+          <EvolutionPreview
+            line={pet.line}
             level={pet.level}
-            element={pet.line.element}
             className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
           />
         )}

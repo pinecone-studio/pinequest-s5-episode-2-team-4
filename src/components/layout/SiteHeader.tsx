@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePetPreview } from "@/components/pet/petPreview";
 import { logOut } from "@/lib/actions";
 import { Logo } from "./Logo";
 import { PetChip } from "./PetChip";
 
 const NAV_LINKS = [
-  { href: "/test", label: "Тоглох" },
+  { href: "/test", label: "Тест" },
   { href: "/pets", label: "Тэжээвэр" },
 ];
 
@@ -21,8 +22,14 @@ type SiteHeaderProps = {
 };
 
 /** Header for student pages. Nav links move to MobileNav below md. */
-export function SiteHeader({ pet }: SiteHeaderProps) {
+export function SiteHeader({ pet: realPet }: SiteHeaderProps) {
   const pathname = usePathname();
+  // The /pets evolution demo shows each stage here too.
+  const preview = usePetPreview();
+  const pet =
+    realPet && preview
+      ? { ...realPet, name: preview.name, level: preview.level, imageSrc: preview.sprite }
+      : realPet;
 
   return (
     <header className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">

@@ -25,7 +25,7 @@ import {
   helperSuggestions,
   lessons,
 } from "./mock/lessons";
-import { testQuestions } from "./mock/questions";
+import { sampleTestAnswers, testQuestions } from "./mock/questions";
 import {
   assignmentDraft,
   classOverview,
@@ -189,6 +189,19 @@ export async function getRetestQuestions(subtopicId: string): Promise<Question[]
     ...testQuestions.filter((q) => q.subtopicId === subtopicId),
     ...(lesson?.practice ?? []),
   ];
+}
+
+/** Demo answers that fill the diagnostic test (5/8). */
+export async function getSampleTestAnswers(): Promise<Record<string, number>> {
+  return sampleTestAnswers;
+}
+
+/** Demo answers that pass a subtopic's retest: all correct. */
+export async function getSampleRetestAnswers(
+  subtopicId: string,
+): Promise<Record<string, number>> {
+  const questions = await getRetestQuestions(subtopicId);
+  return Object.fromEntries(questions.map((q) => [q.id, q.correctIndex]));
 }
 
 /** The current user's latest subtopic retest, passed or not. */
