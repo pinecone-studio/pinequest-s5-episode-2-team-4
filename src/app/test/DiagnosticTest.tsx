@@ -17,6 +17,10 @@ type DiagnosticTestProps = {
   resultsHref?: string;
   /** Where the ✕ button goes. */
   exitHref?: string;
+  /** Demo answers; shows a "fill with sample answers" button. */
+  sampleAnswers?: Answers;
+  /** Start with the sample answers filled in, as if the button was pressed. */
+  startFilled?: boolean;
 };
 
 /** Selected option index per question id. */
@@ -68,9 +72,12 @@ export function DiagnosticTest({
   submit,
   resultsHref,
   exitHref = "/",
+  sampleAnswers,
+  startFilled = false,
 }: DiagnosticTestProps) {
-  const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
+  const prefill = startFilled && sampleAnswers !== undefined;
+  const [current, setCurrent] = useState(prefill ? questions.length - 1 : 0);
+  const [answers, setAnswers] = useState<Answers>(prefill ? sampleAnswers : {});
   const [finishing, startFinishing] = useTransition();
   const router = useRouter();
 
@@ -83,6 +90,21 @@ export function DiagnosticTest({
 
   function pick(index: number) {
     setAnswers((prev) => ({ ...prev, [question.id]: index }));
+  }
+
+  // Demo: fill every answer, jump to the end and confirm with a short toast.
+  const [filled, setFilled] = useState(prefill);
+  useEffect(() => {
+    if (!filled) return;
+    const timer = setTimeout(() => setFilled(false), 3000);
+    return () => clearTimeout(timer);
+  }, [filled]);
+
+  function fillSample() {
+    if (!sampleAnswers) return;
+    setAnswers(sampleAnswers);
+    setCurrent(total - 1);
+    setFilled(true);
   }
 
   const started = answeredCount > 0 && !finishing;
@@ -272,6 +294,28 @@ export function DiagnosticTest({
           </button>
         )}
       </div>
+
+      {sampleAnswers ? (
+        <div className="mt-3 flex flex-col items-center gap-2 md:mt-5 md:gap-2.5">
+          <button
+            type="button"
+            onClick={fillSample}
+            className="min-h-12 cursor-pointer px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 md:min-h-11"
+          >
+            Жишээ хариултаар бөглөх
+          </button>
+          <div role="status" aria-live="polite">
+            {filled ? (
+              <p className="inline-flex items-center gap-2.5 rounded-full bg-black px-4.5 py-2.5 text-sm font-semibold text-white md:px-5 md:py-3">
+                <svg {...iconProps} className="size-4 text-sky md:size-4.5">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                Бөглөлөө
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <dialog
         ref={exitDialog}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PetSprite } from "@/components/pet/PetSprite";
+import { usePetPreview } from "@/components/pet/petPreview";
 
 const HomeIcon = (
   <svg
@@ -40,7 +41,9 @@ function petIcon(sprite?: string) {
 }
 
 /** Sticky bottom navigation for student pages on small screens. */
-export function MobileNav({ petSprite }: { petSprite?: string }) {
+export function MobileNav({ petSprite: realSprite }: { petSprite?: string }) {
+  // The /pets evolution demo shows each stage here too.
+  const petSprite = usePetPreview()?.sprite ?? realSprite;
   const pathname = usePathname();
   const LINKS = [
     { href: "/", label: "Нүүр", icon: HomeIcon },

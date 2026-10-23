@@ -61,6 +61,18 @@ export async function logIn(credentials: Credentials): Promise<AuthError | void>
   redirect(homeFor(account.role));
 }
 
+const DEMO_USERNAME = "Демо";
+
+/** Logs in a fresh demo student: Wrougon at level 1, no test taken yet. */
+export async function demoLogIn() {
+  await writeSession({
+    username: DEMO_USERNAME,
+    role: "student",
+    pet: { lineId: "wrougon", level: 1, xp: 0 },
+  });
+  redirect("/");
+}
+
 /** Ends the session; the account stays so the user can log in again. */
 export async function logOut() {
   await clearSession();

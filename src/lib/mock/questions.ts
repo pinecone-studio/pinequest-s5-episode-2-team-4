@@ -68,3 +68,15 @@ export const testQuestions: Question[] = [
     correctIndex: 3,
   },
 ];
+
+/** Demo answers for the test: 5/8, with "different-denominator" and "simplify" weak. */
+export const sampleTestAnswers: Record<string, number> = {
+  q1: 1,
+  q2: 2,
+  q3: 0,
+  q4: 1,
+  q5: 3,
+  q6: 0,
+  q7: 1,
+  q8: 3,
+};
