@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getCurrentPet, getPetLines } from "@/lib/data";
 import { stageIndex } from "@/lib/pets";
 import { MyPetCard } from "./MyPetCard";
-import { PetLineCard } from "./PetLineCard";
+import { PetCollection } from "./PetCollection";
 import "./pets.css";
 
 export const metadata: Metadata = {
@@ -98,19 +98,7 @@ export default async function PetsPage() {
         </ul>
       </section>
 
-      <section
-        aria-label={`Хувьслын ${lines.length} зам`}
-        className="mt-6 grid gap-3.5 md:mt-8 md:grid-cols-[repeat(auto-fit,minmax(min(520px,100%),1fr))] md:gap-6"
-      >
-        {lines.map((line, index) => (
-          <PetLineCard
-            key={line.id}
-            line={line}
-            index={index}
-            myStage={line.id === pet?.lineId ? myStage : undefined}
-          />
-        ))}
-      </section>
+      <PetCollection lines={lines} myLineId={pet?.lineId} myStage={myStage} />
     </div>
   );
 }

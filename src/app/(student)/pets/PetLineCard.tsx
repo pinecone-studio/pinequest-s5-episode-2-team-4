@@ -10,20 +10,24 @@ type PetLineCardProps = {
   index: number;
   /** Stage the student's pet is in, if this is their line. */
   myStage?: number;
+  /** "flat" sits inside another card, without its own background. */
+  variant?: "card" | "flat";
 };
 
 /** One pet line with its three evolutions. */
-export function PetLineCard({ line, index, myStage }: PetLineCardProps) {
+export function PetLineCard({ line, index, myStage, variant = "card" }: PetLineCardProps) {
   const isMine = myStage !== undefined;
 
   return (
     <article
       aria-labelledby={`line-${line.id}`}
       className={cn(
-        "rounded-[25px] bg-white p-[18px] md:rounded-panel md:px-8 md:pt-7 md:pb-8",
-        isMine
-          ? "shadow-float outline-3 -outline-offset-3 outline-primary"
-          : "shadow-card",
+        variant === "card" &&
+          "rounded-[25px] bg-white p-[18px] md:rounded-panel md:px-8 md:pt-7 md:pb-8",
+        variant === "card" &&
+          (isMine
+            ? "shadow-float outline-3 -outline-offset-3 outline-primary"
+            : "shadow-card"),
       )}
     >
       <div className="flex items-center justify-between gap-2 md:gap-3">
