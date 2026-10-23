@@ -2,7 +2,7 @@ import { ElementBadge } from "@/components/pet/ElementBadge";
 import { cn } from "@/lib/cn";
 import { STAGE_LEVEL_LABELS } from "@/lib/pets";
 import type { PetLine } from "@/lib/types";
-import { AnimatedSprite, SleepyZz } from "./AnimatedSprite";
+import { AnimatedSprite, HappyStars, SleepyZz } from "./AnimatedSprite";
 
 type PetLineCardProps = {
   line: PetLine;
@@ -84,6 +84,7 @@ export function PetLineCard({ line, index, myStage, variant = "card" }: PetLineC
                     delay={(index * 0.7 + i * 0.6) % 2}
                   />
                   <SleepyZz className="top-2 right-2 text-[11px] md:top-3.5 md:right-3.5 md:text-[13px]" />
+                  <HappyStars size="sm" />
                 </div>
                 <p className="mt-1.5 max-w-full truncate text-sm font-bold md:mt-2 md:text-xl">
                   {stage.name}

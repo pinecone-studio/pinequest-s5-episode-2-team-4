@@ -1,7 +1,7 @@
 import { ElementBadge } from "@/components/pet/ElementBadge";
 import { cn } from "@/lib/cn";
 import type { PetElement, PetStage } from "@/lib/types";
-import { AnimatedSprite, SleepyZz } from "./AnimatedSprite";
+import { AnimatedSprite, HappyStars, SleepyZz } from "./AnimatedSprite";
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -65,6 +65,7 @@ export function MyPetCard({ stage, level, element, className }: MyPetCardProps) 
       <div className="pets-hero relative flex h-[216px] items-center justify-center overflow-hidden rounded-card md:h-60 md:flex-[0_0_240px]">
         <AnimatedSprite stage={stage} mobile={192} desktop={192} />
         <SleepyZz className="top-7 right-12 text-base md:top-[30px] md:right-7 md:text-lg" />
+        <HappyStars size="lg" />
       </div>
 
       <div className="flex min-w-0 flex-col gap-3.5 md:flex-[1_1_240px] md:gap-4">

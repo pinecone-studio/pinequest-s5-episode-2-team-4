@@ -43,6 +43,16 @@
   animation: pets-zz 2.6s ease-in-out infinite;
 }
 
+.pets-star {
+  display: none;
+}
+
+/* With reduced motion the animation is off and the stars just stay visible. */
+.pets:has(#mood-happy:checked) .pets-star {
+  display: block;
+  animation: pets-twinkle 1.6s ease-in-out infinite both;
+}
+
 @keyframes pets-bob {
   0%,
   100% {
@@ -91,5 +101,21 @@
   100% {
     opacity: 0;
     transform: translateY(-14px);
+  }
+}
+
+@keyframes pets-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.8);
   }
 }
