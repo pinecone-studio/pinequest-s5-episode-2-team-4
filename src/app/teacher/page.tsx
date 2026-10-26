@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { ClassGoalCard } from "@/components/ClassGoalCard";
 import {
   getAssignmentDraft,
+  getClassGoal,
   getClassOverview,
   getHeatmap,
   getNotifications,
@@ -20,12 +22,14 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications, draft] = await Promise.all([
-    getSubtopics(overview.topicId),
-    getHeatmap(),
-    getNotifications(),
-    getAssignmentDraft(),
-  ]);
+  const [subtopics, heatmap, notifications, draft, classGoal] =
+    await Promise.all([
+      getSubtopics(overview.topicId),
+      getHeatmap(),
+      getNotifications(),
+      getAssignmentDraft(),
+      getClassGoal(),
+    ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
   const rows = heatmap.map((row) => ({
@@ -67,6 +71,7 @@ export default async function TeacherPage() {
           className="md:flex-[2_1_340px]"
         />
       </div>
+      <ClassGoalCard goal={classGoal} className="md:mt-5" />
     </div>
   );
 }
