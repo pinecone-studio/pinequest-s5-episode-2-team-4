@@ -5,6 +5,7 @@ import {
   getHelperConversation,
   getLastRetest,
   getLesson,
+  getPeerQuestions,
   getProgress,
   getSolvedPractice,
   getSubtopics,
@@ -12,6 +13,7 @@ import {
   getTopics,
 } from "@/lib/data";
 import { ExplanationSection } from "./ExplanationSection";
+import { HelpClassmates } from "./HelpClassmates";
 import { HelperPanel } from "./HelperPanel";
 import { LessonSection } from "./LessonSection";
 import { PracticeSection } from "./PracticeSection";
@@ -64,7 +66,10 @@ export default async function LessonPage({
     selected: s.subtopicId === selectedId,
   }));
 
-  const lesson = await getLesson(selectedId);
+  const [lesson, peerQuestions] = await Promise.all([
+    getLesson(selectedId),
+    getPeerQuestions(),
+  ]);
   const failedRetest =
     query.retest === "failed" &&
     lastRetest?.subtopicId === selectedId &&
@@ -106,6 +111,10 @@ export default async function LessonPage({
             key={lesson.subtopicId}
             questions={lesson.practice}
             solvedIds={solvedIds}
+          />
+          <HelpClassmates
+            key={`help-${lesson.subtopicId}`}
+            questions={peerQuestions.filter((q) => q.subtopicId === selectedId)}
           />
         </LessonSection>
       ) : (
