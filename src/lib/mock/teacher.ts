@@ -1,5 +1,6 @@
 import type {
   AssignmentDraft,
+  ClassGoal,
   ClassOverview,
   HeatmapRow,
   HeatmapStatus,
@@ -82,3 +83,10 @@ export const notifications: TeacherNotification[] = [
     time: "10:15",
   },
 ];
+
+export const classGoal: ClassGoal = {
+  classCode: "7А",
+  targetXp: 5000,
+  currentXp: 3200,
+  reward: "Ангиараа шинэ тэжээвэр нээнэ",
+};
