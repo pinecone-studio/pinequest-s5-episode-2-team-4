@@ -7,12 +7,14 @@ import {
   getClassOverview,
   getHeatmap,
   getNotifications,
+  getSignalSummary,
   getSubtopics,
 } from "@/lib/data";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
 import { PeerApproval } from "./PeerApproval";
+import { SignalPanel } from "./SignalPanel";
 import { StatCards } from "./StatCards";
 
 export const metadata: Metadata = {
@@ -24,15 +26,23 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications, draft, questions, classGoal] =
-    await Promise.all([
-      getSubtopics(overview.topicId),
-      getHeatmap(),
-      getNotifications(),
-      getAssignmentDraft(),
-      getAnonQuestions(),
-      getClassGoal(),
-    ]);
+  const [
+    subtopics,
+    heatmap,
+    notifications,
+    draft,
+    signals,
+    questions,
+    classGoal,
+  ] = await Promise.all([
+    getSubtopics(overview.topicId),
+    getHeatmap(),
+    getNotifications(),
+    getAssignmentDraft(),
+    getSignalSummary(),
+    getAnonQuestions(),
+    getClassGoal(),
+  ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
   const rows = heatmap.map((row) => ({
@@ -66,6 +76,13 @@ export default async function TeacherPage() {
         rows={rows}
         testedCount={overview.testedCount}
         highlight={HIGHLIGHTED_STUDENT}
+      />
+      <SignalPanel
+        rows={signals.map((s) => ({
+          ...s,
+          title: subtopicById.get(s.subtopicId)?.title ?? s.subtopicId,
+        }))}
+        className="md:mt-5"
       />
       <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
         <AssignmentDraftCard
