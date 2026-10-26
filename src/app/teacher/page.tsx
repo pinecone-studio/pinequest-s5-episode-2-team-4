@@ -7,6 +7,7 @@ import {
   getClassOverview,
   getHeatmap,
   getNotifications,
+  getQuestionGroups,
   getSignalSummary,
   getSubtopics,
 } from "@/lib/data";
@@ -14,6 +15,7 @@ import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
 import { PeerApproval } from "./PeerApproval";
+import { QuestionGroups } from "./QuestionGroups";
 import { SignalPanel } from "./SignalPanel";
 import { StatCards } from "./StatCards";
 
@@ -32,6 +34,7 @@ export default async function TeacherPage() {
     notifications,
     draft,
     signals,
+    groups,
     questions,
     classGoal,
   ] = await Promise.all([
@@ -40,6 +43,7 @@ export default async function TeacherPage() {
     getNotifications(),
     getAssignmentDraft(),
     getSignalSummary(),
+    getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
   ]);
@@ -50,6 +54,12 @@ export default async function TeacherPage() {
     title: subtopicById.get(row.subtopicId)?.title ?? row.subtopicId,
     lessonTitle:
       subtopicById.get(row.subtopicId)?.lessonTitle ?? row.subtopicId,
+  }));
+  const questionById = new Map(questions.map((q) => [q.id, q]));
+  const questionGroups = groups.map((g) => ({
+    ...g,
+    subtopicTitle: subtopicById.get(g.subtopicId)?.title ?? g.subtopicId,
+    questions: g.questionIds.flatMap((id) => questionById.get(id) ?? []),
   }));
   const pendingAnswers = questions
     .filter((q) => q.answer?.by === "peer" && !q.answer.approved)
@@ -97,6 +107,7 @@ export default async function TeacherPage() {
           className="md:flex-[2_1_340px]"
         />
       </div>
+      <QuestionGroups groups={questionGroups} className="md:mt-5" />
       <PeerApproval questions={pendingAnswers} className="md:mt-5" />
       <ClassGoalCard goal={classGoal} className="md:mt-5" />
     </div>
