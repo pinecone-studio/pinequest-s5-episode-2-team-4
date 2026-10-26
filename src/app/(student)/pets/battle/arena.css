@@ -1,0 +1,88 @@
+/* Battle scene particles. globals.css turns animations off for
+   prefers-reduced-motion. */
+
+.arena-rise,
+.arena-rise-slow,
+.arena-sway,
+.arena-twinkle,
+.arena-shimmer,
+.arena-drift {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.arena-rise {
+  animation: arena-rise 4s linear infinite;
+}
+
+.arena-rise-slow {
+  animation: arena-rise 7s ease-out infinite;
+}
+
+@keyframes arena-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+}
+
+.arena-sway {
+  animation: arena-sway 3s ease-in-out infinite alternate;
+}
+
+@keyframes arena-sway {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+.arena-twinkle {
+  animation: arena-twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes arena-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.arena-shimmer {
+  animation: arena-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes arena-shimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.arena-drift {
+  animation: arena-drift 9s ease-in-out infinite alternate;
+}
+
+@keyframes arena-drift {
+  from {
+    transform: translateX(-16px);
+  }
+  to {
+    transform: translateX(16px);
+  }
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ButtonLink } from "@/components/ui";
 import { getCurrentPet, getPetLines } from "@/lib/data";
 import { stageIndex } from "@/lib/pets";
 import { EvolutionPreview } from "./EvolutionPreview";
@@ -95,6 +96,23 @@ export default async function PetsPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section
+        aria-labelledby="boss-battle-title"
+        className="mt-6 flex flex-col gap-4 rounded-[25px] bg-ink p-5 text-white md:mt-8 md:flex-row md:items-center md:justify-between md:rounded-panel md:px-8 md:py-6"
+      >
+        <div>
+          <h2 id="boss-battle-title" className="text-2xl leading-tight font-bold md:text-[28px]">
+            Боссын тулаан
+          </h2>
+          <p className="mt-1 text-lavender">
+            Англи хэлний асуултад хариулж, тэжээвэртэйгээ хамт боссыг ялаарай.
+          </p>
+        </div>
+        <ButtonLink href="/pets/battle" variant="white" className="w-full md:w-auto">
+          Тулалдах
+        </ButtonLink>
       </section>
 
       <PetCollection lines={lines} myLineId={pet?.lineId} myStage={myStage} />

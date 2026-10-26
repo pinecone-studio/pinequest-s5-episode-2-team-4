@@ -171,6 +171,9 @@ export type TeacherNotification = {
 
 export type BossRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
+/** The battle scene drawn behind a boss. */
+export type BossArena = "beach" | "reef" | "volcano" | "desert" | "bamboo" | "city";
+
 /** A boss students fight with English answers. All numbers are tunable. */
 export type Boss = {
   id: string;
@@ -179,6 +182,7 @@ export type Boss = {
   sprite: string;
   elements: PetElement[];
   rarity: BossRarity;
+  arena: BossArena;
   /** 1 easiest … 5 hardest; also the order on the boss list. */
   difficulty: 1 | 2 | 3 | 4 | 5;
   /** Short Mongolian description. */
@@ -321,4 +325,44 @@ export type EnglishAnswerResult = {
   /** The right answer as text, to show after a wrong one. */
   expected: string;
   explanation: string;
+};
+
+export type BattleStatus = "lobby" | "active" | "paused" | "won" | "lost" | "ended";
+
+/** One player's view of a battle, sent to the browser (no answers in it). */
+export type BattleState = {
+  id: string;
+  bossId: string;
+  mode: "solo" | "group" | "class";
+  status: BattleStatus;
+  hp: number;
+  maxHp: number;
+  /** Boss attacks so far; when it goes up, the browser plays the attack. */
+  attackCount: number;
+  attackDamage: number;
+  /** ISO times from the server; compare with serverNow, not the device clock. */
+  nextAttackAt: string | null;
+  deadlineAt: string | null;
+  serverNow: string;
+  me: {
+    petHp: number;
+    petMaxHp: number;
+    combo: number;
+    bestCombo: number;
+    damageDealt: number;
+    correct: number;
+    wrong: number;
+    faints: number;
+  };
+  /** The question to answer now; null when the battle is over. */
+  question: EnglishQuestionView | null;
+  /** Why it ended: boss defeated, my pet fainted, time ran out, or I left. */
+  endReason: "won" | "fainted" | "timeout" | "left" | null;
+};
+
+/** What one answer did, shown as feedback. */
+export type BattleAnswerOutcome = EnglishAnswerResult & {
+  damage: number;
+  petDamage: number;
+  combo: number;
 };
