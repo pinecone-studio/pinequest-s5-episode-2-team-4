@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import {
+  getAnonQuestions,
   getAssignmentDraft,
   getClassOverview,
   getHeatmap,
   getNotifications,
+  getQuestionGroups,
   getSubtopics,
 } from "@/lib/data";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
+import { QuestionGroups } from "./QuestionGroups";
 import { StatCards } from "./StatCards";
 
 export const metadata: Metadata = {
@@ -20,12 +23,15 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications, draft] = await Promise.all([
-    getSubtopics(overview.topicId),
-    getHeatmap(),
-    getNotifications(),
-    getAssignmentDraft(),
-  ]);
+  const [subtopics, heatmap, notifications, draft, groups, questions] =
+    await Promise.all([
+      getSubtopics(overview.topicId),
+      getHeatmap(),
+      getNotifications(),
+      getAssignmentDraft(),
+      getQuestionGroups(),
+      getAnonQuestions(),
+    ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
   const rows = heatmap.map((row) => ({
@@ -33,6 +39,12 @@ export default async function TeacherPage() {
     title: subtopicById.get(row.subtopicId)?.title ?? row.subtopicId,
     lessonTitle:
       subtopicById.get(row.subtopicId)?.lessonTitle ?? row.subtopicId,
+  }));
+  const questionById = new Map(questions.map((q) => [q.id, q]));
+  const questionGroups = groups.map((g) => ({
+    ...g,
+    subtopicTitle: subtopicById.get(g.subtopicId)?.title ?? g.subtopicId,
+    questions: g.questionIds.flatMap((id) => questionById.get(id) ?? []),
   }));
   // "Mastered" notifications are good news; the rest need the teacher.
   const alertCount = notifications.filter((n) => n.kind !== "mastered").length;
@@ -67,6 +79,7 @@ export default async function TeacherPage() {
           className="md:flex-[2_1_340px]"
         />
       </div>
+      <QuestionGroups groups={questionGroups} className="md:mt-5" />
     </div>
   );
 }
