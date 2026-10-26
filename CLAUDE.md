@@ -52,7 +52,9 @@ The planned issues for each owner are in `docs/backlog.md`. When a team member a
 
 ## Always ask first
 
-Before any of these actions, stop, show exactly what you are about to do (title, name, message, target), and wait for explicit approval. Approval for one action does not cover the next one.
+Before any of these actions, stop, show exactly what you are about to do (title, name, message, target, labels, reviewers), and wait for explicit approval. Approval for one action does not cover the next one.
+
+Approval can be any clear yes in the team member's own words ("go", "tg", "за", "тийм", "ok", ...); do not ask for a specific keyword. If the reply is unclear, ask again.
 
 - Creating a GitHub issue
 - Creating a branch
@@ -88,6 +90,36 @@ When a team member asks for a new feature or a large change, do not do it all in
 Types: `feat`, `fix`, `refactor`, `style`, `docs`, `test`, `chore`.
 
 **Pull requests** — title same style as the commit (`feat: add login form`). Body: short summary of changes, how to test, and `Closes #<issue-number>`.
+
+**Reviewers** — request review from every other team member when opening a PR: `Nyamochir99`, `azaanm7`, `btsolmon`, `BaskaLemon`, `nimbaa123`, minus the author (find yours with `gh api user --jq .login`; GitHub rejects the author as a reviewer). Pass them as one `--reviewer a,b,c,d` to `gh pr create`.
+
+## Labels
+
+Every issue and PR gets labels; set them with `--label` on `gh issue create` and `gh pr create`. The PR uses the same labels as its issue.
+
+**Type: exactly one**, from the commit type:
+
+| Commit type | Label |
+|---|---|
+| `feat` | `enhancement` |
+| `fix` | `bug` |
+| `docs` | `documentation` |
+| `refactor` | `refactor` |
+| `style` | `style` |
+| `test` | `test` |
+| `chore` | `chore` |
+
+**Area: one or more**, for the code it touches (not needed for docs or config only):
+
+| Label | Covers |
+|---|---|
+| `student` | student pages: `/`, `/test`, `/lesson`, `/mastered`, `/pets` |
+| `teacher` | `/teacher` |
+| `auth` | `/login`, `/signup`, session |
+| `ui` | shared components and layout in `src/components/` |
+| `data` | `src/lib/types.ts`, `src/lib/mock/`, `src/lib/data.ts` |
+
+Use only these labels. If a new one seems needed, ask the team first instead of creating it.
 
 ## No Claude attribution
 
