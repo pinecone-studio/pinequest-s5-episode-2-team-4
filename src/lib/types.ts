@@ -169,6 +169,38 @@ export type TeacherNotification = {
   time: string;
 };
 
+// Anonymous questions: the teacher or a classmate answers, not the AI.
+
+export type QuestionAnswer = {
+  by: "teacher" | "peer";
+  /** Student number of the classmate who answered, for peer answers */
+  studentNo?: number;
+  text: string;
+  /** Peer answers reach other students only after the teacher approves them */
+  approved: boolean;
+  /** «Чи сайн тайлбарласан» count */
+  kudos: number;
+};
+
+export type AnonQuestion = {
+  id: string;
+  subtopicId: string;
+  text: string;
+  /** How many students tapped «Би ч бас» */
+  meToo: number;
+  groupId?: string;
+  time: string;
+  answer?: QuestionAnswer;
+};
+
+/** Similar questions grouped (as if by AI) so the teacher answers once. */
+export type QuestionGroup = {
+  id: string;
+  subtopicId: string;
+  title: string;
+  questionIds: string[];
+};
+
 /** Understanding signal a student sends during a lesson: 🟢 got it, 🟡 unsure, 🔴 lost. */
 export type SignalLevel = "got" | "unsure" | "lost";
 
