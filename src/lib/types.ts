@@ -169,6 +169,44 @@ export type TeacherNotification = {
   time: string;
 };
 
+export type BossRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+
+/** A boss students fight with English answers. All numbers are tunable. */
+export type Boss = {
+  id: string;
+  name: string;
+  /** Path under /public, 64×64 pixel art. */
+  sprite: string;
+  elements: PetElement[];
+  rarity: BossRarity;
+  /** 1 easiest … 5 hardest; also the order on the boss list. */
+  difficulty: 1 | 2 | 3 | 4 | 5;
+  /** Short Mongolian description. */
+  description: string;
+  /** HP in a solo battle. */
+  maxHp: number;
+  /** Extra HP for each extra player, as a share of maxHp (group and class battles). */
+  hpPerExtraPlayer: number;
+  /** Question difficulties this boss asks. */
+  questionDifficulty: { min: 1 | 2 | 3; max: 1 | 2 | 3 };
+  attack: {
+    /** Seconds between attacks, picked at random in this range (10–20). */
+    minIntervalSec: number;
+    maxIntervalSec: number;
+    /** Warning shown before each attack. */
+    warningSec: number;
+    /** Damage to each participating pet. */
+    damage: number;
+  };
+  rewards: {
+    exp: number;
+    /** Chance of an egg on victory, 0–1. */
+    eggChance: number;
+    /** Pet lines the egg can hatch into, with relative weights. */
+    eggPool: { lineId: string; weight: number }[];
+  };
+};
+
 /** Shared class XP goal; every student's XP counts towards it. */
 export type ClassGoal = {
   classCode: string;
