@@ -405,3 +405,41 @@ export type EnglishProgress = {
     explanation: string;
   }[];
 };
+
+/** A geometry answer drawn as a small picture instead of text. */
+export type GameShape =
+  | { shape: "angle"; deg: number; name: string }
+  | {
+      shape: "poly";
+      /** Corner points around (0, 0), about −1.2…1.2; or `n` for a regular polygon. */
+      pts?: [number, number][];
+      n?: number;
+      /** Index of the corner marked as a right angle. */
+      right?: number;
+      name: string;
+    }
+  | { shape: "rect"; w: number; h: number; name: string }
+  | { shape: "tri"; b: number; h: number; name: string };
+
+/** One answer a player can pick in a game: plain text or a shape. */
+export type GameAnswer = string | GameShape;
+
+/**
+ * One game round, shared by every game: the 3 `correct` answers fit the
+ * prompt, the 3 `wrong` ones are common mistakes. A game decides how many of
+ * each it shows.
+ */
+export type GameQuestion = {
+  id: string;
+  prompt: string;
+  correct: GameAnswer[];
+  wrong: GameAnswer[];
+  /** Shown after a wrong pick. */
+  explanation: string;
+};
+
+export type GameSubject = {
+  id: string;
+  title: string;
+  questions: GameQuestion[];
+};
