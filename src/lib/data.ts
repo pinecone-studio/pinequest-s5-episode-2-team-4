@@ -8,6 +8,7 @@
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
+  Boss,
   Lesson,
   MasteryResult,
   PetLine,
@@ -32,6 +33,7 @@ import {
   heatmap,
   notifications,
 } from "./mock/teacher";
+import { bosses } from "./mock/bosses";
 import { petLines } from "./mock/pets";
 import { subtopics, topics } from "./mock/topics";
 
@@ -226,6 +228,17 @@ export async function getHelperConversation() {
 
 export async function askHelper(question: string): Promise<string> {
   return helperReplies[question] ?? helperFallbackReply;
+}
+
+// Bosses
+
+/** All bosses, easiest first. */
+export async function getBosses(): Promise<Boss[]> {
+  return [...bosses].sort((a, b) => a.difficulty - b.difficulty);
+}
+
+export async function getBoss(id: string): Promise<Boss | undefined> {
+  return bosses.find((b) => b.id === id);
 }
 
 // Teacher
