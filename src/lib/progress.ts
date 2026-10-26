@@ -4,6 +4,7 @@
 import "server-only";
 import { vocabularyWord } from "./english";
 import { englishQuestions, englishUnits } from "./mock/english";
+import { findPlayer } from "./players";
 import { getSupabaseAdmin } from "./supabase";
 import type { EnglishProgress, EnglishQuestion, EnglishSkill, User } from "./types";
 
@@ -19,9 +20,6 @@ type ProgressRow = {
   last_correct: boolean | null;
   last_answered_at: string;
 };
-
-/** Same matching as the login: usernames ignore case. LIKE wildcards are escaped. */
-const exactName = (name: string) => name.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 const expectedText = (q: EnglishQuestion) =>
   q.kind === "choice" ? q.options[q.correctIndex] : q.acceptedAnswers[0];
@@ -42,17 +40,10 @@ function empty(): EnglishProgress {
 }
 
 export async function englishProgress(user: User): Promise<EnglishProgress> {
-  const db = getSupabaseAdmin();
-  // Read-only: a student who never battled has no player row yet.
-  const { data: player, error: playerError } = await db
-    .from("players")
-    .select("id")
-    .ilike("username", exactName(user.username))
-    .maybeSingle<{ id: string }>();
-  if (playerError) throw new Error(`Could not load player: ${playerError.message}`);
+  const player = await findPlayer(user.username);
   if (!player) return empty();
 
-  const { data, error } = await db
+  const { data, error } = await getSupabaseAdmin()
     .from("english_progress")
     .select("question_id, unit_id, skill, attempts, correct, last_correct, last_answered_at")
     .eq("player_id", player.id)

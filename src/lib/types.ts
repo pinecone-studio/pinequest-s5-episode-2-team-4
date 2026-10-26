@@ -98,10 +98,15 @@ export type PetStage = {
   sprite: string;
 };
 
+/** How rare a pet or boss is, from Common to Legendary. */
+export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+
 /** A pet and its evolutions: levels 1–2, 3–5, 6+. */
 export type PetLine = {
   id: string;
   element: PetElement;
+  /** How rare its egg is from bosses. */
+  rarity: Rarity;
   stages: [PetStage, PetStage, PetStage];
 };
 
@@ -169,7 +174,7 @@ export type TeacherNotification = {
   time: string;
 };
 
-export type BossRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+export type BossRarity = Rarity;
 
 /** The battle scene drawn behind a boss. */
 export type BossArena = "beach" | "reef" | "volcano" | "desert" | "bamboo" | "city";
@@ -358,7 +363,20 @@ export type BattleState = {
   question: EnglishQuestionView | null;
   /** Why it ended: boss defeated, my pet fainted, time ran out, or I left. */
   endReason: "won" | "fainted" | "timeout" | "left" | null;
+  /** The pet fighting for me. */
+  pet: { lineId: string; level: number } | null;
+  /** What I got for winning, once granted. */
+  rewards: { exp: number; petExp: number; egg: { rarity: Rarity } | null } | null;
 };
+
+/** A pet in the student's collection. */
+export type OwnedPet = { lineId: string; level: number; exp: number; active: boolean };
+
+/** An egg waiting to hatch; its pet stays a surprise until then. */
+export type Egg = { id: string; bossId: string; rarity: Rarity; obtainedAt: string };
+
+/** What hatching an egg gave. */
+export type HatchResult = { lineId: string; rarity: Rarity; duplicate: boolean; bonusExp: number };
 
 /** What one answer did, shown as feedback. */
 export type BattleAnswerOutcome = EnglishAnswerResult & {

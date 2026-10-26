@@ -5,8 +5,9 @@
 
 import { redirect } from "next/navigation";
 import { answerBattleQuestion, battleState, forfeitBattle, startSoloBattle } from "./battle";
+import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
-import type { BattleAnswerOutcome, BattleState, EnglishAnswer } from "./types";
+import type { BattleAnswerOutcome, BattleState, EnglishAnswer, HatchResult } from "./types";
 
 async function student() {
   const user = await getCurrentUser();
@@ -48,4 +49,16 @@ export async function submitBattleAnswer(
     bossId.length <= 40;
   if (!valid) return { error: "invalid" };
   return answerBattleQuestion(await student(), battleId, bossId, questionId, attemptId, answer);
+}
+
+/** Hatches one of the student's eggs. */
+export async function hatchMyEgg(eggId: string): Promise<HatchResult | undefined> {
+  if (!/^[0-9a-f-]{36}$/i.test(eggId)) return undefined;
+  return hatchEgg(await student(), eggId);
+}
+
+/** Picks the pet the student fights with. */
+export async function chooseBattlePet(lineId: string): Promise<boolean> {
+  if (lineId.length > 40) return false;
+  return setActivePet(await student(), lineId);
 }

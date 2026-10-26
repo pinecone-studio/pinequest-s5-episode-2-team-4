@@ -6,6 +6,7 @@
 // (pages, layouts) and pass the result to Client Components as props.
 
 import { activeSoloBattleId, battleState } from "./battle";
+import { petCollection, unhatchedEggs } from "./collection";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { englishProgress } from "./progress";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
@@ -18,6 +19,8 @@ import type {
   EnglishAnswer,
   EnglishAnswerResult,
   EnglishProgress,
+  Egg,
+  OwnedPet,
   EnglishQuestionView,
   EnglishSkill,
   EnglishUnit,
@@ -263,6 +266,20 @@ export async function getBoss(id: string): Promise<Boss | undefined> {
 export async function getBattle(battleId: string): Promise<BattleState | undefined> {
   const user = await getCurrentUser();
   return user ? battleState(user, battleId) : undefined;
+}
+
+/** The current student's pets (active one marked) and player level. */
+export async function getPetCollection(): Promise<
+  { pets: OwnedPet[]; player: { level: number; exp: number } } | undefined
+> {
+  const user = await getCurrentUser();
+  return user ? petCollection(user) : undefined;
+}
+
+/** The current student's eggs waiting to hatch. */
+export async function getEggs(): Promise<Egg[]> {
+  const user = await getCurrentUser();
+  return user ? unhatchedEggs(user) : [];
 }
 
 /** The current student's English learning summary from their battle answers. */

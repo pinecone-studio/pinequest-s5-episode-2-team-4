@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui";
-import { getCurrentPet, getPetLines } from "@/lib/data";
-import { stageIndex } from "@/lib/pets";
+import { getBosses, getCurrentPet, getEggs, getPetCollection, getPetLines } from "@/lib/data";
 import { EvolutionPreview } from "./EvolutionPreview";
 import { PetCollection } from "./PetCollection";
 import "./pets.css";
@@ -52,8 +51,18 @@ const RULES = [
 ];
 
 export default async function PetsPage() {
-  const [pet, lines] = await Promise.all([getCurrentPet(), getPetLines()]);
-  const myStage = pet ? stageIndex(pet.level) : undefined;
+  const [pet, lines, collection, eggs, bosses] = await Promise.all([
+    getCurrentPet(),
+    getPetLines(),
+    getPetCollection(),
+    getEggs(),
+    getBosses(),
+  ]);
+  // Which bosses can drop each pet line's egg (for undiscovered pets).
+  const dropsFrom: Record<string, string[]> = {};
+  for (const boss of bosses) {
+    for (const { lineId } of boss.rewards.eggPool) (dropsFrom[lineId] ??= []).push(boss.name);
+  }
 
   return (
     <div className="pets mx-auto max-w-[1280px] px-4 pt-1 md:px-[clamp(16px,4vw,40px)] md:pt-2">
@@ -109,13 +118,23 @@ export default async function PetsPage() {
           <p className="mt-1 text-lavender">
             Англи хэлний асуултад хариулж, тэжээвэртэйгээ хамт боссыг ялаарай.
           </p>
+          {collection ? (
+            <p className="mt-2 text-sm font-bold text-sky">
+              Тоглогчийн түвшин {collection.player.level} · {collection.player.exp % 100}/100 EXP
+            </p>
+          ) : null}
         </div>
-        <ButtonLink href="/pets/battle" variant="white" className="w-full md:w-auto">
-          Тулалдах
-        </ButtonLink>
+        <div className="flex flex-col gap-2 md:flex-row">
+          <ButtonLink href="/pets/eggs" variant="secondary" className="w-full md:w-auto">
+            Өндөг{eggs.length > 0 ? ` (${eggs.length})` : ""}
+          </ButtonLink>
+          <ButtonLink href="/pets/battle" variant="white" className="w-full md:w-auto">
+            Тулалдах
+          </ButtonLink>
+        </div>
       </section>
 
-      <PetCollection lines={lines} myLineId={pet?.lineId} myStage={myStage} />
+      <PetCollection lines={lines} owned={collection?.pets ?? []} dropsFrom={dropsFrom} />
     </div>
   );
 }
