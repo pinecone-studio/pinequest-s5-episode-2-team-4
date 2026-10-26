@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import {
+  getAnonQuestions,
   getCurrentPet,
-  getHelperConversation,
   getLastRetest,
   getLesson,
   getProgress,
@@ -12,9 +12,9 @@ import {
   getTopics,
 } from "@/lib/data";
 import { ExplanationSection } from "./ExplanationSection";
-import { HelperPanel } from "./HelperPanel";
 import { LessonSection } from "./LessonSection";
 import { PracticeSection } from "./PracticeSection";
+import { QuestionPanel } from "./QuestionPanel";
 import { ResultsSection } from "./ResultsSection";
 import { RetestCard } from "./RetestCard";
 
@@ -32,13 +32,12 @@ export default async function LessonPage({
   searchParams,
 }: PageProps<"/lesson/[topic]">) {
   const [{ topic }, query] = await Promise.all([params, searchParams]);
-  const [result, progress, subtopics, pet, helper, solvedIds, lastRetest] =
+  const [result, progress, subtopics, pet, solvedIds, lastRetest] =
     await Promise.all([
       getTestResult(),
       getProgress(),
       getSubtopics(topic),
       getCurrentPet(),
-      getHelperConversation(),
       getSolvedPractice(),
       getLastRetest(),
     ]);
@@ -64,7 +63,10 @@ export default async function LessonPage({
     selected: s.subtopicId === selectedId,
   }));
 
-  const lesson = await getLesson(selectedId);
+  const [lesson, questions] = await Promise.all([
+    getLesson(selectedId),
+    getAnonQuestions(selectedId),
+  ]);
   const failedRetest =
     query.retest === "failed" &&
     lastRetest?.subtopicId === selectedId &&
@@ -88,10 +90,7 @@ export default async function LessonPage({
         <LessonSection
           lesson={lesson}
           helper={
-            <HelperPanel
-              initialMessages={helper.messages}
-              suggestions={helper.suggestions}
-            />
+            <QuestionPanel key={lesson.subtopicId} questions={questions} />
           }
           footer={
             <RetestCard
