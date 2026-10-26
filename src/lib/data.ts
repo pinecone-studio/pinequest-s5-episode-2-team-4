@@ -5,10 +5,12 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
+import { activeSoloBattleId, battleState } from "./battle";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
+  BattleState,
   Boss,
   ClassGoal,
   AnonQuestion,
@@ -253,6 +255,18 @@ export async function getBosses(): Promise<Boss[]> {
 
 export async function getBoss(id: string): Promise<Boss | undefined> {
   return bosses.find((b) => b.id === id);
+}
+
+/** The current student's view of a battle, or undefined if they aren't in it. */
+export async function getBattle(battleId: string): Promise<BattleState | undefined> {
+  const user = await getCurrentUser();
+  return user ? battleState(user, battleId) : undefined;
+}
+
+/** The current student's unfinished solo battle, if any. */
+export async function getActiveSoloBattleId(): Promise<string | undefined> {
+  const user = await getCurrentUser();
+  return user ? activeSoloBattleId(user) : undefined;
 }
 
 // English question bank (boss battles)
