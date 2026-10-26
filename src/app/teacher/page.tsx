@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import {
+  getAnonQuestions,
   getAssignmentDraft,
   getClassOverview,
   getHeatmap,
@@ -9,6 +10,7 @@ import {
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
+import { PeerApproval } from "./PeerApproval";
 import { StatCards } from "./StatCards";
 
 export const metadata: Metadata = {
@@ -20,12 +22,14 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications, draft] = await Promise.all([
-    getSubtopics(overview.topicId),
-    getHeatmap(),
-    getNotifications(),
-    getAssignmentDraft(),
-  ]);
+  const [subtopics, heatmap, notifications, draft, questions] =
+    await Promise.all([
+      getSubtopics(overview.topicId),
+      getHeatmap(),
+      getNotifications(),
+      getAssignmentDraft(),
+      getAnonQuestions(),
+    ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
   const rows = heatmap.map((row) => ({
@@ -34,6 +38,12 @@ export default async function TeacherPage() {
     lessonTitle:
       subtopicById.get(row.subtopicId)?.lessonTitle ?? row.subtopicId,
   }));
+  const pendingAnswers = questions
+    .filter((q) => q.answer?.by === "peer" && !q.answer.approved)
+    .map((q) => ({
+      ...q,
+      subtopicTitle: subtopicById.get(q.subtopicId)?.title ?? q.subtopicId,
+    }));
   // "Mastered" notifications are good news; the rest need the teacher.
   const alertCount = notifications.filter((n) => n.kind !== "mastered").length;
 
@@ -67,6 +77,7 @@ export default async function TeacherPage() {
           className="md:flex-[2_1_340px]"
         />
       </div>
+      <PeerApproval questions={pendingAnswers} className="md:mt-5" />
     </div>
   );
 }
