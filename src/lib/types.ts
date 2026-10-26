@@ -200,3 +200,79 @@ export type QuestionGroup = {
   title: string;
   questionIds: string[];
 };
+
+/** Understanding signal a student sends during a lesson: 🟢 got it, 🟡 unsure, 🔴 lost. */
+export type SignalLevel = "got" | "unsure" | "lost";
+
+export type UnderstandingSignal = {
+  /** Student number (№01, №02, …); the teacher sees counts, not names */
+  studentNo: number;
+  subtopicId: string;
+  level: SignalLevel;
+  time: string;
+};
+
+export type SignalSummary = {
+  subtopicId: string;
+  counts: Record<SignalLevel, number>;
+};
+
+// English boss battles (Grade 7, units from ECONTENT)
+
+export type EnglishSkill = "grammar" | "pronunciation" | "spelling" | "translation";
+
+/** A Grade 7 English unit; titles are the ones listed on ECONTENT. */
+export type EnglishUnit = {
+  id: string;
+  order: number;
+  title: string;
+  /** Where the unit is listed, for teachers to check questions against. */
+  sourceUrl: string;
+};
+
+type EnglishQuestionBase = {
+  id: string;
+  unitId: string;
+  skill: EnglishSkill;
+  /** 1 easy … 3 hard; harder questions deal more damage. */
+  difficulty: 1 | 2 | 3;
+  prompt: string;
+  /** Shown under the prompt, e.g. "h _ b b y" or a sentence to fix. */
+  display?: string;
+  hint?: string;
+  /** English text the browser reads aloud (listening questions). */
+  speak?: string;
+  /** Why the answer is right; shown after every answer. */
+  explanation: string;
+  /**
+   * Original practice questions written from the unit title. False until a
+   * teacher has checked them against the textbook.
+   */
+  verified: boolean;
+};
+
+export type EnglishQuestion =
+  | (EnglishQuestionBase & { kind: "choice"; options: string[]; correctIndex: number })
+  | (EnglishQuestionBase & { kind: "text"; acceptedAnswers: string[] })
+  | (EnglishQuestionBase & {
+      kind: "order";
+      /** The words in scrambled order. */
+      words: string[];
+      acceptedAnswers: string[];
+    });
+
+/** What the browser gets: everything except the answers. */
+export type EnglishQuestionView =
+  | (EnglishQuestionBase & { kind: "choice"; options: string[] })
+  | (EnglishQuestionBase & { kind: "text" })
+  | (EnglishQuestionBase & { kind: "order"; words: string[] });
+
+/** A choice index, or typed / ordered text. */
+export type EnglishAnswer = number | string;
+
+export type EnglishAnswerResult = {
+  correct: boolean;
+  /** The right answer as text, to show after a wrong one. */
+  expected: string;
+  explanation: string;
+};
