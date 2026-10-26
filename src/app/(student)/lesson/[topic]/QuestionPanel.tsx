@@ -26,6 +26,8 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
   const [mine, setMine] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
   const [meToo, setMeToo] = useState<Set<string>>(new Set());
+  // One kudos per answer; there is no way to leave a negative reaction.
+  const [kudos, setKudos] = useState<Set<string>>(new Set());
 
   // Peer answers reach students only after the teacher approves them.
   const answered = questions.filter((q) => q.answer?.approved);
@@ -125,11 +127,29 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
               <div key={q.id} className="rounded-card border-2 border-lavender px-3.5 py-2.5">
                 <p className="text-[15px] font-bold">{q.text}</p>
                 <p className="mt-1.5 text-[15px]">{q.answer?.text}</p>
-                <p className="mt-1 text-xs font-semibold text-ink-muted">
-                  {q.answer?.by === "teacher"
-                    ? "Багш"
-                    : "Ангийн найз · Багш баталсан"}
-                </p>
+                <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs font-semibold text-ink-muted">
+                    {q.answer?.by === "teacher"
+                      ? "Багш"
+                      : "Ангийн найз · Багш баталсан"}
+                  </p>
+                  {q.answer?.by === "peer" ? (
+                    <button
+                      type="button"
+                      disabled={kudos.has(q.id)}
+                      onClick={() => setKudos((prev) => new Set(prev).add(q.id))}
+                      className={cn(
+                        "min-h-11 cursor-pointer rounded-full border-2 px-3 text-xs font-bold disabled:cursor-default",
+                        kudos.has(q.id)
+                          ? "border-primary bg-primary text-white"
+                          : "border-lavender bg-white text-ink hover:bg-lavender",
+                      )}
+                    >
+                      {kudos.has(q.id) ? "Баярлалаа!" : "Чи сайн тайлбарласан"} 👏{" "}
+                      {q.answer.kudos + (kudos.has(q.id) ? 1 : 0)}
+                    </button>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>
