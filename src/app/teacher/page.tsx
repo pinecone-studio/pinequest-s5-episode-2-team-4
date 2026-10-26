@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { ClassGoalCard } from "@/components/ClassGoalCard";
 import {
   getAnonQuestions,
   getAssignmentDraft,
+  getClassGoal,
   getClassOverview,
   getHeatmap,
   getNotifications,
@@ -22,13 +24,14 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications, draft, questions] =
+  const [subtopics, heatmap, notifications, draft, questions, classGoal] =
     await Promise.all([
       getSubtopics(overview.topicId),
       getHeatmap(),
       getNotifications(),
       getAssignmentDraft(),
       getAnonQuestions(),
+      getClassGoal(),
     ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
@@ -78,6 +81,7 @@ export default async function TeacherPage() {
         />
       </div>
       <PeerApproval questions={pendingAnswers} className="md:mt-5" />
+      <ClassGoalCard goal={classGoal} className="md:mt-5" />
     </div>
   );
 }
