@@ -1,8 +1,9 @@
-// Mock accounts and session kept in cookies until there is a real backend
-// and auth. The cookies are not signed or encrypted and passwords are not
-// checked, so this is for the demo only: replace it with real auth before
-// storing anything private.
+// Mock accounts and session kept in cookies until there is real auth. The
+// cookies are signed with SESSION_SECRET so they can't be edited or faked,
+// but they aren't encrypted and passwords aren't checked: don't store
+// anything private in them.
 
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import type { User, UserPet } from "./types";
 
@@ -47,14 +48,39 @@ const cookieOptions = {
   maxAge: MAX_AGE,
 } as const;
 
-function encode(value: unknown) {
-  return Buffer.from(JSON.stringify(value)).toString("base64url");
+// A fixed secret keeps local development working before `.env.local` has
+// one; production must set its own.
+const DEV_SECRET = "levelup-dev-only-secret";
+
+function secret() {
+  const value = process.env.SESSION_SECRET;
+  if (value) return value;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET is not set");
+  }
+  return DEV_SECRET;
 }
 
+const sign = (payload: string) =>
+  createHmac("sha256", secret()).update(payload).digest("base64url");
+
+/** `payload.signature`, both base64url. */
+function encode(value: unknown) {
+  const payload = Buffer.from(JSON.stringify(value)).toString("base64url");
+  return `${payload}.${sign(payload)}`;
+}
+
+/** Undefined for a missing, unsigned or tampered cookie. */
 function decode<T>(value: string | undefined): T | undefined {
-  if (!value) return undefined;
+  const [payload, signature, extra] = value?.split(".") ?? [];
+  if (!payload || !signature || extra !== undefined) return undefined;
+  const expected = Buffer.from(sign(payload));
+  const given = Buffer.from(signature);
+  if (expected.length !== given.length || !timingSafeEqual(expected, given)) {
+    return undefined;
+  }
   try {
-    return JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as T;
+    return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as T;
   } catch {
     return undefined;
   }
