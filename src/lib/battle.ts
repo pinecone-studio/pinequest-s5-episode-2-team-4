@@ -202,7 +202,10 @@ export async function battleState(user: User, battleId: string) {
   return toState(data as ViewJson);
 }
 
-/** Random questions for this boss, for the database to pick the next one from. */
+/**
+ * Random questions for this boss, for the database to pick the next one
+ * from (it weights them by the player's weaker skills).
+ */
 function nextCandidates(boss: Boss) {
   const { min, max } = boss.questionDifficulty;
   const pool = englishQuestions.filter((q) => q.difficulty >= min && q.difficulty <= max);
@@ -210,7 +213,8 @@ function nextCandidates(boss: Boss) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  return pool.slice(0, RECENT_QUESTIONS + 4).map((q) => q.id);
+  // Enough of every skill that weighting has a real choice.
+  return pool.slice(0, RECENT_QUESTIONS + 12);
 }
 
 /**
@@ -232,6 +236,7 @@ export async function answerBattleQuestion(
   const question = englishQuestions.find((q) => q.id === questionId);
   if (!boss || !question) return { error: "invalid" };
   const result = checkEnglishAnswer(question, answer);
+  const candidates = nextCandidates(boss);
 
   const { data, error } = await db().rpc("battle_answer", {
     p_battle: battleId,
@@ -242,7 +247,10 @@ export async function answerBattleQuestion(
     p_correct: result.correct,
     p_damage: BASE_DAMAGE[question.difficulty],
     p_pet_damage: WRONG_ANSWER_PET_DAMAGE,
-    p_next_candidates: nextCandidates(boss),
+    p_next_candidates: candidates.map((q) => q.id),
+    p_unit: question.unitId,
+    p_skill: question.skill,
+    p_candidate_skills: candidates.map((q) => q.skill),
   });
   if (error) fail("Could not save answer", error);
 

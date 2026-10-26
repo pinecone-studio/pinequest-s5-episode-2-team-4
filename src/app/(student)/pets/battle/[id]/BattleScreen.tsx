@@ -543,9 +543,12 @@ function BattleOver({ state, boss }: { state: BattleState; boss: BattleScreenPro
           </div>
         ))}
       </dl>
-      <ButtonLink href="/pets/battle" className="w-full md:w-auto">
-        Боссууд руу буцах
-      </ButtonLink>
+      <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
+        <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
+        <ButtonLink href="/pets/progress" variant="secondary">
+          Ахицаа харах
+        </ButtonLink>
+      </div>
     </section>
   );
 }

@@ -7,6 +7,7 @@
 
 import { activeSoloBattleId, battleState } from "./battle";
 import { checkEnglishAnswer, toQuestionView } from "./english";
+import { englishProgress } from "./progress";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
@@ -16,6 +17,7 @@ import type {
   AnonQuestion,
   EnglishAnswer,
   EnglishAnswerResult,
+  EnglishProgress,
   EnglishQuestionView,
   EnglishSkill,
   EnglishUnit,
@@ -261,6 +263,12 @@ export async function getBoss(id: string): Promise<Boss | undefined> {
 export async function getBattle(battleId: string): Promise<BattleState | undefined> {
   const user = await getCurrentUser();
   return user ? battleState(user, battleId) : undefined;
+}
+
+/** The current student's English learning summary from their battle answers. */
+export async function getEnglishProgress(): Promise<EnglishProgress | undefined> {
+  const user = await getCurrentUser();
+  return user ? englishProgress(user) : undefined;
 }
 
 /** The current student's unfinished solo battle, if any. */

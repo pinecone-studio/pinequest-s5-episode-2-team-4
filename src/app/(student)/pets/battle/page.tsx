@@ -27,6 +27,9 @@ export default async function BossListPage() {
         Англи хэлний асуултад зөв хариулж боссыг ялаарай. Буруу хариулбал тэжээвэр чинь
         гэмтэнэ, босс ч бас үе үе довтолно.
       </p>
+      <ButtonLink href="/pets/progress" variant="secondary" size="sm" className="mt-4">
+        Миний англи хэлний ахиц
+      </ButtonLink>
 
       {activeBattleId ? (
         <div className="mt-5 flex flex-col gap-3 rounded-card bg-surface p-4 md:flex-row md:items-center md:justify-between md:p-5">
