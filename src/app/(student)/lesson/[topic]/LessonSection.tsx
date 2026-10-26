@@ -4,7 +4,7 @@ type LessonSectionProps = {
   lesson: Pick<Lesson, "title" | "approvedByTeacher">;
   /** Explanation and practice, in the main column. */
   children: React.ReactNode;
-  /** The AI helper: a sticky side column on wide screens. */
+  /** Anonymous questions: a sticky side column on wide screens. */
   helper: React.ReactNode;
   /** Below the main column; after the helper on narrow screens. */
   footer: React.ReactNode;

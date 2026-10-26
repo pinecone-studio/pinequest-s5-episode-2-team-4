@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import {
+  getAnonQuestions,
   getCurrentPet,
-  getHelperConversation,
   getLastRetest,
   getLesson,
+  getPeerQuestions,
   getProgress,
   getSolvedPractice,
   getSubtopics,
@@ -12,11 +13,13 @@ import {
   getTopics,
 } from "@/lib/data";
 import { ExplanationSection } from "./ExplanationSection";
-import { HelperPanel } from "./HelperPanel";
+import { HelpClassmates } from "./HelpClassmates";
 import { LessonSection } from "./LessonSection";
 import { PracticeSection } from "./PracticeSection";
+import { QuestionPanel } from "./QuestionPanel";
 import { ResultsSection } from "./ResultsSection";
 import { RetestCard } from "./RetestCard";
+import { SignalCheck } from "./SignalCheck";
 
 export const metadata: Metadata = {
   title: "Үр дүн ба хичээл — LevelUp",
@@ -32,13 +35,12 @@ export default async function LessonPage({
   searchParams,
 }: PageProps<"/lesson/[topic]">) {
   const [{ topic }, query] = await Promise.all([params, searchParams]);
-  const [result, progress, subtopics, pet, helper, solvedIds, lastRetest] =
+  const [result, progress, subtopics, pet, solvedIds, lastRetest] =
     await Promise.all([
       getTestResult(),
       getProgress(),
       getSubtopics(topic),
       getCurrentPet(),
-      getHelperConversation(),
       getSolvedPractice(),
       getLastRetest(),
     ]);
@@ -64,7 +66,11 @@ export default async function LessonPage({
     selected: s.subtopicId === selectedId,
   }));
 
-  const lesson = await getLesson(selectedId);
+  const [lesson, questions, peerQuestions] = await Promise.all([
+    getLesson(selectedId),
+    getAnonQuestions(selectedId),
+    getPeerQuestions(),
+  ]);
   const failedRetest =
     query.retest === "failed" &&
     lastRetest?.subtopicId === selectedId &&
@@ -88,10 +94,7 @@ export default async function LessonPage({
         <LessonSection
           lesson={lesson}
           helper={
-            <HelperPanel
-              initialMessages={helper.messages}
-              suggestions={helper.suggestions}
-            />
+            <QuestionPanel key={lesson.subtopicId} questions={questions} />
           }
           footer={
             <RetestCard
@@ -102,10 +105,15 @@ export default async function LessonPage({
         >
           {/* key: a different lesson starts with fresh practice state */}
           <ExplanationSection lesson={lesson} />
+          <SignalCheck key={`signal-${lesson.subtopicId}`} />
           <PracticeSection
             key={lesson.subtopicId}
             questions={lesson.practice}
             solvedIds={solvedIds}
+          />
+          <HelpClassmates
+            key={`help-${lesson.subtopicId}`}
+            questions={peerQuestions.filter((q) => q.subtopicId === selectedId)}
           />
         </LessonSection>
       ) : (
