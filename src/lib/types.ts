@@ -169,6 +169,22 @@ export type TeacherNotification = {
   time: string;
 };
 
+/** Understanding signal a student sends during a lesson: 🟢 got it, 🟡 unsure, 🔴 lost. */
+export type SignalLevel = "got" | "unsure" | "lost";
+
+export type UnderstandingSignal = {
+  /** Student number (№01, №02, …); the teacher sees counts, not names */
+  studentNo: number;
+  subtopicId: string;
+  level: SignalLevel;
+  time: string;
+};
+
+export type SignalSummary = {
+  subtopicId: string;
+  counts: Record<SignalLevel, number>;
+};
+
 // English boss battles (Grade 7, units from ECONTENT)
 
 export type EnglishSkill = "grammar" | "pronunciation" | "spelling" | "translation";

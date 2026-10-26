@@ -18,6 +18,7 @@ import type {
   MasteryResult,
   PetLine,
   Question,
+  SignalSummary,
   Subtopic,
   SubtopicProgress,
   TestResult,
@@ -40,6 +41,7 @@ import {
 } from "./mock/teacher";
 import { englishQuestions, englishUnits } from "./mock/english";
 import { petLines } from "./mock/pets";
+import { signals } from "./mock/signals";
 import { subtopics, topics } from "./mock/topics";
 
 // Student
@@ -282,4 +284,19 @@ export async function getAssignmentDraft() {
 
 export async function getNotifications() {
   return notifications;
+}
+
+// Understanding signals (🟢🟡🔴 sent by students during a lesson)
+
+export async function getSignals(subtopicId: string) {
+  return signals.filter((s) => s.subtopicId === subtopicId);
+}
+
+/** 🟢/🟡/🔴 counts per subtopic, in topic order. */
+export async function getSignalSummary(): Promise<SignalSummary[]> {
+  return subtopics.map((sub) => {
+    const counts = { got: 0, unsure: 0, lost: 0 };
+    for (const s of signals) if (s.subtopicId === sub.id) counts[s.level]++;
+    return { subtopicId: sub.id, counts };
+  });
 }
