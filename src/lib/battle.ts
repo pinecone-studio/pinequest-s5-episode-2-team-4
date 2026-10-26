@@ -1,12 +1,13 @@
 // Boss battle engine (server only). The database functions in
-// supabase/migrations/0002_solo_battles.sql apply damage, attacks and
-// knock-outs atomically; this file picks questions, checks answers and
+// supabase/migrations/ apply damage, attacks, fainting and rewards
+// atomically; this file picks questions, checks answers, rolls rewards and
 // shapes what the browser sees. Pages read through data.ts.
 
 import "server-only";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { bosses } from "./mock/bosses";
 import { englishQuestions } from "./mock/english";
+import { petLines } from "./mock/pets";
 import { getSupabaseAdmin } from "./supabase";
 import type {
   BattleAnswerOutcome,
@@ -14,6 +15,7 @@ import type {
   Boss,
   EnglishAnswer,
   EnglishQuestion,
+  Rarity,
   User,
   UserPet,
 } from "./types";
@@ -26,11 +28,11 @@ const TIME_LIMIT_SEC = 8 * 60;
 /** Questions not repeated until this many others have been asked. */
 const RECENT_QUESTIONS = 8;
 
-/**
- * A pet's HP in battle grows with its level: 110 at level 1, 160 at level 6.
- * A pet at 0 HP faints and stays out, so this is the whole battle's budget.
- */
-export const petMaxHp = (level: number) => 100 + level * 10;
+// A pet's battle HP is 100 + 10 × level (110 at level 1, 160 at level 6),
+// set in the database (game_battle_pet). A pet at 0 HP faints and stays out.
+
+/** The fighting pet gets this share of the boss's EXP. */
+const PET_EXP_SHARE = 0.5;
 
 function db() {
   return getSupabaseAdmin();
@@ -61,19 +63,22 @@ function pickQuestion(boss: Boss, recentIds: string[]): EnglishQuestion {
 }
 
 /** Starts a solo battle against `bossId`, or returns the unfinished one. */
-export async function startSoloBattle(user: User, pet: UserPet, bossId: string) {
+/**
+ * Starts a solo battle against `bossId` with the player's active pet (their
+ * LevelUp pet until they pick another), or returns the unfinished one.
+ */
+export async function startSoloBattle(user: User, starter: UserPet, bossId: string) {
   const boss = bosses.find((b) => b.id === bossId);
   if (!boss) throw new Error(`Unknown boss ${bossId}`);
   const player = await playerId(user);
-  const maxHp = petMaxHp(pet.level);
 
-  const { data: petId, error: petError } = await db().rpc("game_active_pet", {
+  const { data: pet, error: petError } = await db().rpc("game_battle_pet", {
     p_player: player,
-    p_line: pet.lineId,
-    p_level: pet.level,
-    p_max_hp: maxHp,
+    p_starter_line: starter.lineId,
+    p_starter_level: starter.level,
   });
-  if (petError || !petId) fail("Could not set active pet", petError);
+  if (petError || !pet) fail("Could not load the battle pet", petError);
+  const { id: petId, max_hp: maxHp } = pet as { id: string; max_hp: number };
 
   const { data, error } = await db().rpc("battle_start_solo", {
     p_player: player,
@@ -129,10 +134,16 @@ type ParticipantRow = {
   wrong_count: number;
   faint_count: number;
   current_question_id: string | null;
+  rewarded_at: string | null;
+  reward_exp: number | null;
+  reward_pet_exp: number | null;
+  reward_egg_rarity: Rarity | null;
 };
 
+type PetRow = { line_id: string; level: number };
+
 /** What the battle_view() database function returns. */
-type ViewJson = { battle: BattleRow; me: ParticipantRow; now: string } | null;
+type ViewJson = { battle: BattleRow; me: ParticipantRow; pet: PetRow | null; now: string } | null;
 
 /** Turns the database view into what the browser sees (no answers in it). */
 function toState(view: ViewJson): BattleState | undefined {
@@ -177,7 +188,44 @@ function toState(view: ViewJson): BattleState | undefined {
               ? "fainted"
               : "timeout"
             : null,
+    pet: view.pet ? { lineId: view.pet.line_id, level: view.pet.level } : null,
+    rewards: p.rewarded_at
+      ? {
+          exp: p.reward_exp ?? 0,
+          petExp: p.reward_pet_exp ?? 0,
+          egg: p.reward_egg_rarity ? { rarity: p.reward_egg_rarity } : null,
+        }
+      : null,
   };
+}
+
+/** Picks a pet line from the boss's egg pool by weight. */
+function rollEgg(boss: Boss) {
+  if (Math.random() >= boss.rewards.eggChance) return undefined;
+  const pool = boss.rewards.eggPool;
+  let ticket = Math.random() * pool.reduce((sum, e) => sum + e.weight, 0);
+  const lineId = (pool.find((e) => (ticket -= e.weight) < 0) ?? pool[pool.length - 1]).lineId;
+  const line = petLines.find((l) => l.id === lineId);
+  return line && { lineId: line.id, rarity: line.rarity };
+}
+
+/**
+ * Grants a won battle's rewards (EXP, pet EXP, maybe an egg). The database
+ * grants them only once, so calling again after a refresh is safe.
+ */
+async function claimRewards(user: User, state: BattleState) {
+  const boss = bosses.find((b) => b.id === state.bossId);
+  if (!boss || state.status !== "won" || state.rewards) return;
+  const egg = rollEgg(boss);
+  const { error } = await db().rpc("battle_claim_rewards", {
+    p_battle: state.id,
+    p_username: user.username,
+    p_exp: boss.rewards.exp,
+    p_pet_exp: Math.round(boss.rewards.exp * PET_EXP_SHARE),
+    p_egg_line: egg?.lineId ?? null,
+    p_egg_rarity: egg?.rarity ?? null,
+  });
+  if (error) fail("Could not grant rewards", error);
 }
 
 /** Leaves a solo battle; it ends without a victory. */
@@ -199,7 +247,13 @@ export async function battleState(user: User, battleId: string) {
     p_username: user.username,
   });
   if (error) fail("Could not load battle", error);
-  return toState(data as ViewJson);
+  const state = toState(data as ViewJson);
+  // Won but not rewarded yet (e.g. the winning answer's claim was cut off).
+  if (state?.status === "won" && !state.rewards) {
+    await claimRewards(user, state);
+    return battleState(user, battleId);
+  }
+  return state;
 }
 
 /**
@@ -261,8 +315,9 @@ export async function answerBattleQuestion(
     combo?: number;
     view?: ViewJson;
   };
-  const state = toState(applied.view ?? null);
+  let state = toState(applied.view ?? null);
   if (applied.error) return { state, error: applied.error };
+  if (state?.status === "won") state = await battleState(user, battleId);
   return {
     state,
     outcome: {

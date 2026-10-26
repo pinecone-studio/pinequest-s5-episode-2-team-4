@@ -1,0 +1,72 @@
+/* Egg animations. globals.css turns animations off for
+   prefers-reduced-motion; the egg and pet still show. */
+
+.egg-idle {
+  animation: egg-idle 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes egg-idle {
+  0%,
+  80%,
+  100% {
+    transform: rotate(0);
+  }
+  85% {
+    transform: rotate(-8deg);
+  }
+  90% {
+    transform: rotate(8deg);
+  }
+  95% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* Wobbles harder and harder, then pops. */
+.egg-crack {
+  animation: egg-crack 1.4s ease-in forwards;
+  transform-origin: 50% 100%;
+}
+
+@keyframes egg-crack {
+  0% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  35% {
+    transform: rotate(8deg);
+  }
+  50% {
+    transform: rotate(-14deg);
+  }
+  65% {
+    transform: rotate(14deg);
+  }
+  80% {
+    transform: rotate(-18deg) scale(1.05);
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1.4);
+    filter: brightness(3);
+    opacity: 0;
+  }
+}
+
+.egg-reveal {
+  animation: egg-reveal 0.5s ease-out both;
+}
+
+@keyframes egg-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

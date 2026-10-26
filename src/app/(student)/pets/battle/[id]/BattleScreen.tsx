@@ -12,7 +12,9 @@ import type {
   EnglishAnswer,
   PetStage,
 } from "@/lib/types";
+import { PixelEgg } from "../../PixelEgg";
 import { ArenaBackground } from "../ArenaBackground";
+import { RARITY_LABELS } from "../labels";
 import { BattleAudio, type Sfx } from "./audio";
 import { HpBar } from "./HpBar";
 import { QuestionCard } from "./QuestionCard";
@@ -504,7 +506,7 @@ function Backdrop({ arena }: { arena: Boss["arena"] }) {
 }
 
 const END_MESSAGES: Record<NonNullable<BattleState["endReason"]>, { title: string; text: string }> = {
-  won: { title: "Ялалт!", text: "Боссыг ялсан! Шагналын систем удахгүй нэмэгдэнэ." },
+  won: { title: "Ялалт!", text: "Боссыг ялсан!" },
   fainted: { title: "Ялагдлаа", text: "Тэжээвэр чинь ухаан алдлаа. Дасгалаа давтаад дахин оролдоорой!" },
   timeout: { title: "Хугацаа дууслаа", text: "Энэ удаа амжсангүй. Дахин оролдоод улам сайжраарай!" },
   left: { title: "Тулаанаас гарсан", text: "Хүссэн үедээ дахин тулалдаж болно." },
@@ -530,6 +532,28 @@ function BattleOver({ state, boss }: { state: BattleState; boss: BattleScreenPro
         {message.title}
       </h1>
       <p className="text-ink-muted">{message.text}</p>
+      {state.rewards ? (
+        <div role="status" className="arena-reward flex w-full flex-col items-center gap-3 rounded-card bg-surface p-4">
+          <p className="text-lg font-bold">Шагнал</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <span className="rounded-full bg-primary px-3 py-1 font-bold text-white">+{state.rewards.exp} EXP</span>
+            <span className="rounded-full bg-sky px-3 py-1 font-bold">Тэжээвэр +{state.rewards.petExp} EXP</span>
+          </div>
+          {state.rewards.egg ? (
+            <div className="flex items-center gap-3">
+              <PixelEgg rarity={state.rewards.egg.rarity} size={48} className="arena-egg-bob" />
+              <div className="text-left">
+                <p className="font-bold">Өндөг олдлоо!</p>
+                <p className="text-sm text-ink-muted">
+                  {RARITY_LABELS[state.rewards.egg.rarity]} · Тэжээвэр хэсгээс ангаахай
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-ink-muted">Энэ удаа өндөг олдсонгүй.</p>
+          )}
+        </div>
+      ) : null}
       <dl className="grid w-full grid-cols-2 gap-2 text-sm md:grid-cols-4">
         {[
           ["Нийт хохирол", state.me.damageDealt],
@@ -545,6 +569,11 @@ function BattleOver({ state, boss }: { state: BattleState; boss: BattleScreenPro
       </dl>
       <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
         <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
+        {state.rewards?.egg ? (
+          <ButtonLink href="/pets/eggs" variant="secondary">
+            Өндөг ангаахай
+          </ButtonLink>
+        ) : null}
         <ButtonLink href="/pets/progress" variant="secondary">
           Ахицаа харах
         </ButtonLink>
