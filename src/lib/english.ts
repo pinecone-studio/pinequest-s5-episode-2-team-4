@@ -52,3 +52,33 @@ export function toQuestionView(question: EnglishQuestion): EnglishQuestionView {
   delete view.acceptedAnswers;
   return view as EnglishQuestionView;
 }
+
+/**
+ * The English word or short phrase a spelling or translation question
+ * teaches, without end punctuation. Sentence questions and "find the
+ * misspelling" don't teach one.
+ */
+export function vocabularyWord(question: EnglishQuestion): string | undefined {
+  const word = rawVocabularyWord(question);
+  return word?.replace(/[.!?]+$/, "");
+}
+
+function rawVocabularyWord(question: EnglishQuestion): string | undefined {
+  if (question.skill !== "spelling" && question.skill !== "translation") return undefined;
+  const isMongolian = (text: string) => /[а-яөүё]/i.test(text);
+  if (question.kind === "text") {
+    const answer = question.acceptedAnswers[0];
+    if (question.skill === "spelling") return answer;
+    // "Translate into English: шатар" → chess; "Translate into Mongolian: hobby" → hobby.
+    if (question.display && !question.display.includes(" ")) {
+      return isMongolian(question.display) ? answer : question.display;
+    }
+    const quoted = question.prompt.match(/"([^"]+)"/)?.[1];
+    return quoted && !isMongolian(quoted) ? quoted : undefined;
+  }
+  if (question.kind === "choice" && question.skill === "translation" && !question.display) {
+    // "What does "holiday" mean in Mongolian?"
+    return question.prompt.match(/"([^"]+)"/)?.[1];
+  }
+  return undefined;
+}

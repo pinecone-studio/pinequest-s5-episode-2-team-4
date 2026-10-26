@@ -366,3 +366,24 @@ export type BattleAnswerOutcome = EnglishAnswerResult & {
   petDamage: number;
   combo: number;
 };
+
+/** A student's English learning summary, built from their battle answers. */
+export type EnglishProgress = {
+  attempts: number;
+  correct: number;
+  bySkill: { skill: EnglishSkill; attempts: number; correct: number }[];
+  byUnit: { unitId: string; title: string; attempts: number; correct: number }[];
+  /** The skill to practise next: lowest accuracy among practised skills. */
+  weakestSkill?: EnglishSkill;
+  vocabulary: { learned: string[]; total: number };
+  /** Latest questions whose last answer was wrong, newest first. */
+  mistakes: {
+    questionId: string;
+    skill: EnglishSkill;
+    unitTitle: string;
+    prompt: string;
+    display?: string;
+    expected: string;
+    explanation: string;
+  }[];
+};
