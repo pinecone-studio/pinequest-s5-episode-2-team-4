@@ -5,9 +5,15 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
+import { checkEnglishAnswer, toQuestionView } from "./english";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
+  EnglishAnswer,
+  EnglishAnswerResult,
+  EnglishQuestionView,
+  EnglishSkill,
+  EnglishUnit,
   Lesson,
   MasteryResult,
   PetLine,
@@ -32,6 +38,7 @@ import {
   heatmap,
   notifications,
 } from "./mock/teacher";
+import { englishQuestions, englishUnits } from "./mock/english";
 import { petLines } from "./mock/pets";
 import { subtopics, topics } from "./mock/topics";
 
@@ -226,6 +233,37 @@ export async function getHelperConversation() {
 
 export async function askHelper(question: string): Promise<string> {
   return helperReplies[question] ?? helperFallbackReply;
+}
+
+// English question bank (boss battles)
+
+export async function getEnglishUnits(): Promise<EnglishUnit[]> {
+  return [...englishUnits].sort((a, b) => a.order - b.order);
+}
+
+/** Questions without their answers, optionally for one unit and/or skill. */
+export async function getEnglishQuestions(
+  filter: { unitId?: string; skill?: EnglishSkill } = {},
+): Promise<EnglishQuestionView[]> {
+  return englishQuestions
+    .filter(
+      (q) =>
+        (!filter.unitId || q.unitId === filter.unitId) &&
+        (!filter.skill || q.skill === filter.skill),
+    )
+    .map(toQuestionView);
+}
+
+/**
+ * Checks an answer on the server. Undefined for an unknown question id.
+ * Only call from server code (Server Functions, pages): it reads the answers.
+ */
+export async function checkEnglishQuestion(
+  questionId: string,
+  answer: EnglishAnswer,
+): Promise<EnglishAnswerResult | undefined> {
+  const question = englishQuestions.find((q) => q.id === questionId);
+  return question && checkEnglishAnswer(question, answer);
 }
 
 // Teacher
