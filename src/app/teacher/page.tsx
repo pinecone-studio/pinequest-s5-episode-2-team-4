@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
+import { ClassGoalCard } from "@/components/ClassGoalCard";
 import {
+  getAnonQuestions,
   getAssignmentDraft,
+  getClassGoal,
   getClassOverview,
   getHeatmap,
   getNotifications,
+  getSignalSummary,
   getSubtopics,
 } from "@/lib/data";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
+import { PeerApproval } from "./PeerApproval";
+import { SignalPanel } from "./SignalPanel";
 import { StatCards } from "./StatCards";
 
 export const metadata: Metadata = {
@@ -20,11 +26,22 @@ const HIGHLIGHTED_STUDENT = 17;
 
 export default async function TeacherPage() {
   const overview = await getClassOverview();
-  const [subtopics, heatmap, notifications, draft] = await Promise.all([
+  const [
+    subtopics,
+    heatmap,
+    notifications,
+    draft,
+    signals,
+    questions,
+    classGoal,
+  ] = await Promise.all([
     getSubtopics(overview.topicId),
     getHeatmap(),
     getNotifications(),
     getAssignmentDraft(),
+    getSignalSummary(),
+    getAnonQuestions(),
+    getClassGoal(),
   ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
@@ -34,6 +51,12 @@ export default async function TeacherPage() {
     lessonTitle:
       subtopicById.get(row.subtopicId)?.lessonTitle ?? row.subtopicId,
   }));
+  const pendingAnswers = questions
+    .filter((q) => q.answer?.by === "peer" && !q.answer.approved)
+    .map((q) => ({
+      ...q,
+      subtopicTitle: subtopicById.get(q.subtopicId)?.title ?? q.subtopicId,
+    }));
   // "Mastered" notifications are good news; the rest need the teacher.
   const alertCount = notifications.filter((n) => n.kind !== "mastered").length;
 
@@ -54,6 +77,13 @@ export default async function TeacherPage() {
         testedCount={overview.testedCount}
         highlight={HIGHLIGHTED_STUDENT}
       />
+      <SignalPanel
+        rows={signals.map((s) => ({
+          ...s,
+          title: subtopicById.get(s.subtopicId)?.title ?? s.subtopicId,
+        }))}
+        className="md:mt-5"
+      />
       <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
         <AssignmentDraftCard
           draft={draft}
@@ -67,6 +97,8 @@ export default async function TeacherPage() {
           className="md:flex-[2_1_340px]"
         />
       </div>
+      <PeerApproval questions={pendingAnswers} className="md:mt-5" />
+      <ClassGoalCard goal={classGoal} className="md:mt-5" />
     </div>
   );
 }
