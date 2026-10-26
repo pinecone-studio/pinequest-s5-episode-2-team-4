@@ -17,6 +17,7 @@ import { LessonSection } from "./LessonSection";
 import { PracticeSection } from "./PracticeSection";
 import { ResultsSection } from "./ResultsSection";
 import { RetestCard } from "./RetestCard";
+import { SignalCheck } from "./SignalCheck";
 
 export const metadata: Metadata = {
   title: "Үр дүн ба хичээл — LevelUp",
@@ -102,6 +103,7 @@ export default async function LessonPage({
         >
           {/* key: a different lesson starts with fresh practice state */}
           <ExplanationSection lesson={lesson} />
+          <SignalCheck key={`signal-${lesson.subtopicId}`} />
           <PracticeSection
             key={lesson.subtopicId}
             questions={lesson.practice}
