@@ -8,10 +8,12 @@
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
+  AnonQuestion,
   Lesson,
   MasteryResult,
   PetLine,
   Question,
+  QuestionGroup,
   Subtopic,
   SubtopicProgress,
   TestResult,
@@ -32,6 +34,7 @@ import {
   heatmap,
   notifications,
 } from "./mock/teacher";
+import { anonQuestions, questionGroups } from "./mock/anonQuestions";
 import { petLines } from "./mock/pets";
 import { subtopics, topics } from "./mock/topics";
 
@@ -244,4 +247,21 @@ export async function getAssignmentDraft() {
 
 export async function getNotifications() {
   return notifications;
+}
+
+// Anonymous questions (answered by the teacher or classmates, not the AI)
+
+export async function getAnonQuestions(subtopicId?: string): Promise<AnonQuestion[]> {
+  return subtopicId
+    ? anonQuestions.filter((q) => q.subtopicId === subtopicId)
+    : anonQuestions;
+}
+
+export async function getQuestionGroups(): Promise<QuestionGroup[]> {
+  return questionGroups;
+}
+
+/** Open questions a classmate can answer: no answer yet. */
+export async function getPeerQuestions(): Promise<AnonQuestion[]> {
+  return anonQuestions.filter((q) => !q.answer);
 }
