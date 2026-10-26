@@ -11,6 +11,7 @@ import {
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
+import { PeerApproval } from "./PeerApproval";
 import { QuestionGroups } from "./QuestionGroups";
 import { StatCards } from "./StatCards";
 
@@ -46,6 +47,12 @@ export default async function TeacherPage() {
     subtopicTitle: subtopicById.get(g.subtopicId)?.title ?? g.subtopicId,
     questions: g.questionIds.flatMap((id) => questionById.get(id) ?? []),
   }));
+  const pendingAnswers = questions
+    .filter((q) => q.answer?.by === "peer" && !q.answer.approved)
+    .map((q) => ({
+      ...q,
+      subtopicTitle: subtopicById.get(q.subtopicId)?.title ?? q.subtopicId,
+    }));
   // "Mastered" notifications are good news; the rest need the teacher.
   const alertCount = notifications.filter((n) => n.kind !== "mastered").length;
 
@@ -80,6 +87,7 @@ export default async function TeacherPage() {
         />
       </div>
       <QuestionGroups groups={questionGroups} className="md:mt-5" />
+      <PeerApproval questions={pendingAnswers} className="md:mt-5" />
     </div>
   );
 }
