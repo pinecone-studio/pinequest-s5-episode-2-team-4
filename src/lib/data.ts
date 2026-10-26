@@ -5,14 +5,24 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
+import { checkEnglishAnswer, toQuestionView } from "./english";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
   Boss,
+  ClassGoal,
+  AnonQuestion,
+  EnglishAnswer,
+  EnglishAnswerResult,
+  EnglishQuestionView,
+  EnglishSkill,
+  EnglishUnit,
   Lesson,
   MasteryResult,
   PetLine,
   Question,
+  QuestionGroup,
+  SignalSummary,
   Subtopic,
   SubtopicProgress,
   TestResult,
@@ -29,12 +39,16 @@ import {
 import { sampleTestAnswers, testQuestions } from "./mock/questions";
 import {
   assignmentDraft,
+  classGoal,
   classOverview,
   heatmap,
   notifications,
 } from "./mock/teacher";
 import { bosses } from "./mock/bosses";
+import { anonQuestions, questionGroups } from "./mock/anonQuestions";
+import { englishQuestions, englishUnits } from "./mock/english";
 import { petLines } from "./mock/pets";
+import { signals } from "./mock/signals";
 import { subtopics, topics } from "./mock/topics";
 
 // Student
@@ -241,6 +255,37 @@ export async function getBoss(id: string): Promise<Boss | undefined> {
   return bosses.find((b) => b.id === id);
 }
 
+// English question bank (boss battles)
+
+export async function getEnglishUnits(): Promise<EnglishUnit[]> {
+  return [...englishUnits].sort((a, b) => a.order - b.order);
+}
+
+/** Questions without their answers, optionally for one unit and/or skill. */
+export async function getEnglishQuestions(
+  filter: { unitId?: string; skill?: EnglishSkill } = {},
+): Promise<EnglishQuestionView[]> {
+  return englishQuestions
+    .filter(
+      (q) =>
+        (!filter.unitId || q.unitId === filter.unitId) &&
+        (!filter.skill || q.skill === filter.skill),
+    )
+    .map(toQuestionView);
+}
+
+/**
+ * Checks an answer on the server. Undefined for an unknown question id.
+ * Only call from server code (Server Functions, pages): it reads the answers.
+ */
+export async function checkEnglishQuestion(
+  questionId: string,
+  answer: EnglishAnswer,
+): Promise<EnglishAnswerResult | undefined> {
+  const question = englishQuestions.find((q) => q.id === questionId);
+  return question && checkEnglishAnswer(question, answer);
+}
+
 // Teacher
 
 export async function getClassOverview() {
@@ -257,4 +302,40 @@ export async function getAssignmentDraft() {
 
 export async function getNotifications() {
   return notifications;
+}
+
+export async function getClassGoal(): Promise<ClassGoal> {
+  return classGoal;
+}
+
+// Anonymous questions (answered by the teacher or classmates, not the AI)
+
+export async function getAnonQuestions(subtopicId?: string): Promise<AnonQuestion[]> {
+  return subtopicId
+    ? anonQuestions.filter((q) => q.subtopicId === subtopicId)
+    : anonQuestions;
+}
+
+export async function getQuestionGroups(): Promise<QuestionGroup[]> {
+  return questionGroups;
+}
+
+/** Open questions a classmate can answer: no answer yet. */
+export async function getPeerQuestions(): Promise<AnonQuestion[]> {
+  return anonQuestions.filter((q) => !q.answer);
+}
+
+// Understanding signals (🟢🟡🔴 sent by students during a lesson)
+
+export async function getSignals(subtopicId: string) {
+  return signals.filter((s) => s.subtopicId === subtopicId);
+}
+
+/** 🟢/🟡/🔴 counts per subtopic, in topic order. */
+export async function getSignalSummary(): Promise<SignalSummary[]> {
+  return subtopics.map((sub) => {
+    const counts = { got: 0, unsure: 0, lost: 0 };
+    for (const s of signals) if (s.subtopicId === sub.id) counts[s.level]++;
+    return { subtopicId: sub.id, counts };
+  });
 }

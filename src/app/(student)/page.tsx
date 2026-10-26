@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
+import { ClassGoalCard } from "@/components/ClassGoalCard";
 import {
+  getClassGoal,
   getCurrentPet,
   getPetLines,
   getProgress,
@@ -13,13 +15,15 @@ const TOPIC_ID = "fractions";
 const ORBIT_PET_IDS = ["dollfin", "agnite", "anoleaf", "tweesher", "cardiling"];
 
 export default async function HomePage() {
-  const [topic, subtopics, progress, pet, petLines] = await Promise.all([
-    getTopic(TOPIC_ID),
-    getSubtopics(TOPIC_ID),
-    getProgress(),
-    getCurrentPet(),
-    getPetLines(),
-  ]);
+  const [topic, subtopics, progress, pet, petLines, classGoal] =
+    await Promise.all([
+      getTopic(TOPIC_ID),
+      getSubtopics(TOPIC_ID),
+      getProgress(),
+      getCurrentPet(),
+      getPetLines(),
+      getClassGoal(),
+    ]);
   if (!topic || !pet) notFound();
 
   // No progress means the diagnostic test hasn't been taken yet.
@@ -48,6 +52,7 @@ export default async function HomePage() {
           nodes={nodes}
           pet={pet.stage}
         />
+        <ClassGoalCard goal={classGoal} className="mt-6 md:mt-10" />
       </div>
     </div>
   );
