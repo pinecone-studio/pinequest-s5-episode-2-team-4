@@ -168,3 +168,11 @@ export type TeacherNotification = {
   subtopicId: string;
   time: string;
 };
+
+/** Shared class XP goal; every student's XP counts towards it. */
+export type ClassGoal = {
+  classCode: string;
+  targetXp: number;
+  currentXp: number;
+  reward: string;
+};

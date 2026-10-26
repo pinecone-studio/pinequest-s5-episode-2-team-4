@@ -8,6 +8,7 @@
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import type {
+  ClassGoal,
   Lesson,
   MasteryResult,
   PetLine,
@@ -28,6 +29,7 @@ import {
 import { sampleTestAnswers, testQuestions } from "./mock/questions";
 import {
   assignmentDraft,
+  classGoal,
   classOverview,
   heatmap,
   notifications,
@@ -244,4 +246,8 @@ export async function getAssignmentDraft() {
 
 export async function getNotifications() {
   return notifications;
+}
+
+export async function getClassGoal(): Promise<ClassGoal> {
+  return classGoal;
 }
