@@ -23,7 +23,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "LevelUp",
-  description: "Ойлгоогүйгээ ичихгүйгээр нөх.",
+  description: "Ойлгоогүйгээ өөрийн хурдаар нөх.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

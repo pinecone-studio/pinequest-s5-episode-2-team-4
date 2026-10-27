@@ -27,7 +27,7 @@ type HomeHeroProps = {
 };
 
 export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
-  const words = ["Ойлгоогүйгээ", "ичихгүйгээр"];
+  const words = ["Ойлгоогүйгээ", "өөрийн", "хурдаар"];
   return (
     <section
       aria-labelledby="hero-title"
@@ -45,7 +45,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
               </span>{" "}
             </span>
           ))}
-          <span className="inline-block animate-word text-primary" style={{ animationDelay: "0.4s" }}>
+          <span className="inline-block animate-word text-primary" style={{ animationDelay: "0.55s" }}>
             нөх.
           </span>
         </h1>
