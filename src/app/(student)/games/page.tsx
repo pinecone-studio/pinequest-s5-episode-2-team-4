@@ -89,6 +89,14 @@ const GAMES = [
     shot: "/games/flight.jpg",
     focus: "50% 40%",
   },
+  {
+    href: "/games/slice",
+    title: "Мэдлэгийн зүсэлт",
+    genre: "Хурдан",
+    text: "Хариултууд доороос шидэгдэнэ. Таарахыг нь хуруугаараа зүс, бурууг нь орхи. Таамаглаж зүсвэл тоглоом удааширч, бодох хугацаа өгнө.",
+    shot: "/games/slice.jpg",
+    focus: "50% 70%",
+  },
 ];
 
 export default async function GamesPage() {
