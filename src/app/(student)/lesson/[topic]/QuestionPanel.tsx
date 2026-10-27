@@ -125,16 +125,16 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
                         Би ч бас · {q.meToo + (pressed ? 1 : 0)}
                       </button>
                       {q.answer || replied[q.id] || replying === q.id ? null : (
-                        <Button
-                          variant="white"
-                          size="sm"
+                        <button
+                          type="button"
                           onClick={() => {
                             setReplying(q.id);
                             setReplyDraft("");
                           }}
+                          className="min-h-11 cursor-pointer rounded-full border-2 border-lavender bg-white px-3 text-xs font-bold whitespace-nowrap text-ink hover:bg-lavender"
                         >
                           Хариулах
-                        </Button>
+                        </button>
                       )}
                     </div>
                   </div>
