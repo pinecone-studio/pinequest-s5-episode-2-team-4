@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ElementBadge } from "@/components/pet/ElementBadge";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { ButtonLink, buttonClass } from "@/components/ui";
-import { startBossBattle } from "@/lib/battle-actions";
-import { getActiveSoloBattleId, getBosses, getCurrentPet } from "@/lib/data";
+import { createGroupBossBattle, startBossBattle } from "@/lib/battle-actions";
+import { getActiveGroupBattleId, getActiveSoloBattleId, getBosses, getCurrentPet } from "@/lib/data";
 import { ArenaBackground } from "./ArenaBackground";
 import { RARITY_LABELS } from "./labels";
 
@@ -12,10 +12,11 @@ export const metadata: Metadata = {
 };
 
 export default async function BossListPage() {
-  const [bosses, pet, activeBattleId] = await Promise.all([
+  const [bosses, pet, activeBattleId, groupBattleId] = await Promise.all([
     getBosses(),
     getCurrentPet(),
     getActiveSoloBattleId(),
+    getActiveGroupBattleId(),
   ]);
 
   return (
@@ -36,6 +37,15 @@ export default async function BossListPage() {
           <p className="font-bold">Тулаан үргэлжилж байна.</p>
           <ButtonLink href={`/pets/battle/${activeBattleId}`} size="sm">
             Үргэлжлүүлэх
+          </ButtonLink>
+        </div>
+      ) : null}
+
+      {groupBattleId ? (
+        <div className="mt-5 flex flex-col gap-3 rounded-card bg-sky p-4 md:flex-row md:items-center md:justify-between md:p-5">
+          <p className="font-bold">Бүлгийн тулаан чинь хүлээж байна.</p>
+          <ButtonLink href={`/pets/battle/${groupBattleId}`} size="sm">
+            Бүлэг рүү очих
           </ButtonLink>
         </div>
       ) : null}
@@ -96,15 +106,26 @@ export default async function BossListPage() {
                 <dd className="font-bold">+{boss.rewards.exp}</dd>
               </div>
             </dl>
-            <form action={startBossBattle.bind(null, boss.id)} className="mt-auto">
-              <button
-                type="submit"
-                disabled={!pet || Boolean(activeBattleId)}
-                className={buttonClass({ className: "w-full" })}
-              >
-                Тулалдах
-              </button>
-            </form>
+            <div className="mt-auto grid grid-cols-2 gap-2">
+              <form action={startBossBattle.bind(null, boss.id)}>
+                <button
+                  type="submit"
+                  disabled={!pet || Boolean(activeBattleId)}
+                  className={buttonClass({ size: "sm", className: "w-full" })}
+                >
+                  Ганцаараа
+                </button>
+              </form>
+              <form action={createGroupBossBattle.bind(null, boss.id)}>
+                <button
+                  type="submit"
+                  disabled={!pet || Boolean(groupBattleId)}
+                  className={buttonClass({ variant: "secondary", size: "sm", className: "w-full" })}
+                >
+                  Найзуудтайгаа
+                </button>
+              </form>
+            </div>
           </li>
         ))}
       </ul>

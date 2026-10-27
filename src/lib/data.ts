@@ -5,7 +5,7 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
-import { activeSoloBattleId, battleState } from "./battle";
+import { activeGroupBattleId, activeSoloBattleId, battleState } from "./battle";
 import { petCollection, unhatchedEggs } from "./collection";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { englishProgress } from "./progress";
@@ -286,6 +286,12 @@ export async function getEggs(): Promise<Egg[]> {
 export async function getEnglishProgress(): Promise<EnglishProgress | undefined> {
   const user = await getCurrentUser();
   return user ? englishProgress(user) : undefined;
+}
+
+/** The current student's unfinished group battle (lobby or fight), if any. */
+export async function getActiveGroupBattleId(): Promise<string | undefined> {
+  const user = await getCurrentUser();
+  return user ? activeGroupBattleId(user) : undefined;
 }
 
 /** The current student's unfinished solo battle, if any. */

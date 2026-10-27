@@ -345,6 +345,8 @@ export type BattleState = {
   /** Boss attacks so far; when it goes up, the browser plays the attack. */
   attackCount: number;
   attackDamage: number;
+  /** When the fight began; null for a group lobby that never started. */
+  startedAt: string | null;
   /** ISO times from the server; compare with serverNow, not the device clock. */
   nextAttackAt: string | null;
   deadlineAt: string | null;
@@ -358,6 +360,8 @@ export type BattleState = {
     correct: number;
     wrong: number;
     faints: number;
+    /** Left a group battle: out, and no rewards. */
+    left: boolean;
   };
   /** The question to answer now; null when the battle is over. */
   question: EnglishQuestionView | null;
@@ -367,6 +371,25 @@ export type BattleState = {
   pet: { lineId: string; level: number } | null;
   /** What I got for winning, once granted. */
   rewards: { exp: number; petExp: number; egg: { rarity: Rarity } | null } | null;
+  /** Group battles: the code friends join with, and everyone in it. */
+  joinCode: string | null;
+  isHost: boolean;
+  team: TeamMember[];
+};
+
+/** Someone in a group battle, as everyone in it sees them. */
+export type TeamMember = {
+  username: string;
+  lineId: string | null;
+  level: number | null;
+  petHp: number;
+  petMaxHp: number;
+  damage: number;
+  correct: number;
+  /** Left the battle: out, and no rewards. */
+  left: boolean;
+  host: boolean;
+  me: boolean;
 };
 
 /** A pet in the student's collection. */

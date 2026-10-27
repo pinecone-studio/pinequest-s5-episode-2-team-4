@@ -5,15 +5,20 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { Button, ButtonLink } from "@/components/ui";
 import { leaveBossBattle, refreshBattle, submitBattleAnswer } from "@/lib/battle-actions";
 import { cn } from "@/lib/cn";
+import { petStage } from "@/lib/pets";
+import { useBattleChannel } from "@/lib/realtime";
 import type {
   BattleAnswerOutcome,
   BattleState,
   Boss,
   EnglishAnswer,
+  PetLine,
   PetStage,
+  TeamMember,
 } from "@/lib/types";
 import { PixelEgg } from "../../PixelEgg";
 import { ArenaBackground } from "../ArenaBackground";
+import { Backdrop } from "./Backdrop";
 import { RARITY_LABELS } from "../labels";
 import { BattleAudio, type Sfx } from "./audio";
 import { HpBar } from "./HpBar";
@@ -24,9 +29,15 @@ type BattleScreenProps = {
   initial: BattleState;
   boss: Pick<Boss, "id" | "name" | "sprite" | "attack" | "arena">;
   pet: PetStage;
+  /** For teammates' pets in group battles. */
+  lines: PetLine[];
 };
 
-const POLL_MS = 1500;
+/**
+ * Fallback refresh. Group battles also refresh on Realtime messages, and
+ * every screen refreshes when the next boss attack is due.
+ */
+const POLL_MS = 3000;
 /** How long the end-of-battle animation plays before the result card. */
 const END_DELAY_MS = 1800;
 
@@ -81,7 +92,7 @@ const iconProps = {
   className: "size-5",
 } as const;
 
-export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
+export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
   const [state, setState] = useState(initial);
   const [outcome, setOutcome] = useState<BattleAnswerOutcome | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -96,6 +107,8 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
 
   const offset = useRef(clockOffset(initial));
   const lastAttack = useRef(initial.attackCount);
+  const lastHp = useRef(initial.hp);
+  const submittingRef = useRef(false);
   const lastStatus = useRef(initial.status);
   const attemptId = useRef<string | null>(null);
   const floaterId = useRef(0);
@@ -124,10 +137,20 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
     [later],
   );
 
-  /** Takes a new state from the server and plays any boss attacks in it. */
+  /**
+   * Takes a new state from the server and plays what happened in it: boss
+   * attacks, and (in group battles) teammates' hits. `mine` is the state
+   * from my own answer, whose hit already has its own animation.
+   */
   const apply = useCallback(
-    (next: BattleState) => {
+    (next: BattleState, mine = false) => {
       offset.current = clockOffset(next);
+      if (!mine && next.hp < lastHp.current) {
+        play("hit");
+        setBossAnim((a) => ({ name: "hit", id: a.id + 1 }));
+        float(`−${lastHp.current - next.hp}`, "boss");
+      }
+      lastHp.current = next.hp;
       if (next.attackCount > lastAttack.current) {
         lastAttack.current = next.attackCount;
         play("roar");
@@ -178,19 +201,34 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Poll so boss attacks and the time limit show up.
+  const refresh = useCallback(async () => {
+    // My answer's response brings the new state; don't race it.
+    if (submittingRef.current) return;
+    try {
+      const next = await refreshBattle(initial.id);
+      if (next && !submittingRef.current) apply(next);
+    } catch {
+      // Offline for a moment; the next refresh tries again.
+    }
+  }, [initial.id, apply]);
+
+  // Teammates' answers, joins and leaves arrive as Realtime messages.
+  useBattleChannel(initial.id, refresh);
+
+  // Fallback polling, so attacks and the time limit show up regardless.
   useEffect(() => {
     if (!active) return;
-    const timer = setInterval(async () => {
-      try {
-        const next = await refreshBattle(state.id);
-        if (next) apply(next);
-      } catch {
-        // Offline for a moment; the next poll tries again.
-      }
-    }, POLL_MS);
+    const timer = setInterval(refresh, POLL_MS);
     return () => clearInterval(timer);
-  }, [active, state.id, apply]);
+  }, [active, refresh]);
+
+  // Refresh right when the next boss attack is due.
+  useEffect(() => {
+    if (!active || !state.nextAttackAt) return;
+    const wait = Date.parse(state.nextAttackAt) - (Date.now() + offset.current) + 300;
+    const timer = setTimeout(refresh, Math.max(0, wait));
+    return () => clearTimeout(timer);
+  }, [active, state.nextAttackAt, refresh]);
 
   // End of battle: tune, animation, then the result card.
   useEffect(() => {
@@ -229,6 +267,7 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
     const questionId = state.question?.id;
     if (submitting || !questionId) return;
     setSubmitting(true);
+    submittingRef.current = true;
     setError(null);
     // Same id on a retry after a network error, so it can't count twice.
     attemptId.current ??= crypto.randomUUID();
@@ -255,10 +294,11 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
       } else if (res.error === "fainted") {
         setError("Тэжээвэр чинь ухаан алдсан байна.");
       }
-      if (res.state) apply(res.state);
+      if (res.state) apply(res.state, true);
     } catch {
       setError("Холболт тасарлаа. Дахин оролдоно уу.");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -427,6 +467,14 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
           {warning ? `Босс ${attackIn} секундын дараа довтолно` : ""}
         </p>
 
+        {state.mode !== "solo" ? <TeamPanel team={state.team} lines={lines} /> : null}
+
+        {fainted && active ? (
+          <p role="status" className="rounded-card bg-pink px-5 py-4 text-center font-bold">
+            Тэжээвэр чинь ухаан алдлаа. Багийнхан чинь үргэлжлүүлж байна.
+          </p>
+        ) : null}
+
         {/* Answer feedback, then the next question */}
         {outcome ? (
           <section
@@ -478,7 +526,11 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
           <h2 id="exit-title" className="text-xl leading-tight font-bold md:text-2xl">
             Тулаанаас гарах уу?
           </h2>
-          <p className="mt-2 text-ink-muted">Тулаан дуусч, ялалт тооцогдохгүй.</p>
+          <p className="mt-2 text-ink-muted">
+          {state.mode === "solo"
+            ? "Тулаан дуусч, ялалт тооцогдохгүй."
+            : "Тэжээвэр чинь тулаанаас гарч, шагнал авахгүй. Багийнхан үргэлжлүүлнэ."}
+        </p>
           <div className="mt-6 flex flex-col-reverse gap-3 md:flex-row md:justify-end">
             <Button variant="secondary" size="sm" autoFocus onClick={() => exitDialog.current?.close()}>
               Үргэлжлүүлэх
@@ -495,13 +547,42 @@ export function BattleScreen({ initial, boss, pet }: BattleScreenProps) {
   );
 }
 
-/** The boss's scene behind the whole page (below the header), dimmed so cards stay readable. */
-function Backdrop({ arena }: { arena: Boss["arena"] }) {
+/** Everyone in a group battle: pet, HP and damage so far. */
+function TeamPanel({ team, lines }: { team: TeamMember[]; lines: PetLine[] }) {
+  const total = team.reduce((sum, m) => sum + m.damage, 0);
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-18 bottom-0 -z-10 md:top-22">
-      <ArenaBackground arena={arena} className="size-full" />
-      <div className="absolute inset-0 bg-black/30" />
-    </div>
+    <section aria-labelledby="team-title" className="rounded-[25px] bg-white p-4 shadow-card md:rounded-panel md:p-5">
+      <div className="flex items-baseline justify-between">
+        <h2 id="team-title" className="text-lg font-bold">
+          Баг
+        </h2>
+        <p className="text-sm text-ink-muted">Нийт хохирол {total}</p>
+      </div>
+      <ul className="mt-3 grid gap-2 md:grid-cols-2">
+        {team.map((m) => {
+          const line = lines.find((l) => l.id === m.lineId);
+          const out = m.left || m.petHp === 0;
+          return (
+            <li key={m.username} className={cn("flex items-center gap-3 rounded-tile bg-surface p-2", out && "opacity-60")}>
+              {line ? (
+                <PetSprite stage={petStage(line, m.level ?? 1)} size={40} className={out ? "grayscale" : undefined} />
+              ) : null}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold">
+                  {m.username}
+                  {m.me ? <span className="text-ink-muted"> (чи)</span> : null}
+                  {m.left ? <span className="text-ink-muted"> · гарсан</span> : null}
+                </p>
+                <HpBar value={m.petHp} max={m.petMaxHp} label={`${m.username}-ын тэжээвэр HP`} tone="pet" className="mt-1" />
+              </div>
+              <p className="shrink-0 text-sm font-bold" aria-label={`${m.damage} хохирол`}>
+                −{m.damage}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
@@ -552,6 +633,27 @@ function BattleOver({ state, boss }: { state: BattleState; boss: BattleScreenPro
           ) : (
             <p className="text-sm text-ink-muted">Энэ удаа өндөг олдсонгүй.</p>
           )}
+        </div>
+      ) : null}
+      {state.mode !== "solo" ? (
+        <div className="w-full text-left">
+          <h2 className="mb-2 font-bold">Хэн хэр хохирол учруулсан</h2>
+          <ol className="flex flex-col gap-1.5">
+            {[...state.team]
+              .sort((a, b) => b.damage - a.damage)
+              .map((m) => (
+                <li key={m.username} className="flex justify-between rounded-tile bg-surface px-3 py-2 text-sm">
+                  <span className="font-bold">
+                    {m.username}
+                    {m.me ? " (чи)" : ""}
+                    {m.left ? " · гарсан" : ""}
+                  </span>
+                  <span>
+                    −{m.damage} · {m.correct} зөв
+                  </span>
+                </li>
+              ))}
+          </ol>
         </div>
       ) : null}
       <dl className="grid w-full grid-cols-2 gap-2 text-sm md:grid-cols-4">
