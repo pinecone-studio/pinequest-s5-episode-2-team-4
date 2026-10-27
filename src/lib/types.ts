@@ -382,6 +382,57 @@ export type BattleState = {
   team: TeamMember[];
 };
 
+/** How a past battle ended for this student. */
+export type BattleResult = "won" | "lost" | "left" | "stopped";
+
+/** One finished battle in a student's history. */
+export type BattleHistoryEntry = {
+  battleId: string;
+  bossId: string;
+  mode: BattleState["mode"];
+  result: BattleResult;
+  /** When it ended (ISO). */
+  date: string;
+  damage: number;
+  correct: number;
+  wrong: number;
+  bestCombo: number;
+  /** Everyone's damage together, and how many fought (1 in solo). */
+  teamDamage: number;
+  teamSize: number;
+  rewards: { exp: number; petExp: number; egg: Rarity | null } | null;
+};
+
+/** A student's battle record: totals and the latest battles. */
+export type BattleHistory = {
+  battles: number;
+  victories: number;
+  damage: number;
+  eggs: number;
+  bestCombo: number;
+  entries: BattleHistoryEntry[];
+};
+
+/**
+ * A class's English results for the teacher, all added up: no student is
+ * named or ranked anywhere in it.
+ */
+export type ClassEnglish = {
+  classCode: string;
+  students: number;
+  /** Students who have answered at least one question. */
+  active: number;
+  attempts: number;
+  correct: number;
+  /** Per skill, with how many students could use more practice in it. */
+  bySkill: { skill: EnglishSkill; attempts: number; correct: number; needPractice: number }[];
+  byUnit: { unitId: string; title: string; attempts: number; correct: number }[];
+  /** The questions the class misses most. */
+  hardest: { questionId: string; prompt: string; display?: string; skill: EnglishSkill; attempts: number; correct: number }[];
+  /** The teacher's recent battles with this class. */
+  battles: { id: string; bossId: string; status: BattleStatus; date: string; students: number; damage: number }[];
+};
+
 /** An unfinished class battle: for the student banner and the teacher's card. */
 export type ClassBattleSummary = {
   id: string;

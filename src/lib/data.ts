@@ -15,15 +15,18 @@ import {
   teacherClassBattle,
 } from "./battle";
 import { petCollection, unhatchedEggs } from "./collection";
+import { battleHistory, classEnglish } from "./history";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { englishProgress } from "./progress";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import { streakSummary } from "./streak";
 import type {
+  BattleHistory,
   BattleState,
   Boss,
   ClassBattleSummary,
+  ClassEnglish,
   ClassGoal,
   AnonQuestion,
   EnglishAnswer,
@@ -329,6 +332,18 @@ export async function getOpenClassBattle(): Promise<ClassBattleSummary | undefin
 export async function getTeacherClassBattle(): Promise<ClassBattleSummary | undefined> {
   const user = await getCurrentUser();
   return user?.role === "teacher" ? teacherClassBattle(user) : undefined;
+}
+
+/** The current student's finished battles and totals. */
+export async function getBattleHistory(): Promise<BattleHistory | undefined> {
+  const user = await getCurrentUser();
+  return user?.role === "student" ? battleHistory(user) : undefined;
+}
+
+/** A class's English results for the current teacher; no student is named in it. */
+export async function getClassEnglish(classCode: string): Promise<ClassEnglish | undefined> {
+  const user = await getCurrentUser();
+  return user?.role === "teacher" ? classEnglish(user, classCode) : undefined;
 }
 
 /** The current teacher's view of their class battle, or undefined if it isn't theirs. */
