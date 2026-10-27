@@ -1,0 +1,163 @@
+.hangman-panel {
+  border-top: 4px solid var(--color-primary);
+}
+
+/* A paper illustration sits inside the site's existing light/dark shell. */
+.hangman-stage,
+.hangman-start-layout {
+  color: #242722;
+  background: #fffefb;
+  border-radius: 16px;
+}
+
+.hangman-start-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+}
+
+.hangman-mode-list { display: grid; gap: 14px; position: relative; z-index: 1; }
+.hangman-mode-choice {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px 18px;
+  border: 3px solid #242722;
+  border-radius: 3px 7px 4px 6px;
+  background: #fffefb;
+  color: #242722;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 3px 4px 0 #dedfd8;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.hangman-mode-choice:hover { transform: translateY(-3px) rotate(-1deg); box-shadow: 5px 7px 0 #dedfd8; }
+.hangman-mode-choice:active { transform: translateY(2px); box-shadow: 1px 1px 0 #dedfd8; }
+.hangman-mode-name { display: flex; justify-content: space-between; font-size: 24px; font-weight: 800; letter-spacing: 3px; }
+.hangman-mode-description { font-size: 11px; line-height: 1.6; color: #60655b; }
+.hangman-start-scene { min-width: 0; }
+.hangman-start h1 { letter-spacing: 0.15em; }
+.hangman-paper-note { text-align: center; font-size: 11px; line-height: 1.7; color: #73766d; padding: 10px 4px; }
+.hangman-word-area { margin-top: 24px; }
+.hangman-play-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 24px; margin-top: 12px; }
+.hangman-keyboard-area { min-width: 0; }
+.hangman-keyboard { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; margin-top: 16px; }
+.hangman-key {
+  box-shadow: 0 3px 0 var(--color-line);
+  border-radius: 3px 6px 3px 5px;
+  touch-action: manipulation;
+}
+.hangman-key:enabled:active { transform: translateY(3px); box-shadow: none; }
+.hangman-scene { position: relative; overflow: hidden; isolation: isolate; }
+.hangman-scene-svg { display: block; width: 100%; height: auto; }
+.hangman-flight-position { transform: translateY(var(--descent)); transition: transform 700ms cubic-bezier(.25,.8,.25,1); }
+.hangman-flight-sway { transform-origin: 177px 138px; }
+.hangman-balloon-body { transform-origin: var(--balloon-x) var(--balloon-y); }
+.hangman-balloon.is-popped { visibility: hidden; }
+.hangman-scene.is-won .hangman-flight-position { transform: translateY(-55px); }
+.hangman-monster { transform-origin: 90px 315px; }
+.hangman-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hangman-confetti i { position: absolute; top: -16px; width: 7px; height: 12px; border-radius: 2px; opacity: 0; }
+
+@media (max-width: 600px) {
+  .hangman-start-layout { padding: 14px; gap: 8px; }
+  .hangman-mode-choice { min-height: 74px; padding: 10px; }
+  .hangman-mode-name { font-size: 18px; letter-spacing: 1px; }
+  .hangman-mode-description { font-size: 10px; }
+  .hangman-play-layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .hangman-play-layout .hangman-stage { grid-row: 1; }
+  .hangman-play-layout .hangman-scene { max-width: 230px; margin: auto; }
+  .hangman-keyboard { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+
+@media (max-width: 360px) {
+  .hangman-start-layout { grid-template-columns: minmax(0, 1fr); }
+  .hangman-start-scene { max-width: 190px; margin: auto; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hangman-flight-sway { animation: hangman-float 3s ease-in-out infinite; }
+  .hangman-monster { animation: hangman-breathe 2.5s ease-in-out infinite; }
+  .hangman-balloon.is-popped { visibility: visible; animation: hangman-balloon-hide 380ms steps(1, end) forwards; }
+  .hangman-balloon.is-popped .hangman-balloon-body { animation: hangman-balloon-pop 360ms ease-out forwards; }
+  .hangman-balloon.is-popped .hangman-string { animation: hangman-string-fade 200ms ease-out forwards; }
+  .hangman-scene.is-lost .hangman-flight-sway { animation: hangman-wobble 600ms ease-out both; }
+  .hangman-scene.is-lost .hangman-monster { animation: hangman-breathe 600ms ease-in-out 3; }
+  .hangman-letter.is-revealed { animation: hangman-letter-pop 400ms cubic-bezier(.2,.8,.3,1.3) both; }
+  .hangman-feedback.is-wrong { animation: hangman-shake 300ms ease-in-out; }
+  .hangman-confetti i { animation: hangman-confetti-fall 1800ms ease-out both; animation-delay: calc(var(--piece) * 35ms); }
+  .hangman-victory-stars { animation: hangman-stars 700ms ease-out 3; transform-origin: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hangman-flight-position, .hangman-mode-choice { transition: none; }
+}
+@keyframes hangman-float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-7px) rotate(2deg); } }
+@keyframes hangman-breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035, .96); } }
+@keyframes hangman-balloon-pop { 0% { opacity: 1; transform: scale(1); } 35% { opacity: 1; transform: scale(1.22); } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes hangman-balloon-hide { to { visibility: hidden; } }
+@keyframes hangman-string-fade { to { opacity: 0; } }
+@keyframes hangman-wobble { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-9deg); } 65% { transform: rotate(6deg); } }
+@keyframes hangman-letter-pop { 0% { opacity: 0; transform: translateY(8px) scale(.75); } 65% { opacity: 1; transform: translateY(-3px) scale(1.08); } 100% { transform: translateY(0) scale(1); } }
+@keyframes hangman-shake { 0%,100% { transform: translateX(0); } 25%,75% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+@keyframes hangman-confetti-fall { 0% { opacity: 0; transform: translateY(0) rotate(0); } 10%,80% { opacity: 1; } 100% { opacity: 0; transform: translateY(390px) rotate(420deg); } }
+@keyframes hangman-stars { 0%,100% { opacity: .2; } 50% { opacity: 1; } }
+
+/* One continuous white play surface, with no nested cards. */
+.hangman-board {
+  --color-primary: #252723;
+  --color-primary-dark: #111;
+  --color-ink: #252723;
+  --color-ink-muted: #676a60;
+  --color-line: #d8d9d2;
+  color-scheme: light;
+  color: #252723;
+  background: #fffefb;
+  border: 1px solid #e2e2dc;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgb(0 0 0 / .07);
+  overflow: hidden;
+}
+.hangman-board-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+}
+.hangman-board-header h1 { font-size: 19px; font-weight: 800; letter-spacing: 3px; }
+.hangman-board .hangman-back { color: #252723; display: grid; place-items: center; min-width: 44px; min-height: 44px; font-size: 24px; text-decoration: none; }
+.hangman-level { margin-left: auto; font-size: 12px; color: #676a60; white-space: nowrap; }
+.hangman-change-mode { min-height: 44px; cursor: pointer; color: #676a60; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.hangman-board .hangman-word-area { padding: 4px 24px 16px; margin: 0; text-align: center; }
+.hangman-translation { font-size: 20px; font-weight: 600; }
+.hangman-word-slots { display: flex; justify-content: center; gap: clamp(3px, 1vw, 10px); margin: 20px auto 0; max-width: 600px; }
+.hangman-board .hangman-letter { display: grid; place-items: center; flex: 0 1 36px; min-width: 0; height: 48px; color: #252723; font-size: clamp(18px, 4vw, 30px); font-weight: 700; }
+.hangman-board .hangman-letter.is-missing { color: #a34352; }
+.hangman-board .hangman-play-layout { padding: 0 36px 12px; margin: 0; gap: 36px; }
+.hangman-board .hangman-keyboard { align-self: center; margin: 0; gap: 7px; }
+.hangman-board .hangman-key { min-height: 46px; border: 2px solid #252723; color: #252723; background: transparent; font-size: 21px; font-weight: 600; cursor: pointer; box-shadow: none; }
+.hangman-board .hangman-key:enabled:hover { background: #eeeeea; }
+.hangman-board .hangman-key:disabled { cursor: default; }
+.hangman-board .hangman-key.is-correct { color: #fffefb; background: #454c40; border-color: #454c40; }
+.hangman-board .hangman-key.is-incorrect { color: #b6b8af; border-color: #ddd; text-decoration: line-through; }
+.hangman-board .hangman-key:disabled:not(.is-correct):not(.is-incorrect) { opacity: .35; }
+.hangman-board-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; padding: 16px 24px; background: #f4f4ef; }
+.hangman-result { font-size: 12px; line-height: 1.7; color: #676a60; }
+.hangman-result-title { color: #252723; font-weight: 700; font-size: 15px; }
+.hangman-board :focus-visible { outline-color: #252723; }
+
+@media (max-width: 600px) {
+  .hangman-board-header { padding: 10px 12px; gap: 7px; flex-wrap: wrap; }
+  .hangman-board-header h1 { font-size: 15px; letter-spacing: 2px; }
+  .hangman-level, .hangman-change-mode { font-size: 10px; }
+  .hangman-board .hangman-word-area { padding: 4px 12px 12px; }
+  .hangman-translation { font-size: 18px; }
+  .hangman-word-slots { margin-top: 10px; }
+  .hangman-board .hangman-play-layout { padding: 0 16px 18px; gap: 8px; }
+  .hangman-board .hangman-play-layout > .hangman-scene { grid-row: 1; width: 100%; max-width: 210px; margin: auto; }
+  .hangman-board .hangman-key { min-height: 44px; font-size: 18px; }
+  .hangman-board-footer { padding: 12px 16px; }
+}

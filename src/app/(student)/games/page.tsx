@@ -9,6 +9,14 @@ export const metadata: Metadata = {
 
 const GAMES = [
   {
+    href: "/games/hangman",
+    title: "Hangman",
+    genre: "Үг таах",
+    text: "Монгол орчуулгыг ашиглан англи үгийг үсэг үсгээр таа. 6 удаа алдахаас өмнө бүх үсгийг олоорой!",
+    shot: "/games/hangman.svg",
+    focus: "50% 50%",
+  },
+  {
     href: "/games/snake",
     title: "Мэдлэгийн могой",
     genre: "Хурдан",
@@ -72,6 +80,14 @@ const GAMES = [
     text: "Бот багийн эсрэг пенальтийн цуврал. Зөв хариулттай булан руу өшиглө, бот өшиглөхөөс өмнө зөв хариулж хаалгаа хамгаал!",
     shot: "/games/penalty.jpg",
     focus: "50% 22%",
+  },
+  {
+    href: "/games/flight",
+    title: "Мэдлэгийн нислэг",
+    genre: "Нислэг",
+    text: "Шонхороо товшиж дүүлгэ. Хаалга бүр 3 завсартай: зөв хариулттай завсраар нис. Буруу завсраар орвол тайлбар гарна.",
+    shot: "/games/flight.jpg",
+    focus: "50% 40%",
   },
 ];
 

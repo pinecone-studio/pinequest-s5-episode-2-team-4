@@ -16,6 +16,12 @@ export type GameSound = {
   startMusic: (id: GameMusicId) => void;
   /** Stops the music; turning sound off stops it too. */
   stopMusic: () => void;
+  /**
+   * One tone for a game's own sounds (a splash, a pop...): frequency in Hz,
+   * length in seconds, starting `when` seconds from now; `slide` multiplies
+   * the frequency by the end. Silent while sound is off.
+   */
+  tone: (freq: number, dur: number, type?: OscillatorType, gain?: number, when?: number, slide?: number) => void;
 };
 
 export function createSound(): GameSound {
@@ -82,6 +88,7 @@ export function createSound(): GameSound {
       music?.close();
       music = undefined;
     },
+    tone,
   };
   return sound;
 }

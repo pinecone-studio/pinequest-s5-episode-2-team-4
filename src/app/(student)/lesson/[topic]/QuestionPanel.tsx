@@ -4,6 +4,9 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 import type { AnonQuestion } from "@/lib/types";
 
+/** XP a helper gets once the teacher approves the answer. */
+const HELP_XP = 10;
+
 type QuestionPanelProps = {
   /** Classmates' anonymous questions on this subtopic. */
   questions: AnonQuestion[];
@@ -28,6 +31,10 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
   const [meToo, setMeToo] = useState<Set<string>>(new Set());
   // One kudos per answer; there is no way to leave a negative reaction.
   const [kudos, setKudos] = useState<Set<string>>(new Set());
+  // Which question has its reply box open; sent replies wait for the teacher.
+  const [replying, setReplying] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState("");
+  const [replied, setReplied] = useState<Record<string, string>>({});
 
   // Peer answers reach students only after the teacher approves them.
   const answered = questions.filter((q) => q.answer?.approved);
@@ -98,22 +105,87 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
               return (
                 <div
                   key={q.id}
-                  className="flex items-center gap-2 rounded-card bg-surface px-3.5 py-2.5"
+                  className="flex flex-col gap-2 rounded-card bg-surface px-3.5 py-2.5"
                 >
-                  <p className="flex-1 text-[15px]">{q.text}</p>
-                  <button
-                    type="button"
-                    aria-pressed={pressed}
-                    onClick={() => toggleMeToo(q.id)}
-                    className={cn(
-                      "min-h-11 shrink-0 cursor-pointer rounded-full border-2 px-3 text-xs font-bold whitespace-nowrap",
-                      pressed
-                        ? "border-primary bg-primary text-white"
-                        : "border-lavender bg-white text-ink hover:bg-lavender",
-                    )}
-                  >
-                    Би ч бас · {q.meToo + (pressed ? 1 : 0)}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <p className="flex-1 text-[15px]">{q.text}</p>
+                    <div className="flex shrink-0 flex-col gap-1.5">
+                      <button
+                        type="button"
+                        aria-pressed={pressed}
+                        onClick={() => toggleMeToo(q.id)}
+                        className={cn(
+                          "min-h-11 cursor-pointer rounded-full border-2 px-3 text-xs font-bold whitespace-nowrap",
+                          pressed
+                            ? "border-primary bg-primary text-white"
+                            : "border-lavender bg-white text-ink hover:bg-lavender",
+                        )}
+                      >
+                        Би ч бас · {q.meToo + (pressed ? 1 : 0)}
+                      </button>
+                      {q.answer || replied[q.id] || replying === q.id ? null : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReplying(q.id);
+                            setReplyDraft("");
+                          }}
+                          className="min-h-11 cursor-pointer rounded-full border-2 border-lavender bg-white px-3 text-xs font-bold whitespace-nowrap text-ink hover:bg-lavender"
+                        >
+                          Хариулах
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {replied[q.id] ? (
+                    <div className="rounded-field bg-white px-3.5 py-2.5">
+                      <p className="text-[15px]">{replied[q.id]}</p>
+                      <p role="status" className="mt-1 text-xs font-bold text-ink-muted">
+                        Багш баталгаажуулахыг хүлээж байна · +{HELP_XP} XP
+                      </p>
+                    </div>
+                  ) : replying === q.id ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const text = replyDraft.trim();
+                        if (!text) return;
+                        setReplied((prev) => ({ ...prev, [q.id]: text }));
+                        setReplying(null);
+                      }}
+                      className="flex flex-col gap-2"
+                    >
+                      <label htmlFor={`reply-${q.id}`} className="sr-only">
+                        Хариулт бичих
+                      </label>
+                      <textarea
+                        id={`reply-${q.id}`}
+                        value={replyDraft}
+                        onChange={(e) => setReplyDraft(e.target.value)}
+                        placeholder={`Өөрийнхөөрөө тайлбарла… Багш баталбал +${HELP_XP} XP`}
+                        rows={3}
+                        maxLength={500}
+                        autoFocus
+                        className="w-full resize-none rounded-field border-2 border-line bg-white px-3.5 py-2.5 text-base text-ink outline-none placeholder:text-ink-muted focus:border-primary"
+                      />
+                      <div className="flex gap-2 self-end">
+                        <button
+                          type="button"
+                          onClick={() => setReplying(null)}
+                          className="min-h-11 cursor-pointer rounded-full border-2 border-lavender bg-white px-3 text-xs font-bold whitespace-nowrap text-ink hover:bg-lavender"
+                        >
+                          Болих
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={!replyDraft.trim()}
+                          className="min-h-11 cursor-pointer rounded-full border-2 border-primary bg-primary px-3 text-xs font-bold whitespace-nowrap text-white disabled:cursor-default disabled:opacity-60"
+                        >
+                          Илгээх
+                        </button>
+                      </div>
+                    </form>
+                  ) : null}
                 </div>
               );
             })}

@@ -23,7 +23,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "LevelUp",
-  description: "Ойлгоогүйгээ ичихгүйгээр нөх.",
+  description: "Ойлгоогүйгээ өөрийн хурдаар нөх.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -39,7 +39,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {`try{var theme=localStorage.getItem('levelup-theme');document.documentElement.dataset.theme=theme==='dark'?'dark':'light'}catch{}`}
         </Script>
         <Suspense fallback={<PageLoading />}>{children}</Suspense>
-        <ThemeToggle />
+        {/* The toggle reads the URL (it hides on battle screens), so it streams too. */}
+        <Suspense fallback={null}>
+          <ThemeToggle />
+        </Suspense>
       </body>
     </html>
   );
