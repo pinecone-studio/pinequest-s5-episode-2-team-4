@@ -34,7 +34,10 @@ export type TrailPoint = { x: number; y: number; life: number };
 /** Why a wrong slice looked like guessing: too fast to have read it, or a second wrong one in the task. */
 export type Guess = "quick" | "second" | null;
 
-export type SliceSummary = ScoreSummary & { misses: number; retry: RetryStats; guesses: number };
+export type SliceSummary = ScoreSummary & { retry: RetryStats; guesses: number };
+
+/** One task in play: its tosses, and how the player has done so far. */
+export type Wave = { round: QueuedRound; t: number; plan: Toss[]; wrongCuts: number; marks: boolean[] };
 
 /** What the engine tells the React screen. */
 export type SliceEvents = {

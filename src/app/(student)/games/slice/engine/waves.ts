@@ -1,7 +1,7 @@
 import type { GameQuestion } from "@/lib/types";
 import { shuffle } from "../../_lib/session";
 import { measureAnswer } from "../../_lib/shapes";
-import { GRAVITY, WORLD, type Piece, type Toss } from "./types";
+import { GRAVITY, WORLD, type Piece, type Toss, type Wave } from "./types";
 
 const HALF = WORLD.w / 2;
 
@@ -35,8 +35,27 @@ export function toss(ctx: CanvasRenderingContext2D, t: Toss, time: number): Piec
   };
 }
 
+/**
+ * Moves a wave on by dt: tosses the answers that are due and flies the pieces.
+ * Returns the pieces still in play, the right ones that fell unsliced, and
+ * whether the wave is over.
+ */
+export function stepWave(w: Wave, pieces: Piece[], dt: number, ctx: CanvasRenderingContext2D, time: number, onToss: () => void) {
+  w.t += dt;
+  for (const t of w.plan) {
+    if (t.sent || w.t < t.at) continue;
+    t.sent = true;
+    pieces.push(toss(ctx, t, time));
+    onToss();
+  }
+  const fell = pieces.filter((p) => p.alive && fall(p, dt));
+  for (const p of fell) p.alive = false;
+  const live = pieces.filter((p) => p.alive);
+  return { pieces: live, missed: fell.filter((p) => p.ok), done: w.plan.every((t) => t.sent) && !live.length };
+}
+
 /** Flies a piece under gravity, bouncing off the edges of its half. Returns true once it has fallen out. */
-export function fall(p: Piece, dt: number) {
+function fall(p: Piece, dt: number) {
   p.x += p.vx * dt;
   p.y += p.vy * dt;
   p.vy += GRAVITY * dt;
