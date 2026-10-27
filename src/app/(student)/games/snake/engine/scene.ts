@@ -62,7 +62,8 @@ export class SnakeScene {
     const { snake, foods, skin } = view;
     ctx.save();
     if (this.shake) ctx.translate((Math.random() - 0.5) * 9, (Math.random() - 0.5) * 9);
-    if (this.floor) ctx.drawImage(this.floor, 0, 0, WORLD.w, WORLD.h);
+    // The floor is built 0×0 while the canvas has no size; drawImage throws on that.
+    if (this.floor?.width && this.floor.height) ctx.drawImage(this.floor, 0, 0, WORLD.w, WORLD.h);
     drawLights(ctx, this.orbs, [skin.bands[0], skin.bands[skin.bands.length - 1]], this.time);
     if (this.flash.t) {
       ctx.globalAlpha = this.flash.t * 0.25;
