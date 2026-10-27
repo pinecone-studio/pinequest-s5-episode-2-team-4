@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
-import { AnswerView } from "../_components/AnswerView";
+import { ChoiceGrid } from "../_components/ChoiceGrid";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
 import { ResultPanel } from "../_components/ResultPanel";
@@ -20,7 +19,6 @@ type HorseRaceProps = {
   questions: GameQuestion[];
 };
 
-const LETTERS = "АБВГ";
 const MEDALS = ["🥇", "🥈", "🥉"];
 const CONFETTI = ["🎉", "⭐", "🎊", "✨", "🏆", "⭐", "🎉", "✨"];
 
@@ -41,15 +39,6 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
   const positions = race?.positions ?? HORSES.map(() => 0);
   const ranking = standings(positions);
   const place = ranking.find((h) => h.id === PLAYER)?.place ?? 1;
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const i = Number(e.key) - 1;
-      if (i >= 0 && i < LETTERS.length) choose(i);
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
 
   return (
     <GameShell
@@ -92,30 +81,7 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
         </p>
 
         {round ? (
-          <div className="flex flex-col gap-3">
-            <h2 className="text-lg leading-tight font-extrabold">
-              {round.question.prompt}
-              <span className="block text-sm font-semibold text-[var(--game-muted)]">Тохирохыг нь сонго</span>
-            </h2>
-            <div className="grid grid-cols-2 gap-2">
-              {round.choices.map((choice, k) => (
-                <button
-                  key={`${race?.index}-${k}`}
-                  type="button"
-                  disabled={picked !== null}
-                  onClick={() => choose(k)}
-                  className={cn(
-                    "game-chip race-choice flex min-h-14 cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-left font-bold disabled:cursor-default",
-                    picked !== null && k === round.answer && "border-[var(--game-good)] bg-[rgb(52_211_153/0.2)]",
-                    picked !== null && k === picked && k !== round.answer && "border-[var(--game-bad)] bg-[rgb(255_77_109/0.2)]",
-                  )}
-                >
-                  <span className="grid size-6 flex-none place-items-center rounded-md bg-white/10 text-xs">{LETTERS[k]}</span>
-                  <AnswerView answer={choice} />
-                </button>
-              ))}
-            </div>
-          </div>
+          <ChoiceGrid round={round} picked={picked} onChoose={choose} roundKey={race?.index ?? 0} />
         ) : (
           <p className="text-sm text-[var(--game-muted)]">
             Ботууд өөрсдөө давхина. Чи хурдан, зөв хариулж морио урагшлуул. Финишд хамгийн түрүүнд хүрсэн нь ялна.
