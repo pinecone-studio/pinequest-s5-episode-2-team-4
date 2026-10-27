@@ -55,6 +55,14 @@ const GAMES = [
     art: "from-[#34d399] to-[#ffcf5a]",
     icon: "🔨",
   },
+  {
+    href: "/games/hoops",
+    title: "Сагсан бөмбөг",
+    genre: "Шидэлт",
+    text: "Бөмбөг бүр дээр хариулт бий. Зөвийг нь дээш гулсуулж сагсанд хий, буруугаа доош гулсуулж хая. Дараа нь цагираг хөдөлнө!",
+    art: "from-[#f97316] to-[#5b00ed]",
+    icon: "🏀",
+  },
 ];
 
 export default async function GamesPage() {
