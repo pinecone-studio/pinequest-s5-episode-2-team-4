@@ -114,6 +114,8 @@ export async function activeSoloBattleId(user: User): Promise<string | undefined
 type BattleRow = {
   id: string;
   boss_id: string;
+  join_code: string | null;
+  host_player_id: string | null;
   mode: BattleState["mode"];
   status: BattleState["status"];
   hp: number;
@@ -122,6 +124,7 @@ type BattleRow = {
   attack_damage: number | null;
   next_attack_at: string | null;
   deadline_at: string | null;
+  started_at: string | null;
 };
 
 type ParticipantRow = {
@@ -134,6 +137,7 @@ type ParticipantRow = {
   wrong_count: number;
   faint_count: number;
   current_question_id: string | null;
+  left_at: string | null;
   rewarded_at: string | null;
   reward_exp: number | null;
   reward_pet_exp: number | null;
@@ -142,8 +146,27 @@ type ParticipantRow = {
 
 type PetRow = { line_id: string; level: number };
 
+type TeamRow = {
+  username: string;
+  line_id: string | null;
+  level: number | null;
+  pet_hp: number;
+  pet_max_hp: number;
+  damage: number;
+  correct: number;
+  left: boolean;
+  host: boolean;
+  me: boolean;
+};
+
 /** What the battle_view() database function returns. */
-type ViewJson = { battle: BattleRow; me: ParticipantRow; pet: PetRow | null; now: string } | null;
+type ViewJson = {
+  battle: BattleRow;
+  me: ParticipantRow;
+  pet: PetRow | null;
+  team: TeamRow[];
+  now: string;
+} | null;
 
 /** Turns the database view into what the browser sees (no answers in it). */
 function toState(view: ViewJson): BattleState | undefined {
@@ -163,6 +186,7 @@ function toState(view: ViewJson): BattleState | undefined {
     maxHp: b.max_hp,
     attackCount: b.attack_count,
     attackDamage: b.attack_damage ?? 0,
+    startedAt: b.started_at,
     nextAttackAt: b.next_attack_at,
     deadlineAt: b.deadline_at,
     // The database clock, the same one the attack times come from.
@@ -176,6 +200,7 @@ function toState(view: ViewJson): BattleState | undefined {
       correct: p.correct_count,
       wrong: p.wrong_count,
       faints: p.faint_count,
+      left: p.left_at !== null,
     },
     question: question ? toQuestionView(question) : null,
     endReason:
@@ -196,7 +221,43 @@ function toState(view: ViewJson): BattleState | undefined {
           egg: p.reward_egg_rarity ? { rarity: p.reward_egg_rarity } : null,
         }
       : null,
+    joinCode: b.join_code,
+    isHost: view.team.some((t) => t.me && t.host),
+    team: view.team.map((t) => ({
+      username: t.username,
+      lineId: t.line_id,
+      level: t.level,
+      petHp: t.pet_hp,
+      petMaxHp: t.pet_max_hp,
+      damage: t.damage,
+      correct: t.correct,
+      left: t.left,
+      host: t.host,
+      me: t.me,
+    })),
   };
+}
+
+/**
+ * Tells everyone watching this battle that it changed, over Supabase
+ * Realtime. The message carries no data: each screen then refreshes its
+ * own view through a checked Server Function. Best effort: screens also
+ * refresh on their own, so a lost message only delays an update.
+ */
+async function notifyBattle(battleId: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+  try {
+    await fetch(`${url}/realtime/v1/api/broadcast`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: [{ topic: `battle:${battleId}`, event: "changed", payload: {} }] }),
+      signal: AbortSignal.timeout(2000),
+    });
+  } catch {
+    // Screens poll as a fallback.
+  }
 }
 
 /** Picks a pet line from the boss's egg pool by weight. */
@@ -228,20 +289,123 @@ async function claimRewards(user: User, state: BattleState) {
   if (error) fail("Could not grant rewards", error);
 }
 
-/** Leaves a solo battle; it ends without a victory. */
-export async function forfeitBattle(user: User, battleId: string) {
-  const { error } = await db().rpc("battle_forfeit", {
+/**
+ * Leaves a battle. Solo: it ends without a victory. Group lobby: the host
+ * closes it, others leave. Active group battle: the player's pet is out.
+ */
+export async function leaveBattle(user: User, battleId: string) {
+  const { error } = await db().rpc("battle_leave", {
     p_battle: battleId,
     p_player: await playerId(user),
   });
   if (error) fail("Could not leave battle", error);
+  await notifyBattle(battleId);
+}
+
+/** The player's battle pet (their LevelUp pet until they pick another). */
+async function battlePet(player: string, starter: UserPet) {
+  const { data, error } = await db().rpc("game_battle_pet", {
+    p_player: player,
+    p_starter_line: starter.lineId,
+    p_starter_level: starter.level,
+  });
+  if (error || !data) fail("Could not load the battle pet", error);
+  return data as { id: string; max_hp: number };
+}
+
+/** Opens a group lobby against `bossId` (or returns the player's open one). */
+export async function createGroupBattle(user: User, starter: UserPet, bossId: string) {
+  const boss = bosses.find((b) => b.id === bossId);
+  if (!boss) throw new Error(`Unknown boss ${bossId}`);
+  const player = await playerId(user);
+  const pet = await battlePet(player, starter);
+  const { data, error } = await db().rpc("battle_create_group", {
+    p_player: player,
+    p_pet: pet.id,
+    p_pet_max_hp: pet.max_hp,
+    p_boss: boss.id,
+    p_base_hp: boss.maxHp,
+    p_hp_per_extra: boss.hpPerExtraPlayer,
+    p_attack_min_sec: boss.attack.minIntervalSec,
+    p_attack_max_sec: boss.attack.maxIntervalSec,
+    p_attack_damage: boss.attack.damage,
+    p_time_limit_sec: TIME_LIMIT_SEC,
+    p_first_question: pickQuestion(boss, []).id,
+  });
+  if (error || !data) fail("Could not open the lobby", error);
+  return data as string;
+}
+
+export type JoinError = "no_code" | "started" | "full";
+
+/** Joins a group lobby by its code; reopening an already joined one reconnects. */
+export async function joinGroupBattle(
+  user: User,
+  starter: UserPet,
+  code: string,
+): Promise<{ battleId?: string; error?: JoinError }> {
+  const player = await playerId(user);
+  const pet = await battlePet(player, starter);
+  // The first question has to suit the boss the code is for.
+  const { data: battle } = await db()
+    .from("battles")
+    .select("boss_id")
+    .eq("join_code", code.trim().toUpperCase())
+    .maybeSingle<{ boss_id: string }>();
+  const boss = bosses.find((b) => b.id === battle?.boss_id);
+  const first = boss
+    ? pickQuestion(boss, [])
+    : englishQuestions[Math.floor(Math.random() * englishQuestions.length)];
+  const { data, error } = await db().rpc("battle_join_group", {
+    p_code: code,
+    p_player: player,
+    p_pet: pet.id,
+    p_pet_max_hp: pet.max_hp,
+    p_first_question: first.id,
+  });
+  if (error) fail("Could not join", error);
+  const r = data as { battle?: string; error?: JoinError };
+  if (r.battle) await notifyBattle(r.battle);
+  return { battleId: r.battle, error: r.error };
+}
+
+/** The host starts their lobby (2+ players). */
+export async function startGroupBattle(user: User, battleId: string) {
+  const { data, error } = await db().rpc("battle_start_group", {
+    p_battle: battleId,
+    p_player: await playerId(user),
+  });
+  if (error) fail("Could not start", error);
+  const r = data as { ok?: boolean; error?: string };
+  if (r.ok) await notifyBattle(battleId);
+  return r;
+}
+
+/** The player's unfinished group battle (lobby or fight), if any. */
+export async function activeGroupBattleId(user: User): Promise<string | undefined> {
+  const player = await playerId(user);
+  const { data, error } = await db()
+    .from("battle_participants")
+    .select("battle_id, battles!inner(status, mode)")
+    .eq("player_id", player)
+    .is("left_at", null)
+    .eq("battles.mode", "group")
+    .in("battles.status", ["lobby", "active"])
+    .order("joined_at", { ascending: false })
+    .limit(1);
+  if (error) fail("Could not load battles", error);
+  return data?.[0]?.battle_id as string | undefined;
 }
 
 /**
  * Catches the battle up (attacks, time limit) and returns this player's
  * view in one database round trip, or undefined if they aren't in it.
  */
-export async function battleState(user: User, battleId: string) {
+export async function battleState(
+  user: User,
+  battleId: string,
+  claim = true,
+): Promise<BattleState | undefined> {
   const { data, error } = await db().rpc("battle_state", {
     p_battle: battleId,
     p_username: user.username,
@@ -249,9 +413,10 @@ export async function battleState(user: User, battleId: string) {
   if (error) fail("Could not load battle", error);
   const state = toState(data as ViewJson);
   // Won but not rewarded yet (e.g. the winning answer's claim was cut off).
-  if (state?.status === "won" && !state.rewards) {
+  // Someone who left gets nothing; reload once, never claim in a loop.
+  if (claim && state?.status === "won" && !state.rewards && !state.me.left) {
     await claimRewards(user, state);
-    return battleState(user, battleId);
+    return battleState(user, battleId, false);
   }
   return state;
 }
@@ -317,6 +482,7 @@ export async function answerBattleQuestion(
   };
   let state = toState(applied.view ?? null);
   if (applied.error) return { state, error: applied.error };
+  if (state?.mode !== "solo") await notifyBattle(battleId);
   if (state?.status === "won") state = await battleState(user, battleId);
   return {
     state,

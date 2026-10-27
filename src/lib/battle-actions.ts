@@ -4,7 +4,15 @@
 // the browser never decides damage, attacks or rewards.
 
 import { redirect } from "next/navigation";
-import { answerBattleQuestion, battleState, forfeitBattle, startSoloBattle } from "./battle";
+import {
+  answerBattleQuestion,
+  battleState,
+  createGroupBattle,
+  joinGroupBattle,
+  leaveBattle,
+  startGroupBattle,
+  startSoloBattle,
+} from "./battle";
 import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
 import type { BattleAnswerOutcome, BattleState, EnglishAnswer, HatchResult } from "./types";
@@ -24,10 +32,38 @@ export async function startBossBattle(bossId: string) {
   redirect(`/pets/battle/${battleId}`);
 }
 
-/** Leaves the battle (it ends without a victory) and goes back to the bosses. */
+/** Leaves the battle and goes back to the bosses (solo: it ends without a victory). */
 export async function leaveBossBattle(battleId: string) {
-  await forfeitBattle(await student(), battleId);
+  await leaveBattle(await student(), battleId);
   redirect("/pets/battle");
+}
+
+/** Opens a group lobby for friends to join, and goes to it. */
+export async function createGroupBossBattle(bossId: string) {
+  const user = await student();
+  if (!user.pet) redirect("/pets");
+  const battleId = await createGroupBattle(user, user.pet, bossId);
+  redirect(`/pets/battle/${battleId}`);
+}
+
+/** Joins a group by code; on success goes to its lobby, otherwise says why not. */
+export async function joinGroupBossBattle(
+  _previous: { error?: string } | undefined,
+  form: FormData,
+): Promise<{ error?: string }> {
+  const user = await student();
+  if (!user.pet) redirect("/pets");
+  const code = String(form.get("code") ?? "").trim();
+  if (!/^[A-Za-z0-9]{6}$/.test(code)) return { error: "format" };
+  const { battleId, error } = await joinGroupBattle(user, user.pet, code);
+  if (!battleId) return { error: error ?? "no_code" };
+  redirect(`/pets/battle/${battleId}`);
+}
+
+/** The host starts the lobby. */
+export async function startGroupBossBattle(battleId: string): Promise<{ error?: string }> {
+  const r = await startGroupBattle(await student(), battleId);
+  return r.ok ? {} : { error: r.error ?? "unknown" };
 }
 
 /** The latest battle state; the battle screen polls this. */

@@ -7,6 +7,7 @@ import { cn } from "@/lib/cn";
 const TABS = [
   { href: "/pets", label: "Миний тэжээвэр", exact: true },
   { href: "/pets/battle", label: "Боссууд" },
+  { href: "/pets/join", label: "Нэгдэх" },
   { href: "/pets/eggs", label: "Өндөг", badge: "eggs" as const },
   { href: "/pets/progress", label: "Ахиц" },
 ];
@@ -14,7 +15,7 @@ const TABS = [
 /** A battle in progress, e.g. /pets/battle/<id>: no tabs there, to keep the fight focused. */
 const BATTLE_SCREEN = /^\/pets\/battle\/[0-9a-f-]{36}/i;
 
-/** Tabs for the Pets area: pets and collection, bosses, eggs, English progress. */
+/** Tabs for the Pets area: pets and collection, bosses, joining a group, eggs, English progress. */
 export function PetsTabs({ eggCount }: { eggCount: number }) {
   const pathname = usePathname();
   if (BATTLE_SCREEN.test(pathname)) return null;
