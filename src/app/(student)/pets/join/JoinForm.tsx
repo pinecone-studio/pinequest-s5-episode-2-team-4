@@ -8,7 +8,7 @@ const ERRORS: Record<string, string> = {
   format: "Нэгдэх код 6 тэмдэгттэй, ангийн код 10 хүртэл тэмдэгттэй.",
   no_code: "Ийм код эсвэл тулаан явагдаж буй анги олдсонгүй.",
   started: "Энэ бүлгийн тулаан аль хэдийн эхэлсэн.",
-  full: "Энэ бүлэг дүүрсэн байна (5 хүн).",
+  full: "Энэ бүлэг дүүрсэн байна (8 хүн).",
 };
 
 /** Join a friend's group battle or a class battle: the 6-character code, or the class code. */

@@ -19,7 +19,7 @@ type LobbyScreenProps = {
 
 /** Fallback refresh if a Realtime message is missed. */
 const POLL_MS = 3000;
-const MAX_PLAYERS = 5;
+const MAX_PLAYERS = 8;
 
 const START_ERRORS: Record<string, string> = {
   need_two: "Эхлүүлэхэд дор хаяж 2 хүн хэрэгтэй.",
