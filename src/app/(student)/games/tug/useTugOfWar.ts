@@ -39,7 +39,7 @@ type Tug = {
 };
 
 const fresh = (questions: GameQuestion[]): Tug => ({
-  rounds: pickRounds(questions, POOL).map(makeChoiceRound),
+  rounds: pickRounds(questions, POOL).map((q) => makeChoiceRound(q)),
   index: 0,
   rope: 0,
   ticks: 0,
