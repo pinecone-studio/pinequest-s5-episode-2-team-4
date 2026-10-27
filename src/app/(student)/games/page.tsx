@@ -73,6 +73,14 @@ const GAMES = [
     shot: "/games/penalty.jpg",
     focus: "50% 22%",
   },
+  {
+    href: "/games/flight",
+    title: "Мэдлэгийн нислэг",
+    genre: "Нислэг",
+    text: "Шонхороо товшиж дүүлгэ. Хаалга бүр 3 завсартай: зөв хариулттай завсраар нис. Буруу завсраар орвол тайлбар гарна.",
+    shot: "/games/flight.jpg",
+    focus: "50% 40%",
+  },
 ];
 
 export default async function GamesPage() {
