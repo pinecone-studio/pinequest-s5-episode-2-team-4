@@ -1,0 +1,79 @@
+/* Whack-a-mole field: grass, dirt holes, moles popping up, a hammer swing. */
+
+.mole-field {
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgb(255 255 255 / 0.16), transparent 70%),
+    repeating-linear-gradient(135deg, #3f9a4f 0 22px, #398d48 22px 44px);
+}
+
+.mole-hole {
+  background: radial-gradient(closest-side, #1a0f0a 55%, #3a2414 100%);
+}
+
+.mole-lip {
+  background: radial-gradient(closest-side at 50% 0%, transparent 62%, #6b4424 64%, #8a5a34 100%);
+  clip-path: inset(50% 0 0 0);
+}
+
+.mole-up {
+  animation: mole-up 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+}
+
+@keyframes mole-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.mole-hit {
+  transform-origin: 50% 100%;
+  animation: mole-squash 0.38s ease-in forwards;
+}
+
+@keyframes mole-squash {
+  30% {
+    transform: scaleY(0.7) scaleX(1.12);
+  }
+  to {
+    transform: translateY(100%) scaleY(0.7);
+  }
+}
+
+.mole-sign {
+  box-shadow: 0 3px 0 rgb(0 0 0 / 0.35);
+}
+
+.mole-hammer {
+  transform-origin: 80% 90%;
+  animation: mole-swing 0.24s ease-in both;
+}
+
+@keyframes mole-swing {
+  from {
+    opacity: 1;
+    transform: rotate(40deg);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(-35deg);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(-35deg);
+  }
+}
+
+.mole-stars {
+  animation: mole-stars 0.5s ease-out both;
+}
+
+@keyframes mole-stars {
+  from {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-18px) scale(1.3);
+  }
+}

@@ -47,6 +47,14 @@ const GAMES = [
     art: "from-[#8b5cff] to-[#ff4d6d]",
     icon: "🏃",
   },
+  {
+    href: "/games/mole",
+    title: "Мэнгэ цохих",
+    genre: "Хурдан",
+    text: "Нүхнээс хариулт барьсан мэнгэ цухуйна. Даалгаварт тохирохыг нь цохи, буруу цохивол амь хасагдана. 60 секундэд хэдийг цохих вэ?",
+    art: "from-[#34d399] to-[#ffcf5a]",
+    icon: "🔨",
+  },
 ];
 
 export default async function GamesPage() {
