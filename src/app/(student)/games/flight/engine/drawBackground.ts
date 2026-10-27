@@ -1,5 +1,5 @@
 import type { Stage } from "../../_lib/canvas";
-import { GROUND, WORLD } from "./types";
+import { WORLD } from "./types";
 
 const { w: W, h: H } = WORLD;
 
@@ -133,25 +133,4 @@ function drawAurora(ctx: CanvasRenderingContext2D, time: number) {
     }
   }
   ctx.globalCompositeOperation = "source-over";
-}
-
-/** Grass strip with tufts and dashes that scroll with the gates. */
-export function drawGround(ctx: CanvasRenderingContext2D, scroll: number) {
-  const g = ctx.createLinearGradient(0, GROUND, 0, H);
-  g.addColorStop(0, "#2a1260");
-  g.addColorStop(1, "#140832");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, GROUND, W, H - GROUND);
-  ctx.fillStyle = "#3d1b85";
-  ctx.fillRect(0, GROUND, W, 3);
-  ctx.fillStyle = "#4b23a3";
-  for (let x = -(scroll % 18); x < W + 18; x += 18) {
-    ctx.beginPath();
-    ctx.moveTo(x, GROUND);
-    ctx.lineTo(x + 4, GROUND - 6);
-    ctx.lineTo(x + 7, GROUND);
-    ctx.fill();
-  }
-  ctx.fillStyle = "rgba(255,255,255,.06)";
-  for (let x = -(scroll % 46); x < W + 46; x += 46) ctx.fillRect(x, GROUND + 14, 22, 3);
 }
