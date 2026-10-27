@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Design tokens from the LevelUp design. Light theme only. */
+/* Design tokens from the LevelUp design. */
 @theme {
   --color-primary: #5b00ed;
   --color-primary-dark: #3f0791;
