@@ -44,6 +44,7 @@ import {
   lessons,
 } from "./mock/lessons";
 import { sampleTestAnswers, testQuestions } from "./mock/questions";
+import { raceQuestions } from "./mock/race";
 import {
   assignmentDraft,
   classGoal,
@@ -130,6 +131,11 @@ export async function getTestQuestions(topicId: string) {
   return testQuestions.filter((q) =>
     topics.find((t) => t.id === topicId)?.subtopicIds.includes(q.subtopicId),
   );
+}
+
+/** The horse race game's 10 questions, in order. */
+export async function getRaceQuestions(): Promise<Question[]> {
+  return raceQuestions;
 }
 
 /**

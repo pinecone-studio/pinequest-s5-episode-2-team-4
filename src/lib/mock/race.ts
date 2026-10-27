@@ -1,0 +1,86 @@
+import type { Question } from "@/lib/types";
+import { blank, equals, f, frac, plus } from "./helpers";
+
+/** Horse race: 10 fraction questions, a step for each right answer. */
+export const raceQuestions: Question[] = [
+  {
+    id: "r1",
+    subtopicId: "same-denominator",
+    prompt: "Нийлбэрийг ол",
+    expression: [frac(3, 8), plus, frac(2, 8), equals, blank],
+    options: [f(5, 16), f(5, 8), f(1, 8), f(6, 8)],
+    correctIndex: 1,
+  },
+  {
+    id: "r2",
+    subtopicId: "same-denominator",
+    prompt: "Нийлбэрийг ол",
+    expression: [frac(4, 11), plus, frac(5, 11), equals, blank],
+    options: [f(9, 11), f(9, 22), f(1, 11), f(20, 11)],
+    correctIndex: 0,
+  },
+  {
+    id: "r3",
+    subtopicId: "different-denominator",
+    prompt: "Нийлбэрийг ол",
+    expression: [frac(1, 2), plus, frac(1, 4), equals, blank],
+    options: [f(2, 6), f(2, 4), f(3, 4), f(1, 8)],
+    correctIndex: 2,
+  },
+  {
+    id: "r4",
+    subtopicId: "different-denominator",
+    prompt: "Нийлбэрийг ол",
+    expression: [frac(1, 3), plus, frac(1, 6), equals, blank],
+    options: [f(2, 9), f(2, 6), f(1, 9), f(1, 2)],
+    correctIndex: 3,
+  },
+  {
+    id: "r5",
+    subtopicId: "different-denominator",
+    prompt: "Нийлбэрийг ол",
+    expression: [frac(2, 5), plus, frac(1, 10), equals, blank],
+    options: [f(3, 15), f(1, 2), f(3, 10), f(2, 10)],
+    correctIndex: 1,
+  },
+  {
+    id: "r6",
+    subtopicId: "simplify",
+    prompt: "Хураа",
+    expression: [frac(4, 10), equals, blank],
+    options: [f(2, 5), f(4, 5), f(1, 5), f(2, 10)],
+    correctIndex: 0,
+  },
+  {
+    id: "r7",
+    subtopicId: "simplify",
+    prompt: "Хураа",
+    expression: [frac(9, 12), equals, blank],
+    options: [f(3, 6), f(9, 4), f(1, 4), f(3, 4)],
+    correctIndex: 3,
+  },
+  {
+    id: "r8",
+    subtopicId: "simplify",
+    prompt: "Хураа",
+    expression: [frac(8, 12), equals, blank],
+    options: [f(2, 4), f(2, 3), f(4, 3), f(1, 3)],
+    correctIndex: 1,
+  },
+  {
+    id: "r9",
+    subtopicId: "mixed-numbers",
+    prompt: "Холимог тоо болго",
+    expression: [frac(7, 3), equals, blank],
+    options: [f(1, 3, 2), f(2, 3, 1), f(1, 7, 3), f(3, 7)],
+    correctIndex: 0,
+  },
+  {
+    id: "r10",
+    subtopicId: "mixed-numbers",
+    prompt: "Зөв биш бутархай болго",
+    expression: [frac(3, 4, 1), equals, blank],
+    options: [f(4, 4), f(3, 4), f(7, 4), f(5, 4)],
+    correctIndex: 2,
+  },
+];
