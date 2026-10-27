@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { AnonQuestion } from "@/lib/types";
 
@@ -170,12 +169,20 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
                         className="w-full resize-none rounded-field border-2 border-line bg-white px-3.5 py-2.5 text-base text-ink outline-none placeholder:text-ink-muted focus:border-primary"
                       />
                       <div className="flex gap-2 self-end">
-                        <Button variant="white" size="sm" onClick={() => setReplying(null)}>
+                        <button
+                          type="button"
+                          onClick={() => setReplying(null)}
+                          className="min-h-11 cursor-pointer rounded-full border-2 border-lavender bg-white px-3 text-xs font-bold whitespace-nowrap text-ink hover:bg-lavender"
+                        >
                           Болих
-                        </Button>
-                        <Button type="submit" size="sm" disabled={!replyDraft.trim()}>
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={!replyDraft.trim()}
+                          className="min-h-11 cursor-pointer rounded-full border-2 border-primary bg-primary px-3 text-xs font-bold whitespace-nowrap text-white disabled:cursor-default disabled:opacity-60"
+                        >
                           Илгээх
-                        </Button>
+                        </button>
                       </div>
                     </form>
                   ) : null}
