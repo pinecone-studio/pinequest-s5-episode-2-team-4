@@ -38,7 +38,7 @@ export default async function HomePage() {
   }));
   const orbitPets = ORBIT_PET_IDS.flatMap((id) => {
     const line = petLines.find((l) => l.id === id);
-    return line ? [line.stages[0]] : [];
+    return line ? [{ stage: line.stages[0], element: line.element }] : [];
   });
 
   return (

@@ -1,6 +1,7 @@
+import { ElementRing } from "@/components/pet/ElementRing";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { ButtonLink } from "@/components/ui";
-import type { PetStage } from "@/lib/types";
+import type { PetElement, PetStage } from "@/lib/types";
 
 const PlayIcon = (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="size-6">
@@ -21,7 +22,7 @@ type HomeHeroProps = {
   pet: { stage: PetStage; level: number };
   /** Before the diagnostic test the play button starts it. */
   testTaken: boolean;
-  orbitPets: PetStage[];
+  orbitPets: { stage: PetStage; element: PetElement }[];
 };
 
 export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
@@ -86,14 +87,15 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
               <span className="text-primary">Түв. {pet.level}</span>
             </p>
             <div aria-hidden="true" className="absolute top-10 left-10 size-115 animate-[spin_60s_linear_infinite]">
-              {orbitPets.slice(0, ORBIT_SPOTS.length).map((stage, i) => (
-                <div
+              {orbitPets.slice(0, ORBIT_SPOTS.length).map(({ stage, element }, i) => (
+                <ElementRing
                   key={stage.name}
+                  element={element}
                   className="absolute flex size-20 animate-[spin_60s_linear_infinite_reverse] items-center justify-center rounded-full bg-white/70 shadow-card ring-1 ring-white backdrop-blur-md"
                   style={{ left: ORBIT_SPOTS[i].x, top: ORBIT_SPOTS[i].y }}
                 >
                   <PetSprite stage={stage} />
-                </div>
+                </ElementRing>
               ))}
             </div>
           </div>

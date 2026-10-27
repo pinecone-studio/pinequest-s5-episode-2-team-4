@@ -1,0 +1,189 @@
+/*
+ * Animated ring around a pet chip, one look per element. Element hues live
+ * here because the design tokens have no per-element palette. Motion is
+ * switched off globally by prefers-reduced-motion in globals.css.
+ */
+
+.el-ring {
+  --el-a: #5b00ed;
+  --el-b: #bfefff;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Turning gradient ring */
+.el-ring::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--el-a), var(--el-b), var(--el-a));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  animation: el-spin 6s linear infinite;
+}
+
+/* Effect layer over the chip; each element draws something different */
+.el-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.el-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes el-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes el-spin-rev {
+  to { transform: rotate(-360deg); }
+}
+@keyframes el-ripple {
+  0% { transform: scale(1); opacity: 0.65; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes el-sweep {
+  0% { background-position: 130% 0; }
+  60%, 100% { background-position: -130% 0; }
+}
+
+/* Fire: flickering glow and a hot ring */
+.el-ring[data-element="fire"] {
+  --el-a: #ff3d00;
+  --el-b: #ffc400;
+  animation: el-flicker 1.3s infinite;
+}
+.el-ring[data-element="fire"]::after {
+  background: radial-gradient(circle at 50% 100%, rgb(255 120 0 / 0.45), transparent 65%);
+  animation: el-ember 1.3s ease-in-out infinite;
+}
+@keyframes el-flicker {
+  0%, 100% { box-shadow: 0 0 10px 1px rgb(255 90 0 / 0.55); }
+  20% { box-shadow: 0 0 18px 4px rgb(255 140 0 / 0.7); }
+  45% { box-shadow: 0 0 8px 0 rgb(255 70 0 / 0.45); }
+  70% { box-shadow: 0 0 20px 5px rgb(255 170 0 / 0.65); }
+}
+@keyframes el-ember {
+  0%, 100% { opacity: 0.5; transform: translateY(2px) scale(0.96); }
+  50% { opacity: 1; transform: translateY(-3px) scale(1.02); }
+}
+
+/* Water: ripples spreading out */
+.el-ring[data-element="water"] {
+  --el-a: #1e88e5;
+  --el-b: #80deea;
+}
+.el-ring[data-element="water"]::after {
+  border: 2px solid #4fc3f7;
+  animation: el-ripple 2.6s ease-out infinite;
+}
+.el-ring[data-element="water"] .el-body {
+  animation: el-wave 3.2s ease-in-out infinite;
+}
+@keyframes el-wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Wood: slow growing pulse */
+.el-ring[data-element="wood"] {
+  --el-a: #2e9d4b;
+  --el-b: #b5e86b;
+  animation: el-grow 3.4s ease-in-out infinite;
+}
+.el-ring[data-element="wood"]::after {
+  border: 2px solid #8bd35a;
+  animation: el-ripple 3.4s ease-out infinite;
+}
+@keyframes el-grow {
+  0%, 100% { box-shadow: 0 0 8px 0 rgb(80 190 90 / 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgb(110 210 90 / 0.55); }
+}
+
+/* Ice: a glint sweeps across */
+.el-ring[data-element="ice"] {
+  --el-a: #6ecbff;
+  --el-b: #ffffff;
+  box-shadow: 0 0 14px 1px rgb(140 215 255 / 0.65);
+}
+.el-ring[data-element="ice"]::before {
+  animation-duration: 9s;
+}
+.el-ring[data-element="ice"]::after {
+  background: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.95) 50%, transparent 62%);
+  background-size: 250% 100%;
+  animation: el-sweep 3.2s ease-in-out infinite;
+}
+
+/* Sky: drifting, airy */
+.el-ring[data-element="sky"] {
+  --el-a: #7c5cff;
+  --el-b: #9be7ff;
+  animation: el-drift 4s ease-in-out infinite;
+}
+.el-ring[data-element="sky"]::after {
+  border: 2px dashed rgb(124 92 255 / 0.55);
+  inset: -9px;
+  animation: el-spin-rev 10s linear infinite;
+}
+@keyframes el-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Metal: a hard silver gleam */
+.el-ring[data-element="metal"] {
+  --el-a: #5f6b7a;
+  --el-b: #e3e8ef;
+  box-shadow: 0 0 10px 0 rgb(95 107 122 / 0.4);
+}
+.el-ring[data-element="metal"]::after {
+  background: linear-gradient(115deg, transparent 42%, rgb(255 255 255 / 0.9) 50%, transparent 58%);
+  background-size: 250% 100%;
+  animation: el-sweep 2.4s linear infinite;
+}
+
+/* Earth: low rumble and dust */
+.el-ring[data-element="earth"] {
+  --el-a: #8d5a2b;
+  --el-b: #e0b36a;
+}
+.el-ring[data-element="earth"]::after {
+  border: 2px solid rgb(170 120 60 / 0.7);
+  animation: el-ripple 3s ease-out infinite;
+}
+.el-ring[data-element="earth"] .el-body {
+  animation: el-rumble 2.4s ease-in-out infinite;
+}
+@keyframes el-rumble {
+  0%, 60%, 100% { transform: translate(0, 0); }
+  66% { transform: translate(-2px, 1px); }
+  72% { transform: translate(2px, -1px); }
+  78% { transform: translate(-1px, 1px); }
+  84% { transform: translate(1px, 0); }
+}
+
+/* Shadow: a dark vortex that breathes */
+.el-ring[data-element="shadow"] {
+  --el-a: #2b0a5e;
+  --el-b: #b04dff;
+  box-shadow: 0 0 14px 2px rgb(90 20 160 / 0.5);
+}
+.el-ring[data-element="shadow"]::before {
+  animation: el-spin-rev 3.5s linear infinite;
+}
+.el-ring[data-element="shadow"]::after {
+  background: radial-gradient(circle, transparent 35%, rgb(60 10 120 / 0.45) 100%);
+  animation: el-breathe 3s ease-in-out infinite;
+}
+@keyframes el-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
