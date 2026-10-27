@@ -77,6 +77,7 @@ export function useShootout(questions: GameQuestion[]) {
       engine.destroy();
       engineRef.current = null;
       clearTimeout(timerRef.current);
+      soundRef.current?.stopMusic();
     };
   }, []);
 
@@ -141,6 +142,7 @@ export function useShootout(questions: GameQuestion[]) {
     const g = gameRef.current;
     if (!g) return;
     if (isOver(g)) {
+      soundRef.current?.stopMusic();
       soundRef.current?.round();
       commit(g, null);
       return;
@@ -168,6 +170,8 @@ export function useShootout(questions: GameQuestion[]) {
     if (choice === null) setExplain({ kind: "bad", title: "Хугацаа дууслаа!", text: t.round.question.explanation, seconds: 3.5 });
     commit({ ...scored, bot: [...g.bot, !ok] }, { ...t, picked: choice ?? -1 });
     engineRef.current?.shoot(ok);
+    soundRef.current?.fx("kick");
+    if (ok) setTimeout(() => soundRef.current?.fx("thud"), 450);
   }
 
   function start() {
@@ -175,10 +179,13 @@ export function useShootout(questions: GameQuestion[]) {
     const g: Game = { rounds: pickRounds(questions, POOL), qi: 0, you: [], bot: [], combo: 0, bestCombo: 0, score: 0, right: 0, wrong: 0, missed: [] };
     gameRef.current = g;
     setExplain(null);
+    soundRef.current?.startMusic("penalty");
     engineRef.current?.setCallbacks({
       onKick(zone) {
         const g = gameRef.current!, t = turnRef.current!;
         const ok = zone === t.round.answer;
+        soundRef.current?.fx("kick");
+        if (ok) setTimeout(() => soundRef.current?.fx("cheer"), 450);
         commit({ ...scoreAnswer(g, ok, t.round.question), you: [...g.you, ok] }, { ...t, picked: zone });
         return t.round.answer;
       },

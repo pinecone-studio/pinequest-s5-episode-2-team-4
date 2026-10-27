@@ -64,6 +64,7 @@ export function useHorseRace(questions: GameQuestion[]) {
 
   useEffect(() => {
     soundRef.current ??= createSound();
+    return () => soundRef.current?.stopMusic();
   }, []);
 
   const round = race ? race.rounds[race.index % race.rounds.length] : null;
@@ -82,6 +83,7 @@ export function useHorseRace(questions: GameQuestion[]) {
       : null;
 
   function start() {
+    soundRef.current?.startMusic("race");
     setRace(fresh(questions));
     setPicked(null);
     setExplain(null);
@@ -92,8 +94,10 @@ export function useHorseRace(questions: GameQuestion[]) {
     const ok = choice === round.answer;
     const combo = ok ? race.combo + 1 : 0;
     setPicked(choice);
-    if (ok) soundRef.current?.good(combo);
-    else soundRef.current?.bad();
+    if (ok) {
+      soundRef.current?.good(combo);
+      soundRef.current?.fx("hoof");
+    } else soundRef.current?.bad();
     // Functional update: the bots may have moved since this render.
     setRace((r) =>
       r && {
@@ -136,7 +140,9 @@ export function useHorseRace(questions: GameQuestion[]) {
   }, [running]);
 
   useEffect(() => {
-    if (finished) soundRef.current?.round();
+    if (!finished) return;
+    soundRef.current?.stopMusic();
+    soundRef.current?.round();
   }, [finished]);
 
   // The «Зөв!» card closes by itself.

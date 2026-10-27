@@ -56,10 +56,13 @@ export function useCardBattle(questions: GameQuestion[], petSprite?: string) {
     arenaRef.current = arena;
     const observer = new ResizeObserver(() => arena.resize());
     observer.observe(canvas);
+    // The battle is on from the start, so the music plays whenever sound is on.
+    soundRef.current?.startMusic("cards");
     return () => {
       observer.disconnect();
       arena.destroy();
       arenaRef.current = null;
+      soundRef.current?.stopMusic();
     };
   }, [petSprite]);
 
@@ -83,7 +86,9 @@ export function useCardBattle(questions: GameQuestion[], petSprite?: string) {
     setPicked(null);
     setBusy(true);
     setBattle((b) => ({ ...b, hand: b.hand.filter((_, i) => i !== index) }));
+    soundRef.current?.fx("card");
     await arena.throw(card.power, ok);
+    soundRef.current?.fx(ok ? "hit" : "thud");
     const damage = ok ? Math.round(POWER[card.power].damage * comboMultiplier(combo)) : 0;
     const hp = Math.max(0, battle.hp - damage), won = hp === 0;
     if (ok) arena.hit(card.power, damage, combo, { rage: hp <= MAX_HP / 2, ko: won });
@@ -98,6 +103,7 @@ export function useCardBattle(questions: GameQuestion[], petSprite?: string) {
       missed: ok || battle.missed.includes(card.question) ? battle.missed : [...battle.missed, card.question],
     };
     if (won) {
+      soundRef.current?.stopMusic();
       soundRef.current?.round();
       setBattle(next);
       setTimeout(() => setResult(toResult(next)), 1100);
@@ -113,6 +119,7 @@ export function useCardBattle(questions: GameQuestion[], petSprite?: string) {
     choose,
     play,
     again: () => {
+      soundRef.current?.startMusic("cards");
       arenaRef.current?.reset();
       setBattle(fresh(questions));
       setResult(null);

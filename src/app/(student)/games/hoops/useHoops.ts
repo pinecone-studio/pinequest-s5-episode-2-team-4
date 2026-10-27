@@ -65,6 +65,7 @@ export function useHoops(questions: GameQuestion[]) {
       observer.disconnect();
       engine.destroy();
       engineRef.current = null;
+      soundRef.current?.stopMusic();
     };
   }, []);
 
@@ -93,7 +94,10 @@ export function useHoops(questions: GameQuestion[]) {
     const over = g.hearts <= 0 || g.index >= PROMPTS;
     engineRef.current?.setMoving(!over && g.index >= MOVING_FROM);
     engineRef.current?.serve(over ? null : (g.rack[0]?.answer ?? null));
-    if (over) soundRef.current?.round();
+    if (over) {
+      soundRef.current?.stopMusic();
+      soundRef.current?.round();
+    }
   }
 
   /** The current ball is done: drop it (or send a missed right ball to the back) and move on. */
@@ -113,6 +117,8 @@ export function useHoops(questions: GameQuestion[]) {
     const ball = g.rack[0], q = g.rounds[g.index];
     if (!ball) return;
     let next: Game;
+    if (scored) soundRef.current?.fx("swish");
+    else soundRef.current?.fx("bounce");
     if (scored && ball.ok) {
       const combo = g.combo + 1;
       soundRef.current?.good(combo);
@@ -150,6 +156,7 @@ export function useHoops(questions: GameQuestion[]) {
     const rounds = pickRounds(questions, PROMPTS);
     const g: Game = { rounds, index: 0, rack: rackFor(rounds[0]), scored: 0, hearts: HEARTS, combo: 0, bestCombo: 0, score: 0, right: 0, wrong: 0, missed: [] };
     engineRef.current?.setCallbacks({ onShot, onDiscard });
+    soundRef.current?.startMusic("hoops");
     setExplain(null);
     show(g);
   }
