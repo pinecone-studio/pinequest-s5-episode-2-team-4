@@ -39,6 +39,14 @@ const GAMES = [
     art: "from-[#ffcf5a] to-[#e30ba6]",
     icon: "🪢",
   },
+  {
+    href: "/games/runner",
+    title: "Боссын зам",
+    genre: "Гүйлт",
+    text: "3 замтай замаар гүйж, зөв хариулттай хаалгаар ор. Зөв бүрт томорч хүчтэй болно. Замын төгсгөлд босс хүлээж байна!",
+    art: "from-[#8b5cff] to-[#ff4d6d]",
+    icon: "🏃",
+  },
 ];
 
 export default async function GamesPage() {

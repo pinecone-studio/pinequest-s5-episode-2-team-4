@@ -32,7 +32,7 @@ type Race = {
 };
 
 const fresh = (questions: GameQuestion[]): Race => ({
-  rounds: pickRounds(questions, POOL).map(makeChoiceRound),
+  rounds: pickRounds(questions, POOL).map((q) => makeChoiceRound(q)),
   index: 0,
   positions: HORSES.map(() => 0),
   combo: 0,
