@@ -6,7 +6,14 @@
 // (pages, layouts) and pass the result to Client Components as props.
 
 import { io } from "next/cache";
-import { activeGroupBattleId, activeSoloBattleId, battleState } from "./battle";
+import {
+  activeGroupBattleId,
+  activeSoloBattleId,
+  battleState,
+  classBattleState,
+  openClassBattle,
+  teacherClassBattle,
+} from "./battle";
 import { petCollection, unhatchedEggs } from "./collection";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { englishProgress } from "./progress";
@@ -16,6 +23,7 @@ import { streakSummary } from "./streak";
 import type {
   BattleState,
   Boss,
+  ClassBattleSummary,
   ClassGoal,
   AnonQuestion,
   EnglishAnswer,
@@ -309,6 +317,24 @@ export async function getActiveGroupBattleId(): Promise<string | undefined> {
 export async function getActiveSoloBattleId(): Promise<string | undefined> {
   const user = await getCurrentUser();
   return user ? activeSoloBattleId(user) : undefined;
+}
+
+/** The unfinished battle for the current student's class, if any. */
+export async function getOpenClassBattle(): Promise<ClassBattleSummary | undefined> {
+  const user = await getCurrentUser();
+  return user?.role === "student" ? openClassBattle(user) : undefined;
+}
+
+/** The current teacher's unfinished class battle, if any. */
+export async function getTeacherClassBattle(): Promise<ClassBattleSummary | undefined> {
+  const user = await getCurrentUser();
+  return user?.role === "teacher" ? teacherClassBattle(user) : undefined;
+}
+
+/** The current teacher's view of their class battle, or undefined if it isn't theirs. */
+export async function getClassBattle(battleId: string): Promise<BattleState | undefined> {
+  const user = await getCurrentUser();
+  return user?.role === "teacher" ? classBattleState(user, battleId) : undefined;
 }
 
 // English question bank (boss battles)

@@ -13,6 +13,7 @@ import type {
   BattleAnswerOutcome,
   BattleState,
   Boss,
+  ClassBattleSummary,
   EnglishAnswer,
   EnglishQuestion,
   Rarity,
@@ -25,6 +26,8 @@ const BASE_DAMAGE: Record<EnglishQuestion["difficulty"], number> = { 1: 20, 2: 2
 /** Pet damage for a wrong answer: a nudge, not a punishment. */
 const WRONG_ANSWER_PET_DAMAGE = 6;
 const TIME_LIMIT_SEC = 8 * 60;
+/** A class needs longer: more students, and the teacher can pause. */
+const CLASS_TIME_LIMIT_SEC = 10 * 60;
 /** Questions not repeated until this many others have been asked. */
 const RECENT_QUESTIONS = 8;
 
@@ -124,7 +127,9 @@ type BattleRow = {
   attack_damage: number | null;
   next_attack_at: string | null;
   deadline_at: string | null;
+  paused_at: string | null;
   started_at: string | null;
+  class_code: string | null;
 };
 
 type ParticipantRow = {
@@ -159,19 +164,40 @@ type TeamRow = {
   me: boolean;
 };
 
-/** What the battle_view() database function returns. */
+/**
+ * What the battle_view() database function returns; battle_class_state()
+ * (the teacher's view) has no `me` or `pet`.
+ */
 type ViewJson = {
   battle: BattleRow;
-  me: ParticipantRow;
-  pet: PetRow | null;
+  me?: ParticipantRow;
+  pet?: PetRow | null;
   team: TeamRow[];
   now: string;
 } | null;
 
+/** The teacher isn't in the fight: all their own numbers are zero. */
+const WATCHER: ParticipantRow = {
+  pet_hp: 0,
+  pet_max_hp: 0,
+  combo: 0,
+  best_combo: 0,
+  damage_dealt: 0,
+  correct_count: 0,
+  wrong_count: 0,
+  faint_count: 0,
+  current_question_id: null,
+  left_at: null,
+  rewarded_at: null,
+  reward_exp: null,
+  reward_pet_exp: null,
+  reward_egg_rarity: null,
+};
+
 /** Turns the database view into what the browser sees (no answers in it). */
 function toState(view: ViewJson): BattleState | undefined {
   if (!view) return undefined;
-  const { battle: b, me: p } = view;
+  const { battle: b, me: p = WATCHER } = view;
   const question =
     b.status === "active"
       ? englishQuestions.find((q) => q.id === p.current_question_id)
@@ -189,6 +215,7 @@ function toState(view: ViewJson): BattleState | undefined {
     startedAt: b.started_at,
     nextAttackAt: b.next_attack_at,
     deadlineAt: b.deadline_at,
+    pausedAt: b.paused_at,
     // The database clock, the same one the attack times come from.
     serverNow: view.now,
     me: {
@@ -207,7 +234,9 @@ function toState(view: ViewJson): BattleState | undefined {
       b.status === "won"
         ? "won"
         : b.status === "ended"
-          ? "left"
+          ? b.mode === "class"
+            ? "stopped"
+            : "left"
           : b.status === "lost"
             ? p.pet_hp === 0
               ? "fainted"
@@ -222,6 +251,7 @@ function toState(view: ViewJson): BattleState | undefined {
         }
       : null,
     joinCode: b.join_code,
+    classCode: b.class_code,
     isHost: view.team.some((t) => t.me && t.host),
     team: view.team.map((t) => ({
       username: t.username,
@@ -338,7 +368,10 @@ export async function createGroupBattle(user: User, starter: UserPet, bossId: st
 
 export type JoinError = "no_code" | "started" | "full";
 
-/** Joins a group lobby by its code; reopening an already joined one reconnects. */
+/**
+ * Joins a group lobby or a class battle by its code; reopening an already
+ * joined one reconnects, and a class student who left comes back.
+ */
 export async function joinGroupBattle(
   user: User,
   starter: UserPet,
@@ -395,6 +428,130 @@ export async function activeGroupBattleId(user: User): Promise<string | undefine
     .limit(1);
   if (error) fail("Could not load battles", error);
   return data?.[0]?.battle_id as string | undefined;
+}
+
+// Class letters typed on an English keyboard, as they sound: "7B" is 7Б.
+const LATIN_CLASS_LETTERS: Record<string, string> = { A: "А", B: "Б", V: "В", G: "Г", D: "Д", E: "Е" };
+
+/** Class codes are typed by hand ("7а", " 7А", "7A"): compare them like this. */
+function normalClassCode(code: string) {
+  return code
+    .trim()
+    .toUpperCase()
+    .replace(/[ABVGDE]/g, (c) => LATIN_CLASS_LETTERS[c]);
+}
+
+/** The teacher opens a class battle against `bossId` (or gets back their open one). */
+export async function createClassBattle(teacher: User, classCode: string, bossId: string) {
+  const boss = bosses.find((b) => b.id === bossId);
+  if (!boss) throw new Error(`Unknown boss ${bossId}`);
+  const { data, error } = await db().rpc("battle_create_class", {
+    p_teacher: await playerId(teacher),
+    p_class_code: normalClassCode(classCode),
+    p_boss: boss.id,
+    p_base_hp: boss.maxHp,
+    p_hp_per_extra: boss.hpPerExtraPlayer,
+    p_attack_min_sec: boss.attack.minIntervalSec,
+    p_attack_max_sec: boss.attack.maxIntervalSec,
+    p_attack_damage: boss.attack.damage,
+    p_time_limit_sec: CLASS_TIME_LIMIT_SEC,
+  });
+  if (error || !data) fail("Could not open the class battle", error);
+  return data as string;
+}
+
+type OpenClassRow = {
+  id: string;
+  boss_id: string;
+  status: ClassBattleSummary["status"];
+  class_code: string;
+  battle_participants: { player_id: string; left_at: string | null }[];
+};
+
+function toSummary(row: OpenClassRow, player?: string): ClassBattleSummary {
+  const present = row.battle_participants.filter((p) => p.left_at === null);
+  return {
+    id: row.id,
+    bossId: row.boss_id,
+    status: row.status,
+    classCode: row.class_code,
+    students: present.length,
+    joined: player !== undefined && present.some((p) => p.player_id === player),
+  };
+}
+
+const OPEN_CLASS_SELECT = "id, boss_id, status, class_code, battle_participants(player_id, left_at)";
+
+/** The teacher's unfinished class battle, if any. */
+export async function teacherClassBattle(teacher: User): Promise<ClassBattleSummary | undefined> {
+  const { data, error } = await db()
+    .from("battles")
+    .select(OPEN_CLASS_SELECT)
+    .eq("host_player_id", await playerId(teacher))
+    .eq("mode", "class")
+    .in("status", ["lobby", "active", "paused"])
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (error) fail("Could not load class battles", error);
+  const row = data?.[0] as OpenClassRow | undefined;
+  return row && toSummary(row);
+}
+
+/** The unfinished battle for the student's class (or `classCode`), if any. */
+export async function openClassBattle(
+  user: User,
+  classCode = user.classCode,
+): Promise<ClassBattleSummary | undefined> {
+  if (!classCode?.trim()) return undefined;
+  const player = await playerId(user);
+  const { data, error } = await db()
+    .from("battles")
+    .select(OPEN_CLASS_SELECT)
+    .eq("class_code", normalClassCode(classCode))
+    .eq("mode", "class")
+    .in("status", ["lobby", "active", "paused"])
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (error) fail("Could not load class battles", error);
+  const row = data?.[0] as OpenClassRow | undefined;
+  return row && toSummary(row, player);
+}
+
+/**
+ * Joins (or rejoins) the battle for the student's class (or `classCode`);
+ * same rules as joining by its code.
+ */
+export async function joinClassBattle(user: User, starter: UserPet, classCode = user.classCode) {
+  const open = await openClassBattle(user, classCode);
+  if (!open) return { error: "no_code" as const };
+  const { data, error } = await db().from("battles").select("join_code").eq("id", open.id).single<{ join_code: string }>();
+  if (error) fail("Could not load the class battle", error);
+  return joinGroupBattle(user, starter, data.join_code);
+}
+
+/** What the teacher sees of their class battle, caught up to now. */
+export async function classBattleState(teacher: User, battleId: string): Promise<BattleState | undefined> {
+  const { data, error } = await db().rpc("battle_class_state", {
+    p_battle: battleId,
+    p_teacher: await playerId(teacher),
+  });
+  if (error) fail("Could not load the class battle", error);
+  return toState(data as ViewJson);
+}
+
+export type ClassControl = "start" | "pause" | "resume" | "end";
+
+/** The teacher starts, pauses, resumes or ends their class battle. */
+export async function controlClassBattle(teacher: User, battleId: string, action: ClassControl) {
+  const player = await playerId(teacher);
+  const { data, error } =
+    action === "start"
+      ? await db().rpc("battle_start_class", { p_battle: battleId, p_teacher: player })
+      : await db().rpc("battle_control_class", { p_battle: battleId, p_teacher: player, p_action: action });
+  if (error) fail("Could not change the class battle", error);
+  const r = data as { ok?: boolean; error?: string };
+  if (r.ok) await notifyBattle(battleId);
+  return r;
 }
 
 /**

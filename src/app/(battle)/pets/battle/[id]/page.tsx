@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { requireStudent } from "@/lib/auth";
 import { getBattle, getBoss, getCurrentPet, getPetLine, getPetLines } from "@/lib/data";
 import { petStage } from "@/lib/pets";
 import { BattleScreen } from "./BattleScreen";
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BattlePage({ params }: PageProps<"/pets/battle/[id]">) {
+  await requireStudent();
   const { id } = await params;
   // Not a battle id, or not this student's battle.
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();

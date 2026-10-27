@@ -1,12 +1,11 @@
 import { TuxemonCredit } from "@/components/layout/SiteFooter";
-import { requireStudent } from "@/lib/auth";
 
 /**
  * Battles fill the whole screen: no site header, footer or bottom nav, so the
  * boss and every pet get the space. The battle screen has its own exit.
+ * Students and teachers both use it, so each page checks who may see it.
  */
-export default async function BattleLayout({ children }: { children: React.ReactNode }) {
-  await requireStudent();
+export default function BattleLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
       {children}
