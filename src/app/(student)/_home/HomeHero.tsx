@@ -17,8 +17,6 @@ const ORBIT_SPOTS = [
   { x: -29, y: 119 },
 ];
 
-const hexagon = "[clip-path:polygon(50%_0,100%_25%,100%_75%,50%_100%,0_75%,0_25%)]";
-
 type HomeHeroProps = {
   pet: { stage: PetStage; level: number };
   /** Before the diagnostic test the play button starts it. */
@@ -63,20 +61,26 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
       <div className="mx-auto flex justify-center md:flex-[0_1_540px]">
         <div className="relative size-81 md:size-135">
           <div className="absolute top-0 left-0 size-135 origin-top-left scale-60 md:scale-100">
-            <div aria-hidden="true" className="absolute top-10 left-10 size-115 rounded-full border-2 border-dashed border-line" />
-            <div aria-hidden="true" className={`absolute top-22.5 left-28.5 h-90 w-78 overflow-hidden bg-primary ${hexagon}`}>
-              <div className="absolute -top-19 -left-25 size-128 animate-[spin_14s_linear_infinite] bg-[conic-gradient(from_0deg,var(--color-primary),var(--color-magenta),var(--color-sky),var(--color-lavender),var(--color-primary))]" />
+            {/* Soft aurora glow behind the stage */}
+            <div aria-hidden="true" className="absolute top-14 left-12 size-72 animate-[bob_7s_ease-in-out_infinite] rounded-full bg-primary/35 blur-3xl" />
+            <div aria-hidden="true" className="absolute top-40 right-8 size-64 animate-[bob_9s_ease-in-out_infinite_reverse] rounded-full bg-magenta/30 blur-3xl" />
+            <div aria-hidden="true" className="absolute bottom-6 left-24 size-56 rounded-full bg-sky/60 blur-3xl" />
+            <div aria-hidden="true" className="absolute top-10 left-10 size-115 rounded-full border border-primary/15" />
+            <div aria-hidden="true" className="absolute top-24 left-24 size-87 rounded-full border border-primary/10" />
+            {/* Glass stage with a slowly turning gradient ring */}
+            <div className="absolute top-25 left-28.5 size-78 rounded-full p-1 shadow-float">
+              <div aria-hidden="true" className="absolute inset-0 animate-[spin_14s_linear_infinite] rounded-full bg-[conic-gradient(from_0deg,var(--color-primary),var(--color-magenta),var(--color-sky),var(--color-lavender),var(--color-primary))]" />
+              <div className="relative flex size-full items-center justify-center rounded-full bg-[radial-gradient(circle_at_50%_30%,#fff_0%,var(--color-surface)_55%,var(--color-lavender)_100%)] shadow-[inset_0_2px_12px_rgba(255,255,255,0.9)]">
+                <div aria-hidden="true" className="absolute bottom-14 h-4.5 w-35 rounded-[50%] bg-ink/15 blur-sm" />
+                <PetSprite
+                  stage={pet.stage}
+                  size={256}
+                  alt={`${pet.stage.name}, чиний тэжээвэр`}
+                  className="relative animate-bob drop-shadow-[0_14px_22px_rgba(80,30,200,0.28)]"
+                />
+              </div>
             </div>
-            <div className={`absolute top-26 left-31.5 flex h-83 w-72 items-center justify-center bg-[radial-gradient(circle_at_50%_42%,#fff_0%,var(--color-surface)_48%,var(--color-lavender)_100%)] ${hexagon}`}>
-              <div aria-hidden="true" className="absolute top-62.5 left-18.5 h-4.5 w-35 rounded-[50%] bg-ink/15" />
-              <PetSprite
-                stage={pet.stage}
-                size={256}
-                alt={`${pet.stage.name}, чиний тэжээвэр`}
-                className="relative animate-bob"
-              />
-            </div>
-            <p className="absolute top-105 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-white px-4.5 py-2 text-[15px] font-bold whitespace-nowrap shadow-float">
+            <p className="absolute top-105 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/80 px-4.5 py-2 text-[15px] font-bold whitespace-nowrap shadow-float ring-1 ring-white backdrop-blur-md">
               <span>{pet.stage.name}</span>
               <span aria-hidden="true" className="size-1 rounded-full bg-line" />
               <span className="text-primary">Түв. {pet.level}</span>
@@ -85,7 +89,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
               {orbitPets.slice(0, ORBIT_SPOTS.length).map((stage, i) => (
                 <div
                   key={stage.name}
-                  className="absolute flex size-20 animate-[spin_60s_linear_infinite_reverse] items-center justify-center rounded-full bg-white shadow-card"
+                  className="absolute flex size-20 animate-[spin_60s_linear_infinite_reverse] items-center justify-center rounded-full bg-white/70 shadow-card ring-1 ring-white backdrop-blur-md"
                   style={{ left: ORBIT_SPOTS[i].x, top: ORBIT_SPOTS[i].y }}
                 >
                   <PetSprite stage={stage} />
