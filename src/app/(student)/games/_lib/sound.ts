@@ -1,5 +1,8 @@
 // Short game sounds made with the Web Audio API (no audio files). Browsers
 // allow sound only after a tap, so sound stays off until the player turns it on.
+// Background music comes from ./music and follows the same on/off switch.
+
+import { GameMusic, type GameMusicId } from "./music";
 
 export type GameSound = {
   enabled: boolean;
@@ -9,10 +12,17 @@ export type GameSound = {
   tick: () => void;
   /** A soft rising blip, e.g. for a jump or a launch. */
   blip: () => void;
+  /** Starts the game's music loop; does nothing while sound is off. */
+  startMusic: (id: GameMusicId) => void;
+  /** Stops the music; turning sound off stops it too. */
+  stopMusic: () => void;
 };
 
 export function createSound(): GameSound {
   let audio: AudioContext | undefined;
+  let music: GameMusic | undefined;
+  let musicId: GameMusicId | undefined;
+  let on = false;
 
   function tone(freq: number, dur: number, type: OscillatorType = "sine", gain = 0.07, when = 0, slide = 0) {
     if (!sound.enabled) return;
@@ -31,7 +41,15 @@ export function createSound(): GameSound {
   }
 
   const sound: GameSound = {
-    enabled: false,
+    get enabled() {
+      return on;
+    },
+    set enabled(value: boolean) {
+      on = value;
+      // Turning sound off silences the music; turning it on resumes the game's music
+      if (!value) music?.stop();
+      else if (musicId) void (music ??= GameMusic.forGame(musicId)).start();
+    },
     good(combo = 0) {
       const base = 620 * Math.pow(1.06, Math.min(combo, 10));
       tone(base, 0.12, "triangle");
@@ -49,6 +67,20 @@ export function createSound(): GameSound {
     },
     blip() {
       tone(380, 0.09, "sine", 0.035, 0, 1.8);
+    },
+    startMusic(id) {
+      if (musicId !== id) {
+        music?.close();
+        music = undefined;
+      }
+      musicId = id;
+      if (!on) return;
+      void (music ??= GameMusic.forGame(id)).start();
+    },
+    stopMusic() {
+      musicId = undefined;
+      music?.close();
+      music = undefined;
     },
   };
   return sound;
