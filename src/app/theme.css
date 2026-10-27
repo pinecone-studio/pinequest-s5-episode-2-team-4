@@ -1,0 +1,88 @@
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #eee8ff;
+  --color-ink-muted: #bfb0db;
+  --color-surface: #252038;
+  --color-surface-soft: #171321;
+  --color-lavender: #393050;
+  --color-line: #514268;
+  --color-sky: #214957;
+  --color-sky-dark: #2a5d70;
+  --color-pink: #48223f;
+  --shadow-card: rgba(0, 0, 0, 0.3) 0 15px 50px;
+  --shadow-float: rgba(0, 0, 0, 0.4) 0 20px 60px;
+}
+
+.theme-sun {
+  display: none;
+}
+
+[data-theme="dark"] .theme-sun {
+  display: block;
+}
+
+[data-theme="dark"] .theme-moon {
+  display: none;
+}
+
+/* Override backgrounds separately so white button text and artwork stay intact. */
+@layer utilities {
+  [data-theme="dark"] .bg-white {
+    background-color: #1e192b;
+  }
+
+  [data-theme="dark"] .bg-white\/70 {
+    background-color: rgb(30 25 43 / 0.7);
+  }
+
+  [data-theme="dark"] .bg-white\/80 {
+    background-color: rgb(30 25 43 / 0.8);
+  }
+
+  [data-theme="dark"] .bg-white\/90 {
+    background-color: rgb(30 25 43 / 0.9);
+  }
+
+  [data-theme="dark"] .hover\:bg-white\/60:hover {
+    background-color: rgb(57 48 80 / 0.6);
+  }
+
+  [data-theme="dark"] .bg-ink {
+    background-color: #3f0791;
+  }
+
+  [data-theme="dark"] .text-primary {
+    color: #b99aff;
+  }
+
+  [data-theme="dark"] .bg-\[\#f5fcff\] {
+    background-color: #20333e;
+  }
+
+  [data-theme="dark"] .bg-\[\#fffafd\] {
+    background-color: #382035;
+  }
+
+  [data-theme="dark"] .bg-flow {
+    background-image:
+      radial-gradient(closest-side at 18% 24%, rgb(33 73 87 / 0.65), transparent),
+      radial-gradient(closest-side at 84% 18%, rgb(81 66 104 / 0.65), transparent),
+      radial-gradient(closest-side at 70% 80%, rgb(57 48 80 / 0.8), transparent),
+      radial-gradient(closest-side at 22% 86%, rgb(227 11 166 / 0.08), transparent);
+  }
+}
+
+
+@layer base {
+  [data-theme="dark"] body {
+    background-color: var(--color-surface-soft);
+  }
+
+  [data-theme="dark"] a {
+    color: #b99aff;
+  }
+}
