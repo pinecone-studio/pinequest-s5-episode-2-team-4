@@ -6,39 +6,118 @@
   transform-origin: 50% 100%;
 }
 
-/* The pet dashes at the boss (the boss is on the left). */
+/* Pets bob gently while they wait; each starts at its own time. */
+.arena-idle {
+  animation: arena-idle 1.6s ease-in-out infinite;
+}
+
+@keyframes arena-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* The boss breathes slowly above the arena. */
+.arena-boss-idle {
+  animation: arena-boss-idle 2.4s ease-in-out infinite;
+}
+
+@keyframes arena-boss-idle {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+/* A pet joins the formation: it rises into its place. */
+.arena-enter {
+  animation: arena-enter 0.45s ease-out both;
+}
+
+@keyframes arena-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Gold glow under my own pet. */
+.arena-me-glow {
+  animation: arena-me-glow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes arena-me-glow {
+  from {
+    box-shadow: 0 0 4px 1px rgb(255 209 102 / 0.5);
+  }
+  to {
+    box-shadow: 0 0 12px 4px rgb(255 209 102 / 0.9);
+  }
+}
+
+/* The attacking pet glows and leaps up at the boss (the boss is above). */
 .arena-dash {
-  animation: arena-dash 0.45s ease-in-out;
+  animation: arena-dash 0.5s ease-in-out;
 }
 
 @keyframes arena-dash {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translateY(0);
+    filter: none;
   }
   35% {
-    transform: translateX(-28px) scale(1.05);
+    transform: translateY(-26px) scale(1.08);
+    filter: brightness(1.4) drop-shadow(0 0 6px rgb(255 255 255 / 0.95));
   }
 }
 
-/* The star the pet throws, flying from the pet to the boss. */
-.arena-star {
-  animation: arena-star 0.4s ease-in forwards;
+/* A shot flies from a pet to the boss: the element sits on the pet and
+   --dx / --dy say how far away the boss is. */
+.arena-shot {
+  animation: arena-shot 0.42s ease-in forwards;
 }
 
-@keyframes arena-star {
+@keyframes arena-shot {
   0% {
-    left: 70%;
     opacity: 1;
-    transform: rotate(0deg) scale(0.8);
+    transform: translate(0, 0) rotate(0deg) scale(0.8);
   }
   90% {
     opacity: 1;
   }
   100% {
-    left: 24%;
     opacity: 0;
-    transform: rotate(360deg) scale(1.3);
+    transform: translate(var(--dx), var(--dy)) rotate(360deg) scale(1.3);
+  }
+}
+
+/* Surviving pets hop together when the boss is defeated. */
+.arena-cheer {
+  animation: arena-cheer 0.6s ease-in-out infinite;
+}
+
+@keyframes arena-cheer {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  15% {
+    transform: translateY(0) scale(1.1, 0.9);
+  }
+  50% {
+    transform: translateY(-14px) scale(0.95, 1.05);
   }
 }
 
@@ -66,7 +145,7 @@
   }
 }
 
-/* The boss lunges at the pet (on the right). */
+/* The boss rears back, then lunges down at the pets. */
 .arena-lunge {
   animation: arena-lunge 0.55s ease-in-out;
 }
@@ -74,13 +153,13 @@
 @keyframes arena-lunge {
   0%,
   100% {
-    transform: translateX(0) scale(1);
+    transform: translateY(0) scale(1);
   }
   20% {
-    transform: translateX(-10px) scale(0.96);
+    transform: translateY(-10px) scale(0.96);
   }
   50% {
-    transform: translateX(48px) scale(1.12);
+    transform: translateY(36px) scale(1.12);
   }
 }
 
@@ -122,7 +201,7 @@
   }
 }
 
-/* End of battle: the loser falls. */
+/* End of battle: the defeated boss sinks and fades. */
 .arena-defeated {
   animation: arena-defeated 1.2s ease-in forwards;
 }

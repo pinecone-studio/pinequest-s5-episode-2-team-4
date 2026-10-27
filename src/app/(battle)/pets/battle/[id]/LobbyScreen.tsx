@@ -8,7 +8,7 @@ import { leaveBossBattle, refreshBattle, startGroupBossBattle } from "@/lib/batt
 import { petStage } from "@/lib/pets";
 import { useBattleChannel } from "@/lib/realtime";
 import type { BattleState, Boss, PetLine } from "@/lib/types";
-import { ArenaBackground } from "../ArenaBackground";
+import { ArenaBackground } from "@/app/(student)/pets/battle/ArenaBackground";
 import { Backdrop } from "./Backdrop";
 
 type LobbyScreenProps = {

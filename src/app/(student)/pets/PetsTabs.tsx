@@ -12,13 +12,9 @@ const TABS = [
   { href: "/pets/progress", label: "Ахиц" },
 ];
 
-/** A battle in progress, e.g. /pets/battle/<id>: no tabs there, to keep the fight focused. */
-const BATTLE_SCREEN = /^\/pets\/battle\/[0-9a-f-]{36}/i;
-
 /** Tabs for the Pets area: pets and collection, bosses, joining a group, eggs, English progress. */
 export function PetsTabs({ eggCount }: { eggCount: number }) {
   const pathname = usePathname();
-  if (BATTLE_SCREEN.test(pathname)) return null;
 
   return (
     <nav aria-label="Тэжээвэрийн хэсэг" className="mx-auto max-w-7xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
