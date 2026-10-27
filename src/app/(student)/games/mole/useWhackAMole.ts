@@ -109,6 +109,7 @@ export function useWhackAMole(questions: GameQuestion[]) {
 
   useEffect(() => {
     soundRef.current ??= createSound();
+    return () => soundRef.current?.stopMusic();
   }, []);
 
   const finished = game !== null && (game.hearts <= 0 || game.time >= SECONDS * 1000);
@@ -133,7 +134,9 @@ export function useWhackAMole(questions: GameQuestion[]) {
   }, [running]);
 
   useEffect(() => {
-    if (finished) soundRef.current?.round();
+    if (!finished) return;
+    soundRef.current?.stopMusic();
+    soundRef.current?.round();
   }, [finished]);
 
   useEffect(() => {
@@ -143,6 +146,7 @@ export function useWhackAMole(questions: GameQuestion[]) {
   }, [explain]);
 
   function start() {
+    soundRef.current?.startMusic("mole");
     setGame(fresh(questions));
     setExplain(null);
     setSwing(null);
@@ -153,6 +157,7 @@ export function useWhackAMole(questions: GameQuestion[]) {
     setSwing((s) => ({ hole, n: (s?.n ?? 0) + 1 }));
     const mole = game.moles[hole];
     if (!mole || mole.hit) return;
+    soundRef.current?.fx("whack");
     const q = game.rounds[game.index % game.rounds.length];
     const combo = mole.ok ? game.combo + 1 : 0;
     const found = mole.ok ? [...game.found, mole.answer] : game.found;

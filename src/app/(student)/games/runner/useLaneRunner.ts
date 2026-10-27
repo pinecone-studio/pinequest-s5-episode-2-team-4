@@ -57,6 +57,7 @@ export function useLaneRunner(questions: GameQuestion[]) {
       observer.disconnect();
       engine.destroy();
       engineRef.current = null;
+      soundRef.current?.stopMusic();
     };
   }, []);
 
@@ -91,6 +92,7 @@ export function useLaneRunner(questions: GameQuestion[]) {
       missed: [],
     };
     runRef.current = fresh;
+    soundRef.current?.startMusic("runner");
     setRun({ ...fresh });
     setExplain(null);
     setResult(null);
@@ -106,6 +108,7 @@ export function useLaneRunner(questions: GameQuestion[]) {
         r.right += ok ? 1 : 0;
         r.wrong += ok ? 0 : 1;
         if (!ok && !r.missed.includes(round.question)) r.missed.push(round.question);
+        soundRef.current?.fx("jump");
         if (ok) soundRef.current?.good(r.combo);
         else soundRef.current?.bad();
         setRun({ ...r });
@@ -115,8 +118,12 @@ export function useLaneRunner(questions: GameQuestion[]) {
       onNext: setNext,
       onFinish(won) {
         const r = runRef.current!;
+        soundRef.current?.stopMusic();
         if (won) soundRef.current?.round();
-        else soundRef.current?.bad();
+        else {
+          soundRef.current?.fx("crash");
+          soundRef.current?.bad();
+        }
         setExplain(null);
         setResult({
           won,

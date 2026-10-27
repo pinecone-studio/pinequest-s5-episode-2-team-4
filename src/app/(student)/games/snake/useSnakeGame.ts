@@ -31,7 +31,10 @@ export function useSnakeGame(questions: GameQuestion[], skinId: string) {
     let cardTimer: ReturnType<typeof setTimeout> | undefined;
     const engine = new SnakeEngine(canvas, {
       onRound: (round, q) => setHud((h) => ({ ...h, round, prompt: q.prompt, found: 0 })),
-      onFound: (found) => setHud((h) => ({ ...h, found })),
+      onFound: (found) => {
+        sound.fx("eat");
+        setHud((h) => ({ ...h, found }));
+      },
       onScore: (score, combo) => {
         if (combo > 0) sound.good(combo);
         setHud((h) => ({ ...h, score, combo }));
@@ -46,7 +49,10 @@ export function useSnakeGame(questions: GameQuestion[], skinId: string) {
         clearTimeout(cardTimer);
         cardTimer = setTimeout(() => setCard(null), 2200);
       },
-      onFinish: ({ score, mistakes, bestCombo, missed }) => setFinish(saveResult(score, mistakes, bestCombo, missed)),
+      onFinish: ({ score, mistakes, bestCombo, missed }) => {
+        sound.stopMusic();
+        setFinish(saveResult(score, mistakes, bestCombo, missed));
+      },
     });
     engineRef.current = engine;
     // The banner is clamped to two lines, so the play area's top only changes with the size.
@@ -64,6 +70,7 @@ export function useSnakeGame(questions: GameQuestion[], skinId: string) {
       observer.disconnect();
       engine.destroy();
       engineRef.current = null;
+      sound.stopMusic();
     };
   }, [questions]);
 
@@ -73,7 +80,10 @@ export function useSnakeGame(questions: GameQuestion[], skinId: string) {
 
   return {
     canvasRef, bannerRef, hud, card, finish, soundOn,
-    start: () => engineRef.current?.start(),
+    start: () => {
+      soundRef.current?.startMusic("snake");
+      engineRef.current?.start();
+    },
     tick: () => soundRef.current?.tick(),
     resume: () => {
       setCard(null);
