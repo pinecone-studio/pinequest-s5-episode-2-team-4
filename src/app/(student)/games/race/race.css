@@ -122,26 +122,6 @@
   animation: game-pop 0.5s backwards;
 }
 
-/* 3D answer buttons */
-.race-choice {
-  box-shadow: 0 4px 0 var(--game-line);
-  transition:
-    transform 0.08s,
-    box-shadow 0.08s,
-    border-color 0.15s;
-}
-
-.race-choice:not(:disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--game-line);
-  border-color: #8b5cff;
-}
-
-.race-choice:not(:disabled):active {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 var(--game-line);
-}
-
 .race-confetti {
   animation: race-confetti 2.6s ease-in both;
 }

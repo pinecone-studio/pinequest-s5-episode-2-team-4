@@ -1,0 +1,15 @@
+import type { GameAnswer, GameQuestion } from "@/lib/types";
+import { shuffle } from "./session";
+
+/** A question shown as a 4-way choice: 1 of its right answers and 3 wrong ones. */
+export type ChoiceRound = {
+  question: GameQuestion;
+  choices: GameAnswer[];
+  answer: number;
+};
+
+export function makeChoiceRound(question: GameQuestion): ChoiceRound {
+  const right = shuffle(question.correct)[0];
+  const choices = shuffle([right, ...shuffle(question.wrong).slice(0, 3)]);
+  return { question, choices, answer: choices.indexOf(right) };
+}
