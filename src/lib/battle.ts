@@ -434,7 +434,7 @@ export async function activeGroupBattleId(user: User): Promise<string | undefine
 const LATIN_CLASS_LETTERS: Record<string, string> = { A: "А", B: "Б", V: "В", G: "Г", D: "Д", E: "Е" };
 
 /** Class codes are typed by hand ("7а", " 7А", "7A"): compare them like this. */
-function normalClassCode(code: string) {
+export function normalClassCode(code: string) {
   return code
     .trim()
     .toUpperCase()

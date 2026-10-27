@@ -10,9 +10,10 @@ const TABS = [
   { href: "/pets/join", label: "Нэгдэх" },
   { href: "/pets/eggs", label: "Өндөг", badge: "eggs" as const },
   { href: "/pets/progress", label: "Ахиц" },
+  { href: "/pets/history", label: "Түүх" },
 ];
 
-/** Tabs for the Pets area: pets and collection, bosses, joining a group, eggs, English progress. */
+/** Tabs for the Pets area: pets and collection, bosses, joining, eggs, English progress, battle history. */
 export function PetsTabs({ eggCount }: { eggCount: number }) {
   const pathname = usePathname();
 

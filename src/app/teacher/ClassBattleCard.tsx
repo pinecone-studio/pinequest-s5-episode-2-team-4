@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { ButtonLink, buttonClass } from "@/components/ui";
 import { createClassBossBattle } from "@/lib/battle-actions";
@@ -23,9 +24,14 @@ export function ClassBattleCard({ bosses, open, classCode, className }: ClassBat
       aria-labelledby="class-battle-title"
       className={cn("rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-6", className)}
     >
-      <h2 id="class-battle-title" className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]">
-        Ангийн босс тулаан
-      </h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 id="class-battle-title" className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]">
+          Ангийн босс тулаан
+        </h2>
+        <Link href={`/teacher/english?class=${encodeURIComponent(open?.classCode ?? classCode)}`} className="font-bold">
+          Ангийн англи хэлний ахиц →
+        </Link>
+      </div>
 
       {open ? (
         <div className="mt-4 flex flex-col gap-4 rounded-card bg-surface p-4 md:flex-row md:items-center md:justify-between">
