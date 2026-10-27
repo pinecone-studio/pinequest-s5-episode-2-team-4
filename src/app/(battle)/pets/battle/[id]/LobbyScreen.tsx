@@ -27,7 +27,10 @@ const START_ERRORS: Record<string, string> = {
   started: "Тулаан аль хэдийн эхэлсэн.",
 };
 
-/** A group battle before it starts: the code to share, who's in, and the host's start button. */
+/**
+ * A group or class battle before it starts: the code to share, who's in,
+ * and the host's start button (in a class battle the teacher starts it).
+ */
 export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
   const router = useRouter();
   const [state, setState] = useState(initial);
@@ -41,7 +44,7 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
       if (!next) return;
       setState(next);
       // Started: the page shows the battle instead.
-      if (next.status === "active") router.refresh();
+      if (next.status === "active" || next.status === "paused") router.refresh();
     } catch {
       // Offline for a moment; the next refresh tries again.
     }
@@ -55,6 +58,7 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
     return () => clearInterval(timer);
   }, [state.status, refresh]);
 
+  const isClass = state.mode === "class";
   const members = state.team.filter((m) => !m.left);
   const bossHp = Math.round(boss.maxHp * (1 + boss.hpPerExtraPlayer * (members.length - 1)));
 
@@ -84,7 +88,9 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
         <Backdrop arena={boss.arena} />
         <section className="mx-auto mt-10 flex max-w-md flex-col items-center gap-4 rounded-panel bg-white px-6 py-8 text-center shadow-float">
           <h1 className="text-2xl font-bold">Лобби хаагдсан</h1>
-          <p className="text-ink-muted">Хост энэ бүлгийг хаасан байна.</p>
+          <p className="text-ink-muted">
+            {isClass ? "Багш энэ тулааныг хаасан байна." : "Хост энэ бүлгийг хаасан байна."}
+          </p>
           <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
         </section>
       </>
@@ -109,9 +115,13 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
 
         <div className="flex flex-col items-center gap-2 px-5 text-center md:px-8">
           <h1 id="lobby-title" className="text-2xl font-bold md:text-[32px]">
-            {boss.name} · Бүлгийн тулаан
+            {boss.name} · {isClass ? `${state.classCode ?? ""} ангийн тулаан` : "Бүлгийн тулаан"}
           </h1>
-          <p className="text-ink-muted">Найзууддаа кодоо өг. Тэд «Нэгдэх» хэсэгт оруулна.</p>
+          <p className="text-ink-muted">
+            {isClass
+              ? "Ангийнхан чинь энэ кодоор эсвэл ангийн кодоороо нэгдэнэ."
+              : "Найзууддаа кодоо өг. Тэд «Нэгдэх» хэсэгт оруулна."}
+          </p>
           <div className="mt-2 flex items-center gap-3">
             <p
               aria-label={`Нэгдэх код ${state.joinCode?.split("").join(" ")}`}
@@ -127,9 +137,9 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
 
         <div className="px-5 md:px-8">
           <div className="flex items-baseline justify-between">
-            <h2 className="text-lg font-bold">Багийнхан</h2>
+            <h2 className="text-lg font-bold">{isClass ? "Ангийнхан" : "Багийнхан"}</h2>
             <p className="text-sm text-ink-muted">
-              {members.length}/{MAX_PLAYERS} · Боссын HP {bossHp}
+              {isClass ? `${members.length} сурагч` : `${members.length}/${MAX_PLAYERS}`} · Боссын HP {bossHp}
             </p>
           </div>
           <ul aria-live="polite" className="mt-3 grid gap-2 md:grid-cols-2">
@@ -163,7 +173,7 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
             </Button>
           ) : (
             <p role="status" className="text-center font-bold text-ink-muted">
-              Хост эхлүүлэхийг хүлээж байна…
+              {isClass ? "Багш эхлүүлэхийг хүлээж байна…" : "Хост эхлүүлэхийг хүлээж байна…"}
             </p>
           )}
         </div>

@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import { ElementBadge } from "@/components/pet/ElementBadge";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { ButtonLink, buttonClass } from "@/components/ui";
-import { createGroupBossBattle, startBossBattle } from "@/lib/battle-actions";
-import { getActiveGroupBattleId, getActiveSoloBattleId, getBosses, getCurrentPet } from "@/lib/data";
+import { createGroupBossBattle, joinMyClassBattle, startBossBattle } from "@/lib/battle-actions";
+import {
+  getActiveGroupBattleId,
+  getActiveSoloBattleId,
+  getBosses,
+  getCurrentPet,
+  getOpenClassBattle,
+} from "@/lib/data";
 import { ArenaBackground } from "./ArenaBackground";
 import { RARITY_LABELS } from "./labels";
 
@@ -11,13 +17,21 @@ export const metadata: Metadata = {
   title: "Боссын тулаан · LevelUp",
 };
 
+const CLASS_STATUS = {
+  lobby: "Багш удахгүй эхлүүлнэ",
+  active: "Ангийнхан чинь тулалдаж байна",
+  paused: "Багш түр зогсоосон",
+};
+
 export default async function BossListPage() {
-  const [bosses, pet, activeBattleId, groupBattleId] = await Promise.all([
+  const [bosses, pet, activeBattleId, groupBattleId, classBattle] = await Promise.all([
     getBosses(),
     getCurrentPet(),
     getActiveSoloBattleId(),
     getActiveGroupBattleId(),
+    getOpenClassBattle(),
   ]);
+  const classBoss = classBattle && bosses.find((b) => b.id === classBattle.bossId);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
@@ -31,6 +45,39 @@ export default async function BossListPage() {
       <ButtonLink href="/pets/progress" variant="secondary" size="sm" className="mt-4">
         Миний англи хэлний ахиц
       </ButtonLink>
+
+      {classBattle ? (
+        <div className="mt-5 flex flex-col gap-3 rounded-card bg-primary p-4 text-white md:flex-row md:items-center md:justify-between md:p-5">
+          <div className="flex items-center gap-3">
+            {classBoss ? (
+              <PetSprite stage={{ name: classBoss.name, sprite: classBoss.sprite }} size={56} className="shrink-0" />
+            ) : null}
+            <div>
+              <p className="text-lg font-bold">
+                {classBattle.classCode} ангийн тулаан{classBoss ? ` · ${classBoss.name}` : ""}
+              </p>
+              <p className="text-sm text-white/85">
+                {CLASS_STATUS[classBattle.status]} · {classBattle.students} сурагч
+              </p>
+            </div>
+          </div>
+          {classBattle.joined ? (
+            <ButtonLink href={`/pets/battle/${classBattle.id}`} variant="secondary" size="sm">
+              Үргэлжлүүлэх
+            </ButtonLink>
+          ) : (
+            <form action={joinMyClassBattle}>
+              <button
+                type="submit"
+                disabled={!pet}
+                className={buttonClass({ variant: "secondary", size: "sm", className: "w-full" })}
+              >
+                Нэгдэх
+              </button>
+            </form>
+          )}
+        </div>
+      ) : null}
 
       {activeBattleId ? (
         <div className="mt-5 flex flex-col gap-3 rounded-card bg-surface p-4 md:flex-row md:items-center md:justify-between md:p-5">

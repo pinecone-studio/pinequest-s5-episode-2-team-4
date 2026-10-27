@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { Button, ButtonLink } from "@/components/ui";
-import { leaveBossBattle, refreshBattle, submitBattleAnswer } from "@/lib/battle-actions";
+import { leaveBossBattle, refreshBattle, refreshClassBattle, submitBattleAnswer } from "@/lib/battle-actions";
 import { cn } from "@/lib/cn";
 import { petStage } from "@/lib/pets";
 import { useBattleChannel } from "@/lib/realtime";
@@ -17,21 +18,27 @@ import { Formation, type FormationPet, type PetAnim, type PetFloater } from "./F
 import { HpBar } from "./HpBar";
 import { QuestionCard } from "./QuestionCard";
 import { ShotSprite, type ShotKind } from "./Shot";
+import { TeacherPanel } from "./TeacherPanel";
 import "./battle.css";
 
 type BattleScreenProps = {
   initial: BattleState;
   boss: Pick<Boss, "id" | "name" | "sprite" | "attack" | "arena">;
-  pet: PetStage;
+  /** My fighting pet; the teacher watching a class battle has none. */
+  pet?: PetStage;
   /** For teammates' pets in group battles. */
   lines: PetLine[];
+  /** The teacher watches and runs a class battle instead of answering. */
+  teacher?: boolean;
 };
 
+const isOver = (status: BattleState["status"]) => status === "won" || status === "lost" || status === "ended";
+
 /** Everyone in the battle (solo too) as the formation shows them; my pet is the one fighting. */
-function formationPets(state: BattleState, pet: PetStage, lines: PetLine[]): FormationPet[] {
+function formationPets(state: BattleState, pet: PetStage | undefined, lines: PetLine[]): FormationPet[] {
   return state.team.map((m) => {
     const line = lines.find((l) => l.id === m.lineId);
-    return { ...m, stage: m.me ? pet : line ? petStage(line, m.level ?? 1) : null };
+    return { ...m, stage: m.me && pet ? pet : line ? petStage(line, m.level ?? 1) : null };
   });
 }
 
@@ -102,7 +109,7 @@ const iconProps = {
   className: "size-5",
 } as const;
 
-export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
+export function BattleScreen({ initial, boss, pet, lines, teacher = false }: BattleScreenProps) {
   const [state, setState] = useState(initial);
   const [outcome, setOutcome] = useState<BattleAnswerOutcome | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -112,7 +119,7 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
   const [bossAnim, setBossAnim] = useState<Anim<"hit" | "lunge">>({ name: null, id: 0 });
   const [petAnims, setPetAnims] = useState<Record<string, PetAnim>>({});
   const [shots, setShots] = useState<Shot[]>([]);
-  const [overVisible, setOverVisible] = useState(initial.status !== "active");
+  const [overVisible, setOverVisible] = useState(isOver(initial.status));
   const [now, setNow] = useState(() => Date.now() + clockOffset(initial));
   const soundOn = useSyncExternalStore(subscribeSound, readSound, () => true);
 
@@ -135,6 +142,9 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
   const lastServerNow = useRef(Date.parse(initial.serverNow));
 
   const active = state.status === "active";
+  const paused = state.status === "paused";
+  // Still going: keep listening (a class lobby only for the teacher's screen).
+  const live = active || paused || (teacher && state.status === "lobby");
   const me = state.team.find((m) => m.me);
   const myName = me?.username ?? "";
 
@@ -322,22 +332,22 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
     // My answer's response brings the new state; don't race it.
     if (submittingRef.current) return;
     try {
-      const next = await refreshBattle(initial.id);
+      const next = await (teacher ? refreshClassBattle : refreshBattle)(initial.id);
       if (next && !submittingRef.current) apply(next);
     } catch {
       // Offline for a moment; the next refresh tries again.
     }
-  }, [initial.id, apply]);
+  }, [initial.id, apply, teacher]);
 
   // Teammates' answers, joins and leaves arrive as Realtime messages.
   useBattleChannel(initial.id, refresh);
 
   // Fallback polling, so attacks and the time limit show up regardless.
   useEffect(() => {
-    if (!active) return;
+    if (!live) return;
     const timer = setInterval(refresh, POLL_MS);
     return () => clearInterval(timer);
-  }, [active, refresh]);
+  }, [live, refresh]);
 
   // Refresh right when the next boss attack is due.
   useEffect(() => {
@@ -349,8 +359,8 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
 
   // End of battle: tune, animation, then the result card.
   useEffect(() => {
-    if (lastStatus.current === "active" && state.status !== "active") {
-      play(state.status === "won" ? "victory" : "defeat");
+    if (!isOver(lastStatus.current) && isOver(state.status)) {
+      if (state.status !== "ended") play(state.status === "won" ? "victory" : "defeat");
       later(END_DELAY_MS, () => setOverVisible(true));
     }
     lastStatus.current = state.status;
@@ -419,14 +429,15 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
     return (
       <>
         <Backdrop arena={boss.arena} />
-        <BattleOver state={state} boss={boss} pets={pets} />
+        <BattleOver state={state} boss={boss} pets={pets} teacher={teacher} />
       </>
     );
   }
 
   const won = state.status === "won";
-  const fainted = state.me.petHp === 0;
-  const timeLeft = secondsLeft(state.deadlineAt, now);
+  const fainted = !teacher && state.me.petHp === 0;
+  // Paused: the clock stands still where the teacher stopped it.
+  const timeLeft = secondsLeft(state.deadlineAt, paused && state.pausedAt ? Date.parse(state.pausedAt) : now);
 
   return (
     <>
@@ -441,7 +452,20 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
         >
           {/* Top: exit, the boss's shared HP and the clocks, sound */}
           <div className="flex items-center gap-2 md:gap-3">
-            {active ? (
+            {teacher ? (
+              <Link
+                href="/teacher"
+                aria-label="Багшийн самбар"
+                className="flex size-12 shrink-0 items-center justify-center gap-2 rounded-full bg-surface font-bold text-ink no-underline hover:text-ink md:w-auto md:px-5"
+              >
+                <svg {...iconProps}>
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+                <span aria-hidden="true" className="hidden md:inline">
+                  Самбар
+                </span>
+              </Link>
+            ) : active || paused ? (
               <button
                 type="button"
                 onClick={() => exitDialog.current?.showModal()}
@@ -463,7 +487,12 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
             <div className="mx-auto w-full max-w-xl min-w-0 rounded-tile bg-white/90 px-3 py-1.5 md:px-4 md:py-2.5">
               <div className="mb-1 flex items-center gap-1.5 md:gap-2">
                 <p className="min-w-0 flex-1 truncate text-sm font-bold md:text-lg">{boss.name}</p>
-                {active ? (
+                {paused ? (
+                  <p className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white md:text-sm">
+                    Түр зогссон
+                  </p>
+                ) : null}
+                {active || paused ? (
                   <p
                     aria-label={`${mmss(timeLeft)} үлдсэн`}
                     className="inline-flex shrink-0 items-center gap-1 rounded-full bg-surface px-2 py-0.5 text-xs font-bold tabular-nums md:text-sm"
@@ -557,7 +586,9 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
 
           {/* Middle: the English challenge and what my answer did */}
           <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col gap-2">
-            {outcome ? (
+            {teacher ? (
+              isOver(state.status) ? null : <TeacherPanel state={state} onChanged={refresh} />
+            ) : outcome ? (
               <section
                 role="status"
                 className={cn(
@@ -584,6 +615,10 @@ export function BattleScreen({ initial, boss, pet, lines }: BattleScreenProps) {
                   {active ? "Дараагийн асуулт" : "Үр дүнг харах"}
                 </Button>
               </section>
+            ) : paused ? (
+              <p role="status" className="rounded-card bg-white px-5 py-4 text-center font-bold shadow-float">
+                Багш тулааныг түр зогсоолоо. Удахгүй үргэлжилнэ.
+              </p>
             ) : fainted && active ? (
               <p role="status" className="rounded-card bg-pink px-5 py-4 text-center font-bold shadow-float">
                 Тэжээвэр чинь ухаан алдлаа. Багийнхан чинь үргэлжлүүлж байна.
@@ -668,19 +703,44 @@ const END_MESSAGES: Record<NonNullable<BattleState["endReason"]>, { title: strin
   fainted: { title: "Ялагдлаа", text: "Тэжээвэр чинь ухаан алдлаа. Дасгалаа давтаад дахин оролдоорой!" },
   timeout: { title: "Хугацаа дууслаа", text: "Энэ удаа амжсангүй. Дахин оролдоод улам сайжраарай!" },
   left: { title: "Тулаанаас гарсан", text: "Хүссэн үедээ дахин тулалдаж болно." },
+  stopped: { title: "Тулаан дууслаа", text: "Багш тулааныг дуусгалаа." },
+};
+
+/** What the teacher reads at the end of a class battle. */
+const CLASS_END_MESSAGES: Record<NonNullable<BattleState["endReason"]>, { title: string; text: string }> = {
+  won: { title: "Анги ялсан!", text: "Сурагчид хамтдаа боссыг ялсан." },
+  fainted: { title: "Ялагдлаа", text: "Бүх тэжээвэр ухаан алдлаа." },
+  timeout: { title: "Хугацаа дууслаа", text: "Энэ удаа амжсангүй." },
+  left: { title: "Тулаан дууслаа", text: "" },
+  stopped: { title: "Тулаан дууслаа", text: "Та тулааныг дуусгасан." },
 };
 
 function BattleOver({
   state,
   boss,
   pets,
+  teacher,
 }: {
   state: BattleState;
   boss: BattleScreenProps["boss"];
   pets: FormationPet[];
+  teacher: boolean;
 }) {
   const won = state.status === "won";
-  const message = END_MESSAGES[state.endReason ?? "left"];
+  const message = (teacher ? CLASS_END_MESSAGES : END_MESSAGES)[state.endReason ?? "left"];
+  // The teacher sees the class's numbers; a student sees their own.
+  const stats: [string, number][] = teacher
+    ? [
+        ["Нийт хохирол", state.team.reduce((sum, m) => sum + m.damage, 0)],
+        ["Оролцсон", state.team.length],
+        ["Зөв хариулт", state.team.reduce((sum, m) => sum + m.correct, 0)],
+      ]
+    : [
+        ["Нийт хохирол", state.me.damageDealt],
+        ["Зөв", state.me.correct],
+        ["Буруу", state.me.wrong],
+        ["Шилдэг комбо", state.me.bestCombo],
+      ];
   return (
     <section
       aria-labelledby="result-title"
@@ -743,30 +803,29 @@ function BattleOver({
           </ol>
         </div>
       ) : null}
-      <dl className="grid w-full grid-cols-2 gap-2 text-sm md:grid-cols-4">
-        {[
-          ["Нийт хохирол", state.me.damageDealt],
-          ["Зөв", state.me.correct],
-          ["Буруу", state.me.wrong],
-          ["Шилдэг комбо", state.me.bestCombo],
-        ].map(([label, value]) => (
+      <dl className={cn("grid w-full gap-2 text-sm", teacher ? "grid-cols-3" : "grid-cols-2 md:grid-cols-4")}>
+        {stats.map(([label, value]) => (
           <div key={label} className="rounded-tile bg-surface px-2 py-3">
             <dt className="text-ink-muted">{label}</dt>
             <dd className="text-xl font-bold">{value}</dd>
           </div>
         ))}
       </dl>
-      <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
-        <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
-        {state.rewards?.egg ? (
-          <ButtonLink href="/pets/eggs" variant="secondary">
-            Өндөг ангаахай
+      {teacher ? (
+        <ButtonLink href="/teacher">Багшийн самбар руу</ButtonLink>
+      ) : (
+        <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
+          <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
+          {state.rewards?.egg ? (
+            <ButtonLink href="/pets/eggs" variant="secondary">
+              Өндөг ангаахай
+            </ButtonLink>
+          ) : null}
+          <ButtonLink href="/pets/progress" variant="secondary">
+            Ахицаа харах
           </ButtonLink>
-        ) : null}
-        <ButtonLink href="/pets/progress" variant="secondary">
-          Ахицаа харах
-        </ButtonLink>
-      </div>
+        </div>
+      )}
     </section>
   );
 }

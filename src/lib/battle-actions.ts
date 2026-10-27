@@ -7,12 +7,18 @@ import { redirect } from "next/navigation";
 import {
   answerBattleQuestion,
   battleState,
+  classBattleState,
+  controlClassBattle,
+  createClassBattle,
   createGroupBattle,
+  joinClassBattle,
   joinGroupBattle,
   leaveBattle,
   startGroupBattle,
   startSoloBattle,
+  type ClassControl,
 } from "./battle";
+import { bosses } from "./mock/bosses";
 import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
 import { readSession, writeSession } from "./session";
@@ -23,6 +29,13 @@ async function student() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   if (user.role !== "student") redirect("/teacher");
+  return user;
+}
+
+async function teacher() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+  if (user.role !== "teacher") redirect("/");
   return user;
 }
 
@@ -48,7 +61,11 @@ export async function createGroupBossBattle(bossId: string) {
   redirect(`/pets/battle/${battleId}`);
 }
 
-/** Joins a group by code; on success goes to its lobby, otherwise says why not. */
+/**
+ * Joins a group or class battle by its 6-character code, or the class
+ * battle by the class code ("7А"); on success goes to it, otherwise says why
+ * not. A class code that worked is remembered, so the banner shows next time.
+ */
 export async function joinGroupBossBattle(
   _previous: { error?: string } | undefined,
   form: FormData,
@@ -56,15 +73,54 @@ export async function joinGroupBossBattle(
   const user = await student();
   if (!user.pet) redirect("/pets");
   const code = String(form.get("code") ?? "").trim();
-  if (!/^[A-Za-z0-9]{6}$/.test(code)) return { error: "format" };
-  const { battleId, error } = await joinGroupBattle(user, user.pet, code);
+  if (!code || code.length > 10) return { error: "format" };
+  if (/^[A-Za-z0-9]{6}$/.test(code)) {
+    const { battleId, error } = await joinGroupBattle(user, user.pet, code);
+    if (battleId) redirect(`/pets/battle/${battleId}`);
+    if (error !== "no_code") return { error };
+  }
+  const { battleId, error } = await joinClassBattle(user, user.pet, code);
   if (!battleId) return { error: error ?? "no_code" };
+  const session = await readSession();
+  if (session && !session.classCode) await writeSession({ ...session, classCode: code });
   redirect(`/pets/battle/${battleId}`);
 }
 
 /** The host starts the lobby. */
 export async function startGroupBossBattle(battleId: string): Promise<{ error?: string }> {
   const r = await startGroupBattle(await student(), battleId);
+  return r.ok ? {} : { error: r.error ?? "unknown" };
+}
+
+/** Joins (or rejoins) the student's class battle and opens it. */
+export async function joinMyClassBattle() {
+  const user = await student();
+  if (!user.pet) redirect("/pets");
+  const { battleId } = await joinClassBattle(user, user.pet);
+  redirect(battleId ? `/pets/battle/${battleId}` : "/pets/battle");
+}
+
+/** The teacher opens a class battle (or their open one) and goes to it. */
+export async function createClassBossBattle(form: FormData) {
+  const user = await teacher();
+  const bossId = String(form.get("boss") ?? "");
+  const classCode = String(form.get("classCode") ?? "").trim();
+  if (!bosses.some((b) => b.id === bossId) || !classCode || classCode.length > 10) redirect("/teacher");
+  const battleId = await createClassBattle(user, classCode, bossId);
+  redirect(`/teacher/battle/${battleId}`);
+}
+
+/** The latest state of the teacher's class battle; their screen polls this. */
+export async function refreshClassBattle(battleId: string): Promise<BattleState | undefined> {
+  return classBattleState(await teacher(), battleId);
+}
+
+const CONTROLS: ClassControl[] = ["start", "pause", "resume", "end"];
+
+/** The teacher starts, pauses, resumes or ends their class battle. */
+export async function controlClassBossBattle(battleId: string, action: ClassControl): Promise<{ error?: string }> {
+  if (!CONTROLS.includes(action)) return { error: "invalid" };
+  const r = await controlClassBattle(await teacher(), battleId, action);
   return r.ok ? {} : { error: r.error ?? "unknown" };
 }
 

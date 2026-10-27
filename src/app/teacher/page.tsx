@@ -3,6 +3,7 @@ import { ClassGoalCard } from "@/components/ClassGoalCard";
 import {
   getAnonQuestions,
   getAssignmentDraft,
+  getBosses,
   getClassGoal,
   getClassOverview,
   getHeatmap,
@@ -10,8 +11,10 @@ import {
   getQuestionGroups,
   getSignalSummary,
   getSubtopics,
+  getTeacherClassBattle,
 } from "@/lib/data";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
+import { ClassBattleCard } from "./ClassBattleCard";
 import { Heatmap } from "./Heatmap";
 import { NotificationList } from "./NotificationList";
 import { PeerApproval } from "./PeerApproval";
@@ -37,6 +40,8 @@ export default async function TeacherPage() {
     groups,
     questions,
     classGoal,
+    bosses,
+    classBattle,
   ] = await Promise.all([
     getSubtopics(overview.topicId),
     getHeatmap(),
@@ -46,6 +51,8 @@ export default async function TeacherPage() {
     getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
+    getBosses(),
+    getTeacherClassBattle(),
   ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
@@ -82,6 +89,7 @@ export default async function TeacherPage() {
         weakestTitle={subtopicById.get(overview.weakestSubtopicId)?.title ?? ""}
         notificationCount={alertCount}
       />
+      <ClassBattleCard bosses={bosses} open={classBattle} classCode={classGoal.classCode} className="md:mt-5" />
       <Heatmap
         rows={rows}
         testedCount={overview.testedCount}

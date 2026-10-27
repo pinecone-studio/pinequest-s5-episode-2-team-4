@@ -350,7 +350,10 @@ export type BattleState = {
   /** ISO times from the server; compare with serverNow, not the device clock. */
   nextAttackAt: string | null;
   deadlineAt: string | null;
+  /** Class battles: when the teacher paused it (timers stand still meanwhile). */
+  pausedAt: string | null;
   serverNow: string;
+  /** My numbers; all zero for the teacher watching a class battle. */
   me: {
     petHp: number;
     petMaxHp: number;
@@ -365,16 +368,30 @@ export type BattleState = {
   };
   /** The question to answer now; null when the battle is over. */
   question: EnglishQuestionView | null;
-  /** Why it ended: boss defeated, my pet fainted, time ran out, or I left. */
-  endReason: "won" | "fainted" | "timeout" | "left" | null;
+  /** Why it ended: boss defeated, my pet fainted, time ran out, I left, or the teacher ended it. */
+  endReason: "won" | "fainted" | "timeout" | "left" | "stopped" | null;
   /** The pet fighting for me. */
   pet: { lineId: string; level: number } | null;
   /** What I got for winning, once granted. */
   rewards: { exp: number; petExp: number; egg: { rarity: Rarity } | null } | null;
-  /** Group battles: the code friends join with, and everyone in it. */
+  /** Group and class battles: the code to join with, and everyone in it. */
   joinCode: string | null;
+  /** Class battles: the class it is for. */
+  classCode: string | null;
   isHost: boolean;
   team: TeamMember[];
+};
+
+/** An unfinished class battle: for the student banner and the teacher's card. */
+export type ClassBattleSummary = {
+  id: string;
+  bossId: string;
+  status: "lobby" | "active" | "paused";
+  classCode: string;
+  /** Students in it right now. */
+  students: number;
+  /** The current student is in it (students only). */
+  joined: boolean;
 };
 
 /** Someone in a group battle, as everyone in it sees them. */

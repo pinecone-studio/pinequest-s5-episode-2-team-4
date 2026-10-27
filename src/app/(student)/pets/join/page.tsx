@@ -15,7 +15,8 @@ export default async function JoinPage() {
     <div className="mx-auto max-w-2xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
       <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">Нэгдэх</h1>
       <p className="mt-3 text-ink-muted md:text-lg">
-        Найзынхаа лоббид харагдах 6 тэмдэгттэй кодыг оруулаад хамтдаа боссыг ялаарай.
+        Найзынхаа лобби эсвэл багшийн дэлгэц дээр харагдах 6 тэмдэгттэй кодыг, эсвэл ангийнхаа кодыг
+        (жишээ нь 7А) оруулаад хамтдаа боссыг ялаарай.
       </p>
 
       {groupBattleId ? (
