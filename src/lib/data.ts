@@ -417,11 +417,6 @@ export async function getQuestionGroups(): Promise<QuestionGroup[]> {
   return questionGroups;
 }
 
-/** Open questions a classmate can answer: no answer yet. */
-export async function getPeerQuestions(): Promise<AnonQuestion[]> {
-  return anonQuestions.filter((q) => !q.answer);
-}
-
 // Understanding signals (🟢🟡🔴 sent by students during a lesson)
 
 export async function getSignals(subtopicId: string) {
