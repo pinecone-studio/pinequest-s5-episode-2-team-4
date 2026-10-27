@@ -1,23 +1,30 @@
 import type { Metadata } from "next";
-import { getRaceQuestions } from "@/lib/data";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { PageLoading } from "@/components/PageLoading";
+import { getGameQuestions, getGameSubjects } from "@/lib/data";
 import { HorseRace } from "./HorseRace";
 
 export const metadata: Metadata = {
   title: "Морин уралдаан · LevelUp",
 };
 
-export default async function HorseRacePage() {
-  const questions = await getRaceQuestions();
-
+export default function RacePage({ searchParams }: PageProps<"/games/race">) {
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-4 pb-10 md:px-[clamp(16px,4vw,40px)]">
-      <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">
-        Морин уралдаан
-      </h1>
-      <p className="mt-2 mb-5 font-bold text-ink-muted md:mb-6 md:text-lg">
-        Бутархайн асуултад зөв хариулж, морио финишд түрүүлж хүргэ!
-      </p>
-      <HorseRace questions={questions} />
+    <div className="px-4 pt-2 pb-10 md:px-[clamp(16px,4vw,40px)]">
+      {/* The subject comes from the URL, so it is read behind Suspense. */}
+      <Suspense fallback={<PageLoading />}>
+        <RaceLoader searchParams={searchParams} />
+      </Suspense>
     </div>
   );
+}
+
+async function RaceLoader({ searchParams }: Pick<PageProps<"/games/race">, "searchParams">) {
+  const [{ subject }, subjects] = await Promise.all([searchParams, getGameSubjects()]);
+  const subjectId = typeof subject === "string" ? subject : subjects[0].id;
+  const questions = await getGameQuestions(subjectId);
+  if (!questions?.length) notFound();
+  // Keyed by subject so switching subjects starts a fresh race.
+  return <HorseRace key={subjectId} subjects={subjects} subjectId={subjectId} questions={questions} />;
 }

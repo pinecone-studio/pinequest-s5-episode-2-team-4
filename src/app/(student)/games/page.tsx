@@ -23,6 +23,14 @@ const GAMES = [
     art: "from-[#ffcf5a] to-[#ff4d6d]",
     icon: "🃏",
   },
+  {
+    href: "/games/race",
+    title: "Морин уралдаан",
+    genre: "Уралдаан",
+    text: "Зөв хариулт бүрд морь чинь нэг нүүдэл урагшилна. 10 асуултын дараа 3 морийг гүйцэж финишд түрүүл.",
+    art: "from-[#34d399] to-[#5b00ed]",
+    icon: "🐎",
+  },
 ];
 
 export default async function GamesPage() {
