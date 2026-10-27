@@ -5,12 +5,14 @@
 // The functions are async like a real API. Call them in Server Components
 // (pages, layouts) and pass the result to Client Components as props.
 
+import { io } from "next/cache";
 import { activeGroupBattleId, activeSoloBattleId, battleState } from "./battle";
 import { petCollection, unhatchedEggs } from "./collection";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { englishProgress } from "./progress";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
+import { streakSummary } from "./streak";
 import type {
   BattleState,
   Boss,
@@ -62,6 +64,12 @@ import { signals } from "./mock/signals";
 import { subtopics, topics } from "./mock/topics";
 
 // Student
+
+export async function getLearningStreak() {
+  // Today's streak must use the request's date, never a prerendered date.
+  await io();
+  return streakSummary((await readSession())?.streak);
+}
 
 /** The logged-in user from the mock session, or undefined when logged out. */
 export async function getCurrentUser(): Promise<User | undefined> {

@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function ThemeToggle() {
+  const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    document.documentElement.classList.remove("theme-changing");
+  }, []);
+
   useEffect(() => {
     try {
       document.documentElement.dataset.theme =
@@ -14,7 +21,24 @@ export function ThemeToggle() {
 
   function toggleTheme() {
     const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = theme;
+    const applyTheme = () => {
+      document.documentElement.dataset.theme = theme;
+    };
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion) {
+      applyTheme();
+    } else if (document.startViewTransition) {
+      document.startViewTransition(applyTheme);
+    } else {
+      const root = document.documentElement;
+      root.classList.add("theme-changing");
+      // Commit the transition rules before changing the colors.
+      void root.offsetWidth;
+      applyTheme();
+      if (transitionTimer.current) clearTimeout(transitionTimer.current);
+      transitionTimer.current = setTimeout(() => root.classList.remove("theme-changing"), 350);
+    }
     try {
       localStorage.setItem("levelup-theme", theme);
     } catch {

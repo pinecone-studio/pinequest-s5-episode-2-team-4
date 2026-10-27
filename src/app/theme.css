@@ -2,6 +2,31 @@
   color-scheme: light;
 }
 
+/* Crossfade the entire page, including gradients, without moving its content. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root.theme-changing *,
+  :root.theme-changing *::before,
+  :root.theme-changing *::after {
+    transition: background-color 300ms ease-in-out,
+      color 300ms ease-in-out,
+      border-color 300ms ease-in-out,
+      box-shadow 300ms ease-in-out !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-ink: #eee8ff;
