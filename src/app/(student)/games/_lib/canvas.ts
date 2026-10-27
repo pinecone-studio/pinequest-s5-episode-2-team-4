@@ -29,14 +29,17 @@ export function toWorld(canvas: HTMLCanvasElement, scale: number, e: PointerEven
   return { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
 }
 
-/** Runs `frame(dt)` every animation frame; dt is in seconds, capped so a hidden tab doesn't jump. */
+/**
+ * Runs `frame(dt)` every animation frame; dt is in seconds, capped so a hidden tab doesn't jump.
+ * The next frame is booked first, so one frame that throws can't stop the game.
+ */
 export function startLoop(frame: (dt: number) => void) {
   let last = performance.now();
   let id = requestAnimationFrame(function tick(now) {
+    id = requestAnimationFrame(tick);
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     frame(dt);
-    id = requestAnimationFrame(tick);
   });
   return () => cancelAnimationFrame(id);
 }
