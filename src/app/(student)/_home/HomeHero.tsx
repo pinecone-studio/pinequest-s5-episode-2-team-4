@@ -88,14 +88,20 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
             </p>
             <div aria-hidden="true" className="absolute top-10 left-10 size-115 animate-[spin_60s_linear_infinite]">
               {orbitPets.slice(0, ORBIT_SPOTS.length).map(({ stage, element }, i) => (
-                <ElementRing
+                // The outer box counter-rotates so pets stay upright; the ring
+                // animates inside it so the two never share an animation.
+                <div
                   key={stage.name}
-                  element={element}
-                  className="absolute flex size-20 animate-[spin_60s_linear_infinite_reverse] items-center justify-center rounded-full bg-white/70 shadow-card ring-1 ring-white backdrop-blur-md"
+                  className="absolute size-20 animate-[spin_60s_linear_infinite_reverse]"
                   style={{ left: ORBIT_SPOTS[i].x, top: ORBIT_SPOTS[i].y }}
                 >
-                  <PetSprite stage={stage} />
-                </ElementRing>
+                  <ElementRing
+                    element={element}
+                    className="flex size-full items-center justify-center rounded-full bg-white/70 shadow-card ring-1 ring-white backdrop-blur-md"
+                  >
+                    <PetSprite stage={stage} />
+                  </ElementRing>
+                </div>
               ))}
             </div>
           </div>
