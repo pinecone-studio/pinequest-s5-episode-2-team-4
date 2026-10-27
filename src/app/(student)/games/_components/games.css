@@ -1,0 +1,84 @@
+/* Shared look for the game screens: a dark "night" panel around the canvas,
+   in LevelUp's violet and magenta. globals.css turns animations off for
+   prefers-reduced-motion; everything still reads when still. */
+
+.game-panel {
+  --game-bg: #0d0a22;
+  --game-panel: #1d1647;
+  --game-line: #33296b;
+  --game-ink: #f6f3ff;
+  --game-muted: #b4a9e3;
+  --game-good: #34d399;
+  --game-bad: #ff4d6d;
+  --game-gold: #ffcf5a;
+  color: var(--game-ink);
+  background:
+    radial-gradient(80% 40% at 50% 0%, rgb(91 0 237 / 0.35), transparent 70%),
+    radial-gradient(60% 40% at 100% 100%, rgb(227 11 166 / 0.18), transparent 70%),
+    var(--game-bg);
+}
+
+.game-chip {
+  background: var(--game-panel);
+  border: 1px solid var(--game-line);
+}
+
+.game-field {
+  touch-action: none;
+  user-select: none;
+  border: 1px solid var(--game-line);
+  box-shadow:
+    0 30px 60px -30px rgb(91 0 237 / 0.7),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04);
+}
+
+.game-glass {
+  background: rgb(18 13 46 / 0.8);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--game-line);
+}
+
+.game-overlay {
+  background: radial-gradient(70% 60% at 50% 40%, rgb(91 0 237 / 0.35), rgb(13 10 34 / 0.9));
+}
+
+.game-gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-magenta));
+}
+
+.game-count {
+  text-shadow: 0 0 30px #8b5cff;
+  animation: game-pop 0.8s ease;
+}
+
+.game-pop {
+  animation: game-pop 0.5s backwards;
+}
+
+@keyframes game-pop {
+  from {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.game-timer {
+  transform-origin: left;
+  animation: game-shrink var(--game-timer, 2s) linear forwards;
+}
+
+@keyframes game-shrink {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* The explanation / round card slides up from the bottom of the field. */
+.game-card {
+  transform: translateY(calc(100% + 40px));
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.game-card[data-open="true"] {
+  transform: none;
+}
