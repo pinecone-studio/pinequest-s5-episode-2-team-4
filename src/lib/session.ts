@@ -6,6 +6,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import type { User, UserPet } from "./types";
+import type { LearningStreak } from "./streak";
 
 /** Who is logged in: just the username. */
 const SESSION_COOKIE_NAME = "levelup-session";
@@ -16,6 +17,7 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 const MAX_ACCOUNTS = 8;
 
 export type Account = {
+  streak?: LearningStreak;
   username: string;
   role: User["role"];
   classCode?: string;

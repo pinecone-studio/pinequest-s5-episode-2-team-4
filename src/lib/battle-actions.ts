@@ -15,6 +15,8 @@ import {
 } from "./battle";
 import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
+import { readSession, writeSession } from "./session";
+import { recordLearningDay } from "./streak";
 import type { BattleAnswerOutcome, BattleState, EnglishAnswer, HatchResult } from "./types";
 
 async function student() {
@@ -84,7 +86,15 @@ export async function submitBattleAnswer(
     questionId.length <= 40 &&
     bossId.length <= 40;
   if (!valid) return { error: "invalid" };
-  return answerBattleQuestion(await student(), battleId, bossId, questionId, attemptId, answer);
+  const result = await answerBattleQuestion(await student(), battleId, bossId, questionId, attemptId, answer);
+  if (result.outcome && !result.error) {
+    const session = await readSession();
+    if (session) {
+      const streak = recordLearningDay(session.streak);
+      if (streak !== session.streak) await writeSession({ ...session, streak });
+    }
+  }
+  return result;
 }
 
 /** Hatches one of the student's eggs. */

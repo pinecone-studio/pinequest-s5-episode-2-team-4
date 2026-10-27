@@ -12,6 +12,7 @@ import { subtopics } from "./mock/topics";
 import { XP_PER_LEVEL, addXp } from "./pets";
 import { clearSession, findAccount, readSession, writeSession } from "./session";
 import type { User } from "./types";
+import { recordLearningDay } from "./streak";
 
 type Credentials = {
   username: string;
@@ -91,7 +92,10 @@ export async function submitTest(answers: Record<string, number>) {
       testAnswers[q.id] = index;
     }
   }
-  await writeSession({ ...session, testAnswers });
+  await writeSession({
+    ...session, testAnswers,
+    streak: Object.keys(testAnswers).length > 0 ? recordLearningDay(session.streak) : session.streak,
+  });
 }
 
 /** XP for the first correct answer to a practice question. */
@@ -105,14 +109,17 @@ export async function savePractice(questionId: string, index: number) {
     .flatMap((l) => l.practice)
     .find((q) => q.id === questionId);
   const solved = session.practiceSolved ?? [];
-  if (!question || index !== question.correctIndex || solved.includes(questionId)) {
+  if (!question || !Number.isInteger(index) || index < 0 || index >= question.options.length) {
     return;
   }
 
+  const firstCorrect = index === question.correctIndex && !solved.includes(questionId);
+
   await writeSession({
     ...session,
-    practiceSolved: [...solved, questionId],
-    pet: session.pet && addXp(session.pet, PRACTICE_XP),
+    streak: recordLearningDay(session.streak),
+    practiceSolved: firstCorrect ? [...solved, questionId] : solved,
+    pet: session.pet && firstCorrect ? addXp(session.pet, PRACTICE_XP) : session.pet,
   });
 }
 
@@ -141,6 +148,8 @@ export async function submitRetest(subtopicId: string, answers: Record<string, n
   await writeSession({
     ...session,
     pet,
+    streak: questions.some((q) => Number.isInteger(answers[q.id]) && answers[q.id] >= 0 && answers[q.id] < q.options.length)
+      ? recordLearningDay(session.streak) : session.streak,
     mastered: firstTime ? [...mastered, subtopicId] : mastered,
     lastRetest: {
       subtopicId,

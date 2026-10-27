@@ -153,7 +153,7 @@ export function PracticeSection({ questions, solvedIds }: PracticeSectionProps) 
       [question.id]: { index, tries: (prev[question.id]?.tries ?? 0) + 1 },
     }));
     // Saved on the server, which gives XP the first time.
-    if (index === question.correctIndex) void savePractice(question.id, index);
+    void savePractice(question.id, index);
   }
 
   return (
