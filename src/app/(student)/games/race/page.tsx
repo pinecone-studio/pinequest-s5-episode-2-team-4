@@ -14,9 +14,8 @@ export default async function HorseRacePage() {
       <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">
         Морин уралдаан
       </h1>
-      <p className="mt-2 mb-5 font-bold text-ink-muted md:mb-8 md:text-lg">
-        {questions.length} асуулт. Зөв хариулт бүрт морь чинь нэг нүүдэл
-        урагшилна.
+      <p className="mt-2 mb-5 font-bold text-ink-muted md:mb-6 md:text-lg">
+        Бутархайн асуултад зөв хариулж, морио финишд түрүүлж хүргэ!
       </p>
       <HorseRace questions={questions} />
     </div>
