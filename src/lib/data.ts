@@ -24,6 +24,8 @@ import type {
   EnglishQuestionView,
   EnglishSkill,
   EnglishUnit,
+  GameQuestion,
+  GameSubject,
   Lesson,
   MasteryResult,
   PetLine,
@@ -52,6 +54,7 @@ import {
   notifications,
 } from "./mock/teacher";
 import { bosses } from "./mock/bosses";
+import { gameSubjects } from "./mock/games";
 import { anonQuestions, questionGroups } from "./mock/anonQuestions";
 import { englishQuestions, englishUnits } from "./mock/english";
 import { petLines } from "./mock/pets";
@@ -383,4 +386,18 @@ export async function getSignalSummary(): Promise<SignalSummary[]> {
     for (const s of signals) if (s.subtopicId === sub.id) counts[s.level]++;
     return { subtopicId: sub.id, counts };
   });
+}
+
+/** Subjects that have game questions, without the questions themselves. */
+export async function getGameSubjects(): Promise<
+  Pick<GameSubject, "id" | "title">[]
+> {
+  return gameSubjects.map(({ id, title }) => ({ id, title }));
+}
+
+/** All questions of one game subject, or undefined for an unknown id. */
+export async function getGameQuestions(
+  subjectId: string,
+): Promise<GameQuestion[] | undefined> {
+  return gameSubjects.find((s) => s.id === subjectId)?.questions;
 }
