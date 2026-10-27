@@ -63,6 +63,14 @@ const GAMES = [
     art: "from-[#f97316] to-[#5b00ed]",
     icon: "🏀",
   },
+  {
+    href: "/games/penalty",
+    title: "Пенальти",
+    genre: "Тулаан",
+    text: "Бот багийн эсрэг пенальтийн цуврал. Зөв хариулттай булан руу өшиглө, бот өшиглөхөөс өмнө зөв хариулж хаалгаа хамгаал!",
+    art: "from-[#34d399] to-[#38bdf8]",
+    icon: "⚽",
+  },
 ];
 
 export default async function GamesPage() {
