@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { GameAnswer, GameQuestion } from "@/lib/types";
+import type { GameQuestion } from "@/lib/types";
 import type { ExplainCardState } from "../_components/ExplainCard";
-import { pickRounds, pointsFor, shuffle, starsFor, type SessionResult } from "../_lib/session";
+import { makeChoiceRound, type ChoiceRound } from "../_lib/choices";
+import { pickRounds, pointsFor, starsFor, type SessionResult } from "../_lib/session";
 import { createSound, type GameSound } from "../_lib/sound";
 
 /** Steps from the gate to the finish line. */
@@ -18,21 +19,8 @@ const POOL = 40;
 /** Seconds the «Зөв!» card stays before the next question. */
 const RIGHT_SECONDS = 1.2;
 
-export type RaceRound = {
-  question: GameQuestion;
-  /** 1 right answer and 3 wrong ones, shuffled. */
-  choices: GameAnswer[];
-  answer: number;
-};
-
-function makeRound(question: GameQuestion): RaceRound {
-  const right = shuffle(question.correct)[0];
-  const choices = shuffle([right, ...shuffle(question.wrong).slice(0, 3)]);
-  return { question, choices, answer: choices.indexOf(right) };
-}
-
 type Race = {
-  rounds: RaceRound[];
+  rounds: ChoiceRound[];
   index: number;
   positions: number[];
   combo: number;
@@ -44,7 +32,7 @@ type Race = {
 };
 
 const fresh = (questions: GameQuestion[]): Race => ({
-  rounds: pickRounds(questions, POOL).map(makeRound),
+  rounds: pickRounds(questions, POOL).map(makeChoiceRound),
   index: 0,
   positions: HORSES.map(() => 0),
   combo: 0,

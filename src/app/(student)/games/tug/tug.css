@@ -1,0 +1,57 @@
+/* Tug of war: the rope glides with the flag; teams heave and strain. */
+
+.tug-rope {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* The player's team leans back hard on every right answer. */
+.tug-heave .tug-lean {
+  animation: tug-heave 0.45s ease-out;
+}
+
+@keyframes tug-heave {
+  40% {
+    transform: rotate(-14deg) translateX(-4px);
+  }
+}
+
+/* The bots keep straining while the game runs. */
+.tug-strain .tug-lean {
+  animation: tug-strain 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes tug-strain {
+  to {
+    transform: rotate(-6deg);
+  }
+}
+
+.tug-flag {
+  animation: tug-wave 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes tug-wave {
+  to {
+    transform: scaleX(0.7) skewY(8deg);
+  }
+}
+
+.tug-flag-danger {
+  animation: tug-blink 0.4s steps(2) infinite;
+}
+
+@keyframes tug-blink {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.tug-crowd {
+  animation: tug-cheer 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes tug-cheer {
+  to {
+    transform: translateY(-2px);
+  }
+}

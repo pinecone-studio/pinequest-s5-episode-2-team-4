@@ -31,6 +31,14 @@ const GAMES = [
     art: "from-[#34d399] to-[#5b00ed]",
     icon: "🐎",
   },
+  {
+    href: "/games/tug",
+    title: "Олс таталт",
+    genre: "Хүч",
+    text: "Ботууд олсыг зогсолтгүй татна. Зөв хариулт бүрд чиний баг эргүүлж татна, комбо улам хүчтэй. Тугийг шугамаас давуул!",
+    art: "from-[#ffcf5a] to-[#e30ba6]",
+    icon: "🪢",
+  },
 ];
 
 export default async function GamesPage() {
