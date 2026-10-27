@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getGameSubjects } from "@/lib/data";
 
@@ -12,64 +13,65 @@ const GAMES = [
     title: "Мэдлэгийн могой",
     genre: "Хурдан",
     text: "Даалгаварт таарах 3 хариултыг идэж могойгоо томруул. Буруу идвэл тоглоом зогсож, яагаад буруу болохыг тайлбарлана.",
-    art: "from-[#e30ba6] to-[#5b00ed]",
-    icon: "🐍",
+    shot: "/games/snake.jpg",
+    /** Part of the screenshot kept in the 4:3 card. */
+    focus: "50% 45%",
   },
   {
     href: "/games/cards",
     title: "Картын тулаан",
     genre: "Стратеги",
     text: "Хэцүү карт илүү их хохирол учруулна. Зөв хариулт бүрд тэжээвэр чинь мангас руу од шидэнэ.",
-    art: "from-[#ffcf5a] to-[#ff4d6d]",
-    icon: "🃏",
+    shot: "/games/cards.jpg",
+    focus: "68% 50%",
   },
   {
     href: "/games/race",
     title: "Морин уралдаан",
     genre: "Уралдаан",
-    text: "Зөв хариулт бүрд морь чинь нэг нүүдэл урагшилна. 10 асуултын дараа 3 морийг гүйцэж финишд түрүүл.",
-    art: "from-[#34d399] to-[#5b00ed]",
-    icon: "🐎",
+    text: "Ботуудын морь зогсолтгүй давхина. Зөв хариулт бүрд чиний морь нэг нүүдэл урагшилна. Хурдан, зөв хариулж финишд түрүүл!",
+    shot: "/games/race.jpg",
+    focus: "50% 50%",
   },
   {
     href: "/games/tug",
     title: "Олс таталт",
     genre: "Хүч",
     text: "Ботууд олсыг зогсолтгүй татна. Зөв хариулт бүрд чиний баг эргүүлж татна, комбо улам хүчтэй. Тугийг шугамаас давуул!",
-    art: "from-[#ffcf5a] to-[#e30ba6]",
-    icon: "🪢",
+    shot: "/games/tug.jpg",
+    focus: "50% 50%",
   },
   {
     href: "/games/runner",
     title: "Боссын зам",
     genre: "Гүйлт",
     text: "3 замтай замаар гүйж, зөв хариулттай хаалгаар ор. Зөв бүрт томорч хүчтэй болно. Замын төгсгөлд босс хүлээж байна!",
-    art: "from-[#8b5cff] to-[#ff4d6d]",
-    icon: "🏃",
+    shot: "/games/runner.jpg",
+    focus: "50% 78%",
   },
   {
     href: "/games/mole",
     title: "Мэнгэ цохих",
     genre: "Хурдан",
     text: "Нүхнээс хариулт барьсан мэнгэ цухуйна. Даалгаварт тохирохыг нь цохи, буруу цохивол амь хасагдана. 60 секундэд хэдийг цохих вэ?",
-    art: "from-[#34d399] to-[#ffcf5a]",
-    icon: "🔨",
+    shot: "/games/mole.jpg",
+    focus: "50% 45%",
   },
   {
     href: "/games/hoops",
     title: "Сагсан бөмбөг",
     genre: "Шидэлт",
     text: "Бөмбөг бүр дээр хариулт бий. Зөвийг нь дээш гулсуулж сагсанд хий, буруугаа доош гулсуулж хая. Дараа нь цагираг хөдөлнө!",
-    art: "from-[#f97316] to-[#5b00ed]",
-    icon: "🏀",
+    shot: "/games/hoops.jpg",
+    focus: "50% 28%",
   },
   {
     href: "/games/penalty",
     title: "Пенальти",
     genre: "Тулаан",
     text: "Бот багийн эсрэг пенальтийн цуврал. Зөв хариулттай булан руу өшиглө, бот өшиглөхөөс өмнө зөв хариулж хаалгаа хамгаал!",
-    art: "from-[#34d399] to-[#38bdf8]",
-    icon: "⚽",
+    shot: "/games/penalty.jpg",
+    focus: "50% 22%",
   },
 ];
 
@@ -83,15 +85,22 @@ export default async function GamesPage() {
         Нэг хичээлийн асуултыг өөр өөр тоглоомоор давт. Аль тоглоомд ч буруу хариулбал тайлбар нь гарна.
       </p>
 
-      <ul className="mt-6 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6">
+      <ul className="mt-6 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         {GAMES.map((game) => (
           <li key={game.href}>
             <Link
               href={game.href}
               className="flex h-full flex-col gap-4 rounded-[25px] bg-white p-5 text-ink no-underline shadow-card transition-transform hover:-translate-y-1 hover:text-ink md:rounded-panel md:p-6"
             >
-              <span aria-hidden="true" className={`grid h-40 place-items-center rounded-card bg-linear-to-br text-7xl ${game.art}`}>
-                {game.icon}
+              <span className="relative aspect-[4/3] overflow-hidden rounded-card bg-ink">
+                <Image
+                  src={game.shot}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 380px, (min-width: 768px) 45vw, 100vw"
+                  className="object-cover"
+                  style={{ objectPosition: game.focus }}
+                />
               </span>
               <span className="flex items-center justify-between gap-3">
                 <span className="text-2xl leading-tight font-bold">{game.title}</span>
