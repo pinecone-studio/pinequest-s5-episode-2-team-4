@@ -47,7 +47,7 @@ export function MobileNav({ petSprite: realSprite }: { petSprite?: string }) {
   const pathname = usePathname();
   const LINKS = [
     { href: "/", label: "Нүүр", icon: HomeIcon },
-    { href: "/test", label: "Тоглох", icon: PlayIcon },
+    { href: "/games", label: "Тоглоом", icon: PlayIcon },
     { href: "/pets", label: "Тэжээвэр", icon: petIcon(petSprite) },
   ];
 

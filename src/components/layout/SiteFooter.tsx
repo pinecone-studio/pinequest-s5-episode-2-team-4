@@ -55,7 +55,7 @@ function FullFooter({ pets = [] }: { pets?: PetStage[] }) {
         </div>
         <nav aria-label="Тоглоом" className="flex flex-col">
           <FooterHeading>Тоглоом</FooterHeading>
-          <Link href="/test" className={footerLinkClass}>Тоглох</Link>
+          <Link href="/games" className={footerLinkClass}>Тоглоом</Link>
           <Link href="/lesson/fractions" className={footerLinkClass}>Бутархай</Link>
           <Link href="/pets" className={footerLinkClass}>Тэжээвэр</Link>
         </nav>
