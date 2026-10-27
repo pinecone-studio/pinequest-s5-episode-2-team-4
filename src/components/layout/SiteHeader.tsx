@@ -8,7 +8,7 @@ import { Logo } from "./Logo";
 import { PetChip } from "./PetChip";
 
 const NAV_LINKS = [
-  { href: "/test", label: "Тест" },
+  { href: "/games", label: "Тоглоом" },
   { href: "/pets", label: "Тэжээвэр" },
 ];
 
