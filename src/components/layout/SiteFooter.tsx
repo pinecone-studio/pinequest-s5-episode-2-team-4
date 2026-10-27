@@ -46,7 +46,7 @@ function FullFooter({ pets = [] }: { pets?: PetStage[] }) {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-3 gap-y-6 px-4 pt-7 pb-5 md:grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] md:gap-8 md:px-[clamp(16px,4vw,40px)] md:pt-12 md:pb-8">
         <div className="col-span-2 flex items-center justify-between gap-3 md:col-span-1 md:flex-col md:items-start md:gap-3.5">
           <Logo tone="light" />
-          <p className="hidden max-w-65 md:block">Ойлгоогүйгээ ичихгүйгээр нөх.</p>
+          <p className="hidden max-w-65 md:block">Ойлгоогүйгээ өөрийн хурдаар нөх.</p>
           <div aria-hidden="true" className="flex gap-0.5 md:gap-1">
             {pets.map((stage) => (
               <PetSprite key={stage.name} stage={stage} />
