@@ -1,8 +1,13 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+/** Battle screens (student and teacher): the button would cover the pets there. */
+const BATTLE_SCREEN = /^\/(pets|teacher)\/battle\/[0-9a-f-]{36}/i;
+
 export function ThemeToggle() {
+  const pathname = usePathname();
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
@@ -45,6 +50,9 @@ export function ThemeToggle() {
       // Switching still works when browser storage is unavailable.
     }
   }
+
+  // The saved theme still applies there; only the button is left out.
+  if (BATTLE_SCREEN.test(pathname)) return null;
 
   return (
     <button
