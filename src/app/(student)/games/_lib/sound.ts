@@ -9,6 +9,12 @@ export type GameSound = {
   tick: () => void;
   /** A soft rising blip, e.g. for a jump or a launch. */
   blip: () => void;
+  /**
+   * One tone for a game's own sounds (a splash, a pop...): frequency in Hz,
+   * length in seconds, starting `when` seconds from now; `slide` multiplies
+   * the frequency by the end. Silent while sound is off.
+   */
+  tone: (freq: number, dur: number, type?: OscillatorType, gain?: number, when?: number, slide?: number) => void;
 };
 
 export function createSound(): GameSound {
@@ -50,6 +56,7 @@ export function createSound(): GameSound {
     blip() {
       tone(380, 0.09, "sine", 0.035, 0, 1.8);
     },
+    tone,
   };
   return sound;
 }
