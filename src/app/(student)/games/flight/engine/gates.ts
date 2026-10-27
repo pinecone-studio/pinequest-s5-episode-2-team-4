@@ -1,7 +1,7 @@
 import type { GameQuestion } from "@/lib/types";
 import { shuffle } from "../../_lib/session";
 import { measureAnswer } from "../../_lib/shapes";
-import { FALCON_R, GATE_DIST, GROUND, PILLAR, TASK_GAP, WORLD, type Gate, type Lane } from "./types";
+import { FALCON_R, FALCON_X, GATE_DIST, GATE_W, GROUND, PILLAR, TASK_GAP, WORLD, type Falcon, type Gate, type Lane } from "./types";
 
 /** The three gaps between the pillars, below the task banner at `top`. */
 export function lanes(top: number): Lane[] {
@@ -37,8 +37,18 @@ export function buildGates(ctx: CanvasRenderingContext2D, rounds: GameQuestion[]
   return gates;
 }
 
+/**
+ * Close to the gate the falcon commits to the nearest gap and is steered in.
+ * Reports a hard bump on a pillar, and when the falcon is past the gate.
+ */
+export function approachGate(g: Gate, falcon: Falcon, all: Lane[], dt: number) {
+  if (g.lane === null && g.x - (FALCON_X + FALCON_R) < 26) g.lane = nearestLane(all, falcon.y);
+  if (g.lane === null) return { bumped: false, passed: false };
+  return { bumped: steerIntoLane(falcon, all[g.lane], dt), passed: g.x + GATE_W < FALCON_X - FALCON_R };
+}
+
 /** Keeps the falcon inside the gap it chose: the pillars act as soft bumpers. Returns true on a hard bump. */
-export function steerIntoLane(falcon: { y: number; vy: number }, lane: Lane, dt: number) {
+function steerIntoLane(falcon: Falcon, lane: Lane, dt: number) {
   const lo = lane.y0 + FALCON_R + 2, hi = lane.y1 - FALCON_R - 2;
   if (falcon.y >= lo && falcon.y <= hi) return false;
   const target = Math.max(lo, Math.min(hi, falcon.y));

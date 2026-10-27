@@ -39,17 +39,24 @@ export class FlightScene {
     this.wing = 1;
   }
 
-  hitGood() {
+  /** Right gap at `at`: green burst and ring, and the points over the falcon. */
+  hitGood(at: { x: number; y: number }, falconY: number, points: number) {
+    this.fx.burst(at.x, at.y, GAME_COLORS.good, 22);
+    this.fx.ring(at.x, at.y);
+    this.fx.float(FALCON_X + 10, falconY, `+${points}`);
     this.flash = { color: GAME_COLORS.good, t: 0.3 };
   }
 
-  hitBad() {
+  hitBad(at: { x: number; y: number }) {
+    this.fx.burst(at.x, at.y, GAME_COLORS.bad, 18);
     this.flash = { color: GAME_COLORS.bad, t: 0.5 };
     if (!this.still) this.shake = 0.3;
   }
 
   update(dt: number, view: FlightView) {
     this.time += dt;
+    for (const g of view.gates) if (g.pop) g.pop += dt;
+    view.falcon.dizzy = Math.max(0, view.falcon.dizzy - dt * 0.5);
     this.shake = Math.max(0, this.shake - dt);
     this.flash.t = Math.max(0, this.flash.t - dt);
     this.wing = view.idle ? (Math.sin(this.time * 9) + 1) / 2 : Math.max(0, this.wing - dt * 3.5);

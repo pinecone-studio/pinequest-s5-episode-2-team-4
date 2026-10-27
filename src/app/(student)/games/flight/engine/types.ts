@@ -1,4 +1,5 @@
 import type { GameAnswer, GameQuestion } from "@/lib/types";
+import type { ScoreSummary } from "../../_lib/score";
 
 /** World size the flight game is drawn in; the canvas scales it to fit. */
 export const WORLD = { w: 400, h: 500 } as const;
@@ -48,5 +49,5 @@ export type FlightEvents = {
   onWrong: (picked: GameAnswer, right: GameAnswer, question: GameQuestion) => void;
   /** All 3 gates of a task passed without a mistake. */
   onClean: (question: GameQuestion) => void;
-  onFinish: (stats: { score: number; mistakes: number; bestCombo: number; missed: GameQuestion[] }) => void;
+  onFinish: (summary: ScoreSummary) => void;
 };
