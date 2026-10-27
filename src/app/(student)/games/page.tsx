@@ -9,6 +9,14 @@ export const metadata: Metadata = {
 
 const GAMES = [
   {
+    href: "/games/hangman",
+    title: "Hangman",
+    genre: "Үг таах",
+    text: "Монгол орчуулгыг ашиглан англи үгийг үсэг үсгээр таа. 6 удаа алдахаас өмнө бүх үсгийг олоорой!",
+    shot: "/games/hangman.svg",
+    focus: "50% 50%",
+  },
+  {
     href: "/games/snake",
     title: "Мэдлэгийн могой",
     genre: "Хурдан",
