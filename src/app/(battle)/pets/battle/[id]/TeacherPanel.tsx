@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui";
 import { controlClassBossBattle } from "@/lib/battle-actions";
 import type { BattleState } from "@/lib/types";
+import { classLabel } from "@/lib/class-label";
 
 type TeacherPanelProps = {
   state: BattleState;
@@ -49,7 +50,7 @@ export function TeacherPanel({ state, onChanged }: TeacherPanelProps) {
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
         <div>
           <p className="text-xs font-bold text-ink-muted md:text-sm">
-            {state.classCode} анги · Нэгдэх код
+            {state.classCode && classLabel(state.classCode)} анги · Нэгдэх код
           </p>
           <p
             aria-label={`Нэгдэх код ${state.joinCode?.split("").join(" ")}`}
