@@ -17,7 +17,7 @@ export default async function EggsPage() {
         <div>
           <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">Өндөг</h1>
           <p className="mt-3 text-ink-muted md:text-lg">
-            Боссыг ялахад өндөг олдож болно. Ангаахайлж шинэ тэжээвэртэй болоорой.
+            Боссыг ялахад өндөг олдож болно. Хагалж шинэ тэжээвэртэй болоорой.
           </p>
         </div>
         <ButtonLink href="/pets" variant="secondary" size="sm">

@@ -45,7 +45,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
       if (!r) throw new Error("not hatched");
       setResult(r);
     } catch {
-      setError("Ангаахайлж чадсангүй. Дахин оролдоно уу.");
+      setError("Хагалж чадсангүй. Дахин оролдоно уу.");
     }
   }
 
@@ -69,7 +69,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
             </span>
             <p className="text-center text-sm text-ink-muted">{bossNames[egg.bossId] ?? egg.bossId}-с</p>
             <Button size="sm" className="w-full" onClick={() => hatch(egg)}>
-              Ангаахай
+              Хагалах
             </Button>
           </li>
         ))}
@@ -85,7 +85,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
         className="fixed inset-0 m-auto h-fit w-[min(420px,calc(100%-32px))] rounded-panel bg-white p-6 text-center text-ink shadow-float backdrop:bg-ink/50 md:p-8"
       >
         <h2 id="hatch-title" className="text-2xl font-bold">
-          {revealed ? (result.duplicate ? "Давхардсан тэжээвэр" : "Шинэ тэжээвэр!") : "Ангаахайлж байна…"}
+          {revealed ? (result.duplicate ? "Давхардсан тэжээвэр" : "Шинэ тэжээвэр!") : "Хагалж байна…"}
         </h2>
         <div className="mt-5 flex h-44 items-center justify-center" aria-live="polite">
           {revealed ? (

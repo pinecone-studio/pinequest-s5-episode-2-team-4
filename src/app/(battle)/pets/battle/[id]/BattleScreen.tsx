@@ -812,7 +812,7 @@ function BattleOver({
               <div className="text-left">
                 <p className="font-bold">Өндөг олдлоо!</p>
                 <p className="text-sm text-ink-muted">
-                  {RARITY_LABELS[state.rewards.egg.rarity]} · Тэжээвэр хэсгээс ангаахай
+                  {RARITY_LABELS[state.rewards.egg.rarity]} · Тэжээвэр хэсгээс хагалаарай
                 </p>
               </div>
             </div>
@@ -857,7 +857,7 @@ function BattleOver({
           <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
           {state.rewards?.egg ? (
             <ButtonLink href="/pets/eggs" variant="secondary">
-              Өндөг ангаахай
+              Өндөг хагалах
             </ButtonLink>
           ) : null}
           <ButtonLink href="/pets/progress" variant="secondary">
