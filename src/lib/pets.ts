@@ -14,6 +14,11 @@ export function nextEvolutionLevel(level: number): number | undefined {
   return EVOLVE_LEVELS.find((l) => l > level);
 }
 
+/** Pets a new student can pick: the common ones. Rarer pets hatch from boss eggs. */
+export function isStarterPet(line: PetLine): boolean {
+  return line.rarity === "common";
+}
+
 /** XP that fills one level; mastering a subtopic is a whole level. */
 export const XP_PER_LEVEL = 100;
 

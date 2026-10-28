@@ -13,9 +13,10 @@ import { PetAvatar } from "../_components/PetAvatar";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
+/** `petLines`: the pets a new student can pick; the first is picked to start. */
 export function SignupForm({ petLines }: { petLines: PetLine[] }) {
   const [role, setRole] = useState<Role>("student");
-  const [petId, setPetId] = useState("wrougon");
+  const [petId, setPetId] = useState(petLines[0]?.id);
   /** The field whose value another account already has. */
   const [taken, setTaken] = useState<"username" | "email" | null>(null);
   const [pending, startTransition] = useTransition();
@@ -76,7 +77,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
             <div
               role="group"
               aria-labelledby="pick-title"
-              className="mt-6 grid grid-cols-4 gap-2.5 md:grid-cols-6 md:gap-3"
+              className="mt-6 grid grid-cols-4 gap-2.5 md:gap-3"
             >
               {petLines.map((line) => {
                 const on = line.id === pet.id;

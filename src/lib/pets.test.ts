@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { petLines } from "./mock/pets";
 import {
   XP_PER_LEVEL,
   addXp,
+  isStarterPet,
   nextEvolutionLevel,
   stageIndex,
 } from "./pets";
@@ -56,5 +58,15 @@ describe("addXp", () => {
     const original = pet(1, 0);
     addXp(original, 150);
     expect(original).toEqual(pet(1, 0));
+  });
+});
+
+describe("isStarterPet", () => {
+  it("offers only the common pets, Dollfin first", () => {
+    expect(petLines.filter(isStarterPet).map((l) => l.id)).toEqual(["dollfin", "anoleaf", "kroki", "nut"]);
+  });
+
+  it("keeps rarer pets for boss eggs", () => {
+    expect(petLines.filter((l) => l.rarity !== "common").some(isStarterPet)).toBe(false);
   });
 });
