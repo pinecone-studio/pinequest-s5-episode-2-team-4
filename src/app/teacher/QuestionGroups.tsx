@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "@/lib/cn";
-import { askedBy, QuestionGroupCard, type GroupView } from "./QuestionGroupCard";
+import {
+  askedBy,
+  QuestionGroupCard,
+  type GroupView,
+} from "./QuestionGroupCard";
 
 type QuestionGroupsProps = {
   groups: GroupView[];
@@ -9,8 +13,8 @@ type QuestionGroupsProps = {
 };
 
 /**
- * Anonymous questions grouped by AI: the teacher fixes the grouping and
- * answers each group once; the answer goes to the whole class.
+ * Anonymous questions grouped by AI, with what the AI noticed: the teacher
+ * answers each group once and the answer goes to the whole class.
  */
 export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
   // Unanswered groups first, then the ones most students asked.
@@ -45,11 +49,7 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
       ) : (
         <ul className="mt-4 flex flex-col gap-3">
           {sorted.map((g) => (
-            <QuestionGroupCard
-              key={g.id}
-              group={g}
-              mergeTargets={sorted.filter((t) => t.id !== g.id && t.subtopicId === g.subtopicId)}
-            />
+            <QuestionGroupCard key={g.id} group={g} />
           ))}
         </ul>
       )}
