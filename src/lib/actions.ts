@@ -6,7 +6,7 @@
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { randomBytes } from "node:crypto";
-import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, findAccountById, saveAccount } from "./accounts";
+import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, findAccountById, normalPhone, saveAccount } from "./accounts";
 import { demoQuestions } from "./ai/fallback";
 import { saveAssignment, setAssignmentStatus } from "./content";
 import { getRetestQuestions } from "./data";
@@ -26,12 +26,12 @@ type Credentials = {
   email: string;
   password: string;
   role: User["role"];
-  classCode?: string;
 };
 
 /** Returned instead of redirecting when the form needs to show an error. */
 export type AuthError =
-  | { error: "taken" | "emailTaken" | "unknown" }
+  /** phone: not a phone number; phoneTaken: another account has it. */
+  | { error: "taken" | "emailTaken" | "phone" | "phoneTaken" | "unknown" }
   /** Too many wrong logins: try again in this many minutes. */
   | { error: "blocked"; minutes: number };
 
@@ -47,13 +47,17 @@ function cleanEmail(text: string | undefined) {
   return email && EMAIL.test(email) ? email : undefined;
 }
 
+/** Teachers pick the class they work in first, on every login. */
 function homeFor(role: User["role"]) {
-  return role === "teacher" ? "/teacher" : "/";
+  return role === "teacher" ? "/classes" : "/";
 }
+
+/** Only a QR invite page may be returned to after logging in. */
+const JOIN_PATH = /^\/join\/[\w-]{20,40}$/;
 
 /** A new account: a student's chosen starter pet begins at level 1 with no test taken. */
 export async function signUp(
-  credentials: Credentials & { petLineId?: string; subject?: string },
+  credentials: Credentials & { petLineId?: string; subject?: string; phone?: string },
 ): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   const email = cleanEmail(credentials.email);
@@ -64,13 +68,16 @@ export async function signUp(
   // A teacher teaches one subject, chosen here for good.
   const subject = teacherSubject(credentials.subject);
   if (role === "teacher" && !subject) throw new Error("Teachers pick the subject they teach");
+  // Optional, so teachers can add the student to a class by phone.
+  const phone = normalPhone(credentials.phone);
+  if (clean(credentials.phone, 30) && !phone) return { error: "phone" };
 
   const result = await createAccount({
     username,
     email,
     password: String(credentials.password),
     role,
-    classCode: clean(credentials.classCode, 10),
+    phone,
     progress:
       role === "student" && line ? { pet: { lineId: line.id, level: 1, xp: 0 } } : { subject: subject?.id },
   });
@@ -83,7 +90,7 @@ export async function signUp(
  * Logs in when the username, email and password all belong to one account.
  * Too many wrong tries block the username for a while (login-limit.ts).
  */
-export async function logIn(credentials: Credentials): Promise<AuthError | void> {
+export async function logIn(credentials: Credentials & { next?: string }): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   const email = cleanEmail(credentials.email);
   if (!username || !email) throw new Error("Username and email are required");
@@ -96,10 +103,9 @@ export async function logIn(credentials: Credentials): Promise<AuthError | void>
   }
   await clearLoginFailures(username);
 
-  const classCode = clean(credentials.classCode, 10);
-  if (classCode && classCode !== account.classCode) await saveAccount({ ...account, classCode });
   await startSession(account.id);
-  redirect(homeFor(account.role));
+  const next = credentials.next ?? "";
+  redirect(account.role === "student" && JOIN_PATH.test(next) ? next : homeFor(account.role));
 }
 
 /** Logs in a new throwaway demo student: Dollfin, a common pet, at level 1, no test taken yet. */
@@ -116,7 +122,7 @@ export async function demoTeacherLogIn() {
   const account = await createDemoAccount({ subject: "math" }, "teacher");
   await startSession(account.id);
   after(deleteOldDemoAccounts);
-  redirect("/teacher");
+  redirect("/classes");
 }
 
 /**

@@ -11,7 +11,7 @@ import {
   recognizeMaterialAction,
   saveAssignmentAction,
 } from "@/lib/teacher-actions";
-import type { Assignment, CurriculumChapter, GameQuestion, Subtopic } from "@/lib/types";
+import type { Assignment, ClassOption, CurriculumChapter, GameQuestion, Subtopic } from "@/lib/types";
 import { AiWorking } from "../_content/AiWorking";
 import { MaterialForm } from "../_content/MaterialForm";
 import { ErrorNote, Label, SourceBadge, StepTitle, SubjectField, fieldClass } from "../_content/ui";
@@ -44,7 +44,8 @@ const blank = (): EditableQuestion => toEditable({ prompt: "", correct: [], wron
 
 type AssignmentEditorProps = {
   curriculum: CurriculumChapter[];
-  classCodes: string[];
+  /** The teacher's classes, the current one first */
+  classes: ClassOption[];
   /** Subtopics with diagnostic results, for "only weak students" */
   subtopics: Subtopic[];
   /** Editing an existing assignment */
@@ -59,7 +60,7 @@ type AssignmentEditorProps = {
  * Making a game assignment: get questions from a topic or the teacher's
  * material, edit them (checked as you type), pick games, then publish.
  */
-export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, teacherSubject, fromVideo }: AssignmentEditorProps) {
+export function AssignmentEditor({ curriculum, classes, subtopics, initial, teacherSubject, fromVideo }: AssignmentEditorProps) {
   const id = useId();
   const router = useRouter();
   const a = initial?.assignment;
@@ -76,7 +77,11 @@ export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, t
   const [games, setGames] = useState<string[]>(a?.games ?? []);
   const [gameMode, setGameMode] = useState(a?.gameMode ?? "fixed");
   const [title, setTitle] = useState(a?.title ?? fromVideo?.videoTitle ?? "");
-  const [classCode, setClassCode] = useState(a?.classCode ?? fromVideo?.classCode ?? classCodes[0] ?? "");
+  const [classCode, setClassCode] = useState(a?.classCode ?? fromVideo?.classCode ?? classes[0]?.code ?? "");
+  // A class the teacher no longer has (e.g. an old assignment's) still shows as picked.
+  const startCode = a?.classCode ?? fromVideo?.classCode;
+  const options =
+    startCode && !classes.some((c) => c.code === startCode) ? [...classes, { code: startCode, name: startCode }] : classes;
   const [dueAt, setDueAt] = useState(a?.dueAt?.slice(0, 10) ?? "");
   const [target, setTarget] = useState(a?.target ?? "class");
   const [targetSubtopicId, setTargetSubtopicId] = useState(a?.targetSubtopicId ?? subtopics[0]?.id ?? "");
@@ -229,7 +234,7 @@ export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, t
         ) : (
           <MaterialForm
             curriculum={curriculum}
-            classCodes={classCodes}
+            classes={classes}
             teacherSubject={teacherSubject}
             submitLabel="✦ Материалаас асуулт гаргах"
             onSubmit={async (input, progress) => {
@@ -397,13 +402,20 @@ export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, t
               <input id={`${id}-title`} value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} className={cn(fieldClass, "h-12")} />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`${id}-class`}>Ангийн код</Label>
-              <input id={`${id}-class`} list={`${id}-classes`} value={classCode} onChange={(e) => setClassCode(e.target.value.toUpperCase())} maxLength={10} placeholder="7А" className={cn(fieldClass, "h-12 font-bold uppercase")} />
-              <datalist id={`${id}-classes`}>
-                {classCodes.map((c) => (
-                  <option key={c} value={c} />
+              <Label htmlFor={`${id}-class`}>Анги</Label>
+              <select
+                id={`${id}-class`}
+                value={classCode}
+                onChange={(e) => setClassCode(e.target.value)}
+                className={cn(fieldClass, "h-12 font-bold")}
+              >
+                {options.length === 0 && <option value="">Анги алга</option>}
+                {options.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
                 ))}
-              </datalist>
+              </select>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`${id}-due`} hint="заавал биш">

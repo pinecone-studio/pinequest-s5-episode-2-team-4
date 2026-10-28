@@ -16,6 +16,7 @@ import type { LessonVideo, ReelScript, ReelSection, ReelSectionKind } from "@/li
 import { ReelPlayer } from "@/remotion/ReelPlayer";
 import { AiWorking } from "../../_content/AiWorking";
 import { ErrorNote, Label, SourceBadge, VIDEO_STATUS, fieldClass } from "../../_content/ui";
+import { classLabel } from "@/lib/class-label";
 
 const KINDS: { id: ReelSectionKind; label: string }[] = [
   { id: "hook", label: "Эхлэл" },
@@ -106,7 +107,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
             <span className={cn("rounded-full px-3 py-1 text-sm font-bold", VIDEO_STATUS[video.status].className)}>
               {VIDEO_STATUS[video.status].label}
             </span>
-            <span className="text-sm font-bold text-ink-muted">{video.classCode} анги</span>
+            <span className="text-sm font-bold text-ink-muted">{classLabel(video.classCode)} анги</span>
           </div>
           <Label htmlFor={`${id}-title`}>Гарчиг</Label>
           <input
@@ -261,7 +262,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
             )}
             {video.status === "approved" && !changed && (
               <Button onClick={publish} disabled={Boolean(busy)} aria-busy={busy === "publish"}>
-                {busy === "publish" ? "Нийтэлж байна…" : `${video.classCode} ангид нийтлэх`}
+                {busy === "publish" ? "Нийтэлж байна…" : `${classLabel(video.classCode)} ангид нийтлэх`}
               </Button>
             )}
             <Button variant="secondary" size="sm" onClick={save} disabled={Boolean(busy) || !changed}>

@@ -4,16 +4,16 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
-import { assignmentDemoLogIn, demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
+import { demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
-import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
+import { ArrowIcon, PasswordField, TextField } from "../_components/fields";
 import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
-export function LoginForm({ pet }: { pet: PetStage }) {
+/** `next`: where to go after logging in, e.g. the QR invite a student scanned. */
+export function LoginForm({ pet, next }: { pet: PetStage; next?: string }) {
   const [role, setRole] = useState<Role>("student");
-  const [showCode, setShowCode] = useState(false);
   const [unknown, setUnknown] = useState(false);
   /** Minutes until a username blocked after too many wrong tries may try again. */
   const [blocked, setBlocked] = useState(0);
@@ -37,7 +37,7 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         email: String(form.get("email") ?? ""),
         password: String(form.get("password") ?? ""),
         role,
-        classCode: String(form.get("classCode") ?? ""),
+        next,
       });
       setUnknown(result?.error === "unknown");
       setBlocked(result?.error === "blocked" ? result.minutes : 0);
@@ -85,29 +85,6 @@ export function LoginForm({ pet }: { pet: PetStage }) {
           required
           {...unknownProps}
         />
-        {isStudent &&
-          (showCode ? (
-            <ClassCodeField id="login-code" name="classCode" label="Ангийн код" autoFocus />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowCode(true)}
-              className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start rounded-full border-2 border-dashed border-line bg-white px-3.5 text-sm font-bold text-primary"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-                className="size-4"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Ангийн код
-            </button>
-          ))}
         {unknown && (
           <FormError id="login-error">
             Нэвтрэх нэр, имэйл эсвэл нууц үг буруу байна.{" "}
@@ -132,31 +109,14 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         </button>
       </form>
 
-      {/* Their own forms: forms can't be nested. Always a fresh demo account. */}
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <form action={demoLogIn}>
-          <button
-            type="submit"
-            className={buttonClass({ variant: "secondary", className: "w-full" })}
-          >
-            Сурагчаар демо
-          </button>
-        </form>
-        <form action={demoTeacherLogIn}>
-          <button
-            type="submit"
-            className={buttonClass({ variant: "secondary", className: "w-full" })}
-          >
-            Багшаар демо
-          </button>
-        </form>
-      </div>
-      <form action={assignmentDemoLogIn} className="mt-2">
+      {/* Its own form: forms can't be nested. Follows the role toggle and
+          always logs in to a fresh demo account. */}
+      <form action={isStudent ? demoLogIn : demoTeacherLogIn} className="mt-4">
         <button
           type="submit"
-          className={buttonClass({ variant: "white", className: "w-full" })}
+          className={buttonClass({ variant: "secondary", className: "w-full" })}
         >
-          ▶ Даалгаврын демо: багшаас сурагч хүртэл
+          {isStudent ? "Сурагчийн демо" : "Багшийн демо"}
         </button>
       </form>
 

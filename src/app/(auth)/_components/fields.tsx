@@ -60,19 +60,6 @@ export function SubjectPicker({
   );
 }
 
-/** Class code: dashed, tinted, uppercase with wide letter spacing. */
-export function ClassCodeField(props: FieldProps) {
-  return (
-    <TextField
-      type="text"
-      autoComplete="off"
-      placeholder="K7Q2M"
-      className="border-dashed border-line bg-surface text-lg font-bold tracking-[0.2em] uppercase"
-      {...props}
-    />
-  );
-}
-
 export function PasswordField({ id, label, hint, ...props }: FieldProps) {
   const [visible, setVisible] = useState(false);
   return (
