@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/session";
 
 /** Pages a logged-out visitor may open. */
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
 /** Sends visitors without a session to /login. Pages still check the session itself. */
 export function proxy(request: NextRequest) {

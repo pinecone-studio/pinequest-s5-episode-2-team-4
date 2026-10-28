@@ -143,10 +143,9 @@ export function LoginForm({ pet }: { pet: PetStage }) {
       </form>
 
       <div className="mt-5 flex items-center justify-between gap-3 text-sm font-semibold">
-        {/* TODO: password reset needs a backend */}
-        <a href="#" className="inline-flex min-h-11 items-center text-ink-muted">
+        <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-ink-muted">
           Нууц үг мартсан?
-        </a>
+        </Link>
         <Link href="/signup" className="inline-flex min-h-11 items-center font-bold">
           Бүртгүүлэх
         </Link>

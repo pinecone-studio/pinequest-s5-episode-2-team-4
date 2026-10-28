@@ -168,7 +168,29 @@ export async function checkLogin(credentials: {
   return toAccount(data);
 }
 
-/** Saves the class code and learning progress; nothing else changes after signup. */
+/** The account with this email (any case). Demo accounts have no email. */
+export async function findAccountByEmail(email: string): Promise<StoredAccount | undefined> {
+  const { data, error } = await db()
+    .from("accounts")
+    .select(COLUMNS)
+    .eq("email", email.toLowerCase())
+    .eq("demo", false)
+    .maybeSingle<Row>();
+  if (error) throw new Error(`Could not load account: ${error.message}`);
+  return data ? toAccount(data) : undefined;
+}
+
+/** Replaces the account's password, from a reset link. */
+export async function setPassword(id: string, password: string) {
+  if ([...password].length < MIN_PASSWORD_LENGTH) throw new Error("Password is too short");
+  const { error } = await db()
+    .from("accounts")
+    .update({ password_hash: await hashPassword(password) })
+    .eq("id", id);
+  if (error) throw new Error(`Could not set password: ${error.message}`);
+}
+
+/** Saves the class code and learning progress; the password changes only through setPassword. */
 export async function saveAccount(account: Pick<StoredAccount, "id" | "classCode" | "progress">) {
   const { error } = await db()
     .from("accounts")

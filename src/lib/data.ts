@@ -17,6 +17,7 @@ import {
 import { petCollection, unhatchedEggs } from "./collection";
 import { battleHistory, classEnglish } from "./history";
 import { checkEnglishAnswer, toQuestionView } from "./english";
+import { findResetAccount } from "./password-reset";
 import { englishProgress } from "./progress";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
@@ -93,6 +94,11 @@ export async function getCurrentUser(): Promise<User | undefined> {
     classCode: session.classCode,
     pet: session.pet,
   };
+}
+
+/** Whose password a reset link is for, or undefined once it's used or expired. */
+export async function getPasswordResetUsername(token: string): Promise<string | undefined> {
+  return (await findResetAccount(token))?.username;
 }
 
 // Pets
