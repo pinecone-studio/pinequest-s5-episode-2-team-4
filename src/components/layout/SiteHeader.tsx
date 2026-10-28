@@ -30,10 +30,12 @@ const navLinkClass =
 type SiteHeaderProps = {
   pet?: React.ComponentProps<typeof PetChip>;
   counts?: NavCounts;
+  /** The subject being studied, e.g. "Математик"; links to /subject to change it. */
+  subject?: string;
 };
 
 /** Header for student pages. Nav links move to MobileNav below lg (they don't fit on tablets). */
-export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
+export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderProps) {
   const pathname = usePathname();
   // The /pets evolution demo shows each stage here too.
   const preview = usePetPreview();
@@ -72,6 +74,26 @@ export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
         </nav>
       </div>
       <div className="flex items-center gap-2">
+        <Link
+          href="/subject"
+          aria-label={subject ? `Хичээл: ${subject}. Солих` : "Хичээл сонгох"}
+          aria-current={pathname === "/subject" ? "page" : undefined}
+          className={`${navLinkClass} hidden gap-1.5 bg-surface px-4 text-sm sm:inline-flex`}
+        >
+          {subject ?? "Хичээл сонгох"}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="size-4 text-ink-muted"
+          >
+            <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
+          </svg>
+        </Link>
         {pet && <PetChip {...pet} />}
         {/* No teacher link: only students see this header, and /teacher sends them home. */}
         <form action={logOut}>
