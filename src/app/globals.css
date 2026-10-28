@@ -15,8 +15,14 @@
   --color-magenta: #e30ba6;
   --color-pink: #fce7f6;
 
-  --font-sans:
-    var(--font-poppins), var(--font-montserrat), system-ui, sans-serif;
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+
+  /* Type scale: Tailwind's steps plus 2xs for dense data (heatmap numbers).
+     2xs 11 · xs 12 · sm 14 · base 16 · lg 18 · xl 20 · 2xl 24 · 3xl 30 ·
+     4xl 36 · 5xl 48 · 6xl 60. Use only these, never text-[13px] and the like;
+     page and section titles use type-page-title / type-section-title below. */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.35;
 
   --radius-field: 10px;
   --radius-tile: 15px;
@@ -95,21 +101,22 @@
 
 /* Type scale for page and section titles, so every page uses the same sizes. */
 @utility type-page-title {
-  font-size: 40px;
-  line-height: 1;
+  font-size: 1.875rem; /* 3xl */
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   @media (width >= 48rem) {
-    font-size: 56px;
+    font-size: 3rem; /* 5xl */
+    line-height: 1.05;
   }
 }
 
 @utility type-section-title {
-  font-size: 22px;
+  font-size: 1.5rem; /* 2xl */
   line-height: 1.15;
   font-weight: 700;
   @media (width >= 48rem) {
-    font-size: 28px;
+    font-size: 1.875rem; /* 3xl */
     line-height: 1.1;
   }
 }
@@ -125,6 +132,17 @@
 
   :focus-visible {
     @apply outline-3 outline-offset-3 outline-primary;
+  }
+
+  /* No lone word on a heading's last line, fewer ragged paragraph endings. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   @media (prefers-reduced-motion: reduce) {
