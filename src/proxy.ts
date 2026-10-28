@@ -11,7 +11,10 @@ export function proxy(request: NextRequest) {
   if (PUBLIC_PATHS.includes(pathname) || request.cookies.has(SESSION_COOKIE)) {
     return NextResponse.next();
   }
-  return NextResponse.redirect(new URL("/login", request.url));
+  const login = new URL("/login", request.url);
+  // A student scanning a class QR comes back to it after logging in.
+  if (pathname.startsWith("/join/")) login.searchParams.set("next", pathname);
+  return NextResponse.redirect(login);
 }
 
 export const config = {

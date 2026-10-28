@@ -34,6 +34,9 @@ export type Account = {
   mastered?: string[];
   /** Teachers: the one subject they teach, picked at sign-up (subjects.ts id). */
   subject?: string;
+  /** Students in no class: the subject (subjects.ts id) and grade they practise on their own. */
+  practiceSubject?: string;
+  practiceGrade?: number;
   /** Game ids the student likes most, for assignments played "by interest". */
   favoriteGames?: string[];
   /** Lesson video ids the student has opened; the rest count as new in the menu. */

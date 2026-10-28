@@ -4,7 +4,7 @@ import {
   getCurrentUser,
   getCurriculum,
   getSubtopics,
-  getTeacherClassCodes,
+  getTeacherClassOptions,
   getTeacherMaterial,
   getTeacherVideo,
 } from "@/lib/data";
@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 /** `?video=<id>`: questions from that lesson video's material. */
 export default async function NewAssignmentPage({ searchParams }: PageProps<"/teacher/assignments/new">) {
   const { video: videoId } = await searchParams;
-  const [curriculum, classCodes, subtopics, user, video] = await Promise.all([
+  const [curriculum, classes, subtopics, user, video] = await Promise.all([
     getCurriculum(),
-    getTeacherClassCodes(),
+    getTeacherClassOptions(),
     getSubtopics("fractions"),
     getCurrentUser(),
     typeof videoId === "string" ? getTeacherVideo(videoId) : undefined,
@@ -43,7 +43,7 @@ export default async function NewAssignmentPage({ searchParams }: PageProps<"/te
       <h1 className="type-page-title">Шинэ даалгавар</h1>
       <AssignmentEditor
         curriculum={curriculum}
-        classCodes={classCodes}
+        classes={classes}
         subtopics={subtopics}
         teacherSubject={user?.subject}
         fromVideo={fromVideo}

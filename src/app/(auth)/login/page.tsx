@@ -15,8 +15,8 @@ const DECOR = [
   { id: "cardiling", left: 76, top: 64 },
 ];
 
-export default async function LoginPage() {
-  const [petLines, pet] = await Promise.all([getPetLines(), getCurrentPet()]);
+export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  const [petLines, pet, { next }] = await Promise.all([getPetLines(), getCurrentPet(), searchParams]);
   const decor = DECOR.flatMap(({ id, left, top }) => {
     const line = petLines.find((l) => l.id === id);
     return line ? [{ stage: line.stages[0], left, top }] : [];
@@ -25,7 +25,7 @@ export default async function LoginPage() {
   return (
     <main className="relative flex flex-1 items-center justify-center px-4 pt-22 pb-16">
       <FloatingPets pets={decor} size="lg" />
-      <LoginForm pet={pet?.stage ?? petLines[0].stages[0]} />
+      <LoginForm pet={pet?.stage ?? petLines[0].stages[0]} next={typeof next === "string" ? next : undefined} />
     </main>
   );
 }

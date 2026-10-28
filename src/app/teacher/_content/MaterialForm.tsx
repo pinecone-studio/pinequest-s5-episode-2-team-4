@@ -4,7 +4,7 @@ import { useId, useRef, useState } from "react";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { MaterialInput } from "@/lib/teacher-actions";
-import type { CurriculumChapter } from "@/lib/types";
+import type { ClassOption, CurriculumChapter } from "@/lib/types";
 import { uploadMaterialFiles } from "@/lib/upload-client";
 import { ACCEPT_UPLOADS, MAX_UPLOAD_FILES, uploadProblem } from "@/lib/uploads";
 import { AiWorking } from "./AiWorking";
@@ -12,7 +12,8 @@ import { ErrorNote, Label, SubjectField, fieldClass } from "./ui";
 
 type MaterialFormProps = {
   curriculum: CurriculumChapter[];
-  classCodes: string[];
+  /** The teacher's classes, the current one first */
+  classes: ClassOption[];
   /** Asks for the class too (videos are made for one class). */
   withClass?: boolean;
   submitLabel: string;
@@ -47,12 +48,12 @@ const kb = (n: number) => (n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB
  * A lesson topic plus any mix of text, book page photos, screenshots, PDFs
  * and .txt files. Files go to Storage when the teacher submits.
  */
-export function MaterialForm({ curriculum, classCodes, withClass, submitLabel, onSubmit, teacherSubject }: MaterialFormProps) {
+export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSubmit, teacherSubject }: MaterialFormProps) {
   const id = useId();
   const [topic, setTopic] = useState("");
   const [grade, setGrade] = useState(7);
   const [subject, setSubject] = useState(teacherSubject ?? "math");
-  const [classCode, setClassCode] = useState(classCodes[0] ?? "");
+  const [classCode, setClassCode] = useState(classes[0]?.code ?? "");
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string>();
@@ -142,22 +143,21 @@ export function MaterialForm({ curriculum, classCodes, withClass, submitLabel, o
       {withClass && (
         <div className="flex flex-col gap-1.5 md:max-w-xs">
           <Label htmlFor={`${id}-class`} hint="видео энэ ангид харагдана">
-            Ангийн код
+            Анги
           </Label>
-          <input
+          <select
             id={`${id}-class`}
-            list={`${id}-classes`}
             value={classCode}
-            onChange={(e) => setClassCode(e.target.value.toUpperCase())}
-            maxLength={10}
-            placeholder="7А"
-            className={cn(fieldClass, "h-12 font-bold tracking-wider uppercase")}
-          />
-          <datalist id={`${id}-classes`}>
-            {classCodes.map((c) => (
-              <option key={c} value={c} />
+            onChange={(e) => setClassCode(e.target.value)}
+            className={cn(fieldClass, "h-12 font-bold")}
+          >
+            {classes.length === 0 && <option value="">Анги алга</option>}
+            {classes.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name}
+              </option>
             ))}
-          </datalist>
+          </select>
         </div>
       )}
 
