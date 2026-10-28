@@ -3,17 +3,21 @@
 // through data.ts.
 
 import "server-only";
-import { normalClassCode } from "./battle";
+import { hasSubjectColumn, normalClassCode } from "./battle";
+import { DEFAULT_BATTLE_SUBJECT, battleSubjectTitle, findBattleQuestion } from "./battle-questions";
 import { englishQuestions, englishUnits } from "./mock/english";
 import { findPlayer } from "./players";
 import { getSupabaseAdmin } from "./supabase";
 import type {
+  BattleLog,
+  BattleLogEntry,
   BattleHistory,
   BattleHistoryEntry,
   BattleResult,
   BattleState,
   BattleStatus,
   ClassEnglish,
+  EnglishQuestion,
   EnglishSkill,
   Rarity,
   User,
@@ -226,5 +230,112 @@ export async function classEnglish(teacher: User, classCode: string): Promise<Cl
       students: b.battle_participants.length,
       damage: b.battle_participants.reduce((sum, p) => sum + p.damage_dealt, 0),
     })),
+  };
+}
+
+const BATTLE_LOG_SIZE = 30;
+
+type LogBattleRow = {
+  id: string;
+  boss_id: string;
+  status: BattleStatus;
+  class_code: string | null;
+  subject?: string | null;
+  created_at: string;
+  ended_at: string | null;
+  battle_participants: {
+    player_id: string;
+    joined_at: string;
+    damage_dealt: number;
+    correct_count: number;
+    wrong_count: number;
+  }[];
+};
+
+const expectedAnswer = (q: EnglishQuestion) => (q.kind === "choice" ? q.options[q.correctIndex] : q.acceptedAnswers[0]);
+
+/**
+ * The teacher's class battles (optionally one class), newest first, and for
+ * `battleId` (or the newest) how the class answered each question. Students
+ * are only counted or numbered, never named.
+ */
+export async function classBattleLog(teacher: User, classCode?: string, battleId?: string): Promise<BattleLog> {
+  const teacherPlayer = await findPlayer(teacher.username);
+  if (!teacherPlayer) return { battles: [] };
+  const { data, error } = await db()
+    .from("battles")
+    .select(
+      `id, boss_id, status, class_code, ${(await hasSubjectColumn()) ? "subject, " : ""}created_at, ended_at, ` +
+        "battle_participants(player_id, joined_at, damage_dealt, correct_count, wrong_count)",
+    )
+    .eq("host_player_id", teacherPlayer.id)
+    .eq("mode", "class")
+    .order("created_at", { ascending: false })
+    .limit(BATTLE_LOG_SIZE);
+  if (error) throw new Error(`Could not load class battles: ${error.message}`);
+
+  const code = classCode?.trim() ? normalClassCode(classCode) : undefined;
+  const rows = ((data ?? []) as unknown as LogBattleRow[]).filter((b) => !code || b.class_code === code);
+  const entry = (b: LogBattleRow): BattleLogEntry => ({
+    id: b.id,
+    bossId: b.boss_id,
+    subjectTitle: battleSubjectTitle(b.subject ?? DEFAULT_BATTLE_SUBJECT),
+    classCode: b.class_code ?? "",
+    status: b.status,
+    date: b.ended_at ?? b.created_at,
+    students: b.battle_participants.length,
+    answers: b.battle_participants.reduce((sum, p) => sum + p.correct_count + p.wrong_count, 0),
+    correct: b.battle_participants.reduce((sum, p) => sum + p.correct_count, 0),
+  });
+  const battles = rows.map(entry);
+
+  // Only one of this teacher's own battles can be opened.
+  const chosen = rows.find((b) => b.id === battleId) ?? rows.find((b) => b.battle_participants.length > 0);
+  if (!chosen) return { battles };
+
+  const { data: answers, error: answersError } = await db()
+    .from("battle_answers")
+    .select("player_id, question_id, correct")
+    .eq("battle_id", chosen.id)
+    .limit(5000);
+  if (answersError) throw new Error(`Could not load battle answers: ${answersError.message}`);
+
+  const perQuestion = new Map<string, { answers: number; correct: number; right: Set<string> }>();
+  for (const a of (answers ?? []) as { player_id: string; question_id: string; correct: boolean }[]) {
+    const q = perQuestion.get(a.question_id) ?? { answers: 0, correct: 0, right: new Set<string>() };
+    q.answers++;
+    if (a.correct) {
+      q.correct++;
+      q.right.add(a.player_id);
+    }
+    perQuestion.set(a.question_id, q);
+  }
+  const questions = [...perQuestion].flatMap(([questionId, r]) => {
+    const q = findBattleQuestion(questionId);
+    if (!q) return [];
+    return [
+      {
+        questionId,
+        prompt: q.prompt,
+        display: q.display,
+        expected: expectedAnswer(q),
+        answers: r.answers,
+        correct: r.correct,
+        students: r.right.size,
+      },
+    ];
+  });
+  // Hardest first: they're what the teacher goes over with the class.
+  questions.sort((a, b) => a.correct / a.answers - b.correct / b.answers || b.answers - a.answers);
+
+  return {
+    battles,
+    selected: {
+      ...entry(chosen),
+      questions,
+      perStudent: [...chosen.battle_participants]
+        .sort((a, b) => a.joined_at.localeCompare(b.joined_at))
+        .map((p) => ({ correct: p.correct_count, wrong: p.wrong_count, damage: p.damage_dealt })),
+    },
   };
 }

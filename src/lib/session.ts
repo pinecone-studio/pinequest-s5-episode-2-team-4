@@ -32,6 +32,8 @@ export type Account = {
   practiceSolved?: string[];
   /** Subtopic ids mastered by passing their retest. */
   mastered?: string[];
+  /** Teachers: the one subject they teach, picked at sign-up (subjects.ts id). */
+  subject?: string;
   /** The latest retest, for the mastered page. */
   lastRetest?: {
     subtopicId: string;

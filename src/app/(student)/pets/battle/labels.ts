@@ -32,4 +32,5 @@ export const SKILL_LABELS: Record<EnglishSkill, string> = {
   pronunciation: "Дуудлага",
   spelling: "Зөв бичих",
   translation: "Орчуулга",
+  subject: "Хичээл",
 };

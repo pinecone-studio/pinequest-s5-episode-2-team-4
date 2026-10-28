@@ -15,7 +15,7 @@ import {
   teacherClassBattle,
 } from "./battle";
 import { petCollection, unhatchedEggs } from "./collection";
-import { battleHistory, classEnglish } from "./history";
+import { battleHistory, classBattleLog, classEnglish } from "./history";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { findResetAccount } from "./password-reset";
 import { englishProgress } from "./progress";
@@ -25,6 +25,7 @@ import { readSession } from "./session";
 import { streakSummary } from "./streak";
 import type {
   BattleHistory,
+  BattleLog,
   BattleState,
   Boss,
   ClassBattleSummary,
@@ -71,6 +72,8 @@ import {
 import { bosses } from "./mock/bosses";
 import { gameSubjects } from "./mock/games";
 import { anonQuestions, questionGroups } from "./mock/anonQuestions";
+import { BATTLE_SUBJECTS } from "./battle-questions";
+import { teacherSubject } from "./subjects";
 import { englishQuestions, englishUnits } from "./mock/english";
 import { petLines } from "./mock/pets";
 import { signals } from "./mock/signals";
@@ -94,6 +97,7 @@ export async function getCurrentUser(): Promise<User | undefined> {
     role: session.role,
     classCode: session.classCode,
     pet: session.pet,
+    subject: session.subject,
     demo: session.demo,
   };
 }
@@ -476,4 +480,21 @@ export async function getGameQuestions(
   subjectId: string,
 ): Promise<GameQuestion[] | undefined> {
   return gameSubjects.find((s) => s.id === subjectId)?.questions;
+}
+
+/**
+ * Subjects a boss battle can ask about, English first. A teacher only gets
+ * the topics of the subject they teach.
+ */
+export async function getBattleSubjects(): Promise<{ id: string; title: string }[]> {
+  const session = await readSession();
+  const topics = session?.role === "teacher" ? teacherSubject(session.subject)?.battleTopics : undefined;
+  if (!topics) return BATTLE_SUBJECTS;
+  return topics.flatMap((id) => BATTLE_SUBJECTS.filter((s) => s.id === id));
+}
+
+/** The current teacher's class battles and the answers in one of them; nobody is named. */
+export async function getBattleLog(classCode?: string, battleId?: string): Promise<BattleLog> {
+  const user = await getCurrentUser();
+  return user?.role === "teacher" ? classBattleLog(user, classCode, battleId) : { battles: [] };
 }

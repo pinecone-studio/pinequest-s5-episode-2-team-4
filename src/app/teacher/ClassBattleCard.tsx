@@ -7,6 +7,10 @@ import type { Boss, ClassBattleSummary } from "@/lib/types";
 
 type ClassBattleCardProps = {
   bosses: Boss[];
+  /** Subjects the questions can come from (the teacher's subject's topics). */
+  subjects: { id: string; title: string }[];
+  /** The subject the teacher teaches, e.g. "Математик". */
+  teacherSubjectTitle?: string;
   /** The teacher's unfinished class battle, if any. */
   open: ClassBattleSummary | undefined;
   /** The class to suggest. */
@@ -17,7 +21,7 @@ type ClassBattleCardProps = {
 const STATUS = { lobby: "Сурагчид нэгдэж байна", active: "Тулаан явагдаж байна", paused: "Түр зогссон" };
 
 /** Opens a boss battle for the whole class, or goes back to the one already open. */
-export function ClassBattleCard({ bosses, open, classCode, className }: ClassBattleCardProps) {
+export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, classCode, className }: ClassBattleCardProps) {
   const openBoss = open && bosses.find((b) => b.id === open.bossId);
   return (
     <section
@@ -28,8 +32,8 @@ export function ClassBattleCard({ bosses, open, classCode, className }: ClassBat
         <h2 id="class-battle-title" className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]">
           Ангийн босс тулаан
         </h2>
-        <Link href={`/teacher/english?class=${encodeURIComponent(open?.classCode ?? classCode)}`} className="font-bold">
-          Ангийн англи хэлний ахиц →
+        <Link href={`/teacher/history?class=${encodeURIComponent(open?.classCode ?? classCode)}`} className="font-bold">
+          Тулааны түүх →
         </Link>
       </div>
 
@@ -39,7 +43,7 @@ export function ClassBattleCard({ bosses, open, classCode, className }: ClassBat
             {openBoss ? <PetSprite stage={{ name: openBoss.name, sprite: openBoss.sprite }} size={64} /> : null}
             <div>
               <p className="text-lg font-bold">
-                {open.classCode} анги{openBoss ? ` · ${openBoss.name}` : ""}
+                {open.classCode} анги · {open.subjectTitle}{openBoss ? ` · ${openBoss.name}` : ""}
               </p>
               <p className="text-ink-muted">
                 {STATUS[open.status]} · {open.students} сурагч
@@ -53,8 +57,8 @@ export function ClassBattleCard({ bosses, open, classCode, className }: ClassBat
       ) : (
         <form action={createClassBossBattle} className="mt-3">
           <p className="text-ink-muted">
-            Бүх анги нэг боссыг хамтдаа ялна. Боссоо сонгоод тулааныг нээгээрэй; сурагчид ангийн кодоороо эсвэл
-            дэлгэц дээрх кодоор нэгдэнэ.
+            Бүх анги нэг боссыг хамтдаа ялна. Боссоо сонгоод тулааныг нээгээрэй: асуултууд зөвхөн таны заадаг
+            хичээлээс гарна. Сурагчид ангийн кодоороо эсвэл дэлгэц дээрх кодоор нэгдэнэ.
           </p>
           <fieldset className="mt-4">
             <legend className="mb-2 font-bold">Босс</legend>
@@ -75,6 +79,28 @@ export function ClassBattleCard({ bosses, open, classCode, className }: ClassBat
             </div>
           </fieldset>
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-end">
+            {subjects.length === 1 ? (
+              <p className="flex flex-col gap-1.5 font-bold">
+                Хичээл
+                <span className="flex h-12 items-center rounded-tile bg-surface px-3 md:w-60">{subjects[0].title}</span>
+                <input type="hidden" name="subject" value={subjects[0].id} />
+              </p>
+            ) : (
+              <label className="flex flex-col gap-1.5 font-bold">
+                {teacherSubjectTitle ? `${teacherSubjectTitle}: сэдэв` : "Хичээл"}
+                <select
+                  name="subject"
+                  defaultValue={subjects[0]?.id}
+                  className="h-12 w-full rounded-tile border-2 border-lavender bg-white px-3 text-base text-ink focus:border-primary focus:outline-none md:w-60"
+                >
+                  {subjects.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label className="flex flex-col gap-1.5 font-bold">
               Ангийн код
               <input

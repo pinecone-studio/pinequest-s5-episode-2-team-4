@@ -137,6 +137,8 @@ export type User = {
   role: "student" | "teacher";
   classCode?: string;
   pet?: UserPet;
+  /** Teachers: the one subject they teach (subjects.ts id). */
+  subject?: string;
   /** A throwaway «Демо нэвтрэх» account, which gets demo shortcuts. */
   demo?: boolean;
 };
@@ -289,7 +291,8 @@ export type SignalSummary = {
 
 // English boss battles (Grade 7, units from ECONTENT)
 
-export type EnglishSkill = "grammar" | "pronunciation" | "spelling" | "translation";
+/** "subject": a battle question from another subject (math, history, ...). */
+export type EnglishSkill = "grammar" | "pronunciation" | "spelling" | "translation" | "subject";
 
 /** A Grade 7 English unit; titles are the ones listed on ECONTENT. */
 export type EnglishUnit = {
@@ -307,6 +310,8 @@ type EnglishQuestionBase = {
   /** 1 easy … 3 hard; harder questions deal more damage. */
   difficulty: 1 | 2 | 3;
   prompt: string;
+  /** For a question from another subject: its name, shown instead of the skill. */
+  subjectTitle?: string;
   /** Shown under the prompt, e.g. "h _ b b y" or a sentence to fix. */
   display?: string;
   hint?: string;
@@ -454,6 +459,8 @@ export type ClassBattleSummary = {
   bossId: string;
   status: "lobby" | "active" | "paused";
   classCode: string;
+  /** What the questions are about, e.g. "Математик". */
+  subjectTitle: string;
   /** Students in it right now. */
   students: number;
   /** The current student is in it (students only). */
@@ -548,4 +555,39 @@ export type GameSubject = {
   id: string;
   title: string;
   questions: GameQuestion[];
+};
+
+/** One of the teacher's class battles, in the history list. */
+export type BattleLogEntry = {
+  id: string;
+  bossId: string;
+  subjectTitle: string;
+  classCode: string;
+  status: BattleStatus;
+  date: string;
+  students: number;
+  answers: number;
+  correct: number;
+};
+
+/** How a class answered one battle question; nobody is named. */
+export type BattleQuestionResult = {
+  questionId: string;
+  prompt: string;
+  display?: string;
+  expected: string;
+  answers: number;
+  correct: number;
+  /** Students who got it at least once */
+  students: number;
+};
+
+/** The teacher's class battles and, for the chosen one, every answer added up. */
+export type BattleLog = {
+  battles: BattleLogEntry[];
+  selected?: BattleLogEntry & {
+    questions: BattleQuestionResult[];
+    /** Per student in the order they joined, numbered instead of named. */
+    perStudent: { correct: number; wrong: number; damage: number }[];
+  };
 };
