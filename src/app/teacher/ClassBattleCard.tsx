@@ -4,6 +4,7 @@ import { ButtonLink, buttonClass } from "@/components/ui";
 import { createClassBossBattle } from "@/lib/battle-actions";
 import { cn } from "@/lib/cn";
 import type { Boss, ClassBattleSummary } from "@/lib/types";
+import { classLabel } from "@/lib/class-label";
 
 type ClassBattleCardProps = {
   bosses: Boss[];
@@ -43,7 +44,7 @@ export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, c
             {openBoss ? <PetSprite stage={{ name: openBoss.name, sprite: openBoss.sprite }} size={64} /> : null}
             <div>
               <p className="text-lg font-bold">
-                {open.classCode} анги · {open.subjectTitle}{openBoss ? ` · ${openBoss.name}` : ""}
+                {classLabel(open.classCode)} анги · {open.subjectTitle}{openBoss ? ` · ${openBoss.name}` : ""}
               </p>
               <p className="text-ink-muted">
                 {STATUS[open.status]} · {open.students} сурагч

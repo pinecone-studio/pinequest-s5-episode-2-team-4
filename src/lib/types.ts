@@ -249,6 +249,8 @@ export type Boss = {
 /** Shared class XP goal; every student's XP counts towards it. */
 export type ClassGoal = {
   classCode: string;
+  /** The class's name to show, e.g. "7А" */
+  name: string;
   targetXp: number;
   currentXp: number;
   reward: string;

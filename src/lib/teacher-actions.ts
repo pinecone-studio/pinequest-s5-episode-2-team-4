@@ -7,6 +7,7 @@
 import { redirect } from "next/navigation";
 import { aiEnabled } from "./ai/generate";
 import { normalClassCode } from "./battle";
+import { getTeacherClassOptions } from "./data";
 import { teacherSubject } from "./subjects";
 import {
   type AiResult,
@@ -61,6 +62,11 @@ async function subjectFor(given: unknown): Promise<string> {
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 /** Compared like class battles do, so "7a" and "7А" are the same class. */
 const cleanClassCode = (v: unknown) => normalClassCode(clean(v, 10));
+
+/** Teachers publish only to their own classes (or codes they used before classes existed). */
+async function isOwnClass(classCode: string) {
+  return (await getTeacherClassOptions()).some((o) => o.code === classCode);
+}
 const cleanGrade = (v: unknown) => (Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 12 ? (v as number) : undefined);
 
 // Materials
@@ -172,7 +178,8 @@ export async function saveAssignmentAction(
   const title = clean(input.title, 120);
   const classCode = cleanClassCode(input.classCode);
   if (!title) return { ok: false, error: "Даалгаврын нэр хэрэгтэй" };
-  if (!classCode) return { ok: false, error: "Ангийн код хэрэгтэй" };
+  if (!classCode) return { ok: false, error: "Анги сонгоно уу" };
+  if (!(await isOwnClass(classCode))) return { ok: false, error: "Зөвхөн өөрийн ангид оноох боломжтой" };
 
   const questions = (Array.isArray(input.questions) ? input.questions : []).slice(0, 20).map((q) => ({
     prompt: clean(q.prompt, 200),
@@ -229,7 +236,8 @@ export async function createVideoAction(input: {
   const recognition = toRecognition(input.recognition);
   const classCode = cleanClassCode(input.classCode) || material?.classCode;
   if (!material || !recognition) return { ok: false, error: "Материал олдсонгүй" };
-  if (!classCode) return { ok: false, error: "Ангийн код хэрэгтэй" };
+  if (!classCode) return { ok: false, error: "Анги сонгоно уу" };
+  if (!(await isOwnClass(classCode))) return { ok: false, error: "Зөвхөн өөрийн ангид нийтлэх боломжтой" };
   // The topic the teacher settled on (maybe changed from the AI's) is the material's.
   await saveRecognition(teacher, material.id, recognition, clean(recognition.topic, 120));
 

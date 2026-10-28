@@ -15,6 +15,7 @@ import {
 import { ArenaBackground } from "./ArenaBackground";
 import { cn } from "@/lib/cn";
 import { RARITY_LABELS } from "./labels";
+import { classLabel } from "@/lib/class-label";
 
 export const metadata: Metadata = {
   title: "Боссын тулаан · LevelUp",
@@ -80,7 +81,7 @@ export default async function BossListPage({ searchParams }: PageProps<"/pets/ba
             ) : null}
             <div>
               <p className="text-lg font-bold">
-                {classBattle.classCode} ангийн тулаан · {classBattle.subjectTitle}{classBoss ? ` · ${classBoss.name}` : ""}
+                {classLabel(classBattle.classCode)} ангийн тулаан · {classBattle.subjectTitle}{classBoss ? ` · ${classBoss.name}` : ""}
               </p>
               <p className="text-sm text-white/85">
                 {CLASS_STATUS[classBattle.status]} · {classBattle.students} сурагч
