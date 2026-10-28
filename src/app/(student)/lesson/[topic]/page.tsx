@@ -5,6 +5,7 @@ import {
   getCurrentPet,
   getLastRetest,
   getLesson,
+  getMySignal,
   getProgress,
   getSolvedPractice,
   getSubtopics,
@@ -64,9 +65,10 @@ export default async function LessonPage({
     selected: s.subtopicId === selectedId,
   }));
 
-  const [lesson, questions] = await Promise.all([
+  const [lesson, questions, mySignal] = await Promise.all([
     getLesson(selectedId),
     getAnonQuestions(selectedId),
+    getMySignal(selectedId),
   ]);
   const failedRetest =
     query.retest === "failed" &&
@@ -102,7 +104,11 @@ export default async function LessonPage({
         >
           {/* key: a different lesson starts with fresh practice state */}
           <ExplanationSection lesson={lesson} />
-          <SignalCheck key={`signal-${lesson.subtopicId}`} />
+          <SignalCheck
+            key={`signal-${lesson.subtopicId}`}
+            subtopicId={lesson.subtopicId}
+            initial={mySignal}
+          />
           <PracticeSection
             key={lesson.subtopicId}
             questions={lesson.practice}
