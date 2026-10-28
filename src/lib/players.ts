@@ -2,7 +2,7 @@ import "server-only";
 import { getSupabaseAdmin } from "./supabase";
 
 /** Same matching as the login: usernames ignore case. LIKE wildcards are escaped. */
-const exactName = (name: string) => name.replace(/[\\%_]/g, (c) => `\\${c}`);
+export const exactName = (name: string) => name.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 /**
  * The game player row for a LevelUp username, without creating one (a
