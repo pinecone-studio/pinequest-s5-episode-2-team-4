@@ -9,6 +9,7 @@ import type { GameAnswer } from "@/lib/types";
 import { formatDay } from "../../_content/format";
 import { subjectLabel } from "../../_content/ui";
 import { UnpublishButton } from "./UnpublishButton";
+import { classLabel } from "@/lib/class-label";
 
 export const metadata: Metadata = {
   title: "Даалгаврын үр дүн · LevelUp",
@@ -57,7 +58,7 @@ export default async function AssignmentReportPage({ params }: PageProps<"/teach
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm font-bold text-ink-muted">
-            {a.classCode} · {subjectLabel(a.subject)} · {a.status === "published" ? "Нийтэлсэн" : "Ноорог"}
+            {classLabel(a.classCode)} · {subjectLabel(a.subject)} · {a.status === "published" ? "Нийтэлсэн" : "Ноорог"}
           </p>
           <h1 className="mt-1 type-page-title">{a.title}</h1>
           <p className="mt-3 text-ink-muted">

@@ -1,4 +1,5 @@
 import { Logo } from "@/components/layout/Logo";
+import { PageTransition } from "@/components/layout/PageTransition";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -8,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <header className="relative mx-auto flex h-18 w-full max-w-7xl items-center px-4 md:h-22 md:px-[clamp(16px,4vw,40px)]">
           <Logo />
         </header>
-        {children}
+        <PageTransition className="flex flex-1 flex-col">{children}</PageTransition>
       </div>
       <SiteFooter variant="auth" />
     </>

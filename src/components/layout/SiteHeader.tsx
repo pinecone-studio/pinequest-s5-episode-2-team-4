@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { logOut } from "@/lib/actions";
 import { Logo } from "./Logo";
+import { NavPill } from "./NavPill";
 import { NavBadge } from "./NavBadge";
 import { PetChip } from "./PetChip";
 
@@ -25,15 +26,17 @@ const NAV_LINKS: { href: string; label: string; count?: keyof NavCounts; countLa
 // No display or padding here: each link sets its own, so a `hidden`
 // never clashes with `inline-flex`.
 const navLinkClass =
-  "min-h-12 items-center rounded-full font-semibold text-ink no-underline hover:bg-white/60 hover:text-ink";
+  "min-h-12 items-center rounded-full font-semibold text-ink no-underline transition-colors duration-200 hover:bg-white/60 hover:text-ink";
 
 type SiteHeaderProps = {
   pet?: React.ComponentProps<typeof PetChip>;
   counts?: NavCounts;
+  /** The subject being studied, e.g. "Математик"; links to /subject to change it. */
+  subject?: string;
 };
 
 /** Header for student pages. Nav links move to MobileNav below lg (they don't fit on tablets). */
-export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
+export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderProps) {
   const pathname = usePathname();
   // The /pets evolution demo shows each stage here too.
   const preview = usePetPreview();
@@ -43,7 +46,11 @@ export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
       : realPet;
 
   return (
-    <header className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
+    // Named so it stays put while the page below animates (globals.css).
+    <header
+      style={{ viewTransitionName: "site-header" }}
+      className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]"
+    >
       <div className="flex items-center gap-6">
         <Link
           href="/"
@@ -60,8 +67,9 @@ export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`${navLinkClass} inline-flex gap-2 px-4 whitespace-nowrap xl:px-5 ${active ? "bg-lavender" : ""}`}
+                className={`${navLinkClass} relative isolate inline-flex gap-2 px-4 whitespace-nowrap xl:px-5`}
               >
+                {active && <NavPill name="header-pill" />}
                 {link.label}
                 {link.count && (
                   <NavBadge count={counts[link.count] ?? 0} label={`${counts[link.count] ?? 0} ${link.countLabel}`} />
@@ -72,6 +80,26 @@ export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
         </nav>
       </div>
       <div className="flex items-center gap-2">
+        <Link
+          href="/subject"
+          aria-label={subject ? `Хичээл: ${subject}. Солих` : "Хичээл сонгох"}
+          aria-current={pathname === "/subject" ? "page" : undefined}
+          className={`${navLinkClass} hidden gap-1.5 bg-surface px-4 text-sm sm:inline-flex`}
+        >
+          {subject ?? "Хичээл сонгох"}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="size-4 text-ink-muted"
+          >
+            <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
+          </svg>
+        </Link>
         {pet && <PetChip {...pet} />}
         {/* No teacher link: only students see this header, and /teacher sends them home. */}
         <form action={logOut}>

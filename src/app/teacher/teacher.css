@@ -1,32 +1,5 @@
 /* Teacher dashboard (design 5 · Багшийн самбар) */
 
-/* Outline around the highlighted student's column. --col is its 0-based
-   index; columns are 28px wide on mobile and fluid on desktop, 4px apart. */
-.heatmap-highlight {
-  left: calc(var(--col) * 32px - 5px);
-  width: 38px;
-}
-
-@media (width >= 48rem) {
-  .heatmap-highlight {
-    left: calc((100% - 124px) / 32 * var(--col) + var(--col) * 4px - 5px);
-    width: calc((100% - 124px) / 32 + 10px);
-  }
-}
-
-.heatmap-cell {
-  animation: heatmap-cell 0.3s ease-out both;
-}
-
-@keyframes heatmap-cell {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .teacher-toast {
   animation: teacher-toast 0.2s ease-out both;
 }

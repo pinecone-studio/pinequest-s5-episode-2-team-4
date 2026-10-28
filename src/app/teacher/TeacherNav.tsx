@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavPill } from "@/components/layout/NavPill";
 import { cn } from "@/lib/cn";
 
 const LINKS: { href: string; label: string; exact?: boolean; also?: string }[] = [
   { href: "/teacher", label: "Самбар", exact: true },
+  { href: "/teacher/students", label: "Сурагчид" },
   { href: "/teacher/videos", label: "Хичээлийн видео" },
   { href: "/teacher/assignments", label: "Даалгавар" },
   { href: "/teacher/history", label: "Түүх", also: "/teacher/english" },
@@ -38,15 +40,18 @@ export function TeacherNav({ variant, className }: TeacherNavProps) {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex items-center font-semibold whitespace-nowrap text-ink no-underline hover:text-ink",
+                  "relative isolate inline-flex items-center font-semibold whitespace-nowrap text-ink no-underline transition-colors duration-200 hover:text-ink",
                   variant === "bar"
-                    ? cn("min-h-12 rounded-full px-4 hover:bg-white/60 xl:px-5", active && "bg-lavender")
-                    : cn(
-                        "min-h-11 border-b-3 px-3 text-sm",
-                        active ? "border-primary text-primary hover:text-primary" : "border-transparent",
-                      ),
+                    ? "min-h-12 rounded-full px-4 hover:bg-white/60 xl:px-5"
+                    : cn("min-h-11 px-3 text-sm", active && "text-primary hover:text-primary"),
                 )}
               >
+                {active &&
+                  (variant === "bar" ? (
+                    <NavPill name="teacher-pill" />
+                  ) : (
+                    <NavPill name="teacher-tab" className="inset-x-0 bottom-0 h-0.75 rounded-full bg-primary" />
+                  ))}
                 {link.label}
               </Link>
             </li>

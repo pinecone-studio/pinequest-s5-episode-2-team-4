@@ -25,7 +25,7 @@ export function ClassGoalCard({ goal, className }: ClassGoalCardProps) {
           id="class-goal-title"
           className="type-section-title"
         >
-          {goal.classCode} ангийн зорилго
+          {goal.name} ангийн зорилго
         </h2>
         <p className="text-lg font-bold md:text-xl">
           {xp(goal.currentXp)}{" "}
