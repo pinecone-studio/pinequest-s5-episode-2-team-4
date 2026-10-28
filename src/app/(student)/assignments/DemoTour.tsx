@@ -3,6 +3,7 @@ import { switchDemoTour } from "@/lib/actions";
 import { cn } from "@/lib/cn";
 import { gameTitle } from "@/lib/gamefit";
 import type { StudentAssignment } from "@/lib/data";
+import { classLabel } from "@/lib/class-label";
 
 type Step = { title: string; text: string; state: "done" | "now" | "next" };
 
@@ -21,7 +22,7 @@ export function DemoTour({ assignment }: { assignment?: StudentAssignment }) {
     {
       title: "Тоглоом сонгоод ангидаа нийтлэв",
       text: assignment
-        ? `${assignment.games.map(gameTitle).join(", ")} · ${assignment.classCode} анги`
+        ? `${assignment.games.map(gameTitle).join(", ")} · ${classLabel(assignment.classCode)} анги`
         : "Ангийн бүх сурагчид нэг дор очно.",
       state: "done",
     },

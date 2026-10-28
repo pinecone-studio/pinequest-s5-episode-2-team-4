@@ -2,21 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavPill } from "@/components/layout/NavPill";
 import { cn } from "@/lib/cn";
 
 const LINKS: { href: string; label: string; exact?: boolean; also?: string }[] = [
   { href: "/teacher", label: "Самбар", exact: true },
+  { href: "/teacher/students", label: "Сурагчид" },
   { href: "/teacher/videos", label: "Хичээлийн видео" },
   { href: "/teacher/assignments", label: "Даалгавар" },
   { href: "/teacher/history", label: "Түүх", also: "/teacher/english" },
 ];
 
-/** The teacher's sections, under the header; scrolls sideways on phones. */
-export function TeacherNav() {
+type TeacherNavProps = {
+  /** "bar" sits in the header row (lg up); "tabs" is the header's second row below lg. */
+  variant: "bar" | "tabs";
+  className?: string;
+};
+
+/** The teacher's sections, inside the header: links on wide screens, scrolling tabs on phones. */
+export function TeacherNav({ variant, className }: TeacherNavProps) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Багшийн цэс" className="mx-auto w-full max-w-[1280px] px-4 md:px-[clamp(16px,4vw,40px)]">
-      <ul className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-2 md:gap-2">
+    <nav aria-label="Багшийн цэс" className={className}>
+      <ul
+        className={cn(
+          "flex",
+          variant === "bar" ? "gap-1" : "-mx-1 gap-1 overflow-x-auto px-1",
+        )}
+      >
         {LINKS.map((link) => {
           const active = link.exact
             ? pathname === link.href
@@ -27,10 +40,18 @@ export function TeacherNav() {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold no-underline md:text-base",
-                  active ? "bg-primary text-white hover:text-white" : "bg-surface text-ink hover:bg-lavender hover:text-ink",
+                  "relative isolate inline-flex items-center font-semibold whitespace-nowrap text-ink no-underline transition-colors duration-200 hover:text-ink",
+                  variant === "bar"
+                    ? "min-h-12 rounded-full px-4 hover:bg-white/60 xl:px-5"
+                    : cn("min-h-11 px-3 text-sm", active && "text-primary hover:text-primary"),
                 )}
               >
+                {active &&
+                  (variant === "bar" ? (
+                    <NavPill name="teacher-pill" />
+                  ) : (
+                    <NavPill name="teacher-tab" className="inset-x-0 bottom-0 h-0.75 rounded-full bg-primary" />
+                  ))}
                 {link.label}
               </Link>
             </li>

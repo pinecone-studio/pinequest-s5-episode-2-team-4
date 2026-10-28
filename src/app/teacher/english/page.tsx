@@ -4,9 +4,10 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { ProgressBar, buttonClass } from "@/components/ui";
 import { requireTeacher } from "@/lib/auth";
 import { cn } from "@/lib/cn";
-import { getBosses, getClassEnglish, getClassGoal } from "@/lib/data";
+import { getActiveClass, getBosses, getClassEnglish } from "@/lib/data";
 import type { BattleStatus } from "@/lib/types";
 import { SKILL_LABELS } from "@/app/(student)/pets/battle/labels";
+import { classLabel } from "@/lib/class-label";
 
 export const metadata: Metadata = {
   title: "Ангийн англи хэл · LevelUp",
@@ -38,8 +39,9 @@ const when = new Intl.DateTimeFormat("mn-MN", {
 export default async function ClassEnglishPage({ searchParams }: PageProps<"/teacher/english">) {
   await requireTeacher();
   const { class: asked } = await searchParams;
-  const goal = await getClassGoal();
-  const classCode = (typeof asked === "string" && asked.trim().slice(0, 10)) || goal.classCode;
+  // The class the teacher has open, unless the URL asks for another.
+  const active = await getActiveClass();
+  const classCode = (typeof asked === "string" && asked.trim().slice(0, 10)) || active?.code || "";
   const [view, bosses] = await Promise.all([getClassEnglish(classCode), getBosses()]);
 
   return (
@@ -49,8 +51,8 @@ export default async function ClassEnglishPage({ searchParams }: PageProps<"/tea
       </Link>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">
-            {view?.classCode ?? classCode} ангийн англи хэл
+          <h1 className="type-page-title">
+            {classLabel(view?.classCode ?? classCode)} ангийн англи хэл
           </h1>
           <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
             Боссын тулаанд өгсөн хариултаас ангиар нь нэгтгэсэн. Сурагчийн нэр, эрэмбэ энд гарахгүй.

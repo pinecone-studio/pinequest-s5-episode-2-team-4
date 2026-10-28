@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
 import { createVideoAction, recognizeMaterialAction } from "@/lib/teacher-actions";
-import type { CurriculumChapter, Recognition } from "@/lib/types";
+import type { CurriculumChapter, Recognition, ClassOption } from "@/lib/types";
 import { AiWorking } from "../../_content/AiWorking";
 import { MaterialForm } from "../../_content/MaterialForm";
 import { RecognitionEditor } from "../../_content/RecognitionEditor";
@@ -21,11 +21,11 @@ type Recognized = {
 /** Material → what the AI recognised (teacher fixes it) → draft reel script. */
 export function NewVideoFlow({
   curriculum,
-  classCodes,
+  classes,
   teacherSubject,
 }: {
   curriculum: CurriculumChapter[];
-  classCodes: string[];
+  classes: ClassOption[];
   /** The subject the teacher teaches */
   teacherSubject?: string;
 }) {
@@ -65,7 +65,7 @@ export function NewVideoFlow({
         ) : (
           <MaterialForm
             curriculum={curriculum}
-            classCodes={classCodes}
+            classes={classes}
             withClass
             teacherSubject={teacherSubject}
             submitLabel="✦ AI-аар уншуулах"
