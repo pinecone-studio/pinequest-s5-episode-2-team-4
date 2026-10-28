@@ -34,6 +34,9 @@ export type Account = {
   mastered?: string[];
   /** Teachers: the one subject they teach, picked at sign-up (subjects.ts id). */
   subject?: string;
+  /** Students in no class: the subject (subjects.ts id) and grade they practise on their own. */
+  practiceSubject?: string;
+  practiceGrade?: number;
   /** Game ids the student likes most, for assignments played "by interest". */
   favoriteGames?: string[];
   /** Lesson video ids the student has opened; the rest count as new in the menu. */
@@ -82,6 +85,9 @@ function secret() {
 
 const sign = (payload: string) =>
   createHmac("sha256", secret()).update(payload).digest("base64url");
+
+/** One-way key for a value (e.g. a student id); can't be reversed or guessed without SESSION_SECRET. */
+export const secretHash = (value: string) => sign(value);
 
 /** `payload.signature`, both base64url. */
 function encode(value: unknown) {

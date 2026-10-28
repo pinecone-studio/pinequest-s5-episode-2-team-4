@@ -143,6 +143,32 @@ export type User = {
   demo?: boolean;
 };
 
+/** A class a teacher created; its content (assignments, videos, …) is keyed by `code`. */
+export type SchoolClass = {
+  id: string;
+  /** Unique, e.g. "7А-4821"; what accounts.class_code points at */
+  code: string;
+  /** What the teacher calls it, e.g. "7А" */
+  name: string;
+  /** subjects.ts id: the teacher's subject */
+  subject: string;
+  grade: number;
+  studentCount?: number;
+  /** For students: who teaches it */
+  teacherName?: string;
+};
+
+/** A class a teacher can publish to: its code, and the name to show. */
+export type ClassOption = { code: string; name: string };
+
+/** A student in a teacher's class, as the teacher sees them. */
+export type ClassMember = {
+  id: string;
+  username: string;
+  /** Email or phone, whichever the student signed up with */
+  contact?: string;
+};
+
 /** Teacher heatmap cell; "untested" = has not taken the test. */
 export type HeatmapStatus = "weak" | "learning" | "good" | "untested";
 
@@ -223,6 +249,8 @@ export type Boss = {
 /** Shared class XP goal; every student's XP counts towards it. */
 export type ClassGoal = {
   classCode: string;
+  /** The class's name to show, e.g. "7А" */
+  name: string;
   targetXp: number;
   currentXp: number;
   reward: string;
@@ -287,6 +315,8 @@ export type UnderstandingSignal = {
 export type SignalSummary = {
   subtopicId: string;
   counts: Record<SignalLevel, number>;
+  /** When the first signal came in, "09:40" (Mongolian time) */
+  time: string;
 };
 
 // English boss battles (Grade 7, units from ECONTENT)

@@ -42,7 +42,7 @@ function FooterHeading({ children }: { children: React.ReactNode }) {
 
 function FullFooter({ pets = [] }: { pets?: PetStage[] }) {
   return (
-    <footer className="on-black bg-black text-sm text-lavender md:text-[15px]">
+    <footer className="on-black bg-night text-sm text-lavender md:text-base">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-3 gap-y-6 px-4 pt-7 pb-5 md:grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] md:gap-8 md:px-[clamp(16px,4vw,40px)] md:pt-12 md:pb-8">
         <div className="col-span-2 flex items-center justify-between gap-3 md:col-span-1 md:flex-col md:items-start md:gap-3.5">
           <Logo tone="light" />
@@ -88,7 +88,7 @@ function FullFooter({ pets = [] }: { pets?: PetStage[] }) {
 export function SiteFooter({ variant = "default", pets }: SiteFooterProps) {
   if (variant === "full") return <FullFooter pets={pets} />;
   return (
-    <footer className="on-black bg-black text-[13px] text-lavender">
+    <footer className="on-black bg-night text-sm text-lavender">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-[clamp(16px,4vw,40px)]">
         {variant === "auth" ? (
           <span>© 2026 LevelUp баг</span>

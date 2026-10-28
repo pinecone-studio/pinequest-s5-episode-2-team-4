@@ -7,9 +7,8 @@ const signalsFor = (subtopicId: string, time: string, s: string) =>
     codes[c] ? [{ studentNo: i + 1, subtopicId, level: codes[c], time }] : [],
   );
 
+/** The demo class's lessons today: two subtopics, so the dashboard shows two cards. */
 export const signals: UnderstandingSignal[] = [
   ...signalsFor("different-denominator", "09:40", "GLUG-ULGLGUUGLGL-GGLGUGLG-LGUG-L"),
-  ...signalsFor("simplify", "Өчигдөр", "GGUG-GGLUGUGG-GGUGULGGGU-GUGUG-G"),
-  ...signalsFor("mixed-numbers", "Өчигдөр", "GUGG-GUGGGLGG-GGGUGGGGGL-GGGG-GG"),
-  ...signalsFor("same-denominator", "Даваа", "GGGG-GGGGGUGG-GGGGGGGGGU-GGGGG-G"),
+  ...signalsFor("simplify", "11:20", "GGUG-GGLUGUGG-GGUGULGGGU-GUGUG-G"),
 ];

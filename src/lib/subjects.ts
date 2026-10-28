@@ -23,3 +23,9 @@ export const TEACHER_SUBJECTS: TeacherSubject[] = [
 export const teacherSubject = (id: unknown) => TEACHER_SUBJECTS.find((s) => s.id === id);
 
 export const subjectTitle = (id: string) => teacherSubject(id)?.title ?? id;
+
+/** School grades a student in no class can pick to practise. */
+export const GRADES = [6, 7, 8, 9, 10, 11, 12];
+
+/** Grades with content so far; the rest show as coming soon. */
+export const OPEN_GRADES = [7];

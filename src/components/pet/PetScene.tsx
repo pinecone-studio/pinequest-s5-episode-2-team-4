@@ -70,14 +70,14 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
 // Fixed artwork colors from the design, like the sprites: the scene looks
 // the same in the dark theme.
 const C = {
-  sky: "#bfefff",
-  lavender: "#dad9ff",
-  pink: "#fce7f6",
-  hill: "#cac4f4",
-  ground: "#f2f1ff",
-  primary: "#5b00ed",
-  magenta: "#e30ba6",
-  night: "#3f0791",
+  sky: "#d2ebf4",
+  lavender: "#e0def7",
+  pink: "#fbecf5",
+  hill: "#d0cbeb",
+  ground: "#f2f1fb",
+  primary: "#7039d0",
+  magenta: "#b23886",
+  night: "#4f2e84",
   white: "#ffffff",
 };
 

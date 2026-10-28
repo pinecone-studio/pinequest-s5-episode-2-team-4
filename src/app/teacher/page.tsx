@@ -11,7 +11,7 @@ import {
   getHeatmap,
   getNotifications,
   getQuestionGroups,
-  getSignalSummary,
+  getTodaySignals,
   getSubtopics,
   getTeacherClassBattle,
 } from "@/lib/data";
@@ -53,7 +53,7 @@ export default async function TeacherPage() {
     getHeatmap(),
     getNotifications(),
     getAssignmentDraft(),
-    getSignalSummary(),
+    getTodaySignals(),
     getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
@@ -98,7 +98,7 @@ export default async function TeacherPage() {
         notificationCount={alertCount}
       />
       {user && !user.subject ? <SubjectPrompt className="md:mt-5" /> : null}
-      <ClassBattleCard bosses={bosses} subjects={battleSubjects} teacherSubjectTitle={user?.subject && subjectTitle(user.subject)} open={classBattle} classCode={user?.classCode ?? classGoal.classCode} className="md:mt-5" />
+      <ClassBattleCard bosses={bosses} subjects={battleSubjects} teacherSubjectTitle={user?.subject && subjectTitle(user.subject)} open={classBattle} classCode={user?.classCode ?? ""} className="md:mt-5" />
       <Heatmap
         rows={rows}
         testedCount={overview.testedCount}
@@ -126,7 +126,7 @@ export default async function TeacherPage() {
       </div>
       <QuestionGroups groups={questionGroups} className="md:mt-5" />
       <PeerApproval questions={pendingAnswers} className="md:mt-5" />
-      <ClassGoalCard goal={classGoal} className="md:mt-5" />
+      {classGoal && <ClassGoalCard goal={classGoal} className="md:mt-5" />}
     </div>
   );
 }

@@ -2,18 +2,35 @@
 
 /* Design tokens from the LevelUp design. */
 @theme {
-  --color-primary: #5b00ed;
-  --color-primary-dark: #3f0791;
-  --color-ink: #3f0791;
-  --color-ink-muted: #6539a7;
-  --color-surface: #f2f1ff;
-  --color-surface-soft: #f5f4ff;
-  --color-lavender: #dad9ff;
-  --color-line: #cac4f4;
-  --color-sky: #bfefff;
-  --color-sky-dark: #9fd8ec;
-  --color-magenta: #e30ba6;
-  --color-pink: #fce7f6;
+  /* The original LevelUp hues (violet, sky, magenta) with the saturation turned
+     down so long sessions don't tire the eyes. Violet is the brand and its
+     tints (lavender, line) tint the neutrals; sky marks "good"; magenta is the
+     signal colour for weak and alerts. All text pairs pass 4.5:1. */
+  --color-primary: #7039d0;
+  --color-primary-dark: #4f2e84;
+  --color-ink: #3d2862;
+  --color-ink-muted: #6d5c8a;
+  --color-surface: #f2f1fb;
+  --color-surface-soft: #f8f7fd;
+  --color-lavender: #e0def7;
+  --color-line: #d0cbeb;
+  --color-sky: #d2ebf4;
+  --color-sky-dark: #aad1df;
+  --color-magenta: #b23886;
+  --color-pink: #fbecf5;
+  /* Violet-black for the footer and toasts instead of pure black. */
+  --color-night: #1e172b;
+  /* Card and panel background; dark mode swaps it in theme.css. */
+  --color-card: #ffffff;
+  /* Progress statuses as a soft traffic light, matching the 🟢🟡🔴 signals
+     students send: a pastel fill with a darker ink of the same hue for the
+     icon or number on it (each pair passes 4.5:1). */
+  --color-status-good: #d0ecdc;
+  --color-status-good-ink: #216342;
+  --color-status-mid: #f9e6b8;
+  --color-status-mid-ink: #865013;
+  --color-status-weak: #f4bdc5;
+  --color-status-weak-ink: #99293b;
 
   --font-sans: var(--font-nunito), system-ui, sans-serif;
 
@@ -29,8 +46,9 @@
   --radius-card: 20px;
   --radius-panel: 28px;
 
-  --shadow-card: rgba(0, 0, 0, 0.08) 0 15px 50px;
-  --shadow-float: rgba(0, 0, 0, 0.1) 0 20px 60px;
+  /* Shadows carry the ink hue instead of flat grey. */
+  --shadow-card: rgb(61 40 98 / 0.08) 0 15px 50px;
+  --shadow-float: rgb(61 40 98 / 0.11) 0 20px 60px;
   /* "3D" buttons: solid offset shadow that collapses on press */
   --shadow-3d: 0 6px 0 var(--color-primary-dark);
   --shadow-3d-soft: 0 6px 0 var(--color-line);
@@ -39,6 +57,9 @@
   --animate-flow: flow 18s ease-in-out infinite alternate;
   --animate-word: word 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-pulse-ring: pulse-ring 1.8s ease-in-out infinite;
+
+  /* Motion: a soft ease-out for UI that settles into place. */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
   @keyframes word {
     from {
@@ -59,12 +80,12 @@
     100% {
       box-shadow:
         0 8px 0 var(--color-primary-dark),
-        0 0 0 0 rgb(91 0 237 / 0.35);
+        0 0 0 0 rgb(112 57 208 / 0.3);
     }
     50% {
       box-shadow:
         0 8px 0 var(--color-primary-dark),
-        0 0 0 14px rgb(91 0 237 / 0);
+        0 0 0 14px rgb(112 57 208 / 0);
     }
   }
 
@@ -88,14 +109,14 @@
   }
 }
 
-/* Soft multi-color hero background used on most screens */
+/* Soft multi-colour hero background used on most screens */
 @utility bg-flow {
   background-color: var(--color-surface-soft);
   background-image:
-    radial-gradient(closest-side at 18% 24%, rgb(191 239 255 / 0.95), rgb(191 239 255 / 0)),
-    radial-gradient(closest-side at 84% 18%, rgb(202 196 244 / 0.95), rgb(202 196 244 / 0)),
-    radial-gradient(closest-side at 70% 80%, rgb(218 217 255), rgb(218 217 255 / 0)),
-    radial-gradient(closest-side at 22% 86%, rgb(227 11 166 / 0.12), rgb(227 11 166 / 0));
+    radial-gradient(closest-side at 18% 24%, rgb(210 235 244 / 0.85), rgb(210 235 244 / 0)),
+    radial-gradient(closest-side at 84% 18%, rgb(208 203 235 / 0.8), rgb(208 203 235 / 0)),
+    radial-gradient(closest-side at 70% 80%, rgb(224 222 247), rgb(224 222 247 / 0)),
+    radial-gradient(closest-side at 22% 86%, rgb(178 56 134 / 0.08), rgb(178 56 134 / 0));
   background-size: 180% 180%;
 }
 
@@ -121,6 +142,129 @@
   }
 }
 
+/* Page navigation (PageTransition, NavPill): the headers stay put, the old
+   page leaves quickly, the new one fades in and rises 8px, and the current
+   tab's pill slides to the new tab. */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(bottom-nav) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-old(bottom-nav) {
+  display: none;
+}
+
+::view-transition-new(site-header),
+::view-transition-new(bottom-nav) {
+  animation: none;
+}
+
+/* Under the anchored headers (transparent snapshots), so the tab labels stay
+   readable while the pill slides beneath them. */
+::view-transition-group(.nav-pill) {
+  z-index: 99;
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-soft);
+}
+
+::view-transition-old(.page-out) {
+  animation: 120ms ease-in both page-fade reverse;
+}
+
+::view-transition-new(.page-in) {
+  animation:
+    220ms var(--ease-soft) 80ms both page-fade,
+    320ms var(--ease-soft) both page-rise;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes page-rise {
+  from {
+    translate: 0 8px;
+  }
+}
+
+/* <details> (e.g. the teacher's results list) opens and closes smoothly
+   where the browser can animate to height: auto. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  details::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size 260ms var(--ease-soft),
+      content-visibility 260ms allow-discrete;
+  }
+
+  details[open]::details-content {
+    block-size: auto;
+  }
+}
+
+/* Modal dialogs (e.g. the class QR) grow in and their backdrop fades. */
+dialog {
+  opacity: 0;
+  scale: 0.96;
+  transition:
+    opacity 200ms var(--ease-soft),
+    scale 200ms var(--ease-soft),
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+
+dialog[open] {
+  opacity: 1;
+  scale: 1;
+}
+
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+
+dialog::backdrop {
+  opacity: 0;
+  transition:
+    opacity 200ms ease-out,
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+
+dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
 @layer base {
   body {
     @apply bg-white font-sans text-ink;
@@ -128,6 +272,21 @@
 
   a {
     @apply text-primary hover:text-primary-dark;
+  }
+
+  /* Hover and selected states ease in instead of snapping. Anything with its
+     own transition-* utility keeps it (utilities win over base); the focus
+     outline stays instant. */
+  a,
+  button,
+  summary,
+  label,
+  input,
+  select,
+  textarea {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
   }
 
   :focus-visible {
