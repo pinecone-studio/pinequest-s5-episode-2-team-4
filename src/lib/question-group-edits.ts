@@ -1,4 +1,4 @@
-// The teacher's changes to question groups: rename, merge and answer. Every
+// The teacher's changes to question groups: rename and answer. Every
 // change is limited to the teacher's own class.
 
 import "server-only";
@@ -65,20 +65,6 @@ export async function renameGroup(classCode: string, id: string, title: string) 
     .update({ title: title.slice(0, MAX_TITLE_LENGTH), source: "teacher", updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw new Error(`Could not rename the group: ${error.message}`);
-}
-
-/** Moves `fromId`'s questions into `intoId` (same lesson) and removes `fromId`. */
-export async function mergeGroups(classCode: string, fromId: string, intoId: string) {
-  if (fromId === intoId) throw new Error("Cannot merge a group into itself");
-  const [from, into] = await Promise.all([findGroup(classCode, fromId), findGroup(classCode, intoId)]);
-  if (from.subtopic_id !== into.subtopic_id) throw new Error("Groups are from different lessons");
-
-  const moved = await db().from("anon_questions").update({ group_id: intoId }).eq("group_id", fromId);
-  if (moved.error) throw new Error(`Could not move the questions: ${moved.error.message}`);
-  // The moved questions get the answer the class already has.
-  if (into.status === "answered" && into.answer) await shareAnswer(intoId, into.answer, into.material);
-  const removed = await db().from("question_groups").delete().eq("id", fromId);
-  if (removed.error) throw new Error(`Could not remove the old group: ${removed.error.message}`);
 }
 
 /** One answer for the whole group, with optional material; students see it beside the lesson. */

@@ -257,6 +257,8 @@ export type AnonQuestion = {
   answer?: QuestionAnswer;
   /** The AI thinks the teacher should look first (off-topic, unclear or rude). */
   needsReview?: boolean;
+  /** The wrong idea the AI sees behind the question, for the teacher. */
+  misconception?: string;
 };
 
 /** Similar questions grouped (as if by AI) so the teacher answers once. */

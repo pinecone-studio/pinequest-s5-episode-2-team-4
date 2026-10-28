@@ -6,7 +6,7 @@
 import { refresh } from "next/cache";
 import { parseMaterial } from "./answer-material";
 import { getCurrentUser, questionClass } from "./data";
-import { answerGroup, mergeGroups, renameGroup } from "./question-group-edits";
+import { answerGroup, renameGroup } from "./question-group-edits";
 import { questionsStored } from "./questions";
 
 /** ok, or why not: login: not a teacher; empty: nothing typed; offline: no database; failed: try again. */
@@ -33,10 +33,6 @@ export async function renameQuestionGroup(groupId: string, title: string): Promi
   const name = clean(title);
   if (!name) return { error: "empty" };
   return asTeacher((classCode) => renameGroup(classCode, String(groupId), name));
-}
-
-export async function mergeQuestionGroups(fromId: string, intoId: string): Promise<GroupResult> {
-  return asTeacher((classCode) => mergeGroups(classCode, String(fromId), String(intoId)));
 }
 
 export async function answerQuestionGroup(groupId: string, text: string, material?: unknown): Promise<GroupResult> {
