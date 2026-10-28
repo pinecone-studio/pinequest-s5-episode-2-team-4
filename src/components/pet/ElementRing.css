@@ -1,12 +1,13 @@
 /*
  * Animated ring around a pet chip, one look per element. Element hues live
- * here because the design tokens have no per-element palette. Motion is
+ * here because the design tokens have no per-element palette; they are muted
+ * (saturate filter, lower glow alpha) to match the soft palette. Motion is
  * switched off globally by prefers-reduced-motion in globals.css.
  */
 
 .el-ring {
-  --el-a: #5b00ed;
-  --el-b: #bfefff;
+  --el-a: #7039d0;
+  --el-b: #d2ebf4;
   position: relative;
   isolation: isolate;
 }
@@ -22,6 +23,7 @@
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
   mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
   animation: el-spin 6s linear infinite;
+  filter: saturate(0.65);
 }
 
 /* Effect layer over the chip; each element draws something different */
@@ -31,6 +33,7 @@
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
+  filter: saturate(0.65);
 }
 
 .el-body {
@@ -61,14 +64,14 @@
   animation: el-flicker 1.3s infinite;
 }
 .el-ring[data-element="fire"]::after {
-  background: radial-gradient(circle at 50% 100%, rgb(255 120 0 / 0.45), transparent 65%);
+  background: radial-gradient(circle at 50% 100%, rgb(255 120 0 / 0.27), transparent 65%);
   animation: el-ember 1.3s ease-in-out infinite;
 }
 @keyframes el-flicker {
-  0%, 100% { box-shadow: 0 0 10px 1px rgb(255 90 0 / 0.55); }
-  20% { box-shadow: 0 0 18px 4px rgb(255 140 0 / 0.7); }
-  45% { box-shadow: 0 0 8px 0 rgb(255 70 0 / 0.45); }
-  70% { box-shadow: 0 0 20px 5px rgb(255 170 0 / 0.65); }
+  0%, 100% { box-shadow: 0 0 10px 1px rgb(255 90 0 / 0.33); }
+  20% { box-shadow: 0 0 18px 4px rgb(255 140 0 / 0.42); }
+  45% { box-shadow: 0 0 8px 0 rgb(255 70 0 / 0.27); }
+  70% { box-shadow: 0 0 20px 5px rgb(255 170 0 / 0.39); }
 }
 @keyframes el-ember {
   0%, 100% { opacity: 0.5; transform: translateY(2px) scale(0.96); }
@@ -103,15 +106,15 @@
   animation: el-ripple 3.4s ease-out infinite;
 }
 @keyframes el-grow {
-  0%, 100% { box-shadow: 0 0 8px 0 rgb(80 190 90 / 0.4); }
-  50% { box-shadow: 0 0 20px 4px rgb(110 210 90 / 0.55); }
+  0%, 100% { box-shadow: 0 0 8px 0 rgb(80 190 90 / 0.24); }
+  50% { box-shadow: 0 0 20px 4px rgb(110 210 90 / 0.33); }
 }
 
 /* Ice: a glint sweeps across */
 .el-ring[data-element="ice"] {
   --el-a: #6ecbff;
   --el-b: #ffffff;
-  box-shadow: 0 0 14px 1px rgb(140 215 255 / 0.65);
+  box-shadow: 0 0 14px 1px rgb(140 215 255 / 0.39);
 }
 .el-ring[data-element="ice"]::before {
   animation-duration: 9s;
@@ -129,7 +132,7 @@
   animation: el-drift 4s ease-in-out infinite;
 }
 .el-ring[data-element="sky"]::after {
-  border: 2px dashed rgb(124 92 255 / 0.55);
+  border: 2px dashed rgb(124 92 255 / 0.33);
   inset: -9px;
   animation: el-spin-rev 10s linear infinite;
 }
@@ -142,7 +145,7 @@
 .el-ring[data-element="metal"] {
   --el-a: #5f6b7a;
   --el-b: #e3e8ef;
-  box-shadow: 0 0 10px 0 rgb(95 107 122 / 0.4);
+  box-shadow: 0 0 10px 0 rgb(95 107 122 / 0.24);
 }
 .el-ring[data-element="metal"]::after {
   background: linear-gradient(115deg, transparent 42%, rgb(255 255 255 / 0.9) 50%, transparent 58%);
@@ -156,7 +159,7 @@
   --el-b: #e0b36a;
 }
 .el-ring[data-element="earth"]::after {
-  border: 2px solid rgb(170 120 60 / 0.7);
+  border: 2px solid rgb(170 120 60 / 0.42);
   animation: el-ripple 3s ease-out infinite;
 }
 .el-ring[data-element="earth"] .el-body {
@@ -174,13 +177,13 @@
 .el-ring[data-element="shadow"] {
   --el-a: #2b0a5e;
   --el-b: #b04dff;
-  box-shadow: 0 0 14px 2px rgb(90 20 160 / 0.5);
+  box-shadow: 0 0 14px 2px rgb(90 20 160 / 0.3);
 }
 .el-ring[data-element="shadow"]::before {
   animation: el-spin-rev 3.5s linear infinite;
 }
 .el-ring[data-element="shadow"]::after {
-  background: radial-gradient(circle, transparent 35%, rgb(60 10 120 / 0.45) 100%);
+  background: radial-gradient(circle, transparent 35%, rgb(60 10 120 / 0.27) 100%);
   animation: el-breathe 3s ease-in-out infinite;
 }
 @keyframes el-breathe {
