@@ -2,15 +2,30 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { askQuestion, setMeToo as saveMeToo, type AskResult } from "@/lib/question-actions";
 import type { AnonQuestion } from "@/lib/types";
 
 /** XP a helper gets once the teacher approves the answer. */
 const HELP_XP = 10;
 
 type QuestionPanelProps = {
+  /** Lesson the questions belong to. */
+  subtopicId: string;
   /** Classmates' anonymous questions on this subtopic. */
   questions: AnonQuestion[];
 };
+
+const WAITING = "Багш эсвэл ангийнхны хариуг хүлээж байна";
+
+/** Line under a question the student sent, from what the server said. */
+function sentNote(result: AskResult) {
+  if (!("error" in result)) {
+    return result.duplicate ? "Ангийнхан ч яг ингэж асуусан байна · «Би ч бас» нэмэгдлээ" : WAITING;
+  }
+  if (result.error === "login") return "Асуухын тулд нэвтэрнэ үү";
+  if (result.error === "failed") return "Илгээж чадсангүй. Дахин оролдоорой";
+  return WAITING;
+}
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -23,10 +38,10 @@ const iconProps = {
 
 /**
  * Anonymous questions beside the lesson: the teacher or a classmate answers,
- * not the AI. Mock: new questions and «Би ч бас» stay in local state.
+ * not the AI. New questions and «Би ч бас» are saved on the server.
  */
-export function QuestionPanel({ questions }: QuestionPanelProps) {
-  const [mine, setMine] = useState<string[]>([]);
+export function QuestionPanel({ subtopicId, questions }: QuestionPanelProps) {
+  const [mine, setMine] = useState<{ text: string; note: string }[]>([]);
   const [draft, setDraft] = useState("");
   const [meToo, setMeToo] = useState<Set<string>>(new Set());
   // One kudos per answer; there is no way to leave a negative reaction.
@@ -41,11 +56,19 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
   const open = questions.filter((q) => !q.answer?.approved);
 
   function toggleMeToo(id: string) {
+    void saveMeToo(id, !meToo.has(id));
     setMeToo((prev) => {
       const next = new Set(prev);
       if (!next.delete(id)) next.add(id);
       return next;
     });
+  }
+
+  async function send(text: string) {
+    const index = mine.length;
+    setMine((prev) => [...prev, { text, note: "Илгээж байна…" }]);
+    const note = sentNote(await askQuestion(subtopicId, text));
+    setMine((prev) => prev.map((m, i) => (i === index ? { ...m, note } : m)));
   }
 
   return (
@@ -82,11 +105,11 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
         {mine.length > 0 ? (
           <div className="flex flex-col gap-2">
             <h3 className="text-sm font-bold text-ink-muted">Миний асуулт</h3>
-            {mine.map((text, i) => (
+            {mine.map(({ text, note }, i) => (
               <div key={i} className="rounded-card bg-primary px-3.5 py-2.5 text-white">
                 <p className="text-[15px]">{text}</p>
-                <p className="mt-1 text-xs font-semibold opacity-80">
-                  Багш эсвэл ангийнхны хариуг хүлээж байна
+                <p role="status" className="mt-1 text-xs font-semibold opacity-80">
+                  {note}
                 </p>
               </div>
             ))}
@@ -239,7 +262,7 @@ export function QuestionPanel({ questions }: QuestionPanelProps) {
           e.preventDefault();
           const text = draft.trim();
           if (!text) return;
-          setMine((prev) => [...prev, text]);
+          void send(text);
           setDraft("");
         }}
         className="mx-3.5 mt-3 mb-4 flex items-center gap-2 rounded-full border-2 border-line bg-white py-1 focus-within:border-primary pr-1 pl-4 md:mx-4.5 md:mt-4 md:mb-5 md:py-1.5 md:pr-1.5 md:pl-4.5"
