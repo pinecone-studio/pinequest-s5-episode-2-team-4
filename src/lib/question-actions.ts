@@ -3,8 +3,10 @@
 // Server Functions for the anonymous question box beside a lesson. The
 // student must be logged in, but who asked is never stored.
 
+import { after } from "next/server";
 import { questionClass } from "./data";
 import { subtopics } from "./mock/topics";
+import { groupLesson } from "./question-groups";
 import { cleanQuestion } from "./question-text";
 import { changeMeToo, questionsStored, saveQuestion } from "./questions";
 import { readSession } from "./session";
@@ -22,7 +24,11 @@ export async function askQuestion(subtopicId: string, text: string): Promise<Ask
   if (!clean || !subtopics.some((s) => s.id === subtopicId)) return { error: "empty" };
   if (!questionsStored()) return { error: "offline" };
   try {
-    return await saveQuestion(await questionClass(), subtopicId, clean);
+    const classCode = await questionClass();
+    const saved = await saveQuestion(classCode, subtopicId, clean);
+    // Grouping waits for the AI, so it runs after the student has the reply.
+    if (!saved.duplicate) after(() => groupLesson(classCode, subtopicId).catch(console.error));
+    return saved;
   } catch (error) {
     console.error(error);
     return { error: "failed" };
