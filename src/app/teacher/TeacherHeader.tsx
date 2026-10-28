@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { logOut } from "@/lib/actions";
-import { getClassOverview, getCurrentUser, getTopic } from "@/lib/data";
+import { getActiveClass } from "@/lib/data";
 import { subjectTitle } from "@/lib/subjects";
 import { TeacherNav } from "./TeacherNav";
 
@@ -11,11 +11,8 @@ import { TeacherNav } from "./TeacherNav";
  * sections move to a second row of tabs inside the header.
  */
 export async function TeacherHeader() {
-  const [overview, user] = await Promise.all([getClassOverview(), getCurrentUser()]);
-  const topic = await getTopic(overview.topicId);
-  // The teacher's own class and subject; the mock class until they have them.
-  const classCode = user?.classCode ?? overview.code;
-  const label = user?.subject ? subjectTitle(user.subject) : topic?.title;
+  // The layout makes sure there is one.
+  const active = await getActiveClass();
 
   return (
     <header className="mb-6 border-b border-line md:mb-8">
@@ -35,17 +32,28 @@ export async function TeacherHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* TODO: becomes a class picker once a teacher can have several classes */}
-          <p className="inline-flex h-12 items-center gap-2 rounded-full bg-surface px-1.5 text-sm font-bold sm:pr-4">
-            <span
-              aria-hidden="true"
-              className="flex h-9 min-w-9 items-center justify-center rounded-full bg-primary px-2 text-sm text-white"
-            >
-              {classCode}
+          <Link
+            href="/classes"
+            aria-label={`Анги ${active?.name}, ${active ? subjectTitle(active.subject) : ""}. Анги солих`}
+            className="inline-flex h-12 items-center gap-2 rounded-full bg-surface px-1.5 text-sm font-bold text-ink no-underline hover:bg-lavender hover:text-ink sm:pr-3"
+          >
+            <span className="flex h-9 min-w-9 items-center justify-center rounded-full bg-primary px-2 text-sm text-white">
+              {active?.name}
             </span>
-            <span className="sr-only">Анги {classCode}, </span>
-            <span className="hidden sm:inline">{label}</span>
-          </p>
+            <span className="hidden sm:inline">{active && subjectTitle(active.subject)}</span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="mr-1 size-4 text-ink-muted"
+            >
+              <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
+            </svg>
+          </Link>
           <form action={logOut}>
             {/* Icon only on mobile, where the header is tight. */}
             <button
