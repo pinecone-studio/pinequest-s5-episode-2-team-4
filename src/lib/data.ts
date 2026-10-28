@@ -19,6 +19,7 @@ import { battleHistory, classEnglish } from "./history";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { findResetAccount } from "./password-reset";
 import { englishProgress } from "./progress";
+import { listGroups, listQuestions, questionsStored } from "./questions";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import { readSession } from "./session";
 import { streakSummary } from "./streak";
@@ -413,13 +414,37 @@ export async function getClassGoal(): Promise<ClassGoal> {
 
 // Anonymous questions (answered by the teacher or classmates, not the AI)
 
+/** Class whose questions a user sees; the demo class when they have none. */
+export async function questionClass() {
+  return (await getCurrentUser())?.classCode ?? classOverview.code;
+}
+
+/**
+ * Stored questions when Supabase is set up; the sample questions otherwise,
+ * and also if loading fails (e.g. the 0011 migration hasn't been run yet),
+ * so the lesson and dashboard always show something.
+ */
 export async function getAnonQuestions(subtopicId?: string): Promise<AnonQuestion[]> {
+  if (questionsStored()) {
+    try {
+      return await listQuestions(await questionClass(), subtopicId);
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return subtopicId
     ? anonQuestions.filter((q) => q.subtopicId === subtopicId)
     : anonQuestions;
 }
 
 export async function getQuestionGroups(): Promise<QuestionGroup[]> {
+  if (questionsStored()) {
+    try {
+      return await listGroups(await questionClass());
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return questionGroups;
 }
 
