@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
-import { assignmentDemoLogIn, demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
+import { demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { FormError } from "../_components/FormError";
@@ -132,31 +132,14 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         </button>
       </form>
 
-      {/* Their own forms: forms can't be nested. Always a fresh demo account. */}
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <form action={demoLogIn}>
-          <button
-            type="submit"
-            className={buttonClass({ variant: "secondary", className: "w-full" })}
-          >
-            Сурагчаар демо
-          </button>
-        </form>
-        <form action={demoTeacherLogIn}>
-          <button
-            type="submit"
-            className={buttonClass({ variant: "secondary", className: "w-full" })}
-          >
-            Багшаар демо
-          </button>
-        </form>
-      </div>
-      <form action={assignmentDemoLogIn} className="mt-2">
+      {/* Its own form: forms can't be nested. Follows the role toggle and
+          always logs in to a fresh demo account. */}
+      <form action={isStudent ? demoLogIn : demoTeacherLogIn} className="mt-4">
         <button
           type="submit"
-          className={buttonClass({ variant: "white", className: "w-full" })}
+          className={buttonClass({ variant: "secondary", className: "w-full" })}
         >
-          ▶ Даалгаврын демо: багшаас сурагч хүртэл
+          {isStudent ? "Сурагчийн демо" : "Багшийн демо"}
         </button>
       </form>
 
