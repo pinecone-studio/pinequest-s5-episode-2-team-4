@@ -4,6 +4,7 @@
 
 import "server-only";
 import { classifyQuestion, type ExistingGroup } from "./ai";
+import { groupAnswer } from "./question-group-edits";
 import { subtopics } from "./mock/topics";
 import { getSupabaseAdmin } from "./supabase";
 
@@ -63,6 +64,8 @@ export async function groupQuestion(questionId: string) {
     const result = await classifyQuestion({ text: q.text, lessonTitle, groups });
 
     let groupId = result.groupId;
+    // Joining a group the teacher already answered: the student gets that answer too.
+    const answer = groupId ? await groupAnswer(groupId) : null;
     if (!groupId) {
       const created = await db()
         .from("question_groups")
@@ -77,6 +80,7 @@ export async function groupQuestion(questionId: string) {
       .from("anon_questions")
       .update({
         group_id: groupId,
+        ...(answer && { answer }),
         classify_status: "done",
         classify_attempts: attempts,
         topic: result.title,

@@ -26,6 +26,17 @@ async function findGroup(classCode: string, id: string): Promise<Group> {
 
 const teacherAnswer = (text: string): QuestionAnswer => ({ by: "teacher", text, approved: true, kudos: 0 });
 
+/** The answer a question joining this group should get, if the teacher already answered it. */
+export async function groupAnswer(groupId: string): Promise<QuestionAnswer | null> {
+  const { data, error } = await db()
+    .from("question_groups")
+    .select("status, answer")
+    .eq("id", groupId)
+    .maybeSingle<Pick<Group, "status" | "answer">>();
+  if (error) throw new Error(`Could not load the group answer: ${error.message}`);
+  return data?.status === "answered" && data.answer ? teacherAnswer(data.answer) : null;
+}
+
 /** Gives every question in the group the teacher's answer. */
 async function shareAnswer(groupId: string, text: string) {
   const { error } = await db().from("anon_questions").update({ answer: teacherAnswer(text) }).eq("group_id", groupId);
