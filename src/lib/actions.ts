@@ -10,7 +10,7 @@ import { lessons } from "./mock/lessons";
 import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
 import { subtopics } from "./mock/topics";
-import { XP_PER_LEVEL, addXp } from "./pets";
+import { XP_PER_LEVEL, addXp, isStarterPet } from "./pets";
 import { clearSession, readSession, startSession, writeSession } from "./session";
 import type { User } from "./types";
 import { recordLearningDay } from "./streak";
@@ -42,7 +42,7 @@ function homeFor(role: User["role"]) {
   return role === "teacher" ? "/teacher" : "/";
 }
 
-/** A new account: the chosen pet starts at level 1 with no test taken. */
+/** A new account: a student's chosen starter pet begins at level 1 with no test taken. */
 export async function signUp(
   credentials: Credentials & { petLineId?: string },
 ): Promise<AuthError | void> {
@@ -50,7 +50,8 @@ export async function signUp(
   const email = cleanEmail(credentials.email);
   if (!username || !email) throw new Error("Username and email are required");
   const role = credentials.role === "teacher" ? "teacher" : "student";
-  const line = petLines.find((l) => l.id === credentials.petLineId);
+  const line = petLines.find((l) => l.id === credentials.petLineId && isStarterPet(l));
+  if (role === "student" && !line) throw new Error("Students start with a common pet");
 
   const result = await createAccount({
     username,
@@ -79,9 +80,9 @@ export async function logIn(credentials: Credentials): Promise<AuthError | void>
   redirect(homeFor(account.role));
 }
 
-/** Logs in a new throwaway demo student: Wrougon at level 1, no test taken yet. */
+/** Logs in a new throwaway demo student: Dollfin, a common pet, at level 1, no test taken yet. */
 export async function demoLogIn() {
-  const account = await createDemoAccount({ pet: { lineId: "wrougon", level: 1, xp: 0 } });
+  const account = await createDemoAccount({ pet: { lineId: "dollfin", level: 1, xp: 0 } });
   await startSession(account.id);
   redirect("/");
 }

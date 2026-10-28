@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPetLines } from "@/lib/data";
+import { isStarterPet } from "@/lib/pets";
 import { FloatingPets } from "../_components/FloatingPets";
 import { SignupForm } from "./SignupForm";
 
@@ -29,7 +30,7 @@ export default async function SignupPage() {
         <h1 className="text-center text-[32px] leading-tight font-bold tracking-tight md:text-5xl">
           Бүртгүүлэх
         </h1>
-        <SignupForm petLines={petLines} />
+        <SignupForm petLines={petLines.filter(isStarterPet)} />
       </div>
     </main>
   );
