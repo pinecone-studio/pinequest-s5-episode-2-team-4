@@ -38,6 +38,15 @@ import {
 } from "./content";
 import { isAssignmentGame } from "./gamefit";
 import { grade7MathCurriculum } from "./mock/curriculum";
+import { DEMO_CLASS_CODE } from "./accounts";
+import {
+  classesStored,
+  countClassMembers,
+  findInviteClass,
+  listClassMembers,
+  listStudentClasses,
+  listTeacherClasses,
+} from "./classes";
 import { readSession } from "./session";
 import { findSignal, listDaySignals, signalsStored, summarizeSignals } from "./signals";
 import { learningDay, streakSummary } from "./streak";
@@ -77,6 +86,8 @@ import type {
   TestResult,
   Topic,
   User,
+  SchoolClass,
+  ClassMember,
 } from "./types";
 import {
   helperConversation,
@@ -516,11 +527,18 @@ export async function getMySignal(subtopicId: string): Promise<SignalLevel | und
   }
 }
 
-/** Subjects that have game questions, without the questions themselves. */
+/**
+ * Subjects that have game questions, without the questions themselves: only
+ * those of the student's subject (their class's, or the one they practise)
+ * when they have one, all of them otherwise.
+ */
 export async function getGameSubjects(): Promise<
   Pick<GameSubject, "id" | "title">[]
 > {
-  return gameSubjects.map(({ id, title }) => ({ id, title }));
+  const all = gameSubjects.map(({ id, title }) => ({ id, title }));
+  const topics = teacherSubject((await getStudentSubject())?.subject)?.battleTopics;
+  const mine = topics ? all.filter((s) => topics.includes(s.id)) : [];
+  return mine.length ? mine : all;
 }
 
 /** All questions of one game subject, or undefined for an unknown id. */
@@ -577,7 +595,9 @@ export async function getAssignmentReport(assignmentId: string): Promise<Assignm
 
 /** How many students are in a class, to show "12 / 30 finished". */
 export async function getClassSize(classCode: string): Promise<number> {
-  return (await teacherId()) ? countClassStudents(classCode) : 0;
+  if (!(await teacherId())) return 0;
+  // Students can be in several classes, so count members, not accounts pointing at it.
+  return (await countClassMembers(classCode).catch(() => undefined)) ?? countClassStudents(classCode);
 }
 
 /** Class codes the teacher has used, to offer when publishing. */
@@ -705,4 +725,87 @@ export async function getBattleSubjects(): Promise<{ id: string; title: string }
 export async function getBattleLog(classCode?: string, battleId?: string): Promise<BattleLog> {
   const user = await getCurrentUser();
   return user?.role === "teacher" ? classBattleLog(user, classCode, battleId) : { battles: [] };
+}
+
+// Classes (a teacher's own classes and the students in them)
+
+/** The class a demo account is in: not stored, so demos need no class setup. */
+function demoClass(user: User): SchoolClass {
+  return {
+    id: "demo",
+    code: user.classCode ?? DEMO_CLASS_CODE,
+    name: "7А",
+    subject: user.subject ?? "math",
+    grade: 7,
+    studentCount: classOverview.studentCount,
+    teacherName: "Демо багш",
+  };
+}
+
+/** The logged-in teacher's classes; demo teachers (and servers without Supabase) get the demo class. */
+export async function getTeacherClasses(): Promise<SchoolClass[]> {
+  const user = await getCurrentUser();
+  if (user?.role !== "teacher") return [];
+  if (user.demo || !classesStored()) return [demoClass(user)];
+  try {
+    return await listTeacherClasses(user.id);
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+/** The class the teacher picked to work in, if it is still one of theirs. */
+export async function getActiveClass(): Promise<SchoolClass | undefined> {
+  const user = await getCurrentUser();
+  return (await getTeacherClasses()).find((c) => c.code === user?.classCode);
+}
+
+/** Students in the teacher's current class; none for demo teachers. */
+export async function getClassMembers(): Promise<ClassMember[]> {
+  const active = await getActiveClass();
+  if (!active || active.id === "demo") return [];
+  return listClassMembers(active.id);
+}
+
+/** The classes the logged-in student is in; demo students are in the demo class. */
+export async function getStudentClasses(): Promise<SchoolClass[]> {
+  const user = await getCurrentUser();
+  if (user?.role !== "student") return [];
+  if (user.demo || !classesStored()) return user.classCode ? [demoClass(user)] : [];
+  try {
+    return await listStudentClasses(user.id);
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+/**
+ * What the student is studying now: their current class's subject, or for a
+ * student in no class the subject and grade they picked to practise.
+ */
+export async function getStudentSubject(): Promise<
+  { subject: string; grade: number; class?: SchoolClass } | undefined
+> {
+  const session = await readSession();
+  if (session?.role !== "student") return undefined;
+  const active = (await getStudentClasses()).find((c) => c.code === session.classCode);
+  if (active) return { subject: active.subject, grade: active.grade, class: active };
+  return session.practiceSubject
+    ? { subject: session.practiceSubject, grade: session.practiceGrade ?? 7 }
+    : undefined;
+}
+
+/** The class a QR invite is for, while the teacher is still showing it. */
+export async function getInviteClass(token: string): Promise<SchoolClass | undefined> {
+  // Whether it's still valid depends on the request's time, never a prerendered one.
+  await io();
+  if (!classesStored()) return undefined;
+  try {
+    return await findInviteClass(token);
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 }
