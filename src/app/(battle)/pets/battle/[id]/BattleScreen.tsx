@@ -4,7 +4,13 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { Button, ButtonLink } from "@/components/ui";
-import { leaveBossBattle, refreshBattle, refreshClassBattle, submitBattleAnswer } from "@/lib/battle-actions";
+import {
+  demoWinBossBattle,
+  leaveBossBattle,
+  refreshBattle,
+  refreshClassBattle,
+  submitBattleAnswer,
+} from "@/lib/battle-actions";
 import { cn } from "@/lib/cn";
 import { petStage } from "@/lib/pets";
 import { useBattleChannel } from "@/lib/realtime";
@@ -30,6 +36,8 @@ type BattleScreenProps = {
   lines: PetLine[];
   /** The teacher watches and runs a class battle instead of answering. */
   teacher?: boolean;
+  /** A demo account: solo battles get a button that wins at once, with an egg. */
+  demo?: boolean;
 };
 
 const isOver = (status: BattleState["status"]) => status === "won" || status === "lost" || status === "ended";
@@ -109,7 +117,7 @@ const iconProps = {
   className: "size-5",
 } as const;
 
-export function BattleScreen({ initial, boss, pet, lines, teacher = false }: BattleScreenProps) {
+export function BattleScreen({ initial, boss, pet, lines, teacher = false, demo = false }: BattleScreenProps) {
   const [state, setState] = useState(initial);
   const [outcome, setOutcome] = useState<BattleAnswerOutcome | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -390,6 +398,28 @@ export function BattleScreen({ initial, boss, pet, lines, teacher = false }: Bat
     }
   }
 
+  /** Demo accounts: the pet lands one final hit for all the boss's HP; the server grants the win and an egg. */
+  async function demoWin() {
+    if (submitting) return;
+    setSubmitting(true);
+    submittingRef.current = true;
+    setError(null);
+    try {
+      const res = await demoWinBossBattle(state.id);
+      if (res.state) {
+        attack(myName, shotKind(me), state.hp, 0, true);
+        apply(res.state, true);
+      } else {
+        setError("Демо ялалт ажилласангүй.");
+      }
+    } catch {
+      setError("Холболт тасарлаа. Дахин оролдоно уу.");
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
+  }
+
   async function answer(value: EnglishAnswer) {
     const questionId = state.question?.id;
     if (submitting || !questionId) return;
@@ -638,6 +668,15 @@ export function BattleScreen({ initial, boss, pet, lines, teacher = false }: Bat
               <p role="alert" className="rounded-tile border-2 border-magenta bg-pink px-4 py-3 font-semibold">
                 {error}
               </p>
+            ) : null}
+
+            {demo && active && state.mode === "solo" ? (
+              <Button variant="secondary" size="sm" disabled={submitting} onClick={demoWin} className="self-center">
+                <svg {...iconProps}>
+                  <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                Демо: боссыг ялах
+              </Button>
             ) : null}
           </div>
 

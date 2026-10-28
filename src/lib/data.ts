@@ -94,6 +94,7 @@ export async function getCurrentUser(): Promise<User | undefined> {
     role: session.role,
     classCode: session.classCode,
     pet: session.pet,
+    demo: session.demo,
   };
 }
 

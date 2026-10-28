@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BattlePage({ params }: PageProps<"/pets/battle/[id]">) {
-  await requireStudent();
+  const user = await requireStudent();
   const { id } = await params;
   // Not a battle id, or not this student's battle.
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
@@ -38,6 +38,7 @@ export default async function BattlePage({ params }: PageProps<"/pets/battle/[id
       boss={{ id: boss.id, name: boss.name, sprite: boss.sprite, attack: boss.attack, arena: boss.arena }}
       pet={pet}
       lines={lines}
+      demo={user.demo}
     />
   );
 }
