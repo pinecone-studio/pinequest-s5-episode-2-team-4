@@ -17,6 +17,7 @@ type QuestionRow = {
   group_id: string | null;
   answer: QuestionAnswer | null;
   needs_review: boolean | null;
+  misconception: string | null;
   created_at: string;
 };
 
@@ -39,13 +40,14 @@ const toQuestion = (r: QuestionRow): AnonQuestion => ({
   time: clock(r.created_at),
   answer: r.answer ?? undefined,
   needsReview: r.needs_review ?? undefined,
+  misconception: r.misconception ?? undefined,
 });
 
 /** A class's questions, newest first, optionally for one subtopic. */
 export async function listQuestions(classCode: string, subtopicId?: string): Promise<AnonQuestion[]> {
   let query = db()
     .from("anon_questions")
-    .select("id, subtopic_id, text, me_too, group_id, answer, needs_review, created_at")
+    .select("id, subtopic_id, text, me_too, group_id, answer, needs_review, misconception, created_at")
     .eq("class_code", classCode)
     .order("created_at", { ascending: false })
     .limit(200);
@@ -71,7 +73,7 @@ export async function listGroups(classCode: string): Promise<QuestionGroup[]> {
   }));
 }
 
-const COLUMNS = "id, subtopic_id, text, me_too, group_id, answer, needs_review, created_at";
+const COLUMNS = "id, subtopic_id, text, me_too, group_id, answer, needs_review, misconception, created_at";
 
 /**
  * Saves a question as typed; it is grouped later, so the student never waits

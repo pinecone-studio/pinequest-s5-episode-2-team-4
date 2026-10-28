@@ -16,6 +16,7 @@ export const anonQuestions: AnonQuestion[] = [
     meToo: 6,
     groupId: "g1",
     time: "09:47",
+    misconception: "Хүртвэрийг хүртвэртэй, хуваарийг хуваарьтай нь шууд нэмдэг гэж боддог.",
   },
   {
     id: "q3",
@@ -40,6 +41,7 @@ export const anonQuestions: AnonQuestion[] = [
     meToo: 4,
     groupId: "g2",
     time: "10:05",
+    misconception: "Ерөнхий хуваарь заавал хамгийн бага байх ёстой гэж боддог.",
     answer: {
       by: "peer",
       studentNo: 17,
@@ -84,6 +86,7 @@ export const anonQuestions: AnonQuestion[] = [
     meToo: 2,
     groupId: "g4",
     time: "Өчигдөр",
+    misconception: "Хураахад бутархай багасдаг гэж боддог.",
   },
   {
     id: "q9",
