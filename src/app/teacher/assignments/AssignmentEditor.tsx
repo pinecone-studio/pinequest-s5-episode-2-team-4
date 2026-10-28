@@ -51,29 +51,32 @@ type AssignmentEditorProps = {
   initial?: { assignment: Assignment; questions: GameQuestion[] };
   /** The subject the teacher teaches; everything they make is in it. */
   teacherSubject?: string;
+  /** Starting from a lesson video: its material, topic and class. */
+  fromVideo?: { videoTitle: string; materialId: string; topic: string; classCode: string };
 };
 
 /**
  * Making a game assignment: get questions from a topic or the teacher's
  * material, edit them (checked as you type), pick games, then publish.
  */
-export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, teacherSubject }: AssignmentEditorProps) {
+export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, teacherSubject, fromVideo }: AssignmentEditorProps) {
   const id = useId();
   const router = useRouter();
   const a = initial?.assignment;
   const [mode, setMode] = useState<"topic" | "material">("topic");
-  const [topic, setTopic] = useState(a?.title ?? "");
+  const [topic, setTopic] = useState(a?.title ?? fromVideo?.topic ?? "");
   const [subject, setSubject] = useState(teacherSubject ?? a?.subject ?? "math");
   const [count, setCount] = useState(6);
-  const [materialId, setMaterialId] = useState<string>();
+  const [materialId, setMaterialId] = useState(fromVideo?.materialId);
+  const [linkedVideo, setLinkedVideo] = useState(fromVideo?.videoTitle);
   const [questions, setQuestions] = useState<EditableQuestion[]>(() =>
     (initial?.questions ?? []).map((q) => toEditable(q, q.id)),
   );
   const [source, setSource] = useState<"ai" | "demo">();
   const [games, setGames] = useState<string[]>(a?.games ?? []);
   const [gameMode, setGameMode] = useState(a?.gameMode ?? "fixed");
-  const [title, setTitle] = useState(a?.title ?? "");
-  const [classCode, setClassCode] = useState(a?.classCode ?? classCodes[0] ?? "");
+  const [title, setTitle] = useState(a?.title ?? fromVideo?.videoTitle ?? "");
+  const [classCode, setClassCode] = useState(a?.classCode ?? fromVideo?.classCode ?? classCodes[0] ?? "");
   const [dueAt, setDueAt] = useState(a?.dueAt?.slice(0, 10) ?? "");
   const [target, setTarget] = useState(a?.target ?? "class");
   const [targetSubtopicId, setTargetSubtopicId] = useState(a?.targetSubtopicId ?? subtopics[0]?.id ?? "");
@@ -152,6 +155,23 @@ export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, t
         <StepTitle n={1} done={questions.length > 0}>
           Асуулт гаргах
         </StepTitle>
+        {linkedVideo && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-surface px-4 py-3">
+            <p className="font-semibold">
+              🎬 «{linkedVideo}» видеоны материалаас асуулт гаргана. «AI асуулт гаргах» дээр дарна уу.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setLinkedVideo(undefined);
+                setMaterialId(undefined);
+              }}
+              className="min-h-11 cursor-pointer rounded-full px-3 text-sm font-bold text-primary hover:bg-white"
+            >
+              Видеоноос салгах
+            </button>
+          </div>
+        )}
         <div role="tablist" aria-label="Эх сурвалж" className="flex gap-2">
           {(
             [
@@ -214,6 +234,7 @@ export function AssignmentEditor({ curriculum, classCodes, subtopics, initial, t
             submitLabel="✦ Материалаас асуулт гаргах"
             onSubmit={async (input, progress) => {
               const { materialId: newId, recognition } = await recognizeMaterialAction(input);
+              setLinkedVideo(undefined);
               progress("Асуулт гаргаж байна", QUESTION_ACTIVITY);
               setMaterialId(newId);
               setTopic(recognition.value.topic);

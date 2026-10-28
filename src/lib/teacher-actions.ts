@@ -12,26 +12,38 @@ import {
   type AiResult,
   generateGameQuestions,
   recognizeMaterial,
+  rewriteReelSection,
+  writeBookText,
+  writeReelScript,
 } from "./ai/tasks";
-import { toRecognition } from "./ai/validate";
+import { toRecognition, toScript, toSection } from "./ai/validate";
 import {
+  approveVideo,
   createMaterial,
   createUploadUrls,
+  createVideo,
   getMaterial,
   getTeacherAssignment,
+  getTeacherVideo,
+  publishVideo,
   readMaterialFiles,
   saveAssignment,
   saveRecognition,
+  saveVideoScript,
   setAssignmentStatus,
 } from "./content";
+import { checkFormula } from "./formula";
 import { checkQuestion, isAssignmentGame } from "./gamefit";
 import { readSession, writeSession } from "./session";
+import { synthesizeReel } from "./tts";
 import type {
   AssignmentGameMode,
   AssignmentTarget,
   GameQuestion,
   MaterialFile,
   Recognition,
+  ReelScript,
+  ReelSection,
 } from "./types";
 
 async function requireTeacherId(): Promise<string> {
@@ -202,6 +214,97 @@ export async function saveAssignmentAction(
 export async function unpublishAssignmentAction(assignmentId: string) {
   const teacher = await requireTeacherId();
   await setAssignmentStatus(teacher, assignmentId, "draft");
+}
+
+// Lesson videos
+
+/** A reel script and textbook text from the teacher's edited recognition; creates the draft video. */
+export async function createVideoAction(input: {
+  materialId: string;
+  classCode: string;
+  recognition: Recognition;
+}): Promise<{ ok: true; id: string; source: "ai" | "demo" } | { ok: false; error: string }> {
+  const teacher = await requireTeacherId();
+  const material = await getMaterial(teacher, input.materialId);
+  const recognition = toRecognition(input.recognition);
+  const classCode = cleanClassCode(input.classCode) || material?.classCode;
+  if (!material || !recognition) return { ok: false, error: "Материал олдсонгүй" };
+  if (!classCode) return { ok: false, error: "Ангийн код хэрэгтэй" };
+  // The topic the teacher settled on (maybe changed from the AI's) is the material's.
+  await saveRecognition(teacher, material.id, recognition, clean(recognition.topic, 120));
+
+  const context = { topic: recognition.topic, grade: material.grade, subject: material.subject };
+  const [script, book] = await Promise.all([
+    writeReelScript(context, recognition),
+    writeBookText(context, recognition),
+  ]);
+  const id = await createVideo(teacher, {
+    title: script.value.title,
+    classCode,
+    materialId: material.id,
+    script: script.value,
+    book: book.value,
+  });
+  return { ok: true, id, source: script.source };
+}
+
+export async function rewriteSectionAction(
+  videoId: string,
+  script: ReelScript,
+  index: number,
+  note: string,
+): Promise<{ section: ReelSection; source: "ai" | "demo" } | undefined> {
+  const teacher = await requireTeacherId();
+  const clean = toScript(script);
+  if (!(await getTeacherVideo(teacher, videoId)) || !clean || !clean.sections[index]) return undefined;
+  const { value, source } = await rewriteReelSection(clean, index, String(note ?? ""));
+  return { section: value, source };
+}
+
+export async function saveScriptAction(videoId: string, script: ReelScript) {
+  const teacher = await requireTeacherId();
+  const clean = toScript({ ...script, sections: (script.sections ?? []).map(toSection).filter(Boolean) });
+  if (!clean) return { ok: false as const, error: "Скриптэд дор хаяж 3 хэсэг хэрэгтэй" };
+  await saveVideoScript(teacher, videoId, clean.title, clean);
+  return { ok: true as const };
+}
+
+/** Formulas that are computably wrong block approval; unknown ones need the teacher's tick. */
+function formulaProblems(script: ReelScript, checkedByTeacher: number[]) {
+  return script.sections.flatMap((s, i) => {
+    if (!s.formula) return [];
+    const check = checkFormula(s.formula);
+    if (check.status === "wrong") return [`${i + 1}-р хэсгийн томъёо буруу (зөв нь ${check.expected})`];
+    if (check.status === "unknown" && !checkedByTeacher.includes(i)) return [`${i + 1}-р хэсгийн томъёог шалгаж тэмдэглэнэ үү`];
+    return [];
+  });
+}
+
+/**
+ * Saves the script and, only if every formula checks out, approves it:
+ * narration audio and word timings are made now.
+ */
+export async function approveVideoAction(
+  videoId: string,
+  script: ReelScript,
+  checkedByTeacher: number[],
+): Promise<{ ok: true; voiced: boolean } | { ok: false; error: string }> {
+  const teacher = await requireTeacherId();
+  const saved = await saveScriptAction(videoId, script);
+  if (!saved.ok) return saved;
+  const video = await getTeacherVideo(teacher, videoId);
+  if (!video) return { ok: false, error: "Видео олдсонгүй" };
+  const problems = formulaProblems(video.script, Array.isArray(checkedByTeacher) ? checkedByTeacher : []);
+  if (problems.length) return { ok: false, error: problems.join(". ") };
+
+  const { audio, timings } = await synthesizeReel(video.script);
+  await approveVideo(teacher, videoId, audio, timings);
+  return { ok: true, voiced: Boolean(audio) };
+}
+
+export async function publishVideoAction(videoId: string) {
+  const teacher = await requireTeacherId();
+  await publishVideo(teacher, videoId);
 }
 
 /** Whether Claude is set up, so pages can say when content is demo data. */

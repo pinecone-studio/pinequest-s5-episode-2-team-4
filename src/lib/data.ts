@@ -639,6 +639,19 @@ export async function getClassVideos(): Promise<LessonVideo[]> {
   return session?.classCode ? listClassVideos(normalClassCode(session.classCode)) : [];
 }
 
+/** Ids of the class videos the student has opened. */
+export async function getSeenVideoIds(): Promise<string[]> {
+  return (await readSession())?.videosSeen ?? [];
+}
+
+/** Published class videos the student hasn't opened yet, for the menu badge. */
+export async function getUnseenVideoCount(): Promise<number> {
+  const session = await readSession();
+  if (session?.role !== "student" || !session.classCode) return 0;
+  const seen = new Set(session.videosSeen ?? []);
+  return (await getClassVideos()).filter((v) => !seen.has(v.id)).length;
+}
+
 export async function getClassVideo(videoId: string): Promise<LessonVideo | undefined> {
   const session = await readSession();
   if (!session?.classCode || !/^[0-9a-f-]{36}$/i.test(videoId)) return undefined;

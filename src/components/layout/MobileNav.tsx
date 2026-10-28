@@ -34,6 +34,22 @@ const PlayIcon = (
   </svg>
 );
 
+const VideoIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    className="size-5.5"
+  >
+    <rect x="3" y="5" width="13" height="14" rx="2.5" />
+    <path d="m16 10 5-3v10l-5-3" />
+  </svg>
+);
+
 const TaskIcon = (
   <svg
     viewBox="0 0 24 24"
@@ -67,6 +83,7 @@ export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: 
   const LINKS = [
     { href: "/", label: "Нүүр", icon: HomeIcon },
     { href: "/games", label: "Тоглоом", icon: PlayIcon },
+    { href: "/videos", label: "Видео", icon: VideoIcon, count: counts.videos, countLabel: "шинэ видео" },
     { href: "/assignments", label: "Даалгавар", icon: TaskIcon, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
     { href: "/pets", label: "Тэжээвэр", icon: petIcon(petSprite) },
   ];
@@ -74,7 +91,7 @@ export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: 
   return (
     <nav
       aria-label="Үндсэн цэс"
-      className="sticky bottom-0 z-10 grid grid-cols-4 gap-1 bg-white px-3 pt-2 pb-3 shadow-[0_-8px_24px_rgb(63_7_145/0.1)] lg:hidden"
+      className="sticky bottom-0 z-10 grid grid-cols-5 gap-1 bg-white px-3 pt-2 pb-3 shadow-[0_-8px_24px_rgb(63_7_145/0.1)] lg:hidden"
     >
       {LINKS.map((link) => {
         const active =
