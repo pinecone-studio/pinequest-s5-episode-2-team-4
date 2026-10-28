@@ -134,7 +134,7 @@ export default async function PetsPage() {
         </div>
       </section>
 
-      <PetCollection lines={lines} owned={collection?.pets ?? []} dropsFrom={dropsFrom} />
+      <PetCollection lines={lines} owned={collection?.pets ?? []} dropsFrom={dropsFrom} myLineId={pet?.line.id} />
     </div>
   );
 }
