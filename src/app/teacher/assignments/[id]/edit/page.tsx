@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCurrentUser, getCurriculum, getSubtopics, getTeacherAssignment, getTeacherClassCodes } from "@/lib/data";
+import { getCurrentUser, getCurriculum, getSubtopics, getTeacherAssignment, getTeacherClassOptions } from "@/lib/data";
 import { AssignmentEditor } from "../../AssignmentEditor";
 
 export const metadata: Metadata = {
@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 
 export default async function EditAssignmentPage({ params }: PageProps<"/teacher/assignments/[id]/edit">) {
   const { id } = await params;
-  const [found, curriculum, classCodes, subtopics, user] = await Promise.all([
+  const [found, curriculum, classes, subtopics, user] = await Promise.all([
     getTeacherAssignment(id),
     getCurriculum(),
-    getTeacherClassCodes(),
+    getTeacherClassOptions(),
     getSubtopics("fractions"),
     getCurrentUser(),
   ]);
@@ -25,7 +25,7 @@ export default async function EditAssignmentPage({ params }: PageProps<"/teacher
         ← Даалгавар
       </Link>
       <h1 className="type-page-title">Даалгавар засах</h1>
-      <AssignmentEditor curriculum={curriculum} classCodes={classCodes} subtopics={subtopics} initial={found} teacherSubject={user?.subject} />
+      <AssignmentEditor curriculum={curriculum} classes={classes} subtopics={subtopics} initial={found} teacherSubject={user?.subject} />
     </div>
   );
 }
