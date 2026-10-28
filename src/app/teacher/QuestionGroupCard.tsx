@@ -9,8 +9,12 @@ import {
   renameQuestionGroup,
   type GroupResult,
 } from "@/lib/question-group-actions";
-import type { AnonQuestion, QuestionGroup } from "@/lib/types";
+import type { AnonQuestion, QuestionAnswer, QuestionGroup } from "@/lib/types";
+import { MaterialLink } from "@/components/MaterialLink";
+import { parseMaterial } from "@/lib/answer-material";
 import { GroupForm } from "./GroupForm";
+import { MaterialPicker, type MaterialDraft } from "./MaterialPicker";
+import { MergeSelect } from "./MergeSelect";
 
 export type GroupView = QuestionGroup & {
   subtopicTitle: string;
@@ -38,11 +42,12 @@ type QuestionGroupCardProps = {
 /** One group: rename it, merge it into another, or answer the whole class once. */
 export function QuestionGroupCard({ group: g, mergeTargets }: QuestionGroupCardProps) {
   const [mode, setMode] = useState<"view" | "rename" | "answer">("view");
-  const [sent, setSent] = useState<string | null>(null);
+  const [sent, setSent] = useState<Pick<QuestionAnswer, "text" | "material"> | null>(null);
+  const [material, setMaterial] = useState<MaterialDraft | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const teacherAnswer = sent ?? g.questions.find((q) => q.answer?.by === "teacher")?.answer?.text;
+  const teacherAnswer = sent ?? g.questions.find((q) => q.answer?.by === "teacher")?.answer;
   const answered = g.status === "answered" || Boolean(teacherAnswer);
 
   function run(action: () => Promise<GroupResult>, done?: () => void) {
@@ -91,20 +96,26 @@ export function QuestionGroupCard({ group: g, mergeTargets }: QuestionGroupCardP
           initial={mode === "rename" ? g.title : ""}
           pending={pending}
           onCancel={() => setMode("view")}
-          onSubmit={(text) =>
-            mode === "rename"
-              ? run(() => renameQuestionGroup(g.id, text), () => setMode("view"))
-              : run(() => answerQuestionGroup(g.id, text), () => {
-                  setSent(text);
-                  setMode("view");
-                })
-          }
-        />
+          onSubmit={(text) => {
+            if (mode === "rename") return run(() => renameQuestionGroup(g.id, text), () => setMode("view"));
+            const checked = material && parseMaterial(material);
+            if (material && !checked) return setError("Холбоос https://-ээр эхлэх ёстой");
+            run(() => answerQuestionGroup(g.id, text, checked), () => {
+              setSent({ text, material: checked ?? undefined });
+              setMode("view");
+            });
+          }}
+        >
+          {mode === "answer" ? (
+            <MaterialPicker id={g.id} subtopicId={g.subtopicId} subtopicTitle={g.subtopicTitle} onChange={setMaterial} />
+          ) : null}
+        </GroupForm>
       ) : (
         <>
           {teacherAnswer ? (
             <div className="mt-3 rounded-field bg-white px-3.5 py-2.5">
-              <p className="text-[15px] whitespace-pre-line">{teacherAnswer}</p>
+              <p className="text-[15px] whitespace-pre-line">{teacherAnswer.text}</p>
+              {teacherAnswer.material ? <MaterialLink material={teacherAnswer.material} className="mt-2" /> : null}
               <p role="status" className="mt-1 text-xs font-bold text-ink-muted">
                 Бүх ангид илгээгдсэн
               </p>
@@ -112,26 +123,24 @@ export function QuestionGroupCard({ group: g, mergeTargets }: QuestionGroupCardP
           ) : null}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {teacherAnswer ? null : (
-              <Button size="sm" onClick={() => setMode("answer")}>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setMaterial(null);
+                  setMode("answer");
+                }}
+              >
                 Хариулах
               </Button>
             )}
             <Button variant="white" size="sm" onClick={() => setMode("rename")}>
               Нэр солих
             </Button>
-            {mergeTargets.length > 0 ? (
-              <label className="inline-flex items-center gap-1.5 text-[13px] font-bold">
-                <span className="sr-only">Өөр бүлэгт нэгтгэх</span>
-                <select value="" disabled={pending}
-                  onChange={(e) => e.target.value && run(() => mergeQuestionGroups(g.id, e.target.value))}
-                  className="min-h-9 max-w-56 cursor-pointer rounded-full border-2 border-line bg-white px-3 text-[13px] font-bold text-ink">
-                  <option value="">Нэгтгэх…</option>
-                  {mergeTargets.map((t) => (
-                    <option key={t.id} value={t.id}>{t.title}</option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
+            <MergeSelect
+              targets={mergeTargets}
+              disabled={pending}
+              onMerge={(intoId) => run(() => mergeQuestionGroups(g.id, intoId))}
+            />
           </div>
         </>
       )}
