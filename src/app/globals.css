@@ -2,18 +2,35 @@
 
 /* Design tokens from the LevelUp design. */
 @theme {
-  --color-primary: #5b00ed;
-  --color-primary-dark: #3f0791;
-  --color-ink: #3f0791;
-  --color-ink-muted: #6539a7;
-  --color-surface: #f2f1ff;
-  --color-surface-soft: #f5f4ff;
-  --color-lavender: #dad9ff;
-  --color-line: #cac4f4;
-  --color-sky: #bfefff;
-  --color-sky-dark: #9fd8ec;
-  --color-magenta: #e30ba6;
-  --color-pink: #fce7f6;
+  /* The original LevelUp hues (violet, sky, magenta) with the saturation turned
+     down so long sessions don't tire the eyes. Violet is the brand and its
+     tints (lavender, line) tint the neutrals; sky marks "good"; magenta is the
+     signal colour for weak and alerts. All text pairs pass 4.5:1. */
+  --color-primary: #7039d0;
+  --color-primary-dark: #4f2e84;
+  --color-ink: #3d2862;
+  --color-ink-muted: #6d5c8a;
+  --color-surface: #f2f1fb;
+  --color-surface-soft: #f8f7fd;
+  --color-lavender: #e0def7;
+  --color-line: #d0cbeb;
+  --color-sky: #d2ebf4;
+  --color-sky-dark: #aad1df;
+  --color-magenta: #b23886;
+  --color-pink: #fbecf5;
+  /* Violet-black for the footer and toasts instead of pure black. */
+  --color-night: #1e172b;
+  /* Card and panel background; dark mode swaps it in theme.css. */
+  --color-card: #ffffff;
+  /* Progress statuses as a soft traffic light, matching the 🟢🟡🔴 signals
+     students send: a pastel fill with a darker ink of the same hue for the
+     icon or number on it (each pair passes 4.5:1). */
+  --color-status-good: #d0ecdc;
+  --color-status-good-ink: #216342;
+  --color-status-mid: #f9e6b8;
+  --color-status-mid-ink: #865013;
+  --color-status-weak: #f4bdc5;
+  --color-status-weak-ink: #99293b;
 
   --font-sans: var(--font-nunito), system-ui, sans-serif;
 
@@ -29,8 +46,9 @@
   --radius-card: 20px;
   --radius-panel: 28px;
 
-  --shadow-card: rgba(0, 0, 0, 0.08) 0 15px 50px;
-  --shadow-float: rgba(0, 0, 0, 0.1) 0 20px 60px;
+  /* Shadows carry the ink hue instead of flat grey. */
+  --shadow-card: rgb(61 40 98 / 0.08) 0 15px 50px;
+  --shadow-float: rgb(61 40 98 / 0.11) 0 20px 60px;
   /* "3D" buttons: solid offset shadow that collapses on press */
   --shadow-3d: 0 6px 0 var(--color-primary-dark);
   --shadow-3d-soft: 0 6px 0 var(--color-line);
@@ -59,12 +77,12 @@
     100% {
       box-shadow:
         0 8px 0 var(--color-primary-dark),
-        0 0 0 0 rgb(91 0 237 / 0.35);
+        0 0 0 0 rgb(112 57 208 / 0.3);
     }
     50% {
       box-shadow:
         0 8px 0 var(--color-primary-dark),
-        0 0 0 14px rgb(91 0 237 / 0);
+        0 0 0 14px rgb(112 57 208 / 0);
     }
   }
 
@@ -88,14 +106,14 @@
   }
 }
 
-/* Soft multi-color hero background used on most screens */
+/* Soft multi-colour hero background used on most screens */
 @utility bg-flow {
   background-color: var(--color-surface-soft);
   background-image:
-    radial-gradient(closest-side at 18% 24%, rgb(191 239 255 / 0.95), rgb(191 239 255 / 0)),
-    radial-gradient(closest-side at 84% 18%, rgb(202 196 244 / 0.95), rgb(202 196 244 / 0)),
-    radial-gradient(closest-side at 70% 80%, rgb(218 217 255), rgb(218 217 255 / 0)),
-    radial-gradient(closest-side at 22% 86%, rgb(227 11 166 / 0.12), rgb(227 11 166 / 0));
+    radial-gradient(closest-side at 18% 24%, rgb(210 235 244 / 0.85), rgb(210 235 244 / 0)),
+    radial-gradient(closest-side at 84% 18%, rgb(208 203 235 / 0.8), rgb(208 203 235 / 0)),
+    radial-gradient(closest-side at 70% 80%, rgb(224 222 247), rgb(224 222 247 / 0)),
+    radial-gradient(closest-side at 22% 86%, rgb(178 56 134 / 0.08), rgb(178 56 134 / 0));
   background-size: 180% 180%;
 }
 
