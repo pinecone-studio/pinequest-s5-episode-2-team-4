@@ -29,17 +29,24 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-ink: #eee8ff;
-  --color-ink-muted: #bfb0db;
-  --color-surface: #252038;
-  --color-surface-soft: #171321;
-  --color-lavender: #393050;
-  --color-line: #514268;
-  --color-sky: #214957;
-  --color-sky-dark: #2a5d70;
-  --color-pink: #48223f;
-  --shadow-card: rgba(0, 0, 0, 0.3) 0 15px 50px;
-  --shadow-float: rgba(0, 0, 0, 0.4) 0 20px 60px;
+  --color-ink: #ece7f9;
+  --color-ink-muted: #b3a6c9;
+  --color-surface: #262136;
+  --color-surface-soft: #171320;
+  --color-lavender: #3a324e;
+  --color-line: #504365;
+  --color-sky: #273e49;
+  --color-sky-dark: #365463;
+  --color-pink: #422439;
+  --color-card: #1f1a2b;
+  --color-status-good: #2a4638;
+  --color-status-good-ink: #97d8b2;
+  --color-status-mid: #4c3d24;
+  --color-status-mid-ink: #ecc979;
+  --color-status-weak: #562931;
+  --color-status-weak-ink: #f49aa6;
+  --shadow-card: rgb(0 0 0 / 0.3) 0 15px 50px;
+  --shadow-float: rgb(0 0 0 / 0.4) 0 20px 60px;
 }
 
 .theme-sun {
@@ -57,48 +64,48 @@
 /* Override backgrounds separately so white button text and artwork stay intact. */
 @layer utilities {
   [data-theme="dark"] .bg-white {
-    background-color: #1e192b;
+    background-color: var(--color-card);
   }
 
   [data-theme="dark"] .bg-white\/70 {
-    background-color: rgb(30 25 43 / 0.7);
+    background-color: rgb(31 26 43 / 0.7);
   }
 
   [data-theme="dark"] .bg-white\/80 {
-    background-color: rgb(30 25 43 / 0.8);
+    background-color: rgb(31 26 43 / 0.8);
   }
 
   [data-theme="dark"] .bg-white\/90 {
-    background-color: rgb(30 25 43 / 0.9);
+    background-color: rgb(31 26 43 / 0.9);
   }
 
   [data-theme="dark"] .hover\:bg-white\/60:hover {
-    background-color: rgb(57 48 80 / 0.6);
+    background-color: rgb(58 50 78 / 0.6);
   }
 
   /* White only from a breakpoint up: darken it at the same widths. */
   @media (width >= 48rem) {
     [data-theme="dark"] .md\:bg-white {
-      background-color: #1e192b;
+      background-color: var(--color-card);
     }
   }
 
   @media (width >= 64rem) {
     [data-theme="dark"] .lg\:bg-white {
-      background-color: #1e192b;
+      background-color: var(--color-card);
     }
   }
 
   @media (width >= 80rem) {
     [data-theme="dark"] .xl\:bg-white {
-      background-color: #1e192b;
+      background-color: var(--color-card);
     }
   }
 
   /* Always-black surfaces (the footer) keep the light theme's pale text colours. */
   [data-theme="dark"] .on-black {
-    --color-lavender: #dad9ff;
-    --color-sky: #bfefff;
+    --color-lavender: #e0def7;
+    --color-sky: #d2ebf4;
   }
 
   /* Black pet silhouettes would vanish on dark cards, so draw them light. The
@@ -108,27 +115,27 @@
   }
 
   [data-theme="dark"] .bg-ink {
-    background-color: #3f0791;
+    background-color: #4f2e84;
   }
 
   [data-theme="dark"] .text-primary {
-    color: #b99aff;
+    color: #c2a8f0;
   }
 
   [data-theme="dark"] .bg-\[\#f5fcff\] {
-    background-color: #20333e;
+    background-color: #273e49;
   }
 
   [data-theme="dark"] .bg-\[\#fffafd\] {
-    background-color: #382035;
+    background-color: #422439;
   }
 
   [data-theme="dark"] .bg-flow {
     background-image:
-      radial-gradient(closest-side at 18% 24%, rgb(33 73 87 / 0.65), transparent),
-      radial-gradient(closest-side at 84% 18%, rgb(81 66 104 / 0.65), transparent),
-      radial-gradient(closest-side at 70% 80%, rgb(57 48 80 / 0.8), transparent),
-      radial-gradient(closest-side at 22% 86%, rgb(227 11 166 / 0.08), transparent);
+      radial-gradient(closest-side at 18% 24%, rgb(39 62 73 / 0.6), transparent),
+      radial-gradient(closest-side at 84% 18%, rgb(80 67 101 / 0.6), transparent),
+      radial-gradient(closest-side at 70% 80%, rgb(58 50 78 / 0.8), transparent),
+      radial-gradient(closest-side at 22% 86%, rgb(178 56 134 / 0.06), transparent);
   }
 }
 
@@ -139,6 +146,6 @@
   }
 
   [data-theme="dark"] a {
-    color: #b99aff;
+    color: #c2a8f0;
   }
 }
