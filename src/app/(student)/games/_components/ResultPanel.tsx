@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { SessionResult } from "../_lib/session";
+import { AssignmentResult, useAssignment } from "./AssignmentContext";
 
 type ResultPanelProps = {
   result: SessionResult;
@@ -27,6 +28,8 @@ function Star({ on, big, delay }: { on: boolean; big?: boolean; delay: number })
 
 /** End-of-session screen over the field: stars, score, accuracy, best combo and what to revisit. */
 export function ResultPanel({ result, onAgain, otherHref, children }: ResultPanelProps) {
+  // Played for an assignment: "other game" goes back to the assignments.
+  const assignment = useAssignment();
   const stats = [
     { value: result.score, label: "оноо" },
     { value: `${result.accuracy}%`, label: "нарийвчлал" },
@@ -54,13 +57,14 @@ export function ResultPanel({ result, onAgain, otherHref, children }: ResultPane
           {result.review}
         </p>
       ) : null}
+      <AssignmentResult result={result} />
       {children}
       <div className="mt-1 flex flex-wrap justify-center gap-2">
         <button type="button" onClick={onAgain} className="game-gradient cursor-pointer rounded-[14px] px-6 py-3 font-extrabold text-white">
           Дахин тоглох
         </button>
-        <Link href={otherHref} className="game-chip rounded-[14px] px-6 py-3 font-extrabold text-white no-underline hover:text-white">
-          Өөр тоглоом
+        <Link href={assignment ? "/assignments" : otherHref} className="game-chip rounded-[14px] px-6 py-3 font-extrabold text-white no-underline hover:text-white">
+          {assignment ? "Даалгаврууд" : "Өөр тоглоом"}
         </Link>
       </div>
     </div>

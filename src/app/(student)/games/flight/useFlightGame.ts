@@ -101,6 +101,7 @@ function toResult({ score, mistakes, bestCombo, missed }: ScoreSummary, subjectI
     stars: starsFor(mistakes),
     accuracy: Math.max(0, Math.round((100 * (answers - mistakes)) / answers)),
     review: missed[0]?.explanation,
+    missedIds: missed.map((q) => q.id),
     ...saveBest("flight", subjectId, score),
   };
 }

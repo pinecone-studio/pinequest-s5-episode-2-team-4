@@ -111,6 +111,7 @@ function toResult({ score, mistakes, misses, bestCombo, missed, retry, guesses }
     stars: starsFor(mistakes + misses),
     accuracy: Math.max(0, Math.round((100 * (answers - misses - mistakes)) / answers)),
     review: missed[0]?.explanation,
+    missedIds: missed.map((q) => q.id),
     ...saveBest("slice", subjectId, score),
   };
 }

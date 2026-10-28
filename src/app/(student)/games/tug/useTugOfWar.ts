@@ -83,6 +83,7 @@ export function useTugOfWar(questions: GameQuestion[]) {
           bestCombo: tug.bestCombo,
           stars: won ? starsFor(tug.wrong) : 1,
           review: tug.missed[0]?.explanation,
+          missedIds: tug.missed.map((q) => q.id),
         }
       : null;
 

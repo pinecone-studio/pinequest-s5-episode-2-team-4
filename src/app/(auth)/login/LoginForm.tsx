@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
-import { demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
+import { assignmentDemoLogIn, demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { FormError } from "../_components/FormError";
@@ -151,6 +151,14 @@ export function LoginForm({ pet }: { pet: PetStage }) {
           </button>
         </form>
       </div>
+      <form action={assignmentDemoLogIn} className="mt-2">
+        <button
+          type="submit"
+          className={buttonClass({ variant: "white", className: "w-full" })}
+        >
+          ▶ Даалгаврын демо: багшаас сурагч хүртэл
+        </button>
+      </form>
 
       <div className="mt-5 flex items-center justify-between gap-3 text-sm font-semibold">
         <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-ink-muted">

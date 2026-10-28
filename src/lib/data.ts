@@ -592,6 +592,11 @@ export async function getStudentAssignments(): Promise<StudentAssignment[]> {
   }));
 }
 
+/** Assignments the student hasn't finished yet, for the menu badge. */
+export async function getOpenAssignmentCount(): Promise<number> {
+  return (await getStudentAssignments()).filter((a) => !a.done).length;
+}
+
 /** "fixed": the first chosen game; "interest": the student's favourite among them. */
 function pickGame(a: Assignment, favorites: string[] = []): string {
   const allowed = a.games.filter(isAssignmentGame);
@@ -638,6 +643,12 @@ export async function getClassVideo(videoId: string): Promise<LessonVideo | unde
   const session = await readSession();
   if (!session?.classCode || !/^[0-9a-f-]{36}$/i.test(videoId)) return undefined;
   return getClassVideoRow(normalClassCode(session.classCode), videoId);
+}
+
+/** The assignment demo the visitor is in, if any: which assignment it is about. */
+export async function getDemoTour(): Promise<{ assignmentId: string } | undefined> {
+  const tour = (await readSession())?.demoTour;
+  return tour && { assignmentId: tour.assignmentId };
 }
 
 /**

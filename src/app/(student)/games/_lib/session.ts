@@ -38,4 +38,6 @@ export type SessionResult = {
   stars: 1 | 2 | 3;
   /** Explanation of the first question the player got wrong, to revisit. */
   review?: string;
+  /** Ids of the questions answered wrong, for assignment results. */
+  missedIds?: string[];
 };

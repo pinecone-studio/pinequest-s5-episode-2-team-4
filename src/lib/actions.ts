@@ -5,7 +5,10 @@
 
 import { redirect } from "next/navigation";
 import { after } from "next/server";
-import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, saveAccount } from "./accounts";
+import { randomBytes } from "node:crypto";
+import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, findAccountById, saveAccount } from "./accounts";
+import { demoQuestions } from "./ai/fallback";
+import { saveAssignment, setAssignmentStatus } from "./content";
 import { getRetestQuestions } from "./data";
 import { clearLoginFailures, loginBlockedMinutes, recordLoginFailure } from "./login-limit";
 import { lessons } from "./mock/lessons";
@@ -114,6 +117,51 @@ export async function demoTeacherLogIn() {
   await startSession(account.id);
   after(deleteOldDemoAccounts);
   redirect("/teacher");
+}
+
+/**
+ * The assignment demo: a demo teacher publishes a game assignment to a class
+ * of its own, and the visitor logs in as a demo student of that class to get
+ * it, play it and then see the teacher's results with `switchDemoTour`.
+ */
+export async function assignmentDemoLogIn() {
+  // Its own class, so other visitors' demo assignments don't show up.
+  // Digits only after the prefix, so normalClassCode() leaves it as it is.
+  const classCode = `ДЕМО-${randomBytes(2).readUInt16BE() % 10000}`;
+  const teacher = await createDemoAccount({ subject: "math" }, "teacher", classCode);
+  const assignmentId = await saveAssignment(teacher.id, {
+    title: "Бутархайн дасгал",
+    classCode,
+    subject: "math",
+    games: ["snake", "mole", "cards"],
+    gameMode: "fixed",
+    target: "class",
+    questions: demoQuestions("math", 6),
+  });
+  await setAssignmentStatus(teacher.id, assignmentId, "published");
+  const student = await createDemoAccount(
+    { pet: { lineId: "dollfin", level: 1, xp: 0 }, demoTour: { otherId: teacher.id, assignmentId } },
+    "student",
+    classCode,
+  );
+  await saveAccount({
+    id: teacher.id,
+    classCode,
+    progress: { subject: "math", demoTour: { otherId: student.id, assignmentId } },
+  });
+  await startSession(student.id);
+  after(deleteOldDemoAccounts);
+  redirect("/assignments");
+}
+
+/** In the assignment demo, switches between the student and the teacher. */
+export async function switchDemoTour() {
+  const tour = (await readSession())?.demoTour;
+  const other = tour && (await findAccountById(tour.otherId));
+  // Only ever into the paired demo account.
+  if (!tour || !other?.demo) redirect("/");
+  await startSession(other.id);
+  redirect(other.role === "teacher" ? `/teacher/assignments/${tour.assignmentId}` : "/assignments");
 }
 
 /** Ends the session; the account stays so the user can log in again. */

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageLoading } from "@/components/PageLoading";
-import { getCurrentPet, getGameQuestions, getGameSubjects } from "@/lib/data";
+import { getCurrentPet } from "@/lib/data";
 import { CardBattle } from "./CardBattle";
+import { AssignmentProvider } from "../_components/AssignmentContext";
+import { loadGameRound } from "../_lib/load";
 
 export const metadata: Metadata = {
   title: "Картын тулаан · LevelUp",
@@ -21,10 +22,12 @@ export default function CardsPage({ searchParams }: PageProps<"/games/cards">) {
 }
 
 async function CardsLoader({ searchParams }: Pick<PageProps<"/games/cards">, "searchParams">) {
-  const [{ subject }, subjects, pet] = await Promise.all([searchParams, getGameSubjects(), getCurrentPet()]);
-  const subjectId = typeof subject === "string" ? subject : subjects[0].id;
-  const questions = await getGameQuestions(subjectId);
-  if (!questions?.length) notFound();
+  const [round, pet] = await Promise.all([loadGameRound(searchParams, "cards"), getCurrentPet()]);
+  const { subjects, subjectId, questions } = round;
   // Keyed by subject so switching subjects starts a fresh battle.
-  return <CardBattle key={subjectId} subjects={subjects} subjectId={subjectId} questions={questions} petSprite={pet?.stage.sprite} />;
+  return (
+    <AssignmentProvider assignment={round.assignment}>
+      <CardBattle key={round.assignment?.id ?? subjectId} subjects={subjects} subjectId={subjectId} questions={questions} petSprite={pet?.stage.sprite} />
+    </AssignmentProvider>
+  );
 }
