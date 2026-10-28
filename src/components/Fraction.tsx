@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 import type { ExpressionToken, FractionValue } from "@/lib/types";
 
 // Sizes are in em, so a fraction scales with the parent's font size:
-// <div className="text-[56px] font-bold"><Fraction value={...} /></div>
+// <div className="text-6xl font-bold"><Fraction value={...} /></div>
 
 /** Spoken form for screen readers, e.g. "2 бүхэл 3-ийн 1". */
 export function sayFraction({ whole, num, den }: FractionValue) {
@@ -29,7 +29,7 @@ type FractionProps = {
 export function Fraction({ value, className }: FractionProps) {
   return (
     <span
-      className={cn("inline-flex items-center gap-[0.14em] leading-none", className)}
+      className={cn("inline-flex items-center gap-[0.14em] leading-none tabular-nums", className)}
     >
       {value.whole ? <span className="text-[1.15em]">{value.whole}</span> : null}
       <span className="inline-flex flex-col items-center">

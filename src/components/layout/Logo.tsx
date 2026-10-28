@@ -27,7 +27,7 @@ export function Logo({ tone = "dark", size = "md" }: LogoProps) {
     <span
       className={`inline-flex items-center font-bold tracking-tight ${
         tone === "light" ? "text-white" : "text-ink"
-      } ${size === "md" ? "gap-2.5 text-[22px] md:text-2xl" : "gap-2 text-[15px]"}`}
+      } ${size === "md" ? "gap-2.5 text-2xl" : "gap-2 text-base"}`}
     >
       <LogoMark
         tone={tone}

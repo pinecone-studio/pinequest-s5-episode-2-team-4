@@ -22,7 +22,7 @@ const iconProps = {
 /** The teacher's material under an answer: a lesson part in the app, or an outside page in a new tab. */
 export function MaterialLink({ material, className }: MaterialLinkProps) {
   const classes = cn(
-    "inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border-2 border-lavender bg-white px-3.5 text-[13px] font-bold text-ink hover:bg-lavender",
+    "inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border-2 border-lavender bg-white px-3.5 text-sm font-bold text-ink hover:bg-lavender",
     className,
   );
   const label = <span className="truncate">{materialLabel(material)}</span>;

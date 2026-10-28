@@ -44,7 +44,7 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
         z <span className="text-2xl md:text-3xl">Z</span>
       </span>
       <div className="absolute top-3 left-3 flex items-center gap-2.5 rounded-full bg-white py-1.5 pr-2 pl-4 shadow-[0_6px_20px_rgba(63,7,145,0.12)] md:top-auto md:right-5 md:bottom-5 md:left-5 md:justify-between md:gap-3 md:py-3 md:pr-3.5 md:pl-6 md:shadow-none">
-        <h2 id="pet-scene-name" className="text-xl leading-[1.1] font-bold md:text-[28px]">
+        <h2 id="pet-scene-name" className="type-section-title">
           {discovered ? (
             stage.name
           ) : (
@@ -56,7 +56,7 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
         </h2>
         <span className="flex gap-1.5 md:gap-2">
           {discovered ? (
-            <span className="inline-flex items-center rounded-full bg-primary px-3 py-0.75 text-[13px] font-bold text-white">
+            <span className="inline-flex items-center rounded-full bg-primary px-3 py-0.75 text-sm font-bold text-white">
               Түв. {level}
             </span>
           ) : null}

@@ -24,7 +24,7 @@ export function ElementBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-0.75 text-[13px] font-bold",
+        "inline-flex items-center rounded-full px-3 py-0.75 text-sm font-bold",
         ELEMENT_COLORS[element],
         // White on white needs an outline.
         element === "earth" && "border-2 border-ink",
