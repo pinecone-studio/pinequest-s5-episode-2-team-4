@@ -76,6 +76,37 @@
     background-color: rgb(57 48 80 / 0.6);
   }
 
+  /* White only from a breakpoint up: darken it at the same widths. */
+  @media (width >= 48rem) {
+    [data-theme="dark"] .md\:bg-white {
+      background-color: #1e192b;
+    }
+  }
+
+  @media (width >= 64rem) {
+    [data-theme="dark"] .lg\:bg-white {
+      background-color: #1e192b;
+    }
+  }
+
+  @media (width >= 80rem) {
+    [data-theme="dark"] .xl\:bg-white {
+      background-color: #1e192b;
+    }
+  }
+
+  /* Always-black surfaces (the footer) keep the light theme's pale text colours. */
+  [data-theme="dark"] .on-black {
+    --color-lavender: #dad9ff;
+    --color-sky: #bfefff;
+  }
+
+  /* Black pet silhouettes would vanish on dark cards, so draw them light. The
+     habitat scene's artwork stays light, so its silhouettes stay dark. */
+  [data-theme="dark"] .brightness-0:not(.pet-scene *) {
+    --tw-invert: invert(100%);
+  }
+
   [data-theme="dark"] .bg-ink {
     background-color: #3f0791;
   }
