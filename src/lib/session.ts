@@ -34,6 +34,10 @@ export type Account = {
   mastered?: string[];
   /** Teachers: the one subject they teach, picked at sign-up (subjects.ts id). */
   subject?: string;
+  /** Game ids the student likes most, for assignments played "by interest". */
+  favoriteGames?: string[];
+  /** Assignment ids that already gave XP, so replays don't farm it. */
+  assignmentsRewarded?: string[];
   /** The latest retest, for the mastered page. */
   lastRetest?: {
     subtopicId: string;
