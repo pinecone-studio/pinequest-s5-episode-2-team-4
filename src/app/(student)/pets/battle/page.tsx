@@ -122,7 +122,7 @@ export default async function BossListPage() {
               <div className="flex min-w-0 flex-col gap-1.5">
                 <h2 className="text-2xl leading-tight font-bold">{boss.name}</h2>
                 <p className="flex flex-wrap items-center gap-1.5">
-                  <span className="rounded-full bg-ink px-2.5 py-0.75 text-xs font-bold text-white">
+                  <span lang="en" className="rounded-full bg-ink px-2.5 py-0.75 text-xs font-bold text-white">
                     {RARITY_LABELS[boss.rarity]}
                   </span>
                   {boss.elements.map((e) => (

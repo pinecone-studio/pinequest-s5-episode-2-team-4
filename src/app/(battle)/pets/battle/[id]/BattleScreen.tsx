@@ -812,7 +812,7 @@ function BattleOver({
               <div className="text-left">
                 <p className="font-bold">Өндөг олдлоо!</p>
                 <p className="text-sm text-ink-muted">
-                  {RARITY_LABELS[state.rewards.egg.rarity]} · Тэжээвэр хэсгээс хагалаарай
+                  <span lang="en">{RARITY_LABELS[state.rewards.egg.rarity]}</span> · Тэжээвэр хэсгээс хагалаарай
                 </p>
               </div>
             </div>
