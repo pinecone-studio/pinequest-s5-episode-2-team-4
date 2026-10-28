@@ -13,7 +13,7 @@ import type { User } from "./types";
 export const MIN_PASSWORD_LENGTH = 6;
 
 /** Learning progress saved with the account. */
-export type AccountProgress = Omit<Account, "username" | "role" | "classCode">;
+export type AccountProgress = Omit<Account, "id" | "username" | "email" | "role" | "classCode">;
 
 export type StoredAccount = {
   id: string;

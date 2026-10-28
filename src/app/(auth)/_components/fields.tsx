@@ -44,11 +44,11 @@ export function ClassCodeField(props: FieldProps) {
   );
 }
 
-export function PasswordField({ id, label, ...props }: FieldProps) {
+export function PasswordField({ id, label, hint, ...props }: FieldProps) {
   const [visible, setVisible] = useState(false);
   return (
     <div className="flex flex-col gap-1.5">
-      <Label id={id} label={label} />
+      <Label id={id} label={label} hint={hint} />
       <div className="relative">
         <input
           id={id}

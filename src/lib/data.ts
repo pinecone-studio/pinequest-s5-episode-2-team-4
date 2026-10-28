@@ -82,12 +82,12 @@ export async function getLearningStreak() {
   return streakSummary((await readSession())?.streak);
 }
 
-/** The logged-in user from the mock session, or undefined when logged out. */
+/** The logged-in user, or undefined when logged out. */
 export async function getCurrentUser(): Promise<User | undefined> {
   const session = await readSession();
   if (!session) return undefined;
   return {
-    id: `user-${session.username}`,
+    id: session.id,
     username: session.username,
     role: session.role,
     classCode: session.classCode,
