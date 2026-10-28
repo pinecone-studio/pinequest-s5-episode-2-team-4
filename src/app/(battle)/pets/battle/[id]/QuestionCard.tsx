@@ -57,7 +57,7 @@ export function QuestionCard({ question, disabled, checking, onAnswer, onListen 
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-surface px-3 py-1 text-xs font-bold md:text-sm">
-          {SKILL_LABELS[question.skill]}
+          {question.subjectTitle ?? SKILL_LABELS[question.skill]}
         </span>
         {question.verified ? null : (
           <span className="text-xs font-semibold text-ink-muted">Дадлагын асуулт</span>
@@ -68,7 +68,7 @@ export function QuestionCard({ question, disabled, checking, onAnswer, onListen 
       </div>
 
       <div className="mt-2 flex items-start gap-3">
-        <h2 id="question-prompt" lang="en" className="min-w-0 flex-1 text-lg leading-snug font-bold md:text-xl">
+        <h2 id="question-prompt" lang={question.skill === "subject" ? "mn" : "en"} className="min-w-0 flex-1 text-lg leading-snug font-bold md:text-xl">
           {question.prompt}
         </h2>
         {question.speak && supported ? (

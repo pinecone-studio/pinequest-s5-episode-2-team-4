@@ -19,7 +19,9 @@ import {
   startSoloBattle,
   type ClassControl,
 } from "./battle";
+import { DEFAULT_BATTLE_SUBJECT, isBattleSubject } from "./battle-questions";
 import { bosses } from "./mock/bosses";
+import { teacherSubject } from "./subjects";
 import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
 import { readSession, writeSession } from "./session";
@@ -40,11 +42,17 @@ async function teacher() {
   return user;
 }
 
+/** The subject a battle form asks for; English when missing or unknown. */
+const formSubject = (form?: FormData) => {
+  const subject = form?.get("subject");
+  return isBattleSubject(subject) ? subject : DEFAULT_BATTLE_SUBJECT;
+};
+
 /** Starts (or resumes) a solo battle and opens it. */
-export async function startBossBattle(bossId: string) {
+export async function startBossBattle(bossId: string, form?: FormData) {
   const user = await student();
   if (!user.pet) redirect("/pets");
-  const battleId = await startSoloBattle(user, user.pet, bossId);
+  const battleId = await startSoloBattle(user, user.pet, bossId, formSubject(form));
   redirect(`/pets/battle/${battleId}`);
 }
 
@@ -55,10 +63,10 @@ export async function leaveBossBattle(battleId: string) {
 }
 
 /** Opens a group lobby for friends to join, and goes to it. */
-export async function createGroupBossBattle(bossId: string) {
+export async function createGroupBossBattle(bossId: string, form?: FormData) {
   const user = await student();
   if (!user.pet) redirect("/pets");
-  const battleId = await createGroupBattle(user, user.pet, bossId);
+  const battleId = await createGroupBattle(user, user.pet, bossId, formSubject(form));
   redirect(`/pets/battle/${battleId}`);
 }
 
@@ -107,7 +115,11 @@ export async function createClassBossBattle(form: FormData) {
   const bossId = String(form.get("boss") ?? "");
   const classCode = String(form.get("classCode") ?? "").trim();
   if (!bosses.some((b) => b.id === bossId) || !classCode || classCode.length > 10) redirect("/teacher");
-  const battleId = await createClassBattle(user, classCode, bossId);
+  // A teacher's battles stay in the subject they teach.
+  const topics = teacherSubject(user.subject)?.battleTopics;
+  const asked = formSubject(form);
+  const subject = !topics || topics.includes(asked) ? asked : topics[0];
+  const battleId = await createClassBattle(user, classCode, bossId, subject);
   redirect(`/teacher/battle/${battleId}`);
 }
 

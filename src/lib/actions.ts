@@ -16,6 +16,7 @@ import { XP_PER_LEVEL, addXp, isStarterPet } from "./pets";
 import { clearSession, readSession, startSession, writeSession } from "./session";
 import type { User } from "./types";
 import { recordLearningDay } from "./streak";
+import { teacherSubject } from "./subjects";
 
 type Credentials = {
   username: string;
@@ -49,7 +50,7 @@ function homeFor(role: User["role"]) {
 
 /** A new account: a student's chosen starter pet begins at level 1 with no test taken. */
 export async function signUp(
-  credentials: Credentials & { petLineId?: string },
+  credentials: Credentials & { petLineId?: string; subject?: string },
 ): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   const email = cleanEmail(credentials.email);
@@ -57,6 +58,9 @@ export async function signUp(
   const role = credentials.role === "teacher" ? "teacher" : "student";
   const line = petLines.find((l) => l.id === credentials.petLineId && isStarterPet(l));
   if (role === "student" && !line) throw new Error("Students start with a common pet");
+  // A teacher teaches one subject, chosen here for good.
+  const subject = teacherSubject(credentials.subject);
+  if (role === "teacher" && !subject) throw new Error("Teachers pick the subject they teach");
 
   const result = await createAccount({
     username,
@@ -64,7 +68,8 @@ export async function signUp(
     password: String(credentials.password),
     role,
     classCode: clean(credentials.classCode, 10),
-    progress: role === "student" && line ? { pet: { lineId: line.id, level: 1, xp: 0 } } : {},
+    progress:
+      role === "student" && line ? { pet: { lineId: line.id, level: 1, xp: 0 } } : { subject: subject?.id },
   });
   if ("error" in result) return { error: result.error };
   await startSession(result.account.id);
@@ -101,6 +106,14 @@ export async function demoLogIn() {
   // Each demo is a new account; clear out old ones once the response is sent.
   after(deleteOldDemoAccounts);
   redirect("/");
+}
+
+/** A fresh demo teacher in the same class as the demo students. */
+export async function demoTeacherLogIn() {
+  const account = await createDemoAccount({ subject: "math" }, "teacher");
+  await startSession(account.id);
+  after(deleteOldDemoAccounts);
+  redirect("/teacher");
 }
 
 /** Ends the session; the account stays so the user can log in again. */

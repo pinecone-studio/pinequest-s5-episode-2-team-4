@@ -6,7 +6,7 @@
 import "server-only";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { bosses } from "./mock/bosses";
-import { englishQuestions } from "./mock/english";
+import { DEFAULT_BATTLE_SUBJECT, battleQuestionPool, battleSubjectTitle, findBattleQuestion } from "./battle-questions";
 import { petLines } from "./mock/pets";
 import { getSupabaseAdmin } from "./supabase";
 import type {
@@ -56,21 +56,48 @@ async function playerId(user: User): Promise<string> {
   return data as string;
 }
 
-/** A question for this boss that wasn't asked recently in the battle. */
-function pickQuestion(boss: Boss, recentIds: string[]): EnglishQuestion {
-  const { min, max } = boss.questionDifficulty;
-  const pool = englishQuestions.filter((q) => q.difficulty >= min && q.difficulty <= max);
+/** A question of the battle's subject for this boss that wasn't asked recently. */
+function pickQuestion(boss: Boss, subject: string, recentIds: string[]): EnglishQuestion {
+  const pool = battleQuestionPool(boss, subject);
   const fresh = pool.filter((q) => !recentIds.includes(q.id));
   const from = fresh.length > 0 ? fresh : pool;
   return from[Math.floor(Math.random() * from.length)];
 }
 
-/** Starts a solo battle against `bossId`, or returns the unfinished one. */
+let subjectColumnReady = false;
+
+/**
+ * Whether migration 0014 (battles.subject) has run. Until it has, battles
+ * work as before and are all English. Only "yes" is remembered, so running
+ * the migration takes effect without a restart.
+ */
+export async function hasSubjectColumn(): Promise<boolean> {
+  if (subjectColumnReady) return true;
+  const { error } = await db().from("battles").select("subject").limit(1);
+  subjectColumnReady = !error;
+  return subjectColumnReady;
+}
+
+/** A battle's subject; older battles are English. */
+async function battleSubject(battleId: string): Promise<string> {
+  if (!(await hasSubjectColumn())) return DEFAULT_BATTLE_SUBJECT;
+  const { data } = await db().from("battles").select("subject").eq("id", battleId).maybeSingle<{ subject: string }>();
+  return data?.subject ?? DEFAULT_BATTLE_SUBJECT;
+}
+
+/** Saves what a new battle is about, right after the database made it. */
+async function setBattleSubject(battleId: string, subject: string) {
+  // English is the column's default: nothing to write.
+  if (subject === DEFAULT_BATTLE_SUBJECT || !(await hasSubjectColumn())) return;
+  const { error } = await db().from("battles").update({ subject }).eq("id", battleId);
+  if (error) fail("Could not set the battle subject", error);
+}
+
 /**
  * Starts a solo battle against `bossId` with the player's active pet (their
  * LevelUp pet until they pick another), or returns the unfinished one.
  */
-export async function startSoloBattle(user: User, starter: UserPet, bossId: string) {
+export async function startSoloBattle(user: User, starter: UserPet, bossId: string, subject = DEFAULT_BATTLE_SUBJECT) {
   const boss = bosses.find((b) => b.id === bossId);
   if (!boss) throw new Error(`Unknown boss ${bossId}`);
   const player = await playerId(user);
@@ -93,9 +120,11 @@ export async function startSoloBattle(user: User, starter: UserPet, bossId: stri
     p_attack_max_sec: boss.attack.maxIntervalSec,
     p_attack_damage: boss.attack.damage,
     p_time_limit_sec: TIME_LIMIT_SEC,
-    p_first_question: pickQuestion(boss, []).id,
+    p_first_question: pickQuestion(boss, subject, []).id,
   });
   if (error || !data) fail("Could not start battle", error);
+  // An unfinished battle comes back as it was; only a new one takes the subject.
+  if ((await battleSubject(data as string)) === DEFAULT_BATTLE_SUBJECT) await setBattleSubject(data as string, subject);
   return data as string;
 }
 
@@ -200,7 +229,7 @@ function toState(view: ViewJson): BattleState | undefined {
   const { battle: b, me: p = WATCHER } = view;
   const question =
     b.status === "active"
-      ? englishQuestions.find((q) => q.id === p.current_question_id)
+      ? findBattleQuestion(p.current_question_id)
       : undefined;
 
   return {
@@ -386,7 +415,12 @@ async function battlePet(player: string, starter: UserPet) {
 }
 
 /** Opens a group lobby against `bossId` (or returns the player's open one). */
-export async function createGroupBattle(user: User, starter: UserPet, bossId: string) {
+export async function createGroupBattle(
+  user: User,
+  starter: UserPet,
+  bossId: string,
+  subject = DEFAULT_BATTLE_SUBJECT,
+) {
   const boss = bosses.find((b) => b.id === bossId);
   if (!boss) throw new Error(`Unknown boss ${bossId}`);
   const player = await playerId(user);
@@ -402,9 +436,10 @@ export async function createGroupBattle(user: User, starter: UserPet, bossId: st
     p_attack_max_sec: boss.attack.maxIntervalSec,
     p_attack_damage: boss.attack.damage,
     p_time_limit_sec: TIME_LIMIT_SEC,
-    p_first_question: pickQuestion(boss, []).id,
+    p_first_question: pickQuestion(boss, subject, []).id,
   });
   if (error || !data) fail("Could not open the lobby", error);
+  if ((await battleSubject(data as string)) === DEFAULT_BATTLE_SUBJECT) await setBattleSubject(data as string, subject);
   return data as string;
 }
 
@@ -421,16 +456,14 @@ export async function joinGroupBattle(
 ): Promise<{ battleId?: string; error?: JoinError }> {
   const player = await playerId(user);
   const pet = await battlePet(player, starter);
-  // The first question has to suit the boss the code is for.
+  // The first question has to suit the boss and the subject the code is for.
   const { data: battle } = await db()
     .from("battles")
-    .select("boss_id")
+    .select((await hasSubjectColumn()) ? "boss_id, subject" : "boss_id")
     .eq("join_code", code.trim().toUpperCase())
-    .maybeSingle<{ boss_id: string }>();
-  const boss = bosses.find((b) => b.id === battle?.boss_id);
-  const first = boss
-    ? pickQuestion(boss, [])
-    : englishQuestions[Math.floor(Math.random() * englishQuestions.length)];
+    .maybeSingle<{ boss_id: string; subject: string | null }>();
+  const boss = bosses.find((b) => b.id === battle?.boss_id) ?? bosses[0];
+  const first = pickQuestion(boss, battle?.subject ?? DEFAULT_BATTLE_SUBJECT, []);
   const { data, error } = await db().rpc("battle_join_group", {
     p_code: code,
     p_player: player,
@@ -484,7 +517,12 @@ export function normalClassCode(code: string) {
 }
 
 /** The teacher opens a class battle against `bossId` (or gets back their open one). */
-export async function createClassBattle(teacher: User, classCode: string, bossId: string) {
+export async function createClassBattle(
+  teacher: User,
+  classCode: string,
+  bossId: string,
+  subject = DEFAULT_BATTLE_SUBJECT,
+) {
   const boss = bosses.find((b) => b.id === bossId);
   if (!boss) throw new Error(`Unknown boss ${bossId}`);
   const { data, error } = await db().rpc("battle_create_class", {
@@ -499,6 +537,9 @@ export async function createClassBattle(teacher: User, classCode: string, bossId
     p_time_limit_sec: CLASS_TIME_LIMIT_SEC,
   });
   if (error || !data) fail("Could not open the class battle", error);
+  // The teacher's open battle comes back as it was; only a new one takes the subject.
+  const { data: fresh } = await db().from("battles").select("started_at").eq("id", data as string).single<{ started_at: string | null }>();
+  if (!fresh?.started_at) await setBattleSubject(data as string, subject);
   return data as string;
 }
 
@@ -507,6 +548,7 @@ type OpenClassRow = {
   boss_id: string;
   status: ClassBattleSummary["status"];
   class_code: string;
+  subject?: string | null;
   battle_participants: { player_id: string; left_at: string | null }[];
 };
 
@@ -517,25 +559,27 @@ function toSummary(row: OpenClassRow, player?: string): ClassBattleSummary {
     bossId: row.boss_id,
     status: row.status,
     classCode: row.class_code,
+    subjectTitle: battleSubjectTitle(row.subject ?? DEFAULT_BATTLE_SUBJECT),
     students: present.length,
     joined: player !== undefined && present.some((p) => p.player_id === player),
   };
 }
 
-const OPEN_CLASS_SELECT = "id, boss_id, status, class_code, battle_participants(player_id, left_at)";
+const openClassSelect = async () =>
+  `id, boss_id, status, class_code, ${(await hasSubjectColumn()) ? "subject, " : ""}battle_participants(player_id, left_at)`;
 
 /** The teacher's unfinished class battle, if any. */
 export async function teacherClassBattle(teacher: User): Promise<ClassBattleSummary | undefined> {
   const { data, error } = await db()
     .from("battles")
-    .select(OPEN_CLASS_SELECT)
+    .select(await openClassSelect())
     .eq("host_player_id", await playerId(teacher))
     .eq("mode", "class")
     .in("status", ["lobby", "active", "paused"])
     .order("created_at", { ascending: false })
     .limit(1);
   if (error) fail("Could not load class battles", error);
-  const row = data?.[0] as OpenClassRow | undefined;
+  const row = data?.[0] as unknown as OpenClassRow | undefined;
   return row && toSummary(row);
 }
 
@@ -548,14 +592,14 @@ export async function openClassBattle(
   const player = await playerId(user);
   const { data, error } = await db()
     .from("battles")
-    .select(OPEN_CLASS_SELECT)
+    .select(await openClassSelect())
     .eq("class_code", normalClassCode(classCode))
     .eq("mode", "class")
     .in("status", ["lobby", "active", "paused"])
     .order("created_at", { ascending: false })
     .limit(1);
   if (error) fail("Could not load class battles", error);
-  const row = data?.[0] as OpenClassRow | undefined;
+  const row = data?.[0] as unknown as OpenClassRow | undefined;
   return row && toSummary(row, player);
 }
 
@@ -624,9 +668,8 @@ export async function battleState(
  * Random questions for this boss, for the database to pick the next one
  * from (it weights them by the player's weaker skills).
  */
-function nextCandidates(boss: Boss) {
-  const { min, max } = boss.questionDifficulty;
-  const pool = englishQuestions.filter((q) => q.difficulty >= min && q.difficulty <= max);
+function nextCandidates(boss: Boss, subject: string) {
+  const pool = [...battleQuestionPool(boss, subject)];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -651,10 +694,10 @@ export async function answerBattleQuestion(
   answer: EnglishAnswer,
 ): Promise<{ outcome?: BattleAnswerOutcome; state?: BattleState; error?: string }> {
   const boss = bosses.find((b) => b.id === bossId);
-  const question = englishQuestions.find((q) => q.id === questionId);
+  const question = findBattleQuestion(questionId);
   if (!boss || !question) return { error: "invalid" };
   const result = checkEnglishAnswer(question, answer);
-  const candidates = nextCandidates(boss);
+  const candidates = nextCandidates(boss, await battleSubject(battleId));
 
   const { data, error } = await db().rpc("battle_answer", {
     p_battle: battleId,

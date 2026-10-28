@@ -7,10 +7,11 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass, Card } from "@/components/ui";
 import { signUp } from "@/lib/actions";
 import { cn } from "@/lib/cn";
+import { TEACHER_SUBJECTS } from "@/lib/subjects";
 import type { PetLine } from "@/lib/types";
 import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
-import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
+import { ArrowIcon, ClassCodeField, PasswordField, SubjectPicker, TextField } from "../_components/fields";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
 /** `petLines`: the pets a new student can pick; the first is picked to start. */
@@ -39,6 +40,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
         role,
         classCode: String(form.get("classCode") ?? ""),
         petLineId: isStudent ? pet.id : undefined,
+        subject: isStudent ? undefined : String(form.get("subject") ?? ""),
       });
       setTaken(result?.error === "taken" ? "username" : result?.error === "emailTaken" ? "email" : null);
     });
@@ -160,8 +162,10 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
               required
               minLength={6}
             />
-            {isStudent && (
+            {isStudent ? (
               <ClassCodeField id="su-code" name="classCode" label="Ангийн код" hint="заавал биш" />
+            ) : (
+              <SubjectPicker name="subject" subjects={TEACHER_SUBJECTS} />
             )}
             {taken && (
               <FormError id="signup-error">
