@@ -39,7 +39,8 @@ import {
 import { isAssignmentGame } from "./gamefit";
 import { grade7MathCurriculum } from "./mock/curriculum";
 import { readSession } from "./session";
-import { streakSummary } from "./streak";
+import { findSignal, listDaySignals, signalsStored, summarizeSignals } from "./signals";
+import { learningDay, streakSummary } from "./streak";
 import type {
   Assignment,
   AssignmentReport,
@@ -69,6 +70,7 @@ import type {
   PetLine,
   Question,
   QuestionGroup,
+  SignalLevel,
   SignalSummary,
   Subtopic,
   SubtopicProgress,
@@ -477,17 +479,41 @@ export async function getQuestionGroups(): Promise<QuestionGroup[]> {
 
 // Understanding signals (🟢🟡🔴 sent by students during a lesson)
 
-export async function getSignals(subtopicId: string) {
-  return signals.filter((s) => s.subtopicId === subtopicId);
+/**
+ * Today's 🟢/🟡/🔴 counts for the teacher's class, one row per subtopic taught
+ * today. Demo teachers see the sample lesson, as does a server without
+ * Supabase or one where loading fails (e.g. the 0016 migration isn't run yet).
+ */
+export async function getTodaySignals(): Promise<SignalSummary[]> {
+  // "Today" must use the request's date, never a prerendered date.
+  await io();
+  const user = await getCurrentUser();
+  if (user?.classCode && !user.demo && signalsStored()) {
+    try {
+      return await listDaySignals(user.classCode, learningDay());
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  return summarizeSignals(signals);
 }
 
-/** 🟢/🟡/🔴 counts per subtopic, in topic order. */
-export async function getSignalSummary(): Promise<SignalSummary[]> {
-  return subtopics.map((sub) => {
-    const counts = { got: 0, unsure: 0, lost: 0 };
-    for (const s of signals) if (s.subtopicId === sub.id) counts[s.level]++;
-    return { subtopicId: sub.id, counts };
-  });
+/** The signal the logged-in student already sent for this lesson today, if any. */
+export async function getMySignal(subtopicId: string): Promise<SignalLevel | undefined> {
+  await io();
+  const user = await getCurrentUser();
+  if (user?.role !== "student" || !user.classCode || user.demo || !signalsStored()) return undefined;
+  try {
+    return await findSignal({
+      classCode: user.classCode,
+      subtopicId,
+      day: learningDay(),
+      studentId: user.id,
+    });
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 }
 
 /** Subjects that have game questions, without the questions themselves. */
