@@ -6,6 +6,7 @@
 import { redirect } from "next/navigation";
 import { checkLogin, createAccount, createDemoAccount, saveAccount } from "./accounts";
 import { getRetestQuestions } from "./data";
+import { clearLoginFailures, loginBlockedMinutes, recordLoginFailure } from "./login-limit";
 import { lessons } from "./mock/lessons";
 import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
@@ -24,7 +25,10 @@ type Credentials = {
 };
 
 /** Returned instead of redirecting when the form needs to show an error. */
-export type AuthError = { error: "taken" | "emailTaken" | "unknown" };
+export type AuthError =
+  | { error: "taken" | "emailTaken" | "unknown" }
+  /** Too many wrong logins: try again in this many minutes. */
+  | { error: "blocked"; minutes: number };
 
 function clean(text: string | undefined, max: number) {
   return text?.trim().slice(0, max) || undefined;
@@ -66,13 +70,22 @@ export async function signUp(
   redirect(homeFor(role));
 }
 
-/** Logs in when the username, email and password all belong to one account. */
+/**
+ * Logs in when the username, email and password all belong to one account.
+ * Too many wrong tries block the username for a while (login-limit.ts).
+ */
 export async function logIn(credentials: Credentials): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
   const email = cleanEmail(credentials.email);
   if (!username || !email) throw new Error("Username and email are required");
+  const minutes = await loginBlockedMinutes(username);
+  if (minutes > 0) return { error: "blocked", minutes };
   const account = await checkLogin({ username, email, password: String(credentials.password) });
-  if (!account) return { error: "unknown" };
+  if (!account) {
+    await recordLoginFailure(username);
+    return { error: "unknown" };
+  }
+  await clearLoginFailures(username);
 
   const classCode = clean(credentials.classCode, 10);
   if (classCode && classCode !== account.classCode) await saveAccount({ ...account, classCode });
