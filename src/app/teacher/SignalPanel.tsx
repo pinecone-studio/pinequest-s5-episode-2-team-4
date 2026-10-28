@@ -1,22 +1,37 @@
 import { cn } from "@/lib/cn";
 import type { SignalLevel, SignalSummary } from "@/lib/types";
 
-// Same colors as the heatmap: good → sky, learning → line, weak → magenta.
-const LEVELS: { level: SignalLevel; label: string; className: string }[] = [
-  { level: "got", label: "Ойлгосон", className: "bg-sky" },
-  { level: "unsure", label: "Сайн мэдэхгүй", className: "bg-line" },
-  { level: "lost", label: "Ойлгосонгүй", className: "bg-magenta" },
+// The 🟢🟡🔴 the students sent, in the same status colours as the heatmap.
+const LEVELS: { level: SignalLevel; emoji: string; label: string; className: string }[] = [
+  { level: "got", emoji: "🟢", label: "Ойлгосон", className: "bg-status-good text-status-good-ink" },
+  { level: "unsure", emoji: "🟡", label: "Сайн мэдэхгүй", className: "bg-status-mid text-status-mid-ink" },
+  { level: "lost", emoji: "🔴", label: "Ойлгоогүй", className: "bg-status-weak text-status-weak-ink" },
 ];
 
 /** Share of 🔴 at which a subtopic is flagged to explain again. */
 const REEXPLAIN_SHARE = 0.25;
+/** Share of 🟡 and 🔴 together at which some students are still unsure. */
+const UNSURE_SHARE = 0.4;
+
+/** One-line verdict for a lesson, so the teacher knows what to do at a glance. */
+function verdict({ got, unsure, lost }: SignalSummary["counts"]) {
+  const total = got + unsure + lost;
+  if (lost / total >= REEXPLAIN_SHARE) {
+    return { text: `${lost} сурагч ойлгоогүй · дахин тайлбарлах`, className: LEVELS[2].className };
+  }
+  if ((unsure + lost) / total >= UNSURE_SHARE) {
+    return { text: `${unsure + lost} сурагч эргэлзэж байна · жишээ нэмэх`, className: LEVELS[1].className };
+  }
+  return { text: "Ихэнх нь ойлгосон · дараагийн сэдэв рүү", className: LEVELS[0].className };
+}
 
 type SignalPanelProps = {
+  /** Today's lessons only, in the order they were taught */
   rows: (SignalSummary & { title: string })[];
   className?: string;
 };
 
-/** 🟢🟡🔴 split per subtopic, from the anonymous signals sent in lessons. */
+/** Today's 🟢🟡🔴 per subtopic taught, from the anonymous signals sent in lessons. */
 export function SignalPanel({ rows, className }: SignalPanelProps) {
   return (
     <section
@@ -27,75 +42,57 @@ export function SignalPanel({ rows, className }: SignalPanelProps) {
       )}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2
-          id="signals-title"
-          className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]"
-        >
-          Ойлголтын дохио
+        <h2 id="signals-title" className="type-section-title">
+          Өнөөдрийн хичээлийн дохио
         </h2>
-        <p className="text-[13px] font-semibold text-ink-muted md:text-sm">
-          Нэргүй · хичээлийн үеэр сурагчдын илгээсэн
+        <p className="text-sm font-semibold text-ink-muted">
+          Нэргүй · сурагчид хичээлийн үеэр илгээсэн
         </p>
       </div>
 
-      <ul className="mt-4 flex flex-col gap-3.5 md:gap-4">
-        {rows.map((row) => {
-          const total = row.counts.got + row.counts.unsure + row.counts.lost;
-          const reexplain =
-            total > 0 && row.counts.lost / total >= REEXPLAIN_SHARE;
-          return (
-            <li key={row.subtopicId}>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <b className="text-[15px] md:text-base">{row.title}</b>
-                {reexplain ? (
-                  <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold">
-                    Дахин тайлбарлах
-                  </span>
-                ) : null}
-              </div>
-              <div
-                role="img"
-                aria-label={LEVELS.map(
-                  (l) => `${l.label} ${row.counts[l.level]}`,
-                ).join(", ")}
-                className="mt-1.5 flex h-7 gap-[3px] overflow-hidden rounded-field md:h-8"
-              >
-                {total === 0 ? (
-                  <span className="flex-1 border-2 border-dashed border-line" />
-                ) : (
-                  LEVELS.map((l) =>
-                    row.counts[l.level] > 0 ? (
-                      <span
-                        key={l.level}
-                        style={{ flexGrow: row.counts[l.level] }}
-                        className={cn(
-                          "flex min-w-7 basis-0 items-center justify-center text-xs font-bold",
-                          l.className,
-                          l.level === "lost" ? "text-white" : "text-ink",
-                        )}
-                      >
-                        {row.counts[l.level]}
-                      </span>
-                    ) : null,
-                  )
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      {rows.length === 0 ? (
+        <p className="mt-4 rounded-card border-2 border-dashed border-line px-5 py-6 text-center text-sm font-semibold text-ink-muted">
+          Өнөөдөр дохио ирээгүй байна. Сурагчид хичээлийн «Ойлгосон уу?» хэсгээс илгээнэ.
+        </p>
+      ) : (
+        <ul className={cn("mt-4 grid gap-4", rows.length > 1 && "lg:grid-cols-2")}>
+          {rows.map((row) => {
+            const total = row.counts.got + row.counts.unsure + row.counts.lost;
+            const summary = verdict(row.counts);
+            return (
+              <li key={row.subtopicId} className="flex flex-col gap-3 rounded-card bg-surface p-4 md:p-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                  <h3 className="text-lg font-bold">{row.title}</h3>
+                  <p className="text-sm font-semibold text-ink-muted">
+                    {row.time} · {total} сурагч хариулсан
+                  </p>
+                </div>
 
-      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] font-semibold text-ink-muted">
-        {LEVELS.map((l) => (
-          <li key={l.level} className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className={cn("size-3 rounded-full", l.className)}
-            />
-            {l.label}
-          </li>
-        ))}
-      </ul>
+                <p className={cn("rounded-tile px-4 py-2.5 text-base font-bold", summary.className)}>
+                  {summary.text}
+                </p>
+
+                <dl className="grid grid-cols-3 gap-2">
+                  {LEVELS.map((l) => (
+                    <div key={l.level} className={cn("flex flex-col rounded-tile px-3 py-2.5", l.className)}>
+                      <dt className="order-last text-xs font-semibold">
+                        <span aria-hidden="true" className="hidden sm:inline">{l.emoji} </span>
+                        {l.label}
+                      </dt>
+                      <dd className="text-3xl leading-none font-bold tabular-nums">
+                        {row.counts[l.level]}
+                        <span className="ml-1 text-sm font-semibold">
+                          {Math.round((row.counts[l.level] / total) * 100)}%
+                        </span>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }
