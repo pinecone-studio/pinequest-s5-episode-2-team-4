@@ -6,14 +6,14 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
 import { demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
-import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
+import { ArrowIcon, PasswordField, TextField } from "../_components/fields";
 import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
-export function LoginForm({ pet }: { pet: PetStage }) {
+/** `next`: where to go after logging in, e.g. the QR invite a student scanned. */
+export function LoginForm({ pet, next }: { pet: PetStage; next?: string }) {
   const [role, setRole] = useState<Role>("student");
-  const [showCode, setShowCode] = useState(false);
   const [unknown, setUnknown] = useState(false);
   /** Minutes until a username blocked after too many wrong tries may try again. */
   const [blocked, setBlocked] = useState(0);
@@ -37,7 +37,7 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         email: String(form.get("email") ?? ""),
         password: String(form.get("password") ?? ""),
         role,
-        classCode: String(form.get("classCode") ?? ""),
+        next,
       });
       setUnknown(result?.error === "unknown");
       setBlocked(result?.error === "blocked" ? result.minutes : 0);
@@ -85,29 +85,6 @@ export function LoginForm({ pet }: { pet: PetStage }) {
           required
           {...unknownProps}
         />
-        {isStudent &&
-          (showCode ? (
-            <ClassCodeField id="login-code" name="classCode" label="Ангийн код" autoFocus />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowCode(true)}
-              className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start rounded-full border-2 border-dashed border-line bg-white px-3.5 text-sm font-bold text-primary"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-                className="size-4"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              Ангийн код
-            </button>
-          ))}
         {unknown && (
           <FormError id="login-error">
             Нэвтрэх нэр, имэйл эсвэл нууц үг буруу байна.{" "}
