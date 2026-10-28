@@ -114,6 +114,7 @@ function saveResult(score: number, mistakes: number, bestCombo: number, missed: 
     score, bestCombo, stars,
     accuracy: Math.round((100 * answers) / (answers + mistakes)),
     review: missed[0]?.explanation,
+    missedIds: missed.map((q) => q.id),
     unlocked: unlocked?.name,
   };
 }

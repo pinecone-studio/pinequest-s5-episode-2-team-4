@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageLoading } from "@/components/PageLoading";
-import { getGameQuestions, getGameSubjects } from "@/lib/data";
 import { SnakeGame } from "./SnakeGame";
+import { AssignmentProvider } from "../_components/AssignmentContext";
+import { loadGameRound } from "../_lib/load";
 
 export const metadata: Metadata = {
   title: "Мэдлэгийн могой · LevelUp",
@@ -21,10 +21,12 @@ export default function SnakePage({ searchParams }: PageProps<"/games/snake">) {
 }
 
 async function SnakeLoader({ searchParams }: Pick<PageProps<"/games/snake">, "searchParams">) {
-  const [{ subject }, subjects] = await Promise.all([searchParams, getGameSubjects()]);
-  const subjectId = typeof subject === "string" ? subject : subjects[0].id;
-  const questions = await getGameQuestions(subjectId);
-  if (!questions?.length) notFound();
+  const [round] = await Promise.all([loadGameRound(searchParams, "snake")]);
+  const { subjects, subjectId, questions } = round;
   // Keyed by subject so switching subjects starts a fresh session.
-  return <SnakeGame key={subjectId} subjects={subjects} subjectId={subjectId} questions={questions} />;
+  return (
+    <AssignmentProvider assignment={round.assignment}>
+      <SnakeGame key={round.assignment?.id ?? subjectId} subjects={subjects} subjectId={subjectId} questions={questions} />
+    </AssignmentProvider>
+  );
 }

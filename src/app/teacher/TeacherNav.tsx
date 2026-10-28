@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 
 const LINKS: { href: string; label: string; exact?: boolean; also?: string }[] = [
   { href: "/teacher", label: "Самбар", exact: true },
+  { href: "/teacher/assignments", label: "Даалгавар" },
   { href: "/teacher/history", label: "Түүх", also: "/teacher/english" },
 ];
 

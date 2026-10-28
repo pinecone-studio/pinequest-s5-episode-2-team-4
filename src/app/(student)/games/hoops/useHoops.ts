@@ -84,6 +84,7 @@ export function useHoops(questions: GameQuestion[]) {
           bestCombo: game.bestCombo,
           stars: game.hearts > 0 ? starsFor(game.wrong) : 1,
           review: game.missed[0]?.explanation,
+          missedIds: game.missed.map((q) => q.id),
         }
       : null;
 

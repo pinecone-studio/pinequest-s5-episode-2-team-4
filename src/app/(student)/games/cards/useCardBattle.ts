@@ -141,5 +141,6 @@ function toResult(b: Battle): SessionResult {
     bestCombo: b.bestCombo,
     stars: starsFor(b.wrong),
     review: b.missed[0]?.explanation,
+    missedIds: b.missed.map((q) => q.id),
   };
 }

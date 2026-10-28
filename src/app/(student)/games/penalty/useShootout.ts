@@ -108,6 +108,7 @@ export function useShootout(questions: GameQuestion[]) {
           bestCombo: game.bestCombo,
           stars: won ? starsFor(game.wrong) : 1,
           review: game.missed[0]?.explanation,
+          missedIds: game.missed.map((q) => q.id),
         }
       : null;
 

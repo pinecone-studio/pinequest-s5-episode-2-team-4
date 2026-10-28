@@ -123,6 +123,7 @@ export function useWhackAMole(questions: GameQuestion[]) {
           bestCombo: game.bestCombo,
           stars: starsFor(game.wrong),
           review: game.missed[0]?.explanation,
+          missedIds: game.missed.map((q) => q.id),
         }
       : null;
 

@@ -38,6 +38,8 @@ export type Account = {
   favoriteGames?: string[];
   /** Assignment ids that already gave XP, so replays don't farm it. */
   assignmentsRewarded?: string[];
+  /** Assignment demo: the other demo account (teacher or student) and its assignment. */
+  demoTour?: { otherId: string; assignmentId: string };
   /** The latest retest, for the mastered page. */
   lastRetest?: {
     subtopicId: string;

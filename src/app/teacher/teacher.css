@@ -41,3 +41,21 @@
     transform: none;
   }
 }
+
+/* AI reading a material: a light bar sweeps down each preview. */
+.ai-scan-line {
+  animation: ai-scan 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes ai-scan {
+  from {
+    top: -10%;
+  }
+  to {
+    top: 100%;
+  }
+}
+
+.ai-step-text {
+  animation: teacher-toast 0.3s ease-out both;
+}
