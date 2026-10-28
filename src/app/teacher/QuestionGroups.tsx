@@ -1,28 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { GroupRow } from "./GroupRow";
 import {
-  askedBy,
-  QuestionGroupCard,
+  byLesson,
+  isAnswered,
+  isOffTopic,
   type GroupView,
-} from "./QuestionGroupCard";
+} from "./question-inbox";
 
 type QuestionGroupsProps = {
   groups: GroupView[];
   className?: string;
 };
 
+type Tab = "open" | "answered";
+
 /**
- * Anonymous questions grouped by AI, with what the AI noticed: the teacher
- * answers each group once and the answer goes to the whole class.
+ * Anonymous questions as an inbox: the AI groups them and notes the
+ * misconception; the teacher opens a group and answers the whole class once.
+ * Off-topic questions wait in their own section at the bottom.
  */
 export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
-  // Unanswered groups first, then the ones most students asked.
-  const sorted = [...groups].sort(
-    (a, b) =>
-      Number(a.status === "answered") - Number(b.status === "answered") ||
-      askedBy(b.questions) - askedBy(a.questions),
-  );
+  const [tab, setTab] = useState<Tab>("open");
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const offTopic = groups.filter((g) => isOffTopic(g) && !isAnswered(g));
+  const real = groups.filter((g) => !offTopic.includes(g));
+  const lists: Record<Tab, GroupView[]> = {
+    open: real.filter((g) => !isAnswered(g)),
+    answered: real.filter(isAnswered),
+  };
+  const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id));
+
+  const tabs: [Tab, string][] = [
+    ["open", "Хариулаагүй"],
+    ["answered", "Хариулсан"],
+  ];
 
   return (
     <section
@@ -40,19 +55,81 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
           Нэргүй асуултууд
         </h2>
         <p className="text-[13px] font-semibold text-ink-muted md:text-sm">
-          AI ижил асуултуудыг бүлэглэсэн
+          🤖 AI бүлэглэж, буруу ойлголтыг олсон
         </p>
       </div>
 
-      {sorted.length === 0 ? (
-        <p className="mt-4 text-[15px] text-ink-muted">Одоогоор асуулт алга.</p>
+      <div
+        role="tablist"
+        aria-label="Асуултын төлөв"
+        className="mt-4 inline-flex rounded-full bg-surface p-1"
+      >
+        {tabs.map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={tab === value}
+            onClick={() => setTab(value)}
+            className={cn(
+              "min-h-10 cursor-pointer rounded-full px-4 text-sm font-bold",
+              tab === value
+                ? "bg-white text-ink shadow-card"
+                : "text-ink-muted hover:text-ink",
+            )}
+          >
+            {label}{" "}
+            <span className="ml-0.5 opacity-70">{lists[value].length}</span>
+          </button>
+        ))}
+      </div>
+
+      {lists[tab].length === 0 ? (
+        <p className="mt-5 text-[15px] text-ink-muted">
+          {tab === "open"
+            ? "Бүх асуултад хариулсан байна 🎉"
+            : "Хариулсан асуулт алга."}
+        </p>
       ) : (
-        <ul className="mt-4 flex flex-col gap-3">
-          {sorted.map((g) => (
-            <QuestionGroupCard key={g.id} group={g} />
-          ))}
-        </ul>
+        byLesson(lists[tab]).map(([lesson, items]) => (
+          <div key={lesson} className="mt-5">
+            <h3 className="mb-2 text-xs font-bold tracking-wide text-ink-muted uppercase">
+              {lesson}
+            </h3>
+            <ul className="flex flex-col gap-2">
+              {items.map((g) => (
+                <GroupRow
+                  key={g.id}
+                  group={g}
+                  open={openId === g.id}
+                  onToggle={() => toggle(g.id)}
+                />
+              ))}
+            </ul>
+          </div>
+        ))
       )}
+
+      {tab === "open" && offTopic.length > 0 ? (
+        <details className="mt-6 rounded-card border-2 border-dashed border-line px-4 py-3">
+          <summary className="cursor-pointer text-sm font-bold">
+            ⚠ Шалгах шаардлагатай ({offTopic.length})
+            <span className="ml-1 font-semibold text-ink-muted">
+              · хичээлтэй хамааралгүй байж магадгүй
+            </span>
+          </summary>
+          <ul className="mt-3 flex flex-col gap-2">
+            {offTopic.map((g) => (
+              <GroupRow
+                key={g.id}
+                group={g}
+                open={openId === g.id}
+                onToggle={() => toggle(g.id)}
+              />
+            ))}
+          </ul>
+        </details>
+      ) : null}
     </section>
   );
 }
