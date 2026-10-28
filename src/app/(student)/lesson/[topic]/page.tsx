@@ -91,7 +91,7 @@ export default async function LessonPage({
         <LessonSection
           lesson={lesson}
           helper={
-            <QuestionPanel key={lesson.subtopicId} questions={questions} />
+            <QuestionPanel key={lesson.subtopicId} subtopicId={lesson.subtopicId} questions={questions} />
           }
           footer={
             <RetestCard
