@@ -68,13 +68,41 @@ export async function listGroups(classCode: string): Promise<QuestionGroup[]> {
   }));
 }
 
-/** Saves a question as typed; it is grouped later, so the student never waits for that. */
-export async function addQuestion(classCode: string, subtopicId: string, text: string): Promise<AnonQuestion> {
+const COLUMNS = "id, subtopic_id, text, me_too, group_id, answer, created_at";
+
+/**
+ * Saves a question as typed; it is grouped later, so the student never waits
+ * for that. The same question already asked in this class and lesson gets a
+ * "me too" instead of a second copy.
+ */
+export async function saveQuestion(classCode: string, subtopicId: string, text: string) {
+  const normalized = normalizeQuestion(text);
+  const same = await db()
+    .from("anon_questions")
+    .select(COLUMNS)
+    .match({ class_code: classCode, subtopic_id: subtopicId, normalized })
+    .limit(1)
+    .maybeSingle<QuestionRow>();
+  if (same.error) throw new Error(`Could not check for the same question: ${same.error.message}`);
+  if (same.data) {
+    const meToo = await changeMeToo(same.data.id, 1);
+    return { question: toQuestion({ ...same.data, me_too: meToo }), duplicate: true };
+  }
   const { data, error } = await db()
     .from("anon_questions")
-    .insert({ class_code: classCode, subtopic_id: subtopicId, text, normalized: normalizeQuestion(text) })
-    .select("id, subtopic_id, text, me_too, group_id, answer, created_at")
+    .insert({ class_code: classCode, subtopic_id: subtopicId, text, normalized })
+    .select(COLUMNS)
     .single<QuestionRow>();
   if (error) throw new Error(`Could not save the question: ${error.message}`);
-  return toQuestion(data);
+  return { question: toQuestion(data), duplicate: false };
+}
+
+/** Adds or takes back one "me too"; returns the new count (never below 0). */
+export async function changeMeToo(id: string, by: 1 | -1) {
+  const current = await db().from("anon_questions").select("me_too").eq("id", id).single<{ me_too: number }>();
+  if (current.error) throw new Error(`Could not find the question: ${current.error.message}`);
+  const meToo = Math.max(0, current.data.me_too + by);
+  const { error } = await db().from("anon_questions").update({ me_too: meToo }).eq("id", id);
+  if (error) throw new Error(`Could not save "me too": ${error.message}`);
+  return meToo;
 }
