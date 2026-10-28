@@ -128,7 +128,9 @@ export default async function BattleHistoryPage() {
                           {e.rewards.egg ? (
                             <span className="inline-flex items-center gap-1 text-sm font-bold">
                               <PixelEgg rarity={e.rewards.egg} size={24} />
-                              <span className="sr-only">{RARITY_LABELS[e.rewards.egg]} өндөг</span>
+                              <span className="sr-only">
+                                <span lang="en">{RARITY_LABELS[e.rewards.egg]}</span> өндөг
+                              </span>
                             </span>
                           ) : null}
                         </>

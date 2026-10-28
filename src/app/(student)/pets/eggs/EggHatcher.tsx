@@ -64,7 +64,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
         {eggs.map((egg) => (
           <li key={egg.id} className="flex flex-col items-center gap-3 rounded-card bg-white p-4 shadow-card">
             <PixelEgg rarity={egg.rarity} size={72} className="egg-idle" />
-            <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", RARITY_STYLES[egg.rarity])}>
+            <span lang="en" className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", RARITY_STYLES[egg.rarity])}>
               {RARITY_LABELS[egg.rarity]}
             </span>
             <p className="text-center text-sm text-ink-muted">{bossNames[egg.bossId] ?? egg.bossId}-с</p>
@@ -92,7 +92,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
             <div className="egg-reveal flex flex-col items-center gap-2">
               <PetSprite stage={line.stages[0]} size={128} alt={line.stages[0].name} />
               <p className="text-xl font-bold">{line.stages[0].name}</p>
-              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", RARITY_STYLES[result.rarity])}>
+              <span lang="en" className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", RARITY_STYLES[result.rarity])}>
                 {RARITY_LABELS[result.rarity]}
               </span>
             </div>

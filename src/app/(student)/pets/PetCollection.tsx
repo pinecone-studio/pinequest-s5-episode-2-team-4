@@ -320,7 +320,7 @@ function PetDetail({ line, pet, pickedStage, onPickStage, onClose, dropsFrom, pe
           <div className="flex flex-col gap-3">
             <p className="font-bold">
               Түвшин {pet.level} · <span className="text-ink-muted">{pet.exp}/100 EXP</span>{" "}
-              <span className={cn("ml-1 rounded-full px-2 py-0.5 text-xs", RARITY_STYLES[line.rarity])}>
+              <span lang="en" className={cn("ml-1 rounded-full px-2 py-0.5 text-xs", RARITY_STYLES[line.rarity])}>
                 {RARITY_LABELS[line.rarity]}
               </span>
             </p>
@@ -336,7 +336,7 @@ function PetDetail({ line, pet, pickedStage, onPickStage, onClose, dropsFrom, pe
           </div>
         ) : (
           <div className="flex flex-col items-start gap-2">
-            <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", RARITY_STYLES[line.rarity])}>
+            <span lang="en" className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", RARITY_STYLES[line.rarity])}>
               {RARITY_LABELS[line.rarity]}
             </span>
             <p className="text-ink-muted">
