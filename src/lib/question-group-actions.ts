@@ -4,6 +4,7 @@
 // them, and only on their own class.
 
 import { refresh } from "next/cache";
+import { parseMaterial } from "./answer-material";
 import { getCurrentUser, questionClass } from "./data";
 import { answerGroup, mergeGroups, renameGroup } from "./question-group-edits";
 import { questionsStored } from "./questions";
@@ -38,9 +39,9 @@ export async function mergeQuestionGroups(fromId: string, intoId: string): Promi
   return asTeacher((classCode) => mergeGroups(classCode, String(fromId), String(intoId)));
 }
 
-export async function answerQuestionGroup(groupId: string, text: string): Promise<GroupResult> {
+export async function answerQuestionGroup(groupId: string, text: string, material?: unknown): Promise<GroupResult> {
   // Keeps line breaks: a worked answer often has steps on separate lines.
   const answer = String(text).trim();
   if (!answer) return { error: "empty" };
-  return asTeacher((classCode) => answerGroup(classCode, String(groupId), answer));
+  return asTeacher((classCode) => answerGroup(classCode, String(groupId), answer, parseMaterial(material)));
 }

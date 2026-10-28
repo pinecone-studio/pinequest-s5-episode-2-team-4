@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MaterialLink } from "@/components/MaterialLink";
 import { cn } from "@/lib/cn";
 import { askQuestion, setMeToo as saveMeToo, type AskResult } from "@/lib/question-actions";
 import type { AnonQuestion } from "@/lib/types";
@@ -222,6 +223,9 @@ export function QuestionPanel({ subtopicId, questions }: QuestionPanelProps) {
               <div key={q.id} className="rounded-card border-2 border-lavender px-3.5 py-2.5">
                 <p className="text-[15px] font-bold">{q.text}</p>
                 <p className="mt-1.5 text-[15px]">{q.answer?.text}</p>
+                {q.answer?.material ? (
+                  <MaterialLink material={q.answer.material} className="mt-2" />
+                ) : null}
                 <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-xs font-semibold text-ink-muted">
                     {q.answer?.by === "teacher"

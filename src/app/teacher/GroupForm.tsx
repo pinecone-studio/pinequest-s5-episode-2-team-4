@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
@@ -13,12 +13,14 @@ type GroupFormProps = {
   kind: "rename" | "answer";
   initial?: string;
   pending: boolean;
+  /** Shown between the text field and the buttons. */
+  children?: ReactNode;
   onSubmit: (text: string) => void;
   onCancel: () => void;
 };
 
 /** Inline form under a question group for its new title or the class answer. */
-export function GroupForm({ id, kind, initial = "", pending, onSubmit, onCancel }: GroupFormProps) {
+export function GroupForm({ id, kind, initial = "", pending, children, onSubmit, onCancel }: GroupFormProps) {
   const [draft, setDraft] = useState(initial);
   const inputId = `${kind}-${id}`;
 
@@ -55,6 +57,7 @@ export function GroupForm({ id, kind, initial = "", pending, onSubmit, onCancel 
           className={cn(field, "resize-none")}
         />
       )}
+      {children}
       <div className="flex flex-wrap justify-end gap-2">
         <Button variant="white" size="sm" onClick={onCancel}>
           Болих

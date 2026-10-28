@@ -235,7 +235,14 @@ export type QuestionAnswer = {
   approved: boolean;
   /** «Чи сайн тайлбарласан» count */
   kudos: number;
+  /** Something to read or practise, added by the teacher. */
+  material?: AnswerMaterial;
 };
+
+/** A teacher adds one to a group answer: a part of a lesson in the app, or an outside link. */
+export type AnswerMaterial =
+  | { kind: "lesson"; subtopicId: string; part: "explanation" | "practice" }
+  | { kind: "link"; url: string; title: string };
 
 export type AnonQuestion = {
   id: string;
