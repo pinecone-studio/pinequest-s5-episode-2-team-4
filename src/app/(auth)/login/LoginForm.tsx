@@ -15,12 +15,17 @@ export function LoginForm({ pet }: { pet: PetStage }) {
   const [role, setRole] = useState<Role>("student");
   const [showCode, setShowCode] = useState(false);
   const [unknown, setUnknown] = useState(false);
+  /** Minutes until a username blocked after too many wrong tries may try again. */
+  const [blocked, setBlocked] = useState(0);
   const [pending, startTransition] = useTransition();
   const isStudent = role === "student";
   const unknownProps = {
     "aria-invalid": unknown,
-    "aria-describedby": unknown ? "login-error" : undefined,
-    onChange: () => setUnknown(false),
+    "aria-describedby": unknown || blocked > 0 ? "login-error" : undefined,
+    onChange: () => {
+      setUnknown(false);
+      setBlocked(0);
+    },
   };
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -35,6 +40,7 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         classCode: String(form.get("classCode") ?? ""),
       });
       setUnknown(result?.error === "unknown");
+      setBlocked(result?.error === "blocked" ? result.minutes : 0);
     });
   }
 
@@ -108,6 +114,11 @@ export function LoginForm({ pet }: { pet: PetStage }) {
             <Link href="/signup" className="font-bold">
               Бүртгүүлэх
             </Link>
+          </FormError>
+        )}
+        {blocked > 0 && (
+          <FormError id="login-error">
+            Хэт олон удаа буруу оруулсан. {blocked} минутын дараа дахин оролдоно уу.
           </FormError>
         )}
         <button
