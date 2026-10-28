@@ -6,7 +6,7 @@ type CardProps = React.ComponentProps<"div"> & {
 };
 
 const variants = {
-  panel: "rounded-panel bg-white p-6 shadow-card md:px-8 md:pt-7 md:pb-8",
+  panel: "rounded-panel bg-card p-6 shadow-card md:px-8 md:pt-7 md:pb-8",
   surface: "rounded-card bg-surface p-4",
 };
 

@@ -63,8 +63,8 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
         <div className="relative size-81 md:size-135">
           <div className="absolute top-0 left-0 size-135 origin-top-left scale-60 md:scale-100">
             {/* Soft aurora glow behind the stage */}
-            <div aria-hidden="true" className="absolute top-14 left-12 size-72 animate-[bob_7s_ease-in-out_infinite] rounded-full bg-primary/35 blur-3xl" />
-            <div aria-hidden="true" className="absolute top-40 right-8 size-64 animate-[bob_9s_ease-in-out_infinite_reverse] rounded-full bg-magenta/30 blur-3xl" />
+            <div aria-hidden="true" className="absolute top-14 left-12 size-72 animate-[bob_7s_ease-in-out_infinite] rounded-full bg-primary/25 blur-3xl" />
+            <div aria-hidden="true" className="absolute top-40 right-8 size-64 animate-[bob_9s_ease-in-out_infinite_reverse] rounded-full bg-magenta/15 blur-3xl" />
             <div aria-hidden="true" className="absolute bottom-6 left-24 size-56 rounded-full bg-sky/60 blur-3xl" />
             <div aria-hidden="true" className="absolute top-10 left-10 size-115 rounded-full border border-primary/15" />
             <div aria-hidden="true" className="absolute top-24 left-24 size-87 rounded-full border border-primary/10" />
@@ -77,7 +77,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
                   stage={pet.stage}
                   size={256}
                   alt={`${pet.stage.name}, чиний тэжээвэр`}
-                  className="relative animate-bob drop-shadow-[0_14px_22px_rgba(80,30,200,0.28)]"
+                  className="relative animate-bob drop-shadow-[0_14px_22px_rgba(79,46,132,0.22)]"
                 />
               </div>
             </div>

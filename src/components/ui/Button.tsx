@@ -17,7 +17,7 @@ const variants: Record<Variant, string> = {
   secondary:
     "bg-surface text-ink shadow-3d-soft hover:text-ink active:shadow-[0_1px_0_var(--color-line)]",
   white:
-    "bg-white text-ink shadow-3d-soft hover:text-ink active:shadow-[0_1px_0_var(--color-line)]",
+    "bg-card text-ink shadow-3d-soft hover:text-ink active:shadow-[0_1px_0_var(--color-line)]",
 };
 
 const sizes: Record<Size, string> = {
