@@ -5,8 +5,10 @@ import {
   addXp,
   isStarterPet,
   nextEvolutionLevel,
+  petMood,
   stageIndex,
 } from "./pets";
+import { type LearningStreak, recordLearningDay, streakSummary } from "./streak";
 import type { UserPet } from "./types";
 
 const pet = (level: number, xp: number): UserPet => ({ level, xp }) as UserPet;
@@ -68,5 +70,26 @@ describe("isStarterPet", () => {
 
   it("keeps rarer pets for boss eggs", () => {
     expect(petLines.filter((l) => l.rarity !== "common").some(isStarterPet)).toBe(false);
+  });
+});
+
+describe("petMood", () => {
+  const moodOn = (today: string, learned: string[]) => {
+    let streak: LearningStreak | undefined;
+    for (const day of learned) streak = recordLearningDay(streak, day);
+    return petMood(streakSummary(streak, today));
+  };
+
+  it("is happy after learning today", () => {
+    expect(moodOn("2026-10-28", ["2026-10-27", "2026-10-28"])).toBe("happy");
+  });
+
+  it("is awake while yesterday's streak is alive", () => {
+    expect(moodOn("2026-10-28", ["2026-10-26", "2026-10-27"])).toBe("awake");
+  });
+
+  it("is sleepy after a day off, or before ever learning", () => {
+    expect(moodOn("2026-10-28", ["2026-10-26"])).toBe("sleepy");
+    expect(moodOn("2026-10-28", [])).toBe("sleepy");
   });
 });

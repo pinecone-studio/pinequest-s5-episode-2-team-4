@@ -39,6 +39,24 @@ export function petStage(line: PetLine, level: number): PetStage {
 
 export const STAGE_LEVEL_LABELS = ["Түвшин 1–2", "Түвшин 3–5", "Түвшин 6+"] as const;
 
+/** How the pet feels, from the learning streak. Pets never look hurt. */
+export type PetMood = "happy" | "awake" | "sleepy";
+
+export const PET_MOOD_LABELS: Record<PetMood, string> = {
+  happy: "Баяртай",
+  awake: "Сэргэлэн",
+  sleepy: "Нойрмог",
+};
+
+/**
+ * Learned today: happy. The streak is still alive (learned yesterday): awake.
+ * Otherwise sleepy, until the student learns again.
+ */
+export function petMood(streak: { activeToday: boolean; current: number }): PetMood {
+  if (streak.activeToday) return "happy";
+  return streak.current > 0 ? "awake" : "sleepy";
+}
+
 export const ELEMENT_LABELS: Record<PetElement, string> = {
   water: "Ус",
   fire: "Гал",

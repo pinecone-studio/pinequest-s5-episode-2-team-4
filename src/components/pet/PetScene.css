@@ -1,0 +1,183 @@
+/* The pet's habitat (design: Тэжээвэр). The mood class on .pet-scene picks
+   the pet's animation and the sky: happy hops, awake bobs, sleepy dims and
+   breathes under a night sky with «z Z». */
+
+.pet-scene-pet {
+  transform-origin: 50% 100%;
+}
+
+.pet-scene--awake .pet-scene-pet {
+  animation: pet-scene-bob 2.4s ease-in-out infinite;
+}
+
+.pet-scene--happy .pet-scene-pet {
+  animation: pet-scene-hop 1.8s ease-in-out infinite;
+}
+
+.pet-scene--sleepy .pet-scene-pet {
+  opacity: 0.55;
+  filter: saturate(0.7);
+  animation: pet-scene-breathe 4s ease-in-out infinite;
+}
+
+.pet-scene-zz {
+  display: none;
+}
+
+.pet-scene--sleepy .pet-scene-zz {
+  display: block;
+  animation: pet-scene-zz 2.6s ease-in-out infinite;
+}
+
+.pet-scene-sun,
+.pet-scene-night,
+.pet-scene-stars {
+  transition: opacity 0.6s ease;
+}
+
+.pet-scene-night,
+.pet-scene-stars {
+  opacity: 0;
+}
+
+.pet-scene--sleepy .pet-scene-sun {
+  opacity: 0.2;
+}
+
+.pet-scene--sleepy .pet-scene-night {
+  opacity: 0.5;
+}
+
+.pet-scene--sleepy .pet-scene-stars {
+  opacity: 1;
+}
+
+.pet-scene-drift {
+  animation: pet-scene-drift 9s ease-in-out infinite alternate;
+}
+
+.pet-scene-glow,
+.pet-scene-twinkle,
+.pet-scene-rise {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pet-scene-glow {
+  animation: pet-scene-glow 4s ease-in-out infinite;
+}
+
+.pet-scene-twinkle {
+  animation: pet-scene-twinkle 2.4s ease-in-out infinite;
+}
+
+.pet-scene-rise {
+  opacity: 0;
+  animation: pet-scene-rise 5s ease-in infinite;
+}
+
+@keyframes pet-scene-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pet-scene-hop {
+  0%,
+  34%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  6% {
+    transform: translateY(0) scale(1.06, 0.94);
+  }
+  17% {
+    transform: translateY(-14px) scale(0.97, 1.03);
+  }
+  28% {
+    transform: translateY(0) scale(1.04, 0.96);
+  }
+}
+
+@keyframes pet-scene-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pet-scene-zz {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes pet-scene-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(28px);
+  }
+}
+
+@keyframes pet-scene-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes pet-scene-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pet-scene-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-230px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-scene,
+  .pet-scene * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
