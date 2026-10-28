@@ -1,24 +1,26 @@
-// Mock accounts and session kept in cookies until there is real auth. The
-// cookies are signed with SESSION_SECRET so they can't be edited or faked,
-// but they aren't encrypted and passwords aren't checked: don't store
-// anything private in them.
+// The logged-in session. Accounts live in the accounts table
+// (src/lib/accounts.ts); the session cookie only holds the account id,
+// signed with SESSION_SECRET so it can't be edited or faked.
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { cache } from "react";
+import { type AccountProgress, findAccountById, saveAccount } from "./accounts";
 import type { User, UserPet } from "./types";
 import type { LearningStreak } from "./streak";
 
-/** Who is logged in: just the username. */
+/** Who is logged in: the account id. */
 const SESSION_COOKIE_NAME = "levelup-session";
-/** Accounts signed up in this browser, so logging out keeps them. */
-const ACCOUNTS_COOKIE_NAME = "levelup-accounts";
+/** Mock accounts from before real accounts; deleted at the next login. */
+const OLD_ACCOUNTS_COOKIE_NAME = "levelup-accounts";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-/** Keeps the accounts cookie well under the 4 KB cookie limit. */
-const MAX_ACCOUNTS = 8;
 
 export type Account = {
+  id: string;
   streak?: LearningStreak;
   username: string;
+  /** Lowercase; demo accounts have none. */
+  email?: string;
   role: User["role"];
   classCode?: string;
   pet?: UserPet;
@@ -42,6 +44,9 @@ export type Account = {
 
 /** The logged-in user's account. */
 export type Session = Account;
+
+/** Account fields that aren't learning progress. */
+const IDENTITY_KEYS = ["id", "username", "email", "role", "classCode"] as const satisfies (keyof Account)[];
 
 const cookieOptions = {
   httpOnly: true,
@@ -88,47 +93,53 @@ function decode<T>(value: string | undefined): T | undefined {
   }
 }
 
-/** Usernames match case-insensitively. */
-const keyOf = (username: string) => username.toLowerCase();
-
-async function readAccounts(): Promise<Record<string, Account>> {
-  const accounts = decode<Record<string, Account>>(
-    (await cookies()).get(ACCOUNTS_COOKIE_NAME)?.value,
-  );
-  return accounts && typeof accounts === "object" ? accounts : {};
-}
-
-export async function findAccount(username: string): Promise<Account | undefined> {
-  return (await readAccounts())[keyOf(username)];
-}
-
-/** The current session, or undefined when logged out. */
-export async function readSession(): Promise<Session | undefined> {
-  const session = decode<{ username?: unknown }>(
-    (await cookies()).get(SESSION_COOKIE_NAME)?.value,
-  );
-  if (typeof session?.username !== "string") return undefined;
-  return findAccount(session.username);
+async function loadAccount(id: string): Promise<Session | undefined> {
+  const account = await findAccountById(id);
+  if (!account) return undefined;
+  return {
+    ...account.progress,
+    id: account.id,
+    username: account.username,
+    email: account.email,
+    role: account.role,
+    classCode: account.classCode,
+  };
 }
 
 /**
- * Saves the account and logs it in. Only call from Server Functions:
- * cookies can't be set while rendering.
+ * The account loaded for this request: layouts, pages and data functions
+ * all read the session, so it's fetched once. writeSession keeps it current.
  */
-export async function writeSession(account: Account) {
-  const accounts = await readAccounts();
-  delete accounts[keyOf(account.username)];
-  // Newest last; drop the oldest accounts past the limit.
-  const kept = Object.entries({ ...accounts, [keyOf(account.username)]: account }).slice(
-    -MAX_ACCOUNTS,
-  );
+const requestAccount = cache((): { id?: string; account?: Promise<Session | undefined> } => ({}));
 
-  const store = await cookies();
-  store.set(ACCOUNTS_COOKIE_NAME, encode(Object.fromEntries(kept)), cookieOptions);
-  store.set(SESSION_COOKIE_NAME, encode({ username: account.username }), cookieOptions);
+/** The current session, or undefined when logged out. */
+export async function readSession(): Promise<Session | undefined> {
+  const session = decode<{ id?: unknown }>((await cookies()).get(SESSION_COOKIE_NAME)?.value);
+  if (typeof session?.id !== "string") return undefined;
+  const loaded = requestAccount();
+  if (loaded.id !== session.id || !loaded.account) {
+    loaded.id = session.id;
+    loaded.account = loadAccount(session.id);
+  }
+  return loaded.account;
 }
 
-/** Logs out but keeps the account. Only call from Server Functions. */
+/** Saves the logged-in account's class code and progress. Only call from Server Functions. */
+export async function writeSession(session: Session) {
+  const progress: Record<string, unknown> = { ...session };
+  for (const key of IDENTITY_KEYS) delete progress[key];
+  await saveAccount({ id: session.id, classCode: session.classCode, progress: progress as AccountProgress });
+  Object.assign(requestAccount(), { id: session.id, account: Promise.resolve(session) });
+}
+
+/** Logs in to this account. Only call from Server Functions: cookies can't be set while rendering. */
+export async function startSession(accountId: string) {
+  const store = await cookies();
+  store.set(SESSION_COOKIE_NAME, encode({ id: accountId }), cookieOptions);
+  store.delete(OLD_ACCOUNTS_COOKIE_NAME);
+}
+
+/** Logs out; the account stays so the user can log in again. Only call from Server Functions. */
 export async function clearSession() {
   (await cookies()).delete(SESSION_COOKIE_NAME);
 }

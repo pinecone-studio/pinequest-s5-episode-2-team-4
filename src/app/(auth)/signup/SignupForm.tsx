@@ -16,28 +16,30 @@ import { type Role, RoleToggle } from "../_components/RoleToggle";
 export function SignupForm({ petLines }: { petLines: PetLine[] }) {
   const [role, setRole] = useState<Role>("student");
   const [petId, setPetId] = useState("wrougon");
-  const [taken, setTaken] = useState(false);
+  /** The field whose value another account already has. */
+  const [taken, setTaken] = useState<"username" | "email" | null>(null);
   const [pending, startTransition] = useTransition();
   const pet = petLines.find((l) => l.id === petId) ?? petLines[0];
   const isStudent = role === "student";
-  const takenProps = {
-    "aria-invalid": taken,
-    "aria-describedby": taken ? "signup-error" : undefined,
-    onChange: () => setTaken(false),
-  };
+  const takenProps = (field: "username" | "email") => ({
+    "aria-invalid": taken === field,
+    "aria-describedby": taken === field ? "signup-error" : undefined,
+    onChange: () => setTaken(null),
+  });
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    // The password isn't stored: accounts are mocked in this browser.
     startTransition(async () => {
       const result = await signUp({
         username: String(form.get("username") ?? ""),
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
         role,
         classCode: String(form.get("classCode") ?? ""),
         petLineId: isStudent ? pet.id : undefined,
       });
-      setTaken(result?.error === "taken");
+      setTaken(result?.error === "taken" ? "username" : result?.error === "emailTaken" ? "email" : null);
     });
   }
 
@@ -130,34 +132,39 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
             </PetAvatar>
           )}
           <form onSubmit={submit} className="flex flex-col gap-4">
-            {isStudent ? (
-              <TextField
-                id="su-user"
-                name="username"
-                label="Нэвтрэх нэр"
-                type="text"
-                autoComplete="username"
-                required
-                {...takenProps}
-              />
-            ) : (
-              <TextField
-                id="su-mail"
-                name="username"
-                label="Имэйл"
-                type="email"
-                autoComplete="email"
-                required
-                {...takenProps}
-              />
-            )}
-            <PasswordField id="su-pass" label="Нууц үг" autoComplete="new-password" required />
+            <TextField
+              id="su-user"
+              name="username"
+              label="Нэвтрэх нэр"
+              type="text"
+              autoComplete="username"
+              required
+              {...takenProps("username")}
+            />
+            <TextField
+              id="su-mail"
+              name="email"
+              label="Имэйл"
+              type="email"
+              autoComplete="email"
+              required
+              {...takenProps("email")}
+            />
+            <PasswordField
+              id="su-pass"
+              name="password"
+              label="Нууц үг"
+              hint="дор хаяж 6 тэмдэгт"
+              autoComplete="new-password"
+              required
+              minLength={6}
+            />
             {isStudent && (
               <ClassCodeField id="su-code" name="classCode" label="Ангийн код" hint="заавал биш" />
             )}
             {taken && (
               <FormError id="signup-error">
-                Энэ нэр бүртгэлтэй байна.{" "}
+                {taken === "email" ? "Энэ имэйл бүртгэлтэй байна." : "Энэ нэр бүртгэлтэй байна."}{" "}
                 <Link href="/login" className="font-bold">
                   Нэвтрэх
                 </Link>

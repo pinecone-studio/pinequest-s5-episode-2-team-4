@@ -1,30 +1,41 @@
 "use server";
 
-// Server Functions that change the mock session. Client Components import
-// these directly; they run on the server.
+// Server Functions that log in and change the logged-in account. Client
+// Components import these directly; they run on the server.
 
 import { redirect } from "next/navigation";
+import { checkLogin, createAccount, createDemoAccount, saveAccount } from "./accounts";
 import { getRetestQuestions } from "./data";
 import { lessons } from "./mock/lessons";
 import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
 import { subtopics } from "./mock/topics";
 import { XP_PER_LEVEL, addXp } from "./pets";
-import { clearSession, findAccount, readSession, writeSession } from "./session";
+import { clearSession, readSession, startSession, writeSession } from "./session";
 import type { User } from "./types";
 import { recordLearningDay } from "./streak";
 
 type Credentials = {
   username: string;
+  email: string;
+  password: string;
   role: User["role"];
   classCode?: string;
 };
 
 /** Returned instead of redirecting when the form needs to show an error. */
-export type AuthError = { error: "taken" | "unknown" };
+export type AuthError = { error: "taken" | "emailTaken" | "unknown" };
 
 function clean(text: string | undefined, max: number) {
   return text?.trim().slice(0, max) || undefined;
+}
+
+/** Just the shape; the form's email field checks it first. */
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function cleanEmail(text: string | undefined) {
+  const email = clean(text, 254)?.toLowerCase();
+  return email && EMAIL.test(email) ? email : undefined;
 }
 
 function homeFor(role: User["role"]) {
@@ -36,41 +47,42 @@ export async function signUp(
   credentials: Credentials & { petLineId?: string },
 ): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
-  if (!username) throw new Error("Username is required");
-  if (await findAccount(username)) return { error: "taken" };
+  const email = cleanEmail(credentials.email);
+  if (!username || !email) throw new Error("Username and email are required");
   const role = credentials.role === "teacher" ? "teacher" : "student";
   const line = petLines.find((l) => l.id === credentials.petLineId);
 
-  await writeSession({
+  const result = await createAccount({
     username,
+    email,
+    password: String(credentials.password),
     role,
     classCode: clean(credentials.classCode, 10),
-    pet: role === "student" && line ? { lineId: line.id, level: 1, xp: 0 } : undefined,
+    progress: role === "student" && line ? { pet: { lineId: line.id, level: 1, xp: 0 } } : {},
   });
+  if ("error" in result) return { error: result.error };
+  await startSession(result.account.id);
   redirect(homeFor(role));
 }
 
-/** Logs in to an account signed up in this browser, with its pet and progress. */
+/** Logs in when the username, email and password all belong to one account. */
 export async function logIn(credentials: Credentials): Promise<AuthError | void> {
   const username = clean(credentials.username, 40);
-  if (!username) throw new Error("Username is required");
-  const account = await findAccount(username);
+  const email = cleanEmail(credentials.email);
+  if (!username || !email) throw new Error("Username and email are required");
+  const account = await checkLogin({ username, email, password: String(credentials.password) });
   if (!account) return { error: "unknown" };
 
   const classCode = clean(credentials.classCode, 10);
-  await writeSession(classCode ? { ...account, classCode } : account);
+  if (classCode && classCode !== account.classCode) await saveAccount({ ...account, classCode });
+  await startSession(account.id);
   redirect(homeFor(account.role));
 }
 
-const DEMO_USERNAME = "Демо";
-
-/** Logs in a fresh demo student: Wrougon at level 1, no test taken yet. */
+/** Logs in a new throwaway demo student: Wrougon at level 1, no test taken yet. */
 export async function demoLogIn() {
-  await writeSession({
-    username: DEMO_USERNAME,
-    role: "student",
-    pet: { lineId: "wrougon", level: 1, xp: 0 },
-  });
+  const account = await createDemoAccount({ pet: { lineId: "wrougon", level: 1, xp: 0 } });
+  await startSession(account.id);
   redirect("/");
 }
 

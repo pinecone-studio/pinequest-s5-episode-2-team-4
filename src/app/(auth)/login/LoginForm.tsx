@@ -17,14 +17,20 @@ export function LoginForm({ pet }: { pet: PetStage }) {
   const [unknown, setUnknown] = useState(false);
   const [pending, startTransition] = useTransition();
   const isStudent = role === "student";
+  const unknownProps = {
+    "aria-invalid": unknown,
+    "aria-describedby": unknown ? "login-error" : undefined,
+    onChange: () => setUnknown(false),
+  };
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
-    // The password isn't checked: accounts are mocked in this browser.
     startTransition(async () => {
       const result = await logIn({
         username: String(form.get("username") ?? ""),
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
         role,
         classCode: String(form.get("classCode") ?? ""),
       });
@@ -54,15 +60,24 @@ export function LoginForm({ pet }: { pet: PetStage }) {
           type="text"
           autoComplete="username"
           required
-          aria-invalid={unknown}
-          aria-describedby={unknown ? "login-error" : undefined}
-          onChange={() => setUnknown(false)}
+          {...unknownProps}
+        />
+        <TextField
+          id="login-mail"
+          name="email"
+          label="Имэйл"
+          type="email"
+          autoComplete="email"
+          required
+          {...unknownProps}
         />
         <PasswordField
           id="login-pass"
+          name="password"
           label="Нууц үг"
           autoComplete="current-password"
           required
+          {...unknownProps}
         />
         {isStudent &&
           (showCode ? (
@@ -89,7 +104,7 @@ export function LoginForm({ pet }: { pet: PetStage }) {
           ))}
         {unknown && (
           <FormError id="login-error">
-            Бүртгэлгүй нэр.{" "}
+            Нэвтрэх нэр, имэйл эсвэл нууц үг буруу байна.{" "}
             <Link href="/signup" className="font-bold">
               Бүртгүүлэх
             </Link>
