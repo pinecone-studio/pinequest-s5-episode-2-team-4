@@ -19,13 +19,20 @@ LevelUp: students fill gaps in fractions through a diagnostic test, lessons and 
 
 ## Data
 
-No backend yet. Use mock data only:
+Lesson content is mock data; accounts, progress, pets, battles and teacher content (materials, lesson videos, assignments) are in Supabase.
 
-- Types in `src/lib/types.ts`, mock data in `src/lib/mock/`.
-- Read data only through the async functions in `src/lib/data.ts` (`getTopics()`, `getTestQuestions()`, `getLesson()`, `getHeatmap()`, ...). Never import `src/lib/mock` in pages or components, so a real API can replace it later.
-- Call these functions in Server Components (pages, layouts) and pass the data to Client Components as props.
-- Need new data? Add the type to `types.ts`, the mock to `src/lib/mock/`, and a function to `data.ts`, in a small separate PR.
+- Types in `src/lib/types.ts`, mock data in `src/lib/mock/`. Supabase is reached only from server-only modules in `src/lib/` (`supabase.ts`, `content.ts`, ...).
+- Read data only through the async functions in `src/lib/data.ts` (`getTopics()`, `getTestQuestions()`, `getLesson()`, `getHeatmap()`, ...). Never import `src/lib/mock` or the Supabase modules in pages or components.
+- Call these functions in Server Components (pages, layouts) and pass the data to Client Components as props. Writes are server actions (`src/lib/*-actions.ts`) that check the role first (`requireTeacher()` / `requireStudent()`).
+- Need new data? Add the type to `types.ts`, the mock or a migration in `supabase/migrations/`, and a function to `data.ts`, in a small separate PR.
 - The AI helper returns canned mock replies for now (`askHelper()`).
+
+## AI
+
+- All model calls go through `src/lib/ai/` (Claude Haiku via `@anthropic-ai/sdk`, `ANTHROPIC_API_KEY`). Prompts are in Mongolian and ask for JSON with a schema; validate the reply before using it.
+- Teacher-tool calls (`src/lib/ai/generate.ts`) count toward the monthly budget (`AI_MONTHLY_BUDGET_USD`, default $1, table `ai_usage`); past it those pages use demo content. The question classifier is `src/lib/ai/claude.ts`.
+- Never send student data (names, emails, classes, scores) to the model. Teacher materials are sent as data, never as instructions.
+- Every AI feature must work without a key: fall back to demo content and show it as demo in the UI.
 
 ## Ownership
 
