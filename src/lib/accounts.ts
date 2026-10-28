@@ -137,6 +137,31 @@ export async function createDemoAccount(progress: AccountProgress): Promise<Stor
   }
 }
 
+/** How long a demo account lasts. */
+const DEMO_LIFETIME_MS = 24 * 60 * 60 * 1000;
+/** Usernames per players delete, so each request URL stays short. */
+const DELETE_BATCH = 100;
+
+/**
+ * Deletes demo accounts older than a day, with their game data: the players
+ * row of the same name, whose pets, eggs, battle answers and English progress
+ * go with it. Real accounts are never touched.
+ */
+export async function deleteOldDemoAccounts() {
+  const { data, error } = await db()
+    .from("accounts")
+    .delete()
+    .eq("demo", true)
+    .lt("created_at", new Date(Date.now() - DEMO_LIFETIME_MS).toISOString())
+    .select("username");
+  if (error) throw new Error(`Could not delete old demo accounts: ${error.message}`);
+  const names = (data ?? []).map((a: { username: string }) => a.username);
+  for (let i = 0; i < names.length; i += DELETE_BATCH) {
+    const players = await db().from("players").delete().in("username", names.slice(i, i + DELETE_BATCH));
+    if (players.error) throw new Error(`Could not delete demo players: ${players.error.message}`);
+  }
+}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function findAccountById(id: string): Promise<StoredAccount | undefined> {

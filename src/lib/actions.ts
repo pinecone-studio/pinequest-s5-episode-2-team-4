@@ -4,7 +4,8 @@
 // Components import these directly; they run on the server.
 
 import { redirect } from "next/navigation";
-import { checkLogin, createAccount, createDemoAccount, saveAccount } from "./accounts";
+import { after } from "next/server";
+import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, saveAccount } from "./accounts";
 import { getRetestQuestions } from "./data";
 import { lessons } from "./mock/lessons";
 import { petLines } from "./mock/pets";
@@ -84,6 +85,8 @@ export async function logIn(credentials: Credentials): Promise<AuthError | void>
 export async function demoLogIn() {
   const account = await createDemoAccount({ pet: { lineId: "dollfin", level: 1, xp: 0 } });
   await startSession(account.id);
+  // Each demo is a new account; clear out old ones once the response is sent.
+  after(deleteOldDemoAccounts);
   redirect("/");
 }
 
