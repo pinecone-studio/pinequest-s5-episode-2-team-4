@@ -9,6 +9,8 @@ import { NavBadge } from "./NavBadge";
 import { PetChip } from "./PetChip";
 
 export type NavCounts = {
+  /** Lesson videos the student hasn't opened yet */
+  videos?: number;
   /** Assignments not finished yet */
   assignments?: number;
 };
@@ -16,6 +18,7 @@ export type NavCounts = {
 const NAV_LINKS: { href: string; label: string; count?: keyof NavCounts; countLabel?: string }[] = [
   { href: "/games", label: "Тоглоом" },
   { href: "/pets", label: "Тэжээвэр" },
+  { href: "/videos", label: "Видео хичээл", count: "videos", countLabel: "шинэ видео" },
   { href: "/assignments", label: "Даалгавар", count: "assignments", countLabel: "биелүүлээгүй даалгавар" },
 ];
 

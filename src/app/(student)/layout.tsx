@@ -2,7 +2,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { StudentFooter } from "@/components/layout/StudentFooter";
 import { requireStudent } from "@/lib/auth";
-import { getCurrentPet, getOpenAssignmentCount, getPetLines } from "@/lib/data";
+import { getCurrentPet, getOpenAssignmentCount, getPetLines, getUnseenVideoCount } from "@/lib/data";
 
 const FOOTER_PET_IDS = ["dollfin", "agnite", "wrougon"];
 
@@ -12,12 +12,13 @@ export default async function StudentLayout({
   children: React.ReactNode;
 }) {
   await requireStudent();
-  const [pet, petLines, assignments] = await Promise.all([
+  const [pet, petLines, videos, assignments] = await Promise.all([
     getCurrentPet(),
     getPetLines(),
+    getUnseenVideoCount(),
     getOpenAssignmentCount(),
   ]);
-  const counts = { assignments };
+  const counts = { videos, assignments };
   const footerPets = FOOTER_PET_IDS.flatMap((id) => {
     const line = petLines.find((l) => l.id === id);
     return line ? [line.stages[0]] : [];
