@@ -10,6 +10,15 @@
   );
 }
 
+[data-theme="dark"] .pets-hero {
+  background: radial-gradient(
+    circle at 50% 45%,
+    #393050 0%,
+    #252038 50%,
+    #171321 100%
+  );
+}
+
 /* A gently bobbing sprite (evolution path, collection detail). */
 .pets-bob {
   display: block;
