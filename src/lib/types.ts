@@ -137,6 +137,8 @@ export type User = {
   role: "student" | "teacher";
   classCode?: string;
   pet?: UserPet;
+  /** A throwaway «Демо нэвтрэх» account, which gets demo shortcuts. */
+  demo?: boolean;
 };
 
 /** Teacher heatmap cell; "untested" = has not taken the test. */
