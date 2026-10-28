@@ -5,6 +5,7 @@ import { Card, ProgressBar, buttonClass } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { getBattleLog, getBosses } from "@/lib/data";
 import type { BattleStatus } from "@/lib/types";
+import { classLabel } from "@/lib/class-label";
 
 export const metadata: Metadata = {
   title: "Тулааны түүх · LevelUp",
@@ -101,7 +102,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
                       {boss ? <PetSprite stage={{ name: boss.name, sprite: boss.sprite }} size={48} className="shrink-0" /> : null}
                       <span className="flex min-w-0 flex-1 flex-col">
                         <span className="truncate font-bold">
-                          {b.subjectTitle} · {b.classCode}
+                          {b.subjectTitle} · {classLabel(b.classCode)}
                         </span>
                         <span className="text-sm text-ink-muted">
                           {when.format(new Date(b.date))} · {STATUS[b.status]}
@@ -123,7 +124,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
               <Card className="flex flex-col gap-4">
                 <div>
                   <p className="text-sm font-bold text-ink-muted">
-                    {selected.classCode} анги · {when.format(new Date(selected.date))} · {STATUS[selected.status]}
+                    {classLabel(selected.classCode)} анги · {when.format(new Date(selected.date))} · {STATUS[selected.status]}
                   </p>
                   <h2 className="mt-1 type-section-title">
                     {selected.subjectTitle}
