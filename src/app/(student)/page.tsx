@@ -72,7 +72,7 @@ export default async function HomePage() {
           nodes={nodes}
           pet={pet.stage}
         />
-        <ClassGoalCard goal={classGoal} className="mt-6 md:mt-10" />
+        {classes.length > 0 && classGoal && <ClassGoalCard goal={classGoal} className="mt-6 md:mt-10" />}
       </div>
     </div>
   );

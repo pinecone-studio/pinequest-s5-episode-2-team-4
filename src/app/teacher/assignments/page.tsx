@@ -6,6 +6,7 @@ import { getTeacherAssignments } from "@/lib/data";
 import { gameTitle } from "@/lib/gamefit";
 import { subjectLabel } from "../_content/ui";
 import { formatDay } from "../_content/format";
+import { classLabel } from "@/lib/class-label";
 
 export const metadata: Metadata = {
   title: "Даалгавар · LevelUp",
@@ -43,7 +44,7 @@ export default async function AssignmentsPage() {
                 className="flex h-full flex-col gap-2 rounded-card bg-white p-4 text-ink no-underline shadow-card hover:text-ink hover:ring-2 hover:ring-primary md:p-5"
               >
                 <span className="flex items-center justify-between gap-2">
-                  <span className="rounded-full bg-surface px-2.5 py-0.5 text-xs font-bold">{a.classCode}</span>
+                  <span className="rounded-full bg-surface px-2.5 py-0.5 text-xs font-bold">{classLabel(a.classCode)}</span>
                   <span
                     className={cn(
                       "rounded-full px-2.5 py-0.5 text-xs font-bold",
