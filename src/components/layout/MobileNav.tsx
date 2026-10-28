@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { NavBadge } from "./NavBadge";
+import { NavPill } from "./NavPill";
 import type { NavCounts } from "./SiteHeader";
 
 const HomeIcon = (
@@ -89,30 +90,35 @@ export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: 
   ];
 
   return (
-    <nav
-      aria-label="Үндсэн цэс"
-      className="sticky bottom-0 z-10 grid grid-cols-5 gap-1 bg-white px-3 pt-2 pb-3 shadow-[0_-8px_24px_rgb(63_7_145/0.1)] lg:hidden"
-    >
-      {LINKS.map((link) => {
-        const active =
-          link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            aria-current={active ? "page" : undefined}
-            className={`relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-card text-xs font-bold text-ink no-underline hover:text-ink ${
-              active ? "bg-lavender" : ""
-            }`}
-          >
-            {link.icon}
-            {link.label}
-            {link.count ? (
-              <NavBadge count={link.count} label={`${link.count} ${link.countLabel}`} className="absolute top-1 right-[calc(50%-24px)]" />
-            ) : null}
-          </Link>
-        );
-      })}
-    </nav>
+    // The white bar is this wrapper, not the nav: the nav is named for page
+    // transitions, and its snapshot must be transparent so the sliding pill
+    // shows beneath the labels.
+    <div className="sticky bottom-0 z-10 bg-white shadow-[0_-8px_24px_rgb(63_7_145/0.1)] lg:hidden">
+      <nav
+        aria-label="Үндсэн цэс"
+        style={{ viewTransitionName: "bottom-nav" }}
+        className="grid grid-cols-5 gap-1 px-3 pt-2 pb-3"
+      >
+        {LINKS.map((link) => {
+          const active =
+            link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={active ? "page" : undefined}
+              className="relative isolate flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-card text-xs font-bold text-ink no-underline hover:text-ink"
+            >
+              {active && <NavPill name="mobile-pill" className="inset-0 rounded-card bg-lavender" />}
+              {link.icon}
+              {link.label}
+              {link.count ? (
+                <NavBadge count={link.count} label={`${link.count} ${link.countLabel}`} className="absolute top-1 right-[calc(50%-24px)]" />
+              ) : null}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

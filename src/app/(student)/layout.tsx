@@ -1,4 +1,5 @@
 import { MobileNav } from "@/components/layout/MobileNav";
+import { PageTransition } from "@/components/layout/PageTransition";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { StudentFooter } from "@/components/layout/StudentFooter";
 import { requireStudent } from "@/lib/auth";
@@ -40,7 +41,9 @@ export default async function StudentLayout({
           }
         }
       />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <StudentFooter pets={footerPets} />
       <MobileNav petSprite={pet?.stage.sprite} counts={counts} />
     </>
