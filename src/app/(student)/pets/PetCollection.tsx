@@ -17,8 +17,11 @@ type PetCollectionProps = {
   owned: OwnedPet[];
   /** Boss names that can drop each pet line's egg. */
   dropsFrom: Record<string, string[]>;
-  /** The line of the student's own pet (picked at signup), marked «Чиний». */
+  /** The line of the student's own pet (picked at signup). */
   myLineId?: string;
+  /** The pet in the detail card, also shown at the top of the page; null when the card is closed. */
+  selectedId: string | null;
+  onSelect: (lineId: string | null) => void;
 };
 
 type Filter = "all" | PetElement;
@@ -72,13 +75,10 @@ function CornerBadge({ dark, children }: { dark?: boolean; children: ReactNode }
  * own stay silhouettes and say where their egg drops; forms an owned pet
  * hasn't reached yet stay locked.
  */
-export function PetCollection({ lines, owned, dropsFrom, myLineId }: PetCollectionProps) {
+export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, onSelect }: PetCollectionProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [filter, setFilter] = useState<Filter>("all");
-  const [selectedId, setSelectedId] = useState<string | null>(
-    myLineId ?? owned.find((p) => p.active)?.lineId ?? lines[0]?.id ?? null,
-  );
   /** The form picked in the detail card; null shows the pet's current one. */
   const [pickedStage, setPickedStage] = useState<number | null>(null);
 
@@ -87,7 +87,7 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId }: PetCollecti
   const ownedPet = (lineId: string) => owned.find((p) => p.lineId === lineId);
 
   function select(lineId: string) {
-    setSelectedId(lineId);
+    onSelect(lineId);
     setPickedStage(null);
   }
 
@@ -154,7 +154,6 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId }: PetCollecti
             const pet = ownedPet(line.id);
             const stage = line.stages[pet ? stageIndex(pet.level) : 0];
             const isMine = line.id === myLineId;
-            const badge = isMine ? "Чиний" : pet?.active ? "Тулаанд" : null;
             return (
               <button
                 key={line.id}
@@ -185,15 +184,12 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId }: PetCollecti
                 <span className="text-xs leading-tight font-semibold text-ink-muted xl:text-sm">
                   {pet ? `Түв. ${pet.level}` : ELEMENT_LABELS[line.element]}
                 </span>
-                {badge ? (
+                {pet?.active ? (
                   <span
                     aria-hidden="true"
-                    className={cn(
-                      "absolute top-1.5 left-1.5 rounded-full px-2 text-[11px] font-bold text-white xl:top-2.5 xl:left-2.5 xl:px-2.5 xl:text-xs",
-                      isMine ? "bg-primary-dark" : "bg-primary",
-                    )}
+                    className="absolute top-1.5 left-1.5 rounded-full bg-primary px-2 text-[11px] font-bold text-white xl:top-2.5 xl:left-2.5 xl:px-2.5 xl:text-xs"
                   >
-                    {badge}
+                    Тулаанд
                   </span>
                 ) : null}
                 {on ? <CornerBadge>{checkIcon}</CornerBadge> : null}
@@ -207,10 +203,9 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId }: PetCollecti
             key={selected.id}
             line={selected}
             pet={ownedPet(selected.id)}
-            isMine={selected.id === myLineId}
             pickedStage={pickedStage}
             onPickStage={setPickedStage}
-            onClose={() => setSelectedId(null)}
+            onClose={() => onSelect(null)}
             dropsFrom={dropsFrom[selected.id] ?? []}
             pending={pending}
             onChoose={() => choose(selected.id)}
@@ -224,7 +219,6 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId }: PetCollecti
 type PetDetailProps = {
   line: PetLine;
   pet: OwnedPet | undefined;
-  isMine: boolean;
   pickedStage: number | null;
   onPickStage: (stage: number) => void;
   onClose: () => void;
@@ -237,10 +231,9 @@ type PetDetailProps = {
  * The selected line: big sprite, name and its three forms. Sits above the
  * grid on phones and tablets (× closes it), and beside it on wide screens.
  */
-function PetDetail({ line, pet, isMine, pickedStage, onPickStage, onClose, dropsFrom, pending, onChoose }: PetDetailProps) {
+function PetDetail({ line, pet, pickedStage, onPickStage, onClose, dropsFrom, pending, onChoose }: PetDetailProps) {
   const current = pet ? stageIndex(pet.level) : 0;
   const stage = pet ? Math.min(pickedStage ?? current, current) : 0;
-  const showsMine = isMine && stage === current;
 
   return (
     <aside
@@ -264,16 +257,11 @@ function PetDetail({ line, pet, isMine, pickedStage, onPickStage, onClose, drops
           <PetSprite
             stage={line.stages[stage]}
             size={256}
-            className={cn("pets-detail-bob max-h-32 max-w-32 xl:max-h-none xl:max-w-none", !pet && "opacity-40 brightness-0")}
+            className={cn("pets-bob max-h-32 max-w-32 xl:max-h-none xl:max-w-none", !pet && "opacity-40 brightness-0")}
           />
           <span className="absolute top-3.5 right-3.5 hidden xl:block">
             <ElementBadge element={line.element} />
           </span>
-          {showsMine ? (
-            <span className="absolute top-3.5 left-3.5 hidden rounded-full bg-primary-dark px-3.5 py-1.5 text-sm font-bold text-white xl:inline">
-              Чиний
-            </span>
-          ) : null}
         </div>
         <div className="flex min-w-0 flex-col items-start gap-1.5 pr-9 xl:mt-4 xl:flex-row xl:items-baseline xl:justify-between xl:gap-2 xl:pr-0">
           <ElementBadge element={line.element} className="xl:hidden" />
@@ -282,9 +270,6 @@ function PetDetail({ line, pet, isMine, pickedStage, onPickStage, onClose, drops
           </h3>
           {pet ? (
             <span className="text-[13px] font-bold text-ink-muted xl:text-[15px]">{STAGE_LEVEL_LABELS[stage]}</span>
-          ) : null}
-          {showsMine ? (
-            <span className="rounded-full bg-primary-dark px-2.5 py-0.5 text-xs font-bold text-white xl:hidden">Чиний</span>
           ) : null}
         </div>
       </div>
