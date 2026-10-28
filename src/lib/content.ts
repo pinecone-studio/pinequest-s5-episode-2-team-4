@@ -1,11 +1,11 @@
 // Teacher content in Supabase (server only): materials, lesson videos,
-// assignments and attempts (supabase/migrations/0011_teacher_content.sql),
+// assignments and attempts (supabase/migrations/0013_teacher_content.sql),
 // plus the two private Storage buckets. Callers check who is asking; every
 // teacher query here also filters on teacher_id.
 
 import "server-only";
 import { randomUUID } from "node:crypto";
-import type { AiInput } from "./ai/claude";
+import type { AiInput } from "./ai/generate";
 import { getSupabaseAdmin } from "./supabase";
 import type {
   Assignment,

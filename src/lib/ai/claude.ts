@@ -1,99 +1,76 @@
-// Claude calls that return JSON matching a schema. Server only: the API key
-// must never reach the browser.
-//
-// Without ANTHROPIC_API_KEY, past the monthly budget (budget.ts), or when a
-// call fails, times out, is refused or returns JSON that doesn't validate,
-// `generateJson` returns undefined and the caller falls back to demo
-// content. Only teacher material is ever sent: never student names, emails,
-// class codes or scores.
+// Claude Haiku classifier. Only the question text, the lesson name and the
+// existing group titles are sent; never a student id or name.
 
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import { recordUsage, withinBudget } from "./budget";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { z } from "zod";
+import { subtopics } from "../mock/topics";
+import { INTENTS, MAX_TITLE_LENGTH, type ClassifyInput, type QuestionClassifier } from "./classifier";
 
-/** Haiku: the cheapest model, enough for reading material and writing short JSON. */
-export const MODEL = process.env.CLAUDE_MODEL || "claude-haiku-5-5";
-const TIMEOUT_MS = 45_000;
+const MODEL = "claude-haiku-5-5";
+/** The student never waits for this, but a stuck request should not pile up. */
+const TIMEOUT_MS = 10_000;
 
-let client: Anthropic | undefined;
-function claude() {
-  if (!process.env.ANTHROPIC_API_KEY) return undefined;
-  client ??= new Anthropic({ timeout: TIMEOUT_MS, maxRetries: 1 });
-  return client;
+/** Groups are sent as g1, g2, … so the model cannot invent an id. */
+const Reply = z.object({
+  group: z.string().nullable(),
+  title: z.string(),
+  intent: z.enum(INTENTS),
+  misconception: z.string().nullable(),
+  needs_review: z.boolean(),
+});
+
+const SYSTEM = `Чи 6-7-р ангийн бутархайн хичээлийн нэргүй асуултуудыг ангилдаг туслах.
+Сурагчид кирилл, латин үсгээр (жишээ нь "huvaariig ygd nemdeggui ym"), эсвэл холиод, алдаатай бичиж болно.
+
+Даалгавар:
+- Асуулт аль нэг бүлэгтэй УТГААРАА ижил бол тэр бүлгийн id-г "group"-д бич (жишээ нь "g2"). Үгүй бол null.
+- "title": шинэ бүлгийн нэр "<сэдэв>: <асуултын утга товчоор>" хэлбэрээр, кирилл үсгээр, 80 тэмдэгтээс бага (жишээ нь "Ижил хуваарь: хуваарийг яагаад нэмдэггүй вэ"). Сэдэв нь асуулт аль сэдвийнх вэ гэдгээр, апп-ын нэрээр яг: ${subtopics.map((s) => `"${s.title}" (${s.lessonTitle})`).join(", ")}.
+- "intent": how = алхам асууж байна, why = яагаад гэдгийг, check = хариугаа зөв эсэхийг, other = бусад.
+- "misconception": асуултаас харагдах буруу ойлголт, нэг өгүүлбэрээр. Байхгүй бол null.
+- "needs_review": хичээлтэй хамааралгүй, ойлгомжгүй эсвэл зохисгүй бол true.`;
+
+function prompt({ text, lessonTitle, groups }: ClassifyInput) {
+  const list = groups.length
+    ? groups.map((g, i) => `g${i + 1}: ${g.title}${g.examples.length ? ` (жишээ: ${g.examples.join(" | ")})` : ""}`).join("\n")
+    : "(одоогоор бүлэг алга)";
+  return `Хичээл: ${lessonTitle}\n\nБүлгүүд:\n${list}\n\nАсуулт: ${text}`;
 }
 
-export const aiEnabled = () => Boolean(process.env.ANTHROPIC_API_KEY);
+let client: Anthropic | null = null;
 
-/** A file or text for the model to read. */
-export type AiInput = { text: string } | { mime: string; data: Buffer };
-
-type ImageType = "image/jpeg" | "image/png" | "image/webp";
-
-function toBlock(input: AiInput): Anthropic.ContentBlockParam {
-  if ("text" in input) return { type: "text", text: input.text };
-  const data = input.data.toString("base64");
-  if (input.mime === "application/pdf") {
-    return { type: "document", source: { type: "base64", media_type: "application/pdf", data } };
-  }
-  return { type: "image", source: { type: "base64", media_type: input.mime as ImageType, data } };
-}
-
-/**
- * Structured outputs need `additionalProperties: false` on every object and
- * don't take array length limits; the validators check those instead.
- */
-function strictSchema(schema: unknown): unknown {
-  if (Array.isArray(schema)) return schema.map(strictSchema);
-  if (!schema || typeof schema !== "object") return schema;
-  const out: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(schema)) {
-    if (key === "minItems" || key === "maxItems") continue;
-    out[key] = strictSchema(value);
-  }
-  if (out.type === "object") out.additionalProperties = false;
-  return out;
-}
-
-/**
- * Runs one prompt and returns the parsed JSON if it passes `validate`.
- * `validate` returns the cleaned value or undefined.
- */
-export async function generateJson<T>({
-  system,
-  inputs,
-  schema,
-  validate,
-  maxOutputTokens = 8000,
-}: {
-  system: string;
-  inputs: AiInput[];
-  schema: object;
-  validate: (value: unknown) => T | undefined;
-  maxOutputTokens?: number;
-}): Promise<T | undefined> {
-  const ai = claude();
-  if (!ai || !(await withinBudget())) return undefined;
-  try {
-    // Pictures and PDFs first, then the text that refers to them.
-    const ordered = [...inputs.filter((i) => !("text" in i)), ...inputs.filter((i) => "text" in i)];
-    const response = await ai.messages.create({
+export const claudeClassifier: QuestionClassifier = {
+  async classify(input) {
+    client ??= new Anthropic({ timeout: TIMEOUT_MS, maxRetries: 1 });
+    const started = Date.now();
+    const response = await client.messages.parse({
       model: MODEL,
-      max_tokens: maxOutputTokens,
-      system,
-      // Low effort: the cheapest setting, and these are short, well-defined tasks.
-      output_config: { effort: "low", format: { type: "json_schema", schema: strictSchema(schema) as Record<string, unknown> } },
-      messages: [{ role: "user", content: ordered.map(toBlock) }],
+      max_tokens: 400,
+      system: SYSTEM,
+      messages: [{ role: "user", content: prompt(input) }],
+      thinking: { type: "disabled" },
+      output_config: { effort: "low", format: zodOutputFormat(Reply) },
     });
-    await recordUsage(MODEL, response.usage);
-    if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
-      console.error(`Claude stopped early: ${response.stop_reason}`);
-      return undefined;
-    }
-    // Thinking blocks may come first; the answer is the text block.
-    const text = response.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text;
-    return validate(JSON.parse(text ?? "null"));
-  } catch (error) {
-    console.error("Claude call failed:", error);
-    return undefined;
-  }
-}
+    console.info(
+      `[classify] ${MODEL} ${Date.now() - started}ms in=${response.usage.input_tokens} out=${response.usage.output_tokens}`,
+    );
+    const reply = response.parsed_output;
+    if (!reply) throw new Error(`Classifier gave no valid reply (stop: ${response.stop_reason})`);
+
+    const index = reply.group?.match(/^g(\d+)$/)?.[1];
+    const group = index ? input.groups[Number(index) - 1] : undefined;
+    if (reply.group && !group) throw new Error(`Classifier picked an unknown group: ${reply.group}`);
+    const title = reply.title.trim().slice(0, MAX_TITLE_LENGTH);
+    if (!group && !title) throw new Error("Classifier gave an empty title");
+
+    return {
+      groupId: group?.id ?? null,
+      title: title || group!.title,
+      intent: reply.intent,
+      misconception: reply.misconception?.trim() || null,
+      needsReview: reply.needs_review,
+      source: "ai",
+    };
+  },
+};

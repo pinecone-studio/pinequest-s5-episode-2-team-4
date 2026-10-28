@@ -11,6 +11,7 @@ import {
   controlClassBattle,
   createClassBattle,
   createGroupBattle,
+  demoWinBattle,
   joinClassBattle,
   joinGroupBattle,
   leaveBattle,
@@ -139,6 +140,15 @@ export async function controlClassBossBattle(battleId: string, action: ClassCont
 /** The latest battle state; the battle screen polls this. */
 export async function refreshBattle(battleId: string): Promise<BattleState | undefined> {
   return battleState(await student(), battleId);
+}
+
+/** Demo accounts only: wins their solo battle at once, with an egg, for showing the game. */
+export async function demoWinBossBattle(battleId: string): Promise<{ state?: BattleState; error?: string }> {
+  const user = await student();
+  if (!user.demo) return { error: "demo_only" };
+  if (!/^[0-9a-f-]{36}$/i.test(battleId)) return { error: "invalid" };
+  const state = await demoWinBattle(user, battleId);
+  return state ? { state } : { error: "not_active" };
 }
 
 export async function submitBattleAnswer(

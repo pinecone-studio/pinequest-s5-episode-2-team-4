@@ -1,5 +1,5 @@
-/* Pet moods from the design (Тэжээвэр). The mood picker is a radio group,
-   so :has() switches the animation of every sprite without JavaScript. */
+/* Pets page (design: Тэжээвэр). The habitat scene has its own styles in
+   src/components/pet/PetScene.css. */
 
 .pets-hero {
   background: radial-gradient(
@@ -10,47 +10,33 @@
   );
 }
 
-.pets-mine {
-  background: radial-gradient(circle at 50% 45%, #ffffff 0%, #dad9ff 100%);
+[data-theme="dark"] .pets-hero {
+  background: radial-gradient(
+    circle at 50% 45%,
+    #393050 0%,
+    #252038 50%,
+    #171321 100%
+  );
 }
 
-/* Block so the mood transforms apply (they are ignored on inline boxes) */
-.pets-sprite {
+/* A gently bobbing sprite (evolution path, collection detail). */
+.pets-bob {
   display: block;
-  transform-origin: 50% 100%;
-}
-
-.pets:has(#mood-awake:checked) .pets-sprite {
   animation: pets-bob 2.4s ease-in-out infinite;
 }
 
-.pets:has(#mood-happy:checked) .pets-sprite {
-  animation: pets-hop 1.8s ease-in-out infinite;
+/* Evolution path: «Чи энд» pulses; a locked form wiggles now and then. */
+.pets-path-now {
+  animation: pets-pulse 1.8s ease-in-out infinite;
 }
 
-.pets:has(#mood-sleepy:checked) .pets-sprite {
-  opacity: 0.55;
-  filter: saturate(0.7);
-  animation: pets-breathe 4s ease-in-out infinite;
+.pets-path-locked {
+  animation: pets-wiggle 6s ease-in-out infinite;
 }
 
-.pets-zz {
-  display: none;
-}
-
-.pets:has(#mood-sleepy:checked) .pets-zz {
-  display: block;
-  animation: pets-zz 2.6s ease-in-out infinite;
-}
-
-.pets-star {
-  display: none;
-}
-
-/* With reduced motion the animation is off and the stars just stay visible. */
-.pets:has(#mood-happy:checked) .pets-star {
-  display: block;
-  animation: pets-twinkle 1.6s ease-in-out infinite both;
+/* Collection detail card: drops in when a pet is picked. */
+.pets-detail-in {
+  animation: pets-detail-in 0.2s ease-out both;
 }
 
 @keyframes pets-bob {
@@ -63,59 +49,37 @@
   }
 }
 
-@keyframes pets-hop {
-  0%,
-  34%,
-  100% {
-    transform: translateY(0) scale(1, 1);
-  }
-  6% {
-    transform: translateY(0) scale(1.06, 0.94);
-  }
-  17% {
-    transform: translateY(-14px) scale(0.97, 1.03);
-  }
-  28% {
-    transform: translateY(0) scale(1.04, 0.96);
-  }
-}
-
-@keyframes pets-breathe {
+@keyframes pets-pulse {
   0%,
   100% {
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgb(91 0 237 / 0.35);
   }
   50% {
-    transform: scale(1.02);
+    box-shadow: 0 0 0 14px rgb(91 0 237 / 0);
   }
 }
 
-@keyframes pets-zz {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  30% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-14px);
-  }
-}
-
-@keyframes pets-twinkle {
+@keyframes pets-wiggle {
   0%,
+  90%,
   100% {
+    transform: rotate(0);
+  }
+  93% {
+    transform: rotate(-6deg);
+  }
+  96% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pets-detail-in {
+  from {
     opacity: 0;
-    transform: scale(0.4);
+    transform: translateY(-6px);
   }
-  30% {
+  to {
     opacity: 1;
-    transform: scale(1);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(0.8);
+    transform: none;
   }
 }

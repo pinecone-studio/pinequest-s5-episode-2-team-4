@@ -1,34 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import type { AnonQuestion, QuestionGroup } from "@/lib/types";
+import { GroupRow } from "./GroupRow";
+import {
+  byLesson,
+  isAnswered,
+  isOffTopic,
+  type GroupView,
+} from "./question-inbox";
 
 type QuestionGroupsProps = {
-  groups: (QuestionGroup & {
-    subtopicTitle: string;
-    questions: AnonQuestion[];
-  })[];
+  groups: GroupView[];
   className?: string;
 };
 
-/** Students behind a group: each asker plus everyone who tapped «Би ч бас». */
-const askedBy = (questions: AnonQuestion[]) =>
-  questions.reduce((sum, q) => sum + 1 + q.meToo, 0);
+type Tab = "open" | "answered";
 
 /**
- * Anonymous questions grouped (as if by AI): the teacher answers each group
- * once and the answer goes to the whole class. Mock: replies stay local.
+ * Anonymous questions as an inbox: the AI groups them and notes the
+ * misconception; the teacher opens a group and answers the whole class once.
+ * Off-topic questions wait in their own section at the bottom.
  */
 export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
+  const [tab, setTab] = useState<Tab>("open");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
-  const [sent, setSent] = useState<Record<string, string>>({});
 
-  const sorted = [...groups].sort(
-    (a, b) => askedBy(b.questions) - askedBy(a.questions),
-  );
+  const offTopic = groups.filter((g) => isOffTopic(g) && !isAnswered(g));
+  const real = groups.filter((g) => !offTopic.includes(g));
+  const lists: Record<Tab, GroupView[]> = {
+    open: real.filter((g) => !isAnswered(g)),
+    answered: real.filter(isAnswered),
+  };
+  const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id));
+
+  const tabs: [Tab, string][] = [
+    ["open", "Хариулаагүй"],
+    ["answered", "Хариулсан"],
+  ];
 
   return (
     <section
@@ -46,105 +55,81 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
           Нэргүй асуултууд
         </h2>
         <p className="text-[13px] font-semibold text-ink-muted md:text-sm">
-          AI ижил асуултуудыг бүлэглэсэн
+          🤖 AI бүлэглэж, буруу ойлголтыг олсон
         </p>
       </div>
 
-      <ul className="mt-4 flex flex-col gap-3">
-        {sorted.map((g) => {
-          const teacherAnswer =
-            sent[g.id] ??
-            g.questions.find((q) => q.answer?.by === "teacher")?.answer?.text;
-          return (
-            <li key={g.id} className="rounded-card bg-surface p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex min-w-0 flex-col">
-                  <b className="text-base md:text-lg">{g.title}</b>
-                  <span className="text-[13px] text-ink-muted">
-                    {g.subtopicTitle} · {g.questions.length} асуулт
-                  </span>
-                </div>
-                <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white md:text-[13px]">
-                  {askedBy(g.questions)} сурагч асуусан
-                </span>
-              </div>
+      <div
+        role="tablist"
+        aria-label="Асуултын төлөв"
+        className="mt-4 inline-flex rounded-full bg-surface p-1"
+      >
+        {tabs.map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={tab === value}
+            onClick={() => setTab(value)}
+            className={cn(
+              "min-h-10 cursor-pointer rounded-full px-4 text-sm font-bold",
+              tab === value
+                ? "bg-white text-ink shadow-card"
+                : "text-ink-muted hover:text-ink",
+            )}
+          >
+            {label}{" "}
+            <span className="ml-0.5 opacity-70">{lists[value].length}</span>
+          </button>
+        ))}
+      </div>
 
-              <ul className="mt-2.5 flex flex-col gap-1">
-                {g.questions.map((q) => (
-                  <li key={q.id} className="text-[15px]">
-                    “{q.text}”
-                  </li>
-                ))}
-              </ul>
+      {lists[tab].length === 0 ? (
+        <p className="mt-5 text-[15px] text-ink-muted">
+          {tab === "open"
+            ? "Бүх асуултад хариулсан байна 🎉"
+            : "Хариулсан асуулт алга."}
+        </p>
+      ) : (
+        byLesson(lists[tab]).map(([lesson, items]) => (
+          <div key={lesson} className="mt-5">
+            <h3 className="mb-2 text-xs font-bold tracking-wide text-ink-muted uppercase">
+              {lesson}
+            </h3>
+            <ul className="flex flex-col gap-2">
+              {items.map((g) => (
+                <GroupRow
+                  key={g.id}
+                  group={g}
+                  open={openId === g.id}
+                  onToggle={() => toggle(g.id)}
+                />
+              ))}
+            </ul>
+          </div>
+        ))
+      )}
 
-              {teacherAnswer ? (
-                <div className="mt-3 rounded-field bg-white px-3.5 py-2.5">
-                  <p className="text-[15px]">{teacherAnswer}</p>
-                  <p
-                    role="status"
-                    className="mt-1 text-xs font-bold text-ink-muted"
-                  >
-                    Бүх ангид илгээгдсэн
-                  </p>
-                </div>
-              ) : openId === g.id ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const text = draft.trim();
-                    if (!text) return;
-                    setSent((prev) => ({ ...prev, [g.id]: text }));
-                    setOpenId(null);
-                  }}
-                  className="mt-3 flex flex-col gap-2"
-                >
-                  <label htmlFor={`reply-${g.id}`} className="sr-only">
-                    Ангид хариулт бичих
-                  </label>
-                  <textarea
-                    id={`reply-${g.id}`}
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    rows={3}
-                    maxLength={1000}
-                    autoFocus
-                    placeholder="Нэг хариулт бүх ангид очно…"
-                    className="w-full resize-none rounded-field border-2 border-line bg-white px-3.5 py-2.5 text-base text-ink outline-none placeholder:text-ink-muted focus:border-primary"
-                  />
-                  <div className="flex flex-wrap justify-end gap-2">
-                    <Button
-                      variant="white"
-                      size="sm"
-                      onClick={() => setOpenId(null)}
-                    >
-                      Болих
-                    </Button>
-                    <Button type="submit" size="sm" disabled={!draft.trim()}>
-                      Бүх ангид илгээх
-                    </Button>
-                  </div>
-                </form>
-              ) : (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setOpenId(g.id);
-                      setDraft("");
-                    }}
-                  >
-                    Хариулах
-                  </Button>
-                  {/* Voice replies need a backend; UI only for now. */}
-                  <Button variant="white" size="sm" disabled title="Удахгүй">
-                    🎙 Дуут хариулт
-                  </Button>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {tab === "open" && offTopic.length > 0 ? (
+        <details className="mt-6 rounded-card border-2 border-dashed border-line px-4 py-3">
+          <summary className="cursor-pointer text-sm font-bold">
+            ⚠ Шалгах шаардлагатай ({offTopic.length})
+            <span className="ml-1 font-semibold text-ink-muted">
+              · хичээлтэй хамааралгүй байж магадгүй
+            </span>
+          </summary>
+          <ul className="mt-3 flex flex-col gap-2">
+            {offTopic.map((g) => (
+              <GroupRow
+                key={g.id}
+                group={g}
+                open={openId === g.id}
+                onToggle={() => toggle(g.id)}
+              />
+            ))}
+          </ul>
+        </details>
+      ) : null}
     </section>
   );
 }

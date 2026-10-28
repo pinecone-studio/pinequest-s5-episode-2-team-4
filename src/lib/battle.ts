@@ -67,7 +67,7 @@ function pickQuestion(boss: Boss, subject: string, recentIds: string[]): English
 let subjectColumnReady = false;
 
 /**
- * Whether migration 0012 (battles.subject) has run. Until it has, battles
+ * Whether migration 0014 (battles.subject) has run. Until it has, battles
  * work as before and are all English. Only "yes" is remembered, so running
  * the migration takes effect without a restart.
  */
@@ -319,9 +319,9 @@ async function notifyBattle(battleId: string) {
   }
 }
 
-/** Picks a pet line from the boss's egg pool by weight. */
-function rollEgg(boss: Boss) {
-  if (Math.random() >= boss.rewards.eggChance) return undefined;
+/** Picks a pet line from the boss's egg pool by weight; `sure` skips the egg chance. */
+function rollEgg(boss: Boss, sure = false) {
+  if (!sure && Math.random() >= boss.rewards.eggChance) return undefined;
   const pool = boss.rewards.eggPool;
   let ticket = Math.random() * pool.reduce((sum, e) => sum + e.weight, 0);
   const lineId = (pool.find((e) => (ticket -= e.weight) < 0) ?? pool[pool.length - 1]).lineId;
@@ -330,13 +330,14 @@ function rollEgg(boss: Boss) {
 }
 
 /**
- * Grants a won battle's rewards (EXP, pet EXP, maybe an egg). The database
- * grants them only once, so calling again after a refresh is safe.
+ * Grants a won battle's rewards (EXP, pet EXP, maybe an egg; always one with
+ * `sureEgg`). The database grants them only once, so calling again after a
+ * refresh is safe.
  */
-async function claimRewards(user: User, state: BattleState) {
+async function claimRewards(user: User, state: BattleState, sureEgg = false) {
   const boss = bosses.find((b) => b.id === state.bossId);
   if (!boss || state.status !== "won" || state.rewards) return;
-  const egg = rollEgg(boss);
+  const egg = rollEgg(boss, sureEgg);
   const { error } = await db().rpc("battle_claim_rewards", {
     p_battle: state.id,
     p_username: user.username,
@@ -346,6 +347,47 @@ async function claimRewards(user: User, state: BattleState) {
     p_egg_rarity: egg?.rarity ?? null,
   });
   if (error) fail("Could not grant rewards", error);
+}
+
+/**
+ * For showing the game (the action allows demo accounts only): the player's
+ * own active solo battle is won at once. The boss's remaining HP counts as
+ * their damage, and the rewards always include an egg. Undefined when the
+ * battle isn't theirs, isn't solo or is already over.
+ */
+export async function demoWinBattle(user: User, battleId: string): Promise<BattleState | undefined> {
+  const player = await playerId(user);
+  const [{ data: battle, error }, { data: me, error: meError }] = await Promise.all([
+    db().from("battles").select("mode, status, hp").eq("id", battleId).maybeSingle<{ mode: string; status: string; hp: number }>(),
+    db()
+      .from("battle_participants")
+      .select("damage_dealt")
+      .eq("battle_id", battleId)
+      .eq("player_id", player)
+      .maybeSingle<{ damage_dealt: number }>(),
+  ]);
+  if (error || meError) fail("Could not load battle", error ?? meError);
+  if (!battle || !me || battle.mode !== "solo" || battle.status !== "active") return undefined;
+
+  // Only while it's still active, so a winning answer at the same moment can't count twice.
+  const { data: won, error: winError } = await db()
+    .from("battles")
+    .update({ hp: 0, status: "won", ended_at: new Date().toISOString(), next_attack_at: null })
+    .eq("id", battleId)
+    .eq("status", "active")
+    .select("id");
+  if (winError) fail("Could not end battle", winError);
+  if (!won?.length) return undefined;
+  const { error: damageError } = await db()
+    .from("battle_participants")
+    .update({ damage_dealt: me.damage_dealt + battle.hp })
+    .eq("battle_id", battleId)
+    .eq("player_id", player);
+  if (damageError) fail("Could not record damage", damageError);
+
+  const state = await battleState(user, battleId, false);
+  if (state) await claimRewards(user, state, true);
+  return battleState(user, battleId, false);
 }
 
 /**

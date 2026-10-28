@@ -1,5 +1,5 @@
 // A monthly spending cap for the AI, kept in Supabase (ai_usage, migration
-// 0013). Every call's tokens and cost are saved; once this month's total
+// 0015). Every call's tokens and cost are saved; once this month's total
 // reaches AI_MONTHLY_BUDGET_USD (default $1), no more calls are made and the
 // pages use demo content. Server only.
 //

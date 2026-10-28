@@ -23,6 +23,8 @@ export type Account = {
   email?: string;
   role: User["role"];
   classCode?: string;
+  /** A throwaway «Демо нэвтрэх» account. */
+  demo?: boolean;
   pet?: UserPet;
   /** Selected option index per diagnostic test question id. */
   testAnswers?: Record<string, number>;
@@ -56,7 +58,7 @@ export type Account = {
 export type Session = Account;
 
 /** Account fields that aren't learning progress. */
-const IDENTITY_KEYS = ["id", "username", "email", "role", "classCode"] as const satisfies (keyof Account)[];
+const IDENTITY_KEYS = ["id", "username", "email", "role", "classCode", "demo"] as const satisfies (keyof Account)[];
 
 const cookieOptions = {
   httpOnly: true,
@@ -113,6 +115,7 @@ async function loadAccount(id: string): Promise<Session | undefined> {
     email: account.email,
     role: account.role,
     classCode: account.classCode,
+    demo: account.demo,
   };
 }
 

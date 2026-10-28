@@ -139,6 +139,8 @@ export type User = {
   pet?: UserPet;
   /** Teachers: the one subject they teach (subjects.ts id). */
   subject?: string;
+  /** A throwaway «Демо нэвтрэх» account, which gets demo shortcuts. */
+  demo?: boolean;
 };
 
 /** Teacher heatmap cell; "untested" = has not taken the test. */
@@ -237,7 +239,14 @@ export type QuestionAnswer = {
   approved: boolean;
   /** «Чи сайн тайлбарласан» count */
   kudos: number;
+  /** Something to read or practise, added by the teacher. */
+  material?: AnswerMaterial;
 };
+
+/** A teacher adds one to a group answer: a part of a lesson in the app, or an outside link. */
+export type AnswerMaterial =
+  | { kind: "lesson"; subtopicId: string; part: "explanation" | "practice" }
+  | { kind: "link"; url: string; title: string };
 
 export type AnonQuestion = {
   id: string;
@@ -248,6 +257,10 @@ export type AnonQuestion = {
   groupId?: string;
   time: string;
   answer?: QuestionAnswer;
+  /** The AI thinks the teacher should look first (off-topic, unclear or rude). */
+  needsReview?: boolean;
+  /** The wrong idea the AI sees behind the question, for the teacher. */
+  misconception?: string;
 };
 
 /** Similar questions grouped (as if by AI) so the teacher answers once. */
@@ -256,6 +269,8 @@ export type QuestionGroup = {
   subtopicId: string;
   title: string;
   questionIds: string[];
+  /** answered once the teacher sent one answer to the whole class. */
+  status?: "pending" | "answered";
 };
 
 /** Understanding signal a student sends during a lesson: 🟢 got it, 🟡 unsure, 🔴 lost. */
@@ -543,7 +558,7 @@ export type GameSubject = {
 };
 
 // Teacher content: lesson materials, lesson videos and game assignments
-// (supabase/migrations/0011_teacher_content.sql).
+// (supabase/migrations/0013_teacher_content.sql).
 
 /** A file a teacher uploaded with a material, in the materials bucket. */
 export type MaterialFile = {

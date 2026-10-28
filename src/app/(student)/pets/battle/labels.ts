@@ -1,11 +1,12 @@
 import type { EnglishSkill, Rarity } from "@/lib/types";
 
+/** Kept in English, like rarities in games; show them with `lang="en"`. */
 export const RARITY_LABELS: Record<Rarity, string> = {
-  common: "Энгийн",
-  uncommon: "Ховордуу",
-  rare: "Ховор",
-  epic: "Эрхэм",
-  legendary: "Домогт",
+  common: "Common",
+  uncommon: "Uncommon",
+  rare: "Rare",
+  epic: "Epic",
+  legendary: "Legendary",
 };
 
 /** Badge colours per rarity, from plain to gold. */

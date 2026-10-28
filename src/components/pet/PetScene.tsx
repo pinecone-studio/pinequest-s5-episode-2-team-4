@@ -11,14 +11,18 @@ type PetSceneProps = {
   element: PetElement;
   /** From the learning streak (`petMood`), never a toggle. */
   mood: PetMood;
+  /** False for a pet the student hasn't found yet: a silhouette named «???», no level. */
+  discovered?: boolean;
   className?: string;
 };
 
 /**
- * The student's pet in its pixel-art habitat (design: Тэжээвэр), with its
- * name, level and type. The mood sets how it moves and whether it's night.
+ * A pet in its pixel-art habitat (design: Тэжээвэр), with its name, level
+ * and type. The mood sets how it moves and whether it's night.
  */
-export function PetScene({ stage, level, element, mood, className }: PetSceneProps) {
+export function PetScene({ stage, level, element, mood, discovered = true, className }: PetSceneProps) {
+  const alt = discovered ? `${PET_MOOD_LABELS[mood]} ${stage.name}` : "Олдоогүй тэжээвэр";
+  const silhouette = !discovered && "opacity-40 brightness-0";
   return (
     <section
       aria-labelledby="pet-scene-name"
@@ -30,13 +34,8 @@ export function PetScene({ stage, level, element, mood, className }: PetScenePro
     >
       <SceneArt />
       <div className="pet-scene-pet absolute bottom-14 left-1/2 -ml-24 w-48 md:bottom-26 md:-ml-32 md:w-64">
-        <PetSprite stage={stage} size={192} alt={`${PET_MOOD_LABELS[mood]} ${stage.name}`} className="md:hidden" />
-        <PetSprite
-          stage={stage}
-          size={256}
-          alt={`${PET_MOOD_LABELS[mood]} ${stage.name}`}
-          className="hidden md:block"
-        />
+        <PetSprite stage={stage} size={192} alt={alt} className={cn("md:hidden", silhouette)} />
+        <PetSprite stage={stage} size={256} alt={alt} className={cn("hidden md:block", silhouette)} />
       </div>
       <span
         aria-hidden="true"
@@ -46,12 +45,21 @@ export function PetScene({ stage, level, element, mood, className }: PetScenePro
       </span>
       <div className="absolute top-3 left-3 flex items-center gap-2.5 rounded-full bg-white py-1.5 pr-2 pl-4 shadow-[0_6px_20px_rgba(63,7,145,0.12)] md:top-auto md:right-5 md:bottom-5 md:left-5 md:justify-between md:gap-3 md:py-3 md:pr-3.5 md:pl-6 md:shadow-none">
         <h2 id="pet-scene-name" className="text-xl leading-[1.1] font-bold md:text-[28px]">
-          {stage.name}
+          {discovered ? (
+            stage.name
+          ) : (
+            <>
+              <span aria-hidden="true">???</span>
+              <span className="sr-only">Олдоогүй тэжээвэр</span>
+            </>
+          )}
         </h2>
         <span className="flex gap-1.5 md:gap-2">
-          <span className="inline-flex items-center rounded-full bg-primary px-3 py-0.75 text-[13px] font-bold text-white">
-            Түв. {level}
-          </span>
+          {discovered ? (
+            <span className="inline-flex items-center rounded-full bg-primary px-3 py-0.75 text-[13px] font-bold text-white">
+              Түв. {level}
+            </span>
+          ) : null}
           <ElementBadge element={element} />
         </span>
       </div>

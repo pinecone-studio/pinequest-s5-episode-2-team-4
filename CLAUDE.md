@@ -30,7 +30,7 @@ Lesson content is mock data; accounts, progress, pets, battles and teacher conte
 ## AI
 
 - All model calls go through `src/lib/ai/` (Claude Haiku via `@anthropic-ai/sdk`, `ANTHROPIC_API_KEY`). Prompts are in Mongolian and ask for JSON with a schema; validate the reply before using it.
-- Every call counts toward the monthly budget (`AI_MONTHLY_BUDGET_USD`, default $1, table `ai_usage`); past it the pages use demo content.
+- Teacher-tool calls (`src/lib/ai/generate.ts`) count toward the monthly budget (`AI_MONTHLY_BUDGET_USD`, default $1, table `ai_usage`); past it those pages use demo content. The question classifier is `src/lib/ai/claude.ts`.
 - Never send student data (names, emails, classes, scores) to the model. Teacher materials are sent as data, never as instructions.
 - Every AI feature must work without a key: fall back to demo content and show it as demo in the UI.
 

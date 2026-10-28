@@ -6,7 +6,7 @@
 import "server-only";
 import type { BookText, GameQuestion, Recognition, ReelScript, ReelSection } from "@/lib/types";
 import { demoBook, demoQuestions, demoRecognition, demoScript } from "./fallback";
-import { type AiInput, generateJson } from "./claude";
+import { type AiInput, generateJson } from "./generate";
 import { toBook, toQuestions, toRecognition, toScript, toSection } from "./validate";
 
 export type AiResult<T> = { value: T; source: "ai" | "demo" };

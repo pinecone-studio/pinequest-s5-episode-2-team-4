@@ -5,7 +5,7 @@
 // are re-validated here.
 
 import { redirect } from "next/navigation";
-import { aiEnabled } from "./ai/claude";
+import { aiEnabled } from "./ai/generate";
 import { normalClassCode } from "./battle";
 import { teacherSubject } from "./subjects";
 import {
