@@ -33,9 +33,10 @@ export function ProgressBar({
         className,
       )}
     >
+      {/* Full width, slid left by what's missing: transform animates without relayout. */}
       <div
-        className="h-full rounded-full bg-primary transition-[width] duration-300"
-        style={{ width: `${clamped}%` }}
+        className="h-full rounded-full bg-primary transition-transform duration-500 ease-(--ease-soft)"
+        style={{ transform: `translateX(${clamped - 100}%)` }}
       />
     </div>
   );
