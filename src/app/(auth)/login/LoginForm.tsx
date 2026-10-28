@@ -53,7 +53,7 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         <PetSprite stage={pet} size={128} className="animate-bob" />
       </PetAvatar>
 
-      <h1 id="login-title" className="text-center text-[32px] leading-tight font-bold">
+      <h1 id="login-title" className="text-center text-3xl leading-tight font-bold">
         Нэвтрэх
       </h1>
       <RoleToggle value={role} onChange={setRole} className="mt-6" />

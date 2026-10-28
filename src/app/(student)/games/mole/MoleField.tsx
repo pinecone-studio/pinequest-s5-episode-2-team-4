@@ -72,7 +72,7 @@ export function MoleField({ moles, swing, onHit, disabled }: MoleFieldProps) {
               <span key={mole.id} className={cn("mole-up absolute inset-x-[12%] bottom-0 flex flex-col items-center", mole.hit && "mole-hit")}>
                 <span
                   className={cn(
-                    "mole-sign relative z-10 mb-[-6%] flex min-h-9 w-[112%] items-center justify-center rounded-lg border-2 px-1 py-1 text-[13px] leading-tight font-extrabold text-[var(--game-ink)]",
+                    "mole-sign relative z-10 mb-[-6%] flex min-h-9 w-[112%] items-center justify-center rounded-lg border-2 px-1 py-1 text-sm leading-tight font-extrabold text-[var(--game-ink)]",
                     mole.hit === "good" && "border-[var(--game-good)] bg-[#0f3d33]",
                     mole.hit === "bad" && "border-[var(--game-bad)] bg-[#4a1030]",
                     !mole.hit && "border-[var(--game-line)] bg-[#1d1647]",

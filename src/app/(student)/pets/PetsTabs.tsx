@@ -92,7 +92,7 @@ export function PetsTabs({ eggCount }: { eggCount: number }) {
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "pets-tab inline-flex min-h-12 items-center gap-2 rounded-full border-2 pr-4 pl-1.5 text-sm font-bold whitespace-nowrap no-underline transition-[translate,box-shadow] hover:-translate-y-0.5 active:translate-y-1 active:shadow-none md:min-h-13 md:pr-4.5 md:text-[15px]",
+                  "pets-tab inline-flex min-h-12 items-center gap-2 rounded-full border-2 pr-4 pl-1.5 text-sm font-bold whitespace-nowrap no-underline transition-[translate,box-shadow] hover:-translate-y-0.5 active:translate-y-1 active:shadow-none md:min-h-13 md:pr-4.5 md:text-base",
                   active
                     ? "pets-tab-on border-primary bg-primary text-white shadow-[0_4px_0_var(--color-primary-dark)] hover:text-white"
                     : "border-lavender bg-white text-ink shadow-[0_4px_0_var(--color-lavender)] hover:text-ink",

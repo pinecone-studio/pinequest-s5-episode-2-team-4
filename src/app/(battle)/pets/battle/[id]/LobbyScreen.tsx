@@ -114,7 +114,7 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
         </div>
 
         <div className="flex flex-col items-center gap-2 px-5 text-center md:px-8">
-          <h1 id="lobby-title" className="text-2xl font-bold md:text-[32px]">
+          <h1 id="lobby-title" className="text-2xl font-bold md:text-3xl">
             {boss.name} · {isClass ? `${state.classCode ?? ""} ангийн тулаан` : "Бүлгийн тулаан"}
           </h1>
           <p className="text-ink-muted">

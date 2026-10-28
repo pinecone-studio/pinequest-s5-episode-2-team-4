@@ -63,7 +63,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
         {g.questions.map((q) => (
           <li
             key={q.id}
-            className="flex items-baseline justify-between gap-3 text-[15px]"
+            className="flex items-baseline justify-between gap-3 text-base"
           >
             <span>“{q.text}”</span>
             {q.meToo > 0 ? (
@@ -93,7 +93,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
         <button
           type="button"
           onClick={() => setRenaming(true)}
-          className="cursor-pointer self-start text-[13px] font-bold text-ink-muted underline-offset-2 hover:text-ink hover:underline"
+          className="cursor-pointer self-start text-sm font-bold text-ink-muted underline-offset-2 hover:text-ink hover:underline"
         >
           ✏️ Нэр солих
         </button>
@@ -104,7 +104,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
           <p className="text-xs font-bold text-primary">
             Таны хариулт · бүх ангид илгээгдсэн
           </p>
-          <p className="mt-0.5 text-[15px] whitespace-pre-line">
+          <p className="mt-0.5 text-base whitespace-pre-line">
             {answer.text}
           </p>
           {answer.material ? (
@@ -129,7 +129,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
       )}
 
       {error ? (
-        <p role="alert" className="text-[13px] font-bold text-magenta">
+        <p role="alert" className="text-sm font-bold text-magenta">
           {error}
         </p>
       ) : null}

@@ -202,7 +202,7 @@ export function Formation({
                       {pet.me && combo >= 2 && !out ? (
                         <span
                           aria-label={`Комбо ×${combo}`}
-                          className="absolute -top-1 -right-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] leading-none font-bold text-white shadow-card md:text-xs"
+                          className="absolute -top-1 -right-2 rounded-full bg-primary px-1.5 py-0.5 text-2xs leading-none font-bold text-white shadow-card md:text-xs"
                         >
                           ×{combo}
                         </span>
@@ -225,7 +225,7 @@ export function Formation({
                     <span
                       className={cn(
                         "mt-1 max-w-full truncate rounded-full leading-tight font-bold",
-                        big ? "px-1.5 text-xs md:text-sm" : "px-1 text-[10px]",
+                        big ? "px-1.5 text-xs md:text-sm" : "px-1 text-2xs",
                         pet.me ? "bg-primary text-white" : onCard ? "bg-surface text-ink" : "bg-white/90 text-ink",
                       )}
                     >
@@ -251,7 +251,7 @@ export function Formation({
                       <span
                         aria-hidden="true"
                         className={cn(
-                          "mt-0.5 text-[10px] leading-none font-bold tabular-nums md:text-xs",
+                          "mt-0.5 text-2xs leading-none font-bold tabular-nums md:text-xs",
                           onCard ? "text-ink-muted" : "text-white [text-shadow:0_1px_2px_rgb(0_0_0/0.8)]",
                         )}
                       >

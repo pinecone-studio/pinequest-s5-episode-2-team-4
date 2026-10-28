@@ -25,7 +25,7 @@ export default async function PetsPage() {
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 pt-1 md:px-[clamp(16px,4vw,40px)] md:pt-2">
-      <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[64px]">Тэжээвэр</h1>
+      <h1 className="type-page-title">Тэжээвэр</h1>
       <PetsView
         lines={lines}
         owned={collection?.pets ?? []}

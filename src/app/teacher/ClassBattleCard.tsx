@@ -29,7 +29,7 @@ export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, c
       className={cn("rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-6", className)}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="class-battle-title" className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]">
+        <h2 id="class-battle-title" className="type-section-title">
           Ангийн босс тулаан
         </h2>
         <Link href={`/teacher/history?class=${encodeURIComponent(open?.classCode ?? classCode)}`} className="font-bold">

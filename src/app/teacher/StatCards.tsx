@@ -93,15 +93,15 @@ export function StatCards({
             {stat.icon}
           </span>
           <div>
-            <p className="text-[28px] leading-none font-bold md:text-4xl">
+            <p className="text-3xl leading-none font-bold md:text-4xl">
               {stat.value}
               {stat.total !== undefined && (
-                <span className="text-[15px] text-ink-muted md:text-xl">
+                <span className="text-base text-ink-muted md:text-xl">
                   /{stat.total}
                 </span>
               )}
             </p>
-            <p className="mt-1 text-xs font-semibold md:mt-1.5 md:text-[15px]">
+            <p className="mt-1 text-xs font-semibold md:mt-1.5 md:text-base">
               {stat.label}
               {stat.detail && (
                 <span className="hidden md:inline"> · {stat.detail}</span>

@@ -69,7 +69,7 @@ function PracticeRow({
     >
       <Expression
         tokens={leftSide(question)}
-        className="text-xl font-bold md:w-37.5 md:shrink-0 md:text-[22px]"
+        className="text-xl font-bold md:w-37.5 md:shrink-0 md:text-2xl"
       />
 
       <div aria-live="polite" className="justify-self-end md:order-3">
@@ -110,7 +110,7 @@ function PracticeRow({
                   ? `${label}, чиний хариу, ${solved ? "зөв" : "зөв биш"}`
                   : label
               }
-              className={`flex min-h-14 items-center justify-center gap-1 rounded-tile border-2 text-[17px] font-bold text-ink md:min-h-16 md:gap-2 md:text-xl ${
+              className={`flex min-h-14 items-center justify-center gap-1 rounded-tile border-2 text-lg font-bold text-ink md:min-h-16 md:gap-2 md:text-xl ${
                 picked && solved
                   ? "border-ink bg-sky"
                   : picked
@@ -164,13 +164,13 @@ export function PracticeSection({ questions, solvedIds }: PracticeSectionProps) 
       <div className="flex items-center justify-between gap-2 md:gap-3">
         <h3
           id="practice-title"
-          className="text-2xl leading-tight font-bold md:text-[28px]"
+          className="text-2xl leading-tight font-bold md:text-3xl"
         >
           Дасгал
         </h3>
         <span
           aria-label={`${questions.length}-аас ${solvedCount} бодсон`}
-          className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-sm font-bold md:px-3.5 md:py-1.5 md:text-[15px]"
+          className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-sm font-bold md:px-3.5 md:py-1.5 md:text-base"
         >
           <svg
             viewBox="0 0 24 24"

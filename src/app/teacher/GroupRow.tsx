@@ -38,25 +38,25 @@ export function GroupRow({ group: g, open, onToggle }: GroupRowProps) {
           <b className="text-lg leading-none md:text-xl">
             {askedBy(g.questions)}
           </b>
-          <span className="mt-0.5 text-[10px] font-semibold opacity-85">
+          <span className="mt-0.5 text-2xs font-semibold opacity-85">
             асуусан
           </span>
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <b className="text-[15px] leading-snug md:text-base">
+          <b className="text-base leading-snug">
             {shortTitle(g)}
           </b>
           {misconception ? (
             <span
               className={cn(
-                "text-[13px] text-ink-muted",
+                "text-sm text-ink-muted",
                 !open && "line-clamp-1",
               )}
             >
               🤖 {misconception}
             </span>
           ) : (
-            <span className="text-[13px] text-ink-muted">
+            <span className="text-sm text-ink-muted">
               {g.questions.length} асуулт
             </span>
           )}

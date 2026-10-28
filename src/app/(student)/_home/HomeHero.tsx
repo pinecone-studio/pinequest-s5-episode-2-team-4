@@ -35,7 +35,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
       <div className="contents md:flex md:max-w-135 md:min-w-0 md:flex-[1_1_420px] md:flex-col md:items-start md:gap-10">
         <h1
           id="hero-title"
-          className="px-1 text-[40px] leading-[1.05] font-bold tracking-tight text-balance md:px-0 md:text-6xl"
+          className="px-1 text-4xl leading-[1.05] font-bold tracking-tight text-balance md:px-0 md:text-6xl"
         >
           {words.map((w, i) => (
             <span key={w}>
@@ -81,7 +81,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
                 />
               </div>
             </div>
-            <p className="absolute top-105 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/80 px-4.5 py-2 text-[15px] font-bold whitespace-nowrap shadow-float ring-1 ring-white backdrop-blur-md">
+            <p className="absolute top-105 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/80 px-4.5 py-2 text-base font-bold whitespace-nowrap shadow-float ring-1 ring-white backdrop-blur-md">
               <span>{pet.stage.name}</span>
               <span aria-hidden="true" className="size-1 rounded-full bg-line" />
               <span className="text-primary">Түв. {pet.level}</span>

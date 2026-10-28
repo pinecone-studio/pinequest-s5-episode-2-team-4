@@ -50,11 +50,11 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2
           id="questions-title"
-          className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]"
+          className="type-section-title"
         >
           Нэргүй асуултууд
         </h2>
-        <p className="text-[13px] font-semibold text-ink-muted md:text-sm">
+        <p className="text-sm font-semibold text-ink-muted">
           🤖 AI бүлэглэж, буруу ойлголтыг олсон
         </p>
       </div>
@@ -85,7 +85,7 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
       </div>
 
       {lists[tab].length === 0 ? (
-        <p className="mt-5 text-[15px] text-ink-muted">
+        <p className="mt-5 text-base text-ink-muted">
           {tab === "open"
             ? "Бүх асуултад хариулсан байна 🎉"
             : "Хариулсан асуулт алга."}

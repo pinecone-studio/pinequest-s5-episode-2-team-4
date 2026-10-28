@@ -32,7 +32,7 @@ export function ForgotForm() {
       aria-labelledby="forgot-title"
       className="w-full max-w-115 rounded-panel bg-white px-6 py-8 shadow-float md:px-10 md:py-9"
     >
-      <h1 id="forgot-title" className="text-center text-[32px] leading-tight font-bold">
+      <h1 id="forgot-title" className="text-center text-3xl leading-tight font-bold">
         Нууц үг сэргээх
       </h1>
       {sentTo ? (

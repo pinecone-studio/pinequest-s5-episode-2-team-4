@@ -40,8 +40,8 @@ export function ChatQuestion({
   return (
     <li className="flex flex-col items-start gap-1.5">
       <div className="max-w-[85%] rounded-[20px] rounded-bl-md bg-surface px-3.5 py-2.5">
-        <p className="text-[15px]">{q.text}</p>
-        <p className="mt-0.5 text-right text-[11px] font-semibold text-ink-muted">
+        <p className="text-base">{q.text}</p>
+        <p className="mt-0.5 text-right text-2xs font-semibold text-ink-muted">
           {q.time}
         </p>
       </div>
@@ -71,7 +71,7 @@ export function ChatQuestion({
           <p className="text-xs font-bold text-primary">
             {answer.by === "teacher" ? "Багш" : "Ангийн найз"}
           </p>
-          <p className="mt-0.5 text-[15px] whitespace-pre-line">
+          <p className="mt-0.5 text-base whitespace-pre-line">
             {answer.text}
           </p>
           {answer.material ? (
@@ -91,10 +91,10 @@ export function ChatQuestion({
         </div>
       ) : replied ? (
         <div className="ml-5 max-w-[85%] rounded-[20px] rounded-tl-md bg-primary px-3.5 py-2.5 text-white">
-          <p className="text-[15px]">{replied}</p>
+          <p className="text-base">{replied}</p>
           <p
             role="status"
-            className="mt-0.5 text-[11px] font-semibold opacity-80"
+            className="mt-0.5 text-2xs font-semibold opacity-80"
           >
             Багш шалгаж байна · +{HELP_XP} XP
           </p>
@@ -119,7 +119,7 @@ export function ChatQuestion({
             rows={2}
             maxLength={500}
             autoFocus
-            className="w-full resize-none rounded-field border-2 border-line bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink-muted focus:border-primary md:text-[15px]"
+            className="w-full resize-none rounded-field border-2 border-line bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink-muted focus:border-primary"
           />
           <div className="flex gap-1.5 self-end">
             <button

@@ -27,7 +27,7 @@ export default async function SignupPage() {
     <main className="relative flex-1 px-4 pt-4 pb-16">
       <FloatingPets pets={decor} />
       <div className="relative mx-auto max-w-278">
-        <h1 className="text-center text-[32px] leading-tight font-bold tracking-tight md:text-5xl">
+        <h1 className="text-center text-3xl leading-tight font-bold tracking-tight md:text-5xl">
           Бүртгүүлэх
         </h1>
         <SignupForm petLines={petLines.filter(isStarterPet)} />

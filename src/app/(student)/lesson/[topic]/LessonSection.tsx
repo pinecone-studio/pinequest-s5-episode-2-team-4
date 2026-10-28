@@ -22,12 +22,12 @@ export function LessonSection({
       <div className="flex flex-col items-start gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4">
         <h2
           id="lesson-title"
-          className="text-[32px] leading-[1.05] font-bold tracking-[-0.02em] md:text-[40px]"
+          className="text-3xl leading-[1.05] font-bold tracking-[-0.02em] md:text-4xl"
         >
           {lesson.title}
         </h2>
         {lesson.approvedByTeacher ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-0.75 text-xs font-bold md:px-3 md:py-1.25 md:text-[13px]">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-0.75 text-xs font-bold md:px-3 md:py-1.25 md:text-sm">
             <svg
               viewBox="0 0 24 24"
               fill="none"

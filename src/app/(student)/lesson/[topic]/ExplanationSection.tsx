@@ -87,7 +87,7 @@ function BarRow({
       <span
         role="img"
         aria-label={sayFraction(value)}
-        className={`w-7 shrink-0 text-center text-[17px] font-bold md:w-9 md:text-xl ${
+        className={`w-7 shrink-0 text-center text-lg font-bold md:w-9 md:text-xl ${
           highlight ? "text-primary" : ""
         }`}
       >
@@ -128,7 +128,7 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
         <div
           role="img"
           aria-label={`${sayExpression(expression)} гэж бодсон, зөв биш`}
-          className="flex items-center gap-3 text-[34px] leading-none font-bold md:gap-4 md:text-[44px]"
+          className="flex items-center gap-3 text-4xl leading-none font-bold md:gap-4 md:text-5xl"
         >
           {expression.map((token, i) => {
             const isAnswer = i === expression.length - 1;
@@ -209,7 +209,7 @@ export function ExplanationSection({ lesson }: ExplanationSectionProps) {
             </p>
             <span
               aria-hidden="true"
-              className="hidden text-center text-[28px] font-bold text-primary md:block"
+              className="hidden text-center text-3xl font-bold text-primary md:block"
             >
               =
             </span>

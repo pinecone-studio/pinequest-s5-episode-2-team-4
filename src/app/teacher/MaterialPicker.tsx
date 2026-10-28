@@ -19,14 +19,14 @@ type MaterialPickerProps = {
 
 const chip = (on: boolean) =>
   cn(
-    "min-h-9 cursor-pointer rounded-full border-2 px-3 text-[13px] font-bold",
+    "min-h-9 cursor-pointer rounded-full border-2 px-3 text-sm font-bold",
     on
       ? "border-primary bg-primary text-white"
       : "border-lavender bg-white text-ink hover:bg-lavender",
   );
 
 const field =
-  "w-full rounded-field border-2 border-line bg-white px-3.5 py-2 text-[15px] text-ink outline-none placeholder:text-ink-muted focus:border-primary";
+  "w-full rounded-field border-2 border-line bg-white px-3.5 py-2 text-base text-ink outline-none placeholder:text-ink-muted focus:border-primary";
 
 type Choice = "none" | "explanation" | "practice" | "link";
 
@@ -58,7 +58,7 @@ export function MaterialPicker({
 
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1.5 text-[13px] font-bold text-ink-muted">
+      <legend className="mb-1.5 text-sm font-bold text-ink-muted">
         Нэмэлт материал
       </legend>
       <div className="flex flex-wrap gap-1.5">

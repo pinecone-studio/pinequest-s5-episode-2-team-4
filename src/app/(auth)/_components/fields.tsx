@@ -17,7 +17,7 @@ function Label({ id, label, hint }: { id: string; label: string; hint?: string }
   return (
     <label htmlFor={id} className="flex items-baseline justify-between gap-2 text-sm font-bold">
       {label}
-      {hint && <span className="text-[13px] font-medium text-ink-muted">{hint}</span>}
+      {hint && <span className="text-sm font-medium text-ink-muted">{hint}</span>}
     </label>
   );
 }
@@ -43,7 +43,7 @@ export function SubjectPicker({
     <fieldset className="flex flex-col gap-1.5">
       <legend className="mb-1.5 flex w-full items-baseline justify-between gap-2 text-sm font-bold">
         Заадаг хичээл
-        <span className="text-[13px] font-medium text-ink-muted">дараа солих боломжгүй</span>
+        <span className="text-sm font-medium text-ink-muted">дараа солих боломжгүй</span>
       </legend>
       <div className="grid grid-cols-2 gap-2">
         {subjects.map((s) => (

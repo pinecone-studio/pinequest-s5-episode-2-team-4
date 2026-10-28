@@ -37,16 +37,16 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
       <div className="flex items-center justify-between gap-3">
         <h2
           id="peer-title"
-          className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]"
+          className="type-section-title"
         >
           Сурагчдын хариулт
         </h2>
-        <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-[13px]">
+        <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-sm">
           {pendingCount}
           <span className="sr-only"> хүлээгдэж буй</span>
         </span>
       </div>
-      <p className="mt-1 text-[13px] font-semibold text-ink-muted md:text-sm">
+      <p className="mt-1 text-sm font-semibold text-ink-muted">
         Батлагдсан хариулт л ангийнхандаа харагдана.
       </p>
 
@@ -60,7 +60,7 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
             const decision = decided[q.id];
             return (
               <li key={q.id} className="rounded-card bg-surface p-4">
-                <span className="text-[13px] text-ink-muted">
+                <span className="text-sm text-ink-muted">
                   {q.subtopicTitle} · {q.time}
                 </span>
                 <p className="font-bold">“{q.text}”</p>
@@ -68,7 +68,7 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
                   <span className="text-xs font-bold text-ink-muted">
                     №{pad(q.answer?.studentNo ?? 0)} хариулсан
                   </span>
-                  <p className="text-[15px]">{q.answer?.text}</p>
+                  <p className="text-base">{q.answer?.text}</p>
                 </div>
                 {decision ? (
                   <p role="status" className="mt-2.5 text-sm font-bold">

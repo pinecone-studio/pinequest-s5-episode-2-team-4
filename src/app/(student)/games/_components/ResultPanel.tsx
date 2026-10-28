@@ -46,13 +46,13 @@ export function ResultPanel({ result, onAgain, otherHref, children }: ResultPane
       <dl className="grid w-full max-w-[330px] grid-cols-3 gap-2">
         {stats.map((s) => (
           <div key={s.label} className="game-chip flex flex-col-reverse rounded-[14px] px-1 py-2">
-            <dt className="text-[11px] text-[var(--game-muted)]">{s.label}</dt>
+            <dt className="text-2xs text-[var(--game-muted)]">{s.label}</dt>
             <dd className="text-lg font-extrabold text-white">{s.value}</dd>
           </div>
         ))}
       </dl>
       {result.review ? (
-        <p className="line-clamp-4 max-w-[330px] rounded-[14px] border border-[rgb(255_207_90/0.3)] bg-[rgb(255_207_90/0.08)] px-3 py-2 text-left text-[13px] text-[var(--game-muted)]">
+        <p className="line-clamp-4 max-w-[330px] rounded-[14px] border border-[rgb(255_207_90/0.3)] bg-[rgb(255_207_90/0.08)] px-3 py-2 text-left text-sm text-[var(--game-muted)]">
           <b className="text-[var(--game-gold)]">Давтах нь: </b>
           {result.review}
         </p>

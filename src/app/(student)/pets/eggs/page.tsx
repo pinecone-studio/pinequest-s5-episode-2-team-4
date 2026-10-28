@@ -15,7 +15,7 @@ export default async function EggsPage() {
     <div className="mx-auto max-w-5xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">Өндөг</h1>
+          <h1 className="type-page-title">Өндөг</h1>
           <p className="mt-3 text-ink-muted md:text-lg">
             Боссыг ялахад өндөг олдож болно. Хагалж шинэ тэжээвэртэй болоорой.
           </p>

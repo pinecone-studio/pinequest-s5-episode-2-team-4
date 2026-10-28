@@ -77,7 +77,7 @@ export function Celebration({ score, pet, heading, nextHref }: CelebrationProps)
         ))}
       </div>
 
-      <p className="relative inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-[15px] font-bold shadow-card md:gap-2 md:px-[18px] md:py-2 md:text-base">
+      <p className="relative inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-base font-bold shadow-card md:gap-2 md:px-[18px] md:py-2">
         <StarIcon className="size-4 md:size-[18px]" />
         <span className="sr-only">
           Дахин шалгалт: {score.correct}/{score.total} зөв, {percent} хувь
@@ -161,7 +161,7 @@ export function Celebration({ score, pet, heading, nextHref }: CelebrationProps)
             <ArrowUpIcon className="size-[13px] md:size-4" />
             Түв. {pet.to.level}
           </span>
-          <span className="absolute top-[178px] left-1/2 -translate-x-1/2 rounded-full bg-white px-3.5 py-1 text-sm font-bold whitespace-nowrap shadow-card md:top-[292px] md:px-4 md:py-1.5 md:text-[15px]">
+          <span className="absolute top-[178px] left-1/2 -translate-x-1/2 rounded-full bg-white px-3.5 py-1 text-sm font-bold whitespace-nowrap shadow-card md:top-[292px] md:px-4 md:py-1.5 md:text-base">
             {pet.to.stage.name}
           </span>
         </div>
@@ -169,7 +169,7 @@ export function Celebration({ score, pet, heading, nextHref }: CelebrationProps)
 
       <h1
         id="mastered-title"
-        className="relative mt-8 text-center text-[40px] leading-none font-bold tracking-[-0.03em] md:mt-10 md:text-[64px]"
+        className="relative mt-8 text-center text-4xl leading-none font-bold tracking-[-0.03em] md:mt-10 md:text-6xl"
       >
         Эзэмшсэн!
       </h1>

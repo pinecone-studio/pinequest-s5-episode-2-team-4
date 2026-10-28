@@ -126,14 +126,14 @@ export function QuestionPanel({ subtopicId, questions }: QuestionPanelProps) {
             {mine.map(({ text, time, note }, i) => (
               <li key={i} className="flex flex-col items-end gap-1">
                 <div className="max-w-[85%] rounded-[20px] rounded-br-md bg-primary px-3.5 py-2.5 text-white">
-                  <p className="text-[15px]">{text}</p>
-                  <p className="mt-0.5 text-right text-[11px] font-semibold opacity-80">
+                  <p className="text-base">{text}</p>
+                  <p className="mt-0.5 text-right text-2xs font-semibold opacity-80">
                     {time}
                   </p>
                 </div>
                 <p
                   role="status"
-                  className="pr-1 text-[11px] font-semibold text-ink-muted"
+                  className="pr-1 text-2xs font-semibold text-ink-muted"
                 >
                   {note}
                 </p>

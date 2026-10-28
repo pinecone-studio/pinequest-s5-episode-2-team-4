@@ -28,7 +28,7 @@ export function Track({ horses, positions, steps, player }: TrackProps) {
     <div className="race-sky">
       <div aria-hidden="true" className="race-stands relative h-12">
         <span className="race-crowd absolute inset-x-0 bottom-1.5 h-7" />
-        <span className="race-banner absolute top-1.5 left-1/2 -translate-x-1/2 rounded-md px-2.5 py-0.5 text-[10px] font-extrabold tracking-[0.2em] text-[#2a1600]">
+        <span className="race-banner absolute top-1.5 left-1/2 -translate-x-1/2 rounded-md px-2.5 py-0.5 text-2xs font-extrabold tracking-[0.2em] text-[#2a1600]">
           LEVELUP DERBY
         </span>
       </div>
@@ -50,7 +50,7 @@ export function Track({ horses, positions, steps, player }: TrackProps) {
               >
                 <span
                   aria-hidden="true"
-                  className="race-gate grid h-full w-7 shrink-0 place-items-center rounded-l-lg text-[10px] font-extrabold text-[#2a1600]"
+                  className="race-gate grid h-full w-7 shrink-0 place-items-center rounded-l-lg text-2xs font-extrabold text-[#2a1600]"
                 >
                   {i === player ? "ЧИ" : i + 1}
                 </span>
@@ -64,7 +64,7 @@ export function Track({ horses, positions, steps, player }: TrackProps) {
                     style={{ left: `calc(${pos / steps} * (100% - 4.5rem))` }}
                   >
                     {leading ? (
-                      <span aria-hidden="true" className="race-crown absolute -top-3 left-[52%] text-[11px] leading-none">
+                      <span aria-hidden="true" className="race-crown absolute -top-3 left-[52%] text-2xs leading-none">
                         👑
                       </span>
                     ) : null}
