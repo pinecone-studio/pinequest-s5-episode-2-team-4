@@ -79,6 +79,7 @@ export function useHorseRace(questions: GameQuestion[]) {
           bestCombo: race.bestCombo,
           stars: starsFor(race.wrong),
           review: race.missed[0]?.explanation,
+          missedIds: race.missed.map((q) => q.id),
         }
       : null;
 

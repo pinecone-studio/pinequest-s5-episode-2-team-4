@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PageLoading } from "@/components/PageLoading";
-import { getGameQuestions, getGameSubjects } from "@/lib/data";
 import { Shootout } from "./Shootout";
+import { AssignmentProvider } from "../_components/AssignmentContext";
+import { loadGameRound } from "../_lib/load";
 
 export const metadata: Metadata = {
   title: "Пенальти · LevelUp",
@@ -21,10 +21,12 @@ export default function PenaltyPage({ searchParams }: PageProps<"/games/penalty"
 }
 
 async function PenaltyLoader({ searchParams }: Pick<PageProps<"/games/penalty">, "searchParams">) {
-  const [{ subject }, subjects] = await Promise.all([searchParams, getGameSubjects()]);
-  const subjectId = typeof subject === "string" ? subject : subjects[0].id;
-  const questions = await getGameQuestions(subjectId);
-  if (!questions?.length) notFound();
+  const [round] = await Promise.all([loadGameRound(searchParams, "penalty")]);
+  const { subjects, subjectId, questions } = round;
   // Keyed by subject so switching subjects starts a fresh game.
-  return <Shootout key={subjectId} subjects={subjects} subjectId={subjectId} questions={questions} />;
+  return (
+    <AssignmentProvider assignment={round.assignment}>
+      <Shootout key={round.assignment?.id ?? subjectId} subjects={subjects} subjectId={subjectId} questions={questions} />
+    </AssignmentProvider>
+  );
 }

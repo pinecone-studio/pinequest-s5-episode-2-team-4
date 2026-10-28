@@ -121,12 +121,26 @@ export async function createAccount(input: {
   return { account: toAccount(data) };
 }
 
-/** A throwaway demo student with a fresh name, no email and no password. */
-export async function createDemoAccount(progress: AccountProgress): Promise<StoredAccount> {
+/** The class every demo account is in, so a demo teacher's work reaches demo students. */
+// Cyrillic, as class codes are compared after normalClassCode().
+export const DEMO_CLASS_CODE = "ДЕМО";
+
+/** A throwaway demo student or teacher with a fresh name, no email and no password. */
+export async function createDemoAccount(
+  progress: AccountProgress,
+  role: User["role"] = "student",
+  classCode = DEMO_CLASS_CODE,
+): Promise<StoredAccount> {
   for (let attempt = 1; ; attempt++) {
     const { data, error } = await db()
       .from("accounts")
-      .insert({ username: `Демо-${randomBytes(3).toString("hex")}`, role: "student", demo: true, progress })
+      .insert({
+        username: `${role === "teacher" ? "Демо-багш" : "Демо"}-${randomBytes(3).toString("hex")}`,
+        role,
+        class_code: classCode,
+        demo: true,
+        progress,
+      })
       .select(COLUMNS)
       .single<Row>();
     if (!error) return toAccount(data);

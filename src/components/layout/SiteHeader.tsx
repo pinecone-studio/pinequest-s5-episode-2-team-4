@@ -5,11 +5,21 @@ import { usePathname } from "next/navigation";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { logOut } from "@/lib/actions";
 import { Logo } from "./Logo";
+import { NavBadge } from "./NavBadge";
 import { PetChip } from "./PetChip";
 
-const NAV_LINKS = [
+export type NavCounts = {
+  /** Lesson videos the student hasn't opened yet */
+  videos?: number;
+  /** Assignments not finished yet */
+  assignments?: number;
+};
+
+const NAV_LINKS: { href: string; label: string; count?: keyof NavCounts; countLabel?: string }[] = [
   { href: "/games", label: "Тоглоом" },
   { href: "/pets", label: "Тэжээвэр" },
+  { href: "/videos", label: "Видео хичээл", count: "videos", countLabel: "шинэ видео" },
+  { href: "/assignments", label: "Даалгавар", count: "assignments", countLabel: "биелүүлээгүй даалгавар" },
 ];
 
 // No display or padding here: each link sets its own, so a `hidden`
@@ -19,10 +29,11 @@ const navLinkClass =
 
 type SiteHeaderProps = {
   pet?: React.ComponentProps<typeof PetChip>;
+  counts?: NavCounts;
 };
 
-/** Header for student pages. Nav links move to MobileNav below md. */
-export function SiteHeader({ pet: realPet }: SiteHeaderProps) {
+/** Header for student pages. Nav links move to MobileNav below lg (they don't fit on tablets). */
+export function SiteHeader({ pet: realPet, counts = {} }: SiteHeaderProps) {
   const pathname = usePathname();
   // The /pets evolution demo shows each stage here too.
   const preview = usePetPreview();
@@ -41,7 +52,7 @@ export function SiteHeader({ pet: realPet }: SiteHeaderProps) {
         >
           <Logo />
         </Link>
-        <nav aria-label="Үндсэн цэс" className="hidden gap-1 md:flex">
+        <nav aria-label="Үндсэн цэс" className="hidden gap-1 lg:flex">
           {NAV_LINKS.map((link) => {
             const active = pathname.startsWith(link.href);
             return (
@@ -49,9 +60,12 @@ export function SiteHeader({ pet: realPet }: SiteHeaderProps) {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`${navLinkClass} inline-flex px-5 ${active ? "bg-lavender" : ""}`}
+                className={`${navLinkClass} inline-flex gap-2 px-4 whitespace-nowrap xl:px-5 ${active ? "bg-lavender" : ""}`}
               >
                 {link.label}
+                {link.count && (
+                  <NavBadge count={counts[link.count] ?? 0} label={`${counts[link.count] ?? 0} ${link.countLabel}`} />
+                )}
               </Link>
             );
           })}

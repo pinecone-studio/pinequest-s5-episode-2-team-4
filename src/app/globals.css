@@ -93,6 +93,27 @@
   background-size: 180% 180%;
 }
 
+/* Type scale for page and section titles, so every page uses the same sizes. */
+@utility type-page-title {
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  @media (width >= 48rem) {
+    font-size: 56px;
+  }
+}
+
+@utility type-section-title {
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 700;
+  @media (width >= 48rem) {
+    font-size: 28px;
+    line-height: 1.1;
+  }
+}
+
 @layer base {
   body {
     @apply bg-white font-sans text-ink;

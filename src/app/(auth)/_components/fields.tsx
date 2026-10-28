@@ -31,6 +31,35 @@ export function TextField({ id, label, hint, className, ...props }: FieldProps) 
   );
 }
 
+/** The one subject a teacher teaches, picked from chips; sent as `name`. */
+export function SubjectPicker({
+  name,
+  subjects,
+}: {
+  name: string;
+  subjects: { id: string; title: string }[];
+}) {
+  return (
+    <fieldset className="flex flex-col gap-1.5">
+      <legend className="mb-1.5 flex w-full items-baseline justify-between gap-2 text-sm font-bold">
+        Заадаг хичээл
+        <span className="text-[13px] font-medium text-ink-muted">дараа солих боломжгүй</span>
+      </legend>
+      <div className="grid grid-cols-2 gap-2">
+        {subjects.map((s) => (
+          <label
+            key={s.id}
+            className="flex min-h-12 cursor-pointer items-center justify-center rounded-tile border-2 border-lavender bg-white px-2 text-center text-sm font-bold transition-colors hover:border-primary has-checked:border-primary has-checked:bg-surface has-focus-visible:ring-2 has-focus-visible:ring-primary"
+          >
+            <input type="radio" name={name} value={s.id} required className="sr-only" />
+            {s.title}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 /** Class code: dashed, tinted, uppercase with wide letter spacing. */
 export function ClassCodeField(props: FieldProps) {
   return (

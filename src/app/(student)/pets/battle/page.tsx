@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ElementBadge } from "@/components/pet/ElementBadge";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { ButtonLink, buttonClass } from "@/components/ui";
@@ -6,11 +7,13 @@ import { createGroupBossBattle, joinMyClassBattle, startBossBattle } from "@/lib
 import {
   getActiveGroupBattleId,
   getActiveSoloBattleId,
+  getBattleSubjects,
   getBosses,
   getCurrentPet,
   getOpenClassBattle,
 } from "@/lib/data";
 import { ArenaBackground } from "./ArenaBackground";
+import { cn } from "@/lib/cn";
 import { RARITY_LABELS } from "./labels";
 
 export const metadata: Metadata = {
@@ -23,8 +26,10 @@ const CLASS_STATUS = {
   paused: "Багш түр зогсоосон",
 };
 
-export default async function BossListPage() {
-  const [bosses, pet, activeBattleId, groupBattleId, classBattle] = await Promise.all([
+export default async function BossListPage({ searchParams }: PageProps<"/pets/battle">) {
+  const [{ subject: asked }, subjects, bosses, pet, activeBattleId, groupBattleId, classBattle] = await Promise.all([
+    searchParams,
+    getBattleSubjects(),
     getBosses(),
     getCurrentPet(),
     getActiveSoloBattleId(),
@@ -32,6 +37,7 @@ export default async function BossListPage() {
     getOpenClassBattle(),
   ]);
   const classBoss = classBattle && bosses.find((b) => b.id === classBattle.bossId);
+  const subject = subjects.find((s) => s.id === asked) ?? subjects[0];
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
@@ -39,9 +45,29 @@ export default async function BossListPage() {
         Боссын тулаан
       </h1>
       <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
-        Англи хэлний асуултад зөв хариулж боссыг ялаарай. Буруу хариулбал тэжээвэр чинь
+        Сонгосон хичээлийнхээ асуултад зөв хариулж боссыг ялаарай. Буруу хариулбал тэжээвэр чинь
         гэмтэнэ, босс ч бас үе үе довтолно.
       </p>
+      <nav aria-label="Тулааны хичээл" className="mt-5">
+        <p className="mb-2 font-bold">Хичээл</p>
+        <ul className="flex flex-wrap gap-2">
+          {subjects.map((s) => (
+            <li key={s.id}>
+              <Link
+                href={`/pets/battle?subject=${s.id}`}
+                scroll={false}
+                aria-current={s.id === subject.id ? "true" : undefined}
+                className={cn(
+                  "inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold no-underline",
+                  s.id === subject.id ? "bg-primary text-white hover:text-white" : "bg-white text-ink shadow-card hover:text-ink",
+                )}
+              >
+                {s.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
       <ButtonLink href="/pets/progress" variant="secondary" size="sm" className="mt-4">
         Миний англи хэлний ахиц
       </ButtonLink>
@@ -54,7 +80,7 @@ export default async function BossListPage() {
             ) : null}
             <div>
               <p className="text-lg font-bold">
-                {classBattle.classCode} ангийн тулаан{classBoss ? ` · ${classBoss.name}` : ""}
+                {classBattle.classCode} ангийн тулаан · {classBattle.subjectTitle}{classBoss ? ` · ${classBoss.name}` : ""}
               </p>
               <p className="text-sm text-white/85">
                 {CLASS_STATUS[classBattle.status]} · {classBattle.students} сурагч
@@ -155,6 +181,7 @@ export default async function BossListPage() {
             </dl>
             <div className="mt-auto grid grid-cols-2 gap-2">
               <form action={startBossBattle.bind(null, boss.id)}>
+                <input type="hidden" name="subject" value={subject.id} />
                 <button
                   type="submit"
                   disabled={!pet || Boolean(activeBattleId)}
@@ -164,6 +191,7 @@ export default async function BossListPage() {
                 </button>
               </form>
               <form action={createGroupBossBattle.bind(null, boss.id)}>
+                <input type="hidden" name="subject" value={subject.id} />
                 <button
                   type="submit"
                   disabled={!pet || Boolean(groupBattleId)}

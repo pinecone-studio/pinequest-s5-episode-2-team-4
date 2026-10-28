@@ -30,6 +30,16 @@ export type Account = {
   practiceSolved?: string[];
   /** Subtopic ids mastered by passing their retest. */
   mastered?: string[];
+  /** Teachers: the one subject they teach, picked at sign-up (subjects.ts id). */
+  subject?: string;
+  /** Game ids the student likes most, for assignments played "by interest". */
+  favoriteGames?: string[];
+  /** Lesson video ids the student has opened; the rest count as new in the menu. */
+  videosSeen?: string[];
+  /** Assignment ids that already gave XP, so replays don't farm it. */
+  assignmentsRewarded?: string[];
+  /** Assignment demo: the other demo account (teacher or student) and its assignment. */
+  demoTour?: { otherId: string; assignmentId: string };
   /** The latest retest, for the mastered page. */
   lastRetest?: {
     subtopicId: string;

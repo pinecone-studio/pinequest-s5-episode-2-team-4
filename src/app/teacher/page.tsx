@@ -3,9 +3,11 @@ import { ClassGoalCard } from "@/components/ClassGoalCard";
 import {
   getAnonQuestions,
   getAssignmentDraft,
+  getBattleSubjects,
   getBosses,
   getClassGoal,
   getClassOverview,
+  getCurrentUser,
   getHeatmap,
   getNotifications,
   getQuestionGroups,
@@ -13,6 +15,7 @@ import {
   getSubtopics,
   getTeacherClassBattle,
 } from "@/lib/data";
+import { subjectTitle } from "@/lib/subjects";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { ClassBattleCard } from "./ClassBattleCard";
 import { Heatmap } from "./Heatmap";
@@ -21,6 +24,7 @@ import { PeerApproval } from "./PeerApproval";
 import { QuestionGroups } from "./QuestionGroups";
 import { SignalPanel } from "./SignalPanel";
 import { StatCards } from "./StatCards";
+import { SubjectPrompt } from "./SubjectPrompt";
 
 export const metadata: Metadata = {
   title: "Багшийн самбар · LevelUp",
@@ -42,6 +46,8 @@ export default async function TeacherPage() {
     classGoal,
     bosses,
     classBattle,
+    battleSubjects,
+    user,
   ] = await Promise.all([
     getSubtopics(overview.topicId),
     getHeatmap(),
@@ -53,6 +59,8 @@ export default async function TeacherPage() {
     getClassGoal(),
     getBosses(),
     getTeacherClassBattle(),
+    getBattleSubjects(),
+    getCurrentUser(),
   ]);
 
   const subtopicById = new Map(subtopics.map((s) => [s.id, s]));
@@ -89,7 +97,8 @@ export default async function TeacherPage() {
         weakestTitle={subtopicById.get(overview.weakestSubtopicId)?.title ?? ""}
         notificationCount={alertCount}
       />
-      <ClassBattleCard bosses={bosses} open={classBattle} classCode={classGoal.classCode} className="md:mt-5" />
+      {user && !user.subject ? <SubjectPrompt className="md:mt-5" /> : null}
+      <ClassBattleCard bosses={bosses} subjects={battleSubjects} teacherSubjectTitle={user?.subject && subjectTitle(user.subject)} open={classBattle} classCode={user?.classCode ?? classGoal.classCode} className="md:mt-5" />
       <Heatmap
         rows={rows}
         testedCount={overview.testedCount}

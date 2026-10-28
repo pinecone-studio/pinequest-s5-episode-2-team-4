@@ -132,6 +132,7 @@ export function useLaneRunner(questions: GameQuestion[]) {
           bestCombo: r.bestCombo,
           stars: won ? starsFor(r.wrong) : 1,
           review: r.missed[0]?.explanation,
+          missedIds: r.missed.map((q) => q.id),
         });
       },
     });

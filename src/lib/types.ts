@@ -137,6 +137,8 @@ export type User = {
   role: "student" | "teacher";
   classCode?: string;
   pet?: UserPet;
+  /** Teachers: the one subject they teach (subjects.ts id). */
+  subject?: string;
 };
 
 /** Teacher heatmap cell; "untested" = has not taken the test. */
@@ -274,7 +276,8 @@ export type SignalSummary = {
 
 // English boss battles (Grade 7, units from ECONTENT)
 
-export type EnglishSkill = "grammar" | "pronunciation" | "spelling" | "translation";
+/** "subject": a battle question from another subject (math, history, ...). */
+export type EnglishSkill = "grammar" | "pronunciation" | "spelling" | "translation" | "subject";
 
 /** A Grade 7 English unit; titles are the ones listed on ECONTENT. */
 export type EnglishUnit = {
@@ -292,6 +295,8 @@ type EnglishQuestionBase = {
   /** 1 easy … 3 hard; harder questions deal more damage. */
   difficulty: 1 | 2 | 3;
   prompt: string;
+  /** For a question from another subject: its name, shown instead of the skill. */
+  subjectTitle?: string;
   /** Shown under the prompt, e.g. "h _ b b y" or a sentence to fix. */
   display?: string;
   hint?: string;
@@ -439,6 +444,8 @@ export type ClassBattleSummary = {
   bossId: string;
   status: "lobby" | "active" | "paused";
   classCode: string;
+  /** What the questions are about, e.g. "Математик". */
+  subjectTitle: string;
   /** Students in it right now. */
   students: number;
   /** The current student is in it (students only). */
@@ -533,4 +540,155 @@ export type GameSubject = {
   id: string;
   title: string;
   questions: GameQuestion[];
+};
+
+// Teacher content: lesson materials, lesson videos and game assignments
+// (supabase/migrations/0011_teacher_content.sql).
+
+/** A file a teacher uploaded with a material, in the materials bucket. */
+export type MaterialFile = {
+  path: string;
+  mime: string;
+  size: number;
+  name: string;
+};
+
+/** What the AI recognised in a material; the teacher edits it before use. */
+export type Recognition = {
+  topic: string;
+  concepts: { title: string; explanation: string }[];
+  examples: { problem: string; solution: string; answer: string }[];
+  mistakes: { wrong: string; why: string }[];
+  formulas: string[];
+};
+
+export type Material = {
+  id: string;
+  topicTitle: string;
+  classCode?: string;
+  grade?: number;
+  subject: string;
+  text?: string;
+  files: MaterialFile[];
+  recognition?: Recognition;
+  createdAt: string;
+};
+
+export type ReelSectionKind = "hook" | "step" | "example" | "question";
+
+/** One part of a lesson reel: what the narrator says and what the screen shows. */
+export type ReelSection = {
+  kind: ReelSectionKind;
+  /** Spoken narration */
+  say: string;
+  /** Short on-screen title */
+  caption: string;
+  /** Optional formula shown big, e.g. "1/2 + 1/3 = 5/6" */
+  formula?: string;
+};
+
+export type ReelScript = {
+  title: string;
+  sections: ReelSection[];
+};
+
+/** Textbook-style explanation students can read instead of watching. */
+export type BookText = {
+  blocks: { heading: string; body: string; formula?: string }[];
+};
+
+/** When each word and section is spoken, in ms from the start. */
+export type ReelTimings = {
+  words: { text: string; start: number; end: number }[];
+  sections: { start: number; end: number }[];
+  duration: number;
+};
+
+export type LessonVideoStatus = "draft" | "approved" | "published";
+
+export type LessonVideo = {
+  id: string;
+  title: string;
+  classCode: string;
+  status: LessonVideoStatus;
+  script: ReelScript;
+  book?: BookText;
+  /** Signed URL of the narration, when there is audio */
+  audioUrl?: string;
+  timings?: ReelTimings;
+  materialId?: string;
+  updatedAt: string;
+  publishedAt?: string;
+};
+
+export type AssignmentGameMode = "fixed" | "interest";
+export type AssignmentTarget = "class" | "weak";
+
+export type Assignment = {
+  id: string;
+  title: string;
+  classCode: string;
+  subject: string;
+  games: string[];
+  gameMode: AssignmentGameMode;
+  target: AssignmentTarget;
+  targetSubtopicId?: string;
+  dueAt?: string;
+  status: "draft" | "published";
+  createdAt: string;
+};
+
+/** How a class did on an assignment: counts only, no student names. */
+export type AssignmentReport = {
+  assignment: Assignment;
+  questions: GameQuestion[];
+  /** Students who finished it at least once */
+  doneCount: number;
+  attemptCount: number;
+  averageAccuracy: number;
+  /** Most-missed first */
+  missed: { questionId: string; count: number }[];
+};
+
+/** A textbook chapter, for suggesting lesson topics to teachers. */
+export type CurriculumChapter = {
+  order: number;
+  title: string;
+  /** Textbook lesson titles, in order */
+  lessons: string[];
+};
+
+/** One of the teacher's class battles, in the history list. */
+export type BattleLogEntry = {
+  id: string;
+  bossId: string;
+  subjectTitle: string;
+  classCode: string;
+  status: BattleStatus;
+  date: string;
+  students: number;
+  answers: number;
+  correct: number;
+};
+
+/** How a class answered one battle question; nobody is named. */
+export type BattleQuestionResult = {
+  questionId: string;
+  prompt: string;
+  display?: string;
+  expected: string;
+  answers: number;
+  correct: number;
+  /** Students who got it at least once */
+  students: number;
+};
+
+/** The teacher's class battles and, for the chosen one, every answer added up. */
+export type BattleLog = {
+  battles: BattleLogEntry[];
+  selected?: BattleLogEntry & {
+    questions: BattleQuestionResult[];
+    /** Per student in the order they joined, numbered instead of named. */
+    perStudent: { correct: number; wrong: number; damage: number }[];
+  };
 };

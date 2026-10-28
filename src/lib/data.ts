@@ -11,19 +11,42 @@ import {
   activeSoloBattleId,
   battleState,
   classBattleState,
+  normalClassCode,
   openClassBattle,
   teacherClassBattle,
 } from "./battle";
 import { petCollection, unhatchedEggs } from "./collection";
-import { battleHistory, classEnglish } from "./history";
+import { battleHistory, classBattleLog, classEnglish } from "./history";
 import { checkEnglishAnswer, toQuestionView } from "./english";
 import { findResetAccount } from "./password-reset";
 import { englishProgress } from "./progress";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
+import {
+  countClassStudents,
+  finishedAssignmentIds,
+  getClassAssignment,
+  getClassVideo as getClassVideoRow,
+  getMaterial as getMaterialRow,
+  getTeacherAssignment as getTeacherAssignmentRow,
+  getTeacherVideo as getTeacherVideoRow,
+  listAttempts,
+  listClassAssignments,
+  listClassVideos,
+  listTeacherAssignments,
+  listTeacherVideos,
+} from "./content";
+import { isAssignmentGame } from "./gamefit";
+import { grade7MathCurriculum } from "./mock/curriculum";
 import { readSession } from "./session";
 import { streakSummary } from "./streak";
 import type {
+  Assignment,
+  AssignmentReport,
+  CurriculumChapter,
+  LessonVideo,
+  Material,
   BattleHistory,
+  BattleLog,
   BattleState,
   Boss,
   ClassBattleSummary,
@@ -70,6 +93,8 @@ import {
 import { bosses } from "./mock/bosses";
 import { gameSubjects } from "./mock/games";
 import { anonQuestions, questionGroups } from "./mock/anonQuestions";
+import { BATTLE_SUBJECTS } from "./battle-questions";
+import { teacherSubject } from "./subjects";
 import { englishQuestions, englishUnits } from "./mock/english";
 import { petLines } from "./mock/pets";
 import { signals } from "./mock/signals";
@@ -93,6 +118,7 @@ export async function getCurrentUser(): Promise<User | undefined> {
     role: session.role,
     classCode: session.classCode,
     pet: session.pet,
+    subject: session.subject,
   };
 }
 
@@ -450,4 +476,182 @@ export async function getGameQuestions(
   subjectId: string,
 ): Promise<GameQuestion[] | undefined> {
   return gameSubjects.find((s) => s.id === subjectId)?.questions;
+}
+
+// Teacher content: lesson videos and game assignments (Supabase). Teachers
+// only see their own; students only see what's published for their class.
+
+/** Textbook chapters with lesson titles, to suggest topics to teachers. */
+/** Textbook topics to suggest; there is only Grade 7 math so far. */
+export async function getCurriculum(): Promise<CurriculumChapter[]> {
+  const subject = (await readSession())?.subject;
+  return !subject || subject === "math" ? grade7MathCurriculum : [];
+}
+
+async function teacherId(): Promise<string | undefined> {
+  const session = await readSession();
+  return session?.role === "teacher" ? session.id : undefined;
+}
+
+export async function getTeacherAssignments(): Promise<Assignment[]> {
+  const id = await teacherId();
+  return id ? listTeacherAssignments(id) : [];
+}
+
+export async function getTeacherAssignment(assignmentId: string) {
+  const id = await teacherId();
+  return id ? getTeacherAssignmentRow(id, assignmentId) : undefined;
+}
+
+/** How the class did: who finished, accuracy and the most-missed questions. */
+export async function getAssignmentReport(assignmentId: string): Promise<AssignmentReport | undefined> {
+  const found = await getTeacherAssignment(assignmentId);
+  if (!found) return undefined;
+  const attempts = await listAttempts(assignmentId);
+  const missed = new Map<string, number>();
+  for (const a of attempts) for (const q of a.missed_question_ids) missed.set(q, (missed.get(q) ?? 0) + 1);
+  return {
+    ...found,
+    // Done needs at least one right answer; every play still counts below.
+    doneCount: new Set(attempts.filter((a) => a.accuracy > 0).map((a) => a.student_id)).size,
+    attemptCount: attempts.length,
+    averageAccuracy: attempts.length
+      ? Math.round(attempts.reduce((sum, a) => sum + a.accuracy, 0) / attempts.length)
+      : 0,
+    missed: [...missed]
+      .map(([questionId, count]) => ({ questionId, count }))
+      .sort((a, b) => b.count - a.count),
+  };
+}
+
+/** How many students are in a class, to show "12 / 30 finished". */
+export async function getClassSize(classCode: string): Promise<number> {
+  return (await teacherId()) ? countClassStudents(classCode) : 0;
+}
+
+/** Class codes the teacher has used, to offer when publishing. */
+export async function getTeacherClassCodes(): Promise<string[]> {
+  const session = await readSession();
+  if (session?.role !== "teacher") return [];
+  const [assignments, videos] = await Promise.all([
+    listTeacherAssignments(session.id),
+    listTeacherVideos(session.id),
+  ]);
+  const codes = [session.classCode, ...assignments.map((a) => a.classCode), ...videos.map((v) => v.classCode)];
+  return [...new Set(codes.filter((c): c is string => Boolean(c)))];
+}
+
+export type StudentAssignment = Assignment & {
+  done: boolean;
+  /** The game the student opens it in */
+  playGame: string;
+};
+
+/**
+ * Published assignments for the student's class, unless one is only for
+ * students weak in a subtopic and this student isn't.
+ */
+export async function getStudentAssignments(): Promise<StudentAssignment[]> {
+  const session = await readSession();
+  if (!session?.classCode || session.role !== "student") return [];
+  const [assignments, progress] = await Promise.all([listClassAssignments(normalClassCode(session.classCode)), getProgress()]);
+  const weak = new Set(progress.filter((p) => p.status === "weak" || p.status === "learning").map((p) => p.subtopicId));
+  const visible = assignments.filter(
+    (a) => a.target === "class" || !a.targetSubtopicId || weak.has(a.targetSubtopicId),
+  );
+  const done = await finishedAssignmentIds(session.id, visible.map((a) => a.id));
+  return visible.map((a) => ({
+    ...a,
+    done: done.has(a.id),
+    playGame: pickGame(a, session.favoriteGames),
+  }));
+}
+
+/** Assignments the student hasn't finished yet, for the menu badge. */
+export async function getOpenAssignmentCount(): Promise<number> {
+  return (await getStudentAssignments()).filter((a) => !a.done).length;
+}
+
+/** "fixed": the first chosen game; "interest": the student's favourite among them. */
+function pickGame(a: Assignment, favorites: string[] = []): string {
+  const allowed = a.games.filter(isAssignmentGame);
+  const options = allowed.length ? allowed : ["snake"];
+  if (a.gameMode === "interest") return favorites.find((g) => options.includes(g as never)) ?? options[0];
+  return options[0];
+}
+
+/**
+ * The assignment a game plays for `?assignment=`: only a published one of
+ * the student's own class.
+ */
+export async function getAssignmentForPlay(
+  assignmentId: string,
+): Promise<{ id: string; title: string; questions: GameQuestion[] } | undefined> {
+  const session = await readSession();
+  if (!session?.classCode || !/^[0-9a-f-]{36}$/i.test(assignmentId)) return undefined;
+  const found = await getClassAssignment(normalClassCode(session.classCode), assignmentId);
+  return found && { id: found.assignment.id, title: found.assignment.title, questions: found.questions };
+}
+
+export async function getTeacherVideos(): Promise<LessonVideo[]> {
+  const id = await teacherId();
+  return id ? listTeacherVideos(id) : [];
+}
+
+export async function getTeacherVideo(videoId: string): Promise<LessonVideo | undefined> {
+  const id = await teacherId();
+  return id ? getTeacherVideoRow(id, videoId) : undefined;
+}
+
+export async function getTeacherMaterial(materialId: string): Promise<Material | undefined> {
+  const id = await teacherId();
+  return id ? getMaterialRow(id, materialId) : undefined;
+}
+
+/** Published lesson videos for the student's class. */
+export async function getClassVideos(): Promise<LessonVideo[]> {
+  const session = await readSession();
+  return session?.classCode ? listClassVideos(normalClassCode(session.classCode)) : [];
+}
+
+/** Ids of the class videos the student has opened. */
+export async function getSeenVideoIds(): Promise<string[]> {
+  return (await readSession())?.videosSeen ?? [];
+}
+
+/** Published class videos the student hasn't opened yet, for the menu badge. */
+export async function getUnseenVideoCount(): Promise<number> {
+  const session = await readSession();
+  if (session?.role !== "student" || !session.classCode) return 0;
+  const seen = new Set(session.videosSeen ?? []);
+  return (await getClassVideos()).filter((v) => !seen.has(v.id)).length;
+}
+
+export async function getClassVideo(videoId: string): Promise<LessonVideo | undefined> {
+  const session = await readSession();
+  if (!session?.classCode || !/^[0-9a-f-]{36}$/i.test(videoId)) return undefined;
+  return getClassVideoRow(normalClassCode(session.classCode), videoId);
+}
+
+/** The assignment demo the visitor is in, if any: which assignment it is about. */
+export async function getDemoTour(): Promise<{ assignmentId: string } | undefined> {
+  const tour = (await readSession())?.demoTour;
+  return tour && { assignmentId: tour.assignmentId };
+}
+
+/**
+ * Subjects a boss battle can ask about, English first. A teacher only gets
+ * the topics of the subject they teach.
+ */
+export async function getBattleSubjects(): Promise<{ id: string; title: string }[]> {
+  const session = await readSession();
+  const topics = session?.role === "teacher" ? teacherSubject(session.subject)?.battleTopics : undefined;
+  if (!topics) return BATTLE_SUBJECTS;
+  return topics.flatMap((id) => BATTLE_SUBJECTS.filter((s) => s.id === id));
+}
+
+/** The current teacher's class battles and the answers in one of them; nobody is named. */
+export async function getBattleLog(classCode?: string, battleId?: string): Promise<BattleLog> {
+  const user = await getCurrentUser();
+  return user?.role === "teacher" ? classBattleLog(user, classCode, battleId) : { battles: [] };
 }

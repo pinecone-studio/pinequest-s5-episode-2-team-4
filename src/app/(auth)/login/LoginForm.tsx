@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { buttonClass } from "@/components/ui";
-import { demoLogIn, logIn } from "@/lib/actions";
+import { assignmentDemoLogIn, demoLogIn, demoTeacherLogIn, logIn } from "@/lib/actions";
 import type { PetStage } from "@/lib/types";
 import { ArrowIcon, ClassCodeField, PasswordField, TextField } from "../_components/fields";
 import { FormError } from "../_components/FormError";
@@ -132,13 +132,31 @@ export function LoginForm({ pet }: { pet: PetStage }) {
         </button>
       </form>
 
-      {/* Its own form: forms can't be nested. Always a fresh demo student. */}
-      <form action={demoLogIn} className="mt-3">
+      {/* Their own forms: forms can't be nested. Always a fresh demo account. */}
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <form action={demoLogIn}>
+          <button
+            type="submit"
+            className={buttonClass({ variant: "secondary", className: "w-full" })}
+          >
+            Сурагчаар демо
+          </button>
+        </form>
+        <form action={demoTeacherLogIn}>
+          <button
+            type="submit"
+            className={buttonClass({ variant: "secondary", className: "w-full" })}
+          >
+            Багшаар демо
+          </button>
+        </form>
+      </div>
+      <form action={assignmentDemoLogIn} className="mt-2">
         <button
           type="submit"
-          className={buttonClass({ variant: "secondary", className: "w-full" })}
+          className={buttonClass({ variant: "white", className: "w-full" })}
         >
-          Демо нэвтрэх
+          ▶ Даалгаврын демо: багшаас сурагч хүртэл
         </button>
       </form>
 
