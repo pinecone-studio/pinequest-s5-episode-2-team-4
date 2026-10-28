@@ -287,6 +287,8 @@ export type UnderstandingSignal = {
 export type SignalSummary = {
   subtopicId: string;
   counts: Record<SignalLevel, number>;
+  /** When the first signal came in, "09:40" (Mongolian time) */
+  time: string;
 };
 
 // English boss battles (Grade 7, units from ECONTENT)

@@ -83,6 +83,9 @@ function secret() {
 const sign = (payload: string) =>
   createHmac("sha256", secret()).update(payload).digest("base64url");
 
+/** One-way key for a value (e.g. a student id); can't be reversed or guessed without SESSION_SECRET. */
+export const secretHash = (value: string) => sign(value);
+
 /** `payload.signature`, both base64url. */
 function encode(value: unknown) {
   const payload = Buffer.from(JSON.stringify(value)).toString("base64url");
