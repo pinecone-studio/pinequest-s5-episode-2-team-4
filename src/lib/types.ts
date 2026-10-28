@@ -246,6 +246,8 @@ export type AnonQuestion = {
   groupId?: string;
   time: string;
   answer?: QuestionAnswer;
+  /** The AI thinks the teacher should look first (off-topic, unclear or rude). */
+  needsReview?: boolean;
 };
 
 /** Similar questions grouped (as if by AI) so the teacher answers once. */
@@ -254,6 +256,8 @@ export type QuestionGroup = {
   subtopicId: string;
   title: string;
   questionIds: string[];
+  /** answered once the teacher sent one answer to the whole class. */
+  status?: "pending" | "answered";
 };
 
 /** Understanding signal a student sends during a lesson: 🟢 got it, 🟡 unsure, 🔴 lost. */

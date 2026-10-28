@@ -16,10 +16,11 @@ type QuestionRow = {
   me_too: number;
   group_id: string | null;
   answer: QuestionAnswer | null;
+  needs_review: boolean | null;
   created_at: string;
 };
 
-type GroupRow = { id: string; subtopic_id: string; title: string };
+type GroupRow = { id: string; subtopic_id: string; title: string; status: "pending" | "answered" };
 
 /** True when the server has Supabase keys; without them the mock data is used. */
 export const questionsStored = () =>
@@ -37,13 +38,14 @@ const toQuestion = (r: QuestionRow): AnonQuestion => ({
   groupId: r.group_id ?? undefined,
   time: clock(r.created_at),
   answer: r.answer ?? undefined,
+  needsReview: r.needs_review ?? undefined,
 });
 
 /** A class's questions, newest first, optionally for one subtopic. */
 export async function listQuestions(classCode: string, subtopicId?: string): Promise<AnonQuestion[]> {
   let query = db()
     .from("anon_questions")
-    .select("id, subtopic_id, text, me_too, group_id, answer, created_at")
+    .select("id, subtopic_id, text, me_too, group_id, answer, needs_review, created_at")
     .eq("class_code", classCode)
     .order("created_at", { ascending: false })
     .limit(200);
@@ -56,7 +58,7 @@ export async function listQuestions(classCode: string, subtopicId?: string): Pro
 /** A class's question groups with the ids of the questions in each. */
 export async function listGroups(classCode: string): Promise<QuestionGroup[]> {
   const [groups, questions] = await Promise.all([
-    db().from("question_groups").select("id, subtopic_id, title").eq("class_code", classCode).returns<GroupRow[]>(),
+    db().from("question_groups").select("id, subtopic_id, title, status").eq("class_code", classCode).returns<GroupRow[]>(),
     listQuestions(classCode),
   ]);
   if (groups.error) throw new Error(`Could not load question groups: ${groups.error.message}`);
@@ -64,11 +66,12 @@ export async function listGroups(classCode: string): Promise<QuestionGroup[]> {
     id: g.id,
     subtopicId: g.subtopic_id,
     title: g.title,
+    status: g.status,
     questionIds: questions.filter((q) => q.groupId === g.id).map((q) => q.id),
   }));
 }
 
-const COLUMNS = "id, subtopic_id, text, me_too, group_id, answer, created_at";
+const COLUMNS = "id, subtopic_id, text, me_too, group_id, answer, needs_review, created_at";
 
 /**
  * Saves a question as typed; it is grouped later, so the student never waits
