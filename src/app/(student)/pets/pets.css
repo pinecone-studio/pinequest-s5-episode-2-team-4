@@ -53,6 +53,27 @@
   animation: pets-twinkle 1.6s ease-in-out infinite both;
 }
 
+/* Collection detail card: drops in when a pet is picked; its big sprite bobs. */
+.pets-detail-in {
+  animation: pets-detail-in 0.2s ease-out both;
+}
+
+.pets-detail-bob {
+  display: block;
+  animation: pets-bob 2.4s ease-in-out infinite;
+}
+
+@keyframes pets-detail-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes pets-bob {
   0%,
   100% {
