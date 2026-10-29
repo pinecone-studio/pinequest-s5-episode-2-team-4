@@ -44,7 +44,7 @@ function resetEmail(account: StoredAccount, link: string): Email {
     text: `Сайн байна уу, ${account.username}!\n\n${intro}\n${link}\n\n${ignore}\n`,
     html:
       `<p>Сайн байна уу, ${escapeHtml(account.username)}!</p><p>${intro}</p>` +
-      `<p><a href="${escapeHtml(link)}" style="display:inline-block;padding:12px 20px;border-radius:12px;background:#7039d0;color:#fff;font-weight:bold;text-decoration:none">Нууц үг шинэчлэх</a></p>` +
+      `<p><a href="${escapeHtml(link)}" style="display:inline-block;padding:12px 20px;border-radius:12px;background:#5b00ed;color:#fff;font-weight:bold;text-decoration:none">Нууц үг шинэчлэх</a></p>` +
       `<p style="color:#666">${ignore}</p>`,
   };
 }

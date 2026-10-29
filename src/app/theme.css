@@ -45,8 +45,27 @@
   --color-status-mid-ink: #ecc979;
   --color-status-weak: #562931;
   --color-status-weak-ink: #f49aa6;
+  --color-tint-blue: #1f3a45;
+  --color-tint-blue-ink: #a9dcef;
+  --color-tint-pink: #45203a;
+  --color-tint-pink-ink: #f4a9d4;
+  --color-tint-violet: #2d2950;
+  --color-tint-violet-ink: #c2b8f3;
+  --color-tint-periwinkle: #253154;
+  --color-tint-periwinkle-ink: #b3c3f5;
+  --color-tint-purple: #33265a;
+  --color-tint-purple-ink: #cdb8ff;
+  --color-tint-gray: #2b2a33;
+  --color-tint-gray-ink: #d6d4e0;
+  --color-tint-sand: #3d3123;
+  --color-tint-sand-ink: #e8c9a3;
+  --color-tint-plum: #2f2840;
+  --color-tint-plum-ink: #cbbfe6;
   --shadow-card: rgb(0 0 0 / 0.3) 0 15px 50px;
   --shadow-float: rgb(0 0 0 / 0.4) 0 20px 60px;
+  --shadow-3d: 0 6px 16px rgb(91 0 237 / 0.35);
+  --shadow-3d-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 16px rgb(0 0 0 / 0.25);
+  --shadow-pick: 0 8px 18px rgb(91 0 237 / 0.3);
 }
 
 .theme-sun {
@@ -104,8 +123,8 @@
 
   /* Always-black surfaces (the footer) keep the light theme's pale text colours. */
   [data-theme="dark"] .on-black {
-    --color-lavender: #e0def7;
-    --color-sky: #d2ebf4;
+    --color-lavender: #efe9fe;
+    --color-sky: #e3f4fb;
   }
 
   /* Black pet silhouettes would vanish on dark cards, so draw them light. The

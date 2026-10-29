@@ -10,14 +10,12 @@ type StyleProps = {
   className?: string;
 };
 
-// "3D" buttons: a solid offset shadow that collapses when pressed.
+// Soft shadows (a purple glow under primary): buttons lift 2px on hover and
+// settle when pressed.
 const variants: Record<Variant, string> = {
-  primary:
-    "bg-primary text-white shadow-3d hover:text-white active:shadow-[0_1px_0_var(--color-primary-dark)]",
-  secondary:
-    "bg-surface text-ink shadow-3d-soft hover:text-ink active:shadow-[0_1px_0_var(--color-line)]",
-  white:
-    "bg-card text-ink shadow-3d-soft hover:text-ink active:shadow-[0_1px_0_var(--color-line)]",
+  primary: "bg-primary text-white shadow-3d hover:text-white",
+  secondary: "bg-surface text-ink shadow-3d-soft hover:text-ink",
+  white: "bg-card text-ink shadow-3d-soft hover:text-ink",
 };
 
 const sizes: Record<Size, string> = {
@@ -32,7 +30,7 @@ export function buttonClass({
   className,
 }: StyleProps = {}) {
   return cn(
-    "inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full font-bold no-underline transition-[transform,box-shadow,filter] duration-75 hover:brightness-105 active:translate-y-[5px] disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full font-bold no-underline transition-[translate,box-shadow,filter] duration-150 hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:shadow-none disabled:pointer-events-none disabled:opacity-50",
     variants[variant],
     sizes[size],
     className,

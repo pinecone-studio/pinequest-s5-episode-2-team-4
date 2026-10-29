@@ -23,7 +23,7 @@ const TABS: Tab[] = [
     href: "/pets",
     label: "Миний тэжээвэр",
     exact: true,
-    iconColors: "bg-sky text-ink",
+    iconColors: "bg-tint-blue text-tint-blue-ink",
     icon: (
       <>
         <circle cx="11" cy="4" r="2" />
@@ -36,13 +36,13 @@ const TABS: Tab[] = [
   {
     href: "/pets/battle",
     label: "Боссууд",
-    iconColors: "bg-magenta text-white",
+    iconColors: "bg-tint-pink text-tint-pink-ink",
     icon: <path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M14.5 6.5 18 3h3v3l-3.5 3.5M5 14l4 4M7 17l-3 3M3 19l2 2" />,
   },
   {
     href: "/pets/join",
     label: "Нэгдэх",
-    iconColors: "bg-lavender text-ink",
+    iconColors: "bg-tint-periwinkle text-tint-periwinkle-ink",
     icon: (
       <>
         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -55,19 +55,19 @@ const TABS: Tab[] = [
     href: "/pets/eggs",
     label: "Өндөг",
     badge: "eggs",
-    iconColors: "bg-pink text-magenta",
+    iconColors: "bg-tint-sand text-tint-sand-ink",
     icon: <path d="M12 22c6.23-.05 7.87-5.57 7.5-10-.36-4.34-3.95-9.96-7.5-10-3.55.04-7.14 5.66-7.5 10-.37 4.43 1.27 9.95 7.5 10z" />,
   },
   {
     href: "/pets/progress",
     label: "Ахиц",
-    iconColors: "bg-line text-ink",
+    iconColors: "bg-tint-violet text-tint-violet-ink",
     icon: <path d="M22 7 13.5 15.5l-5-5L2 17M16 7h6v6" />,
   },
   {
     href: "/pets/history",
     label: "Түүх",
-    iconColors: "bg-primary-dark text-white",
+    iconColors: "bg-tint-plum text-tint-plum-ink",
     icon: <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5M12 7v5l4 2" />,
   },
 ];
@@ -84,7 +84,7 @@ export function PetsTabs({ eggCount }: { eggCount: number }) {
     <nav aria-label="Тэжээвэрийн хэсэг" className="mx-auto max-w-7xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
       {/* The track scrolls sideways on narrow screens instead of wrapping. */}
       <div className="-mx-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
-        <ul className="flex w-max gap-0.5 rounded-full border-2 border-lavender bg-card p-1 shadow-[0_3px_0_var(--color-lavender)] md:gap-1">
+        <ul className="flex w-max gap-0.5 rounded-full border-2 border-lavender bg-card p-1 shadow-3d-soft md:gap-1">
           {TABS.map((tab) => {
             const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
             const count = tab.badge === "eggs" ? eggCount : 0;
@@ -101,7 +101,7 @@ export function PetsTabs({ eggCount }: { eggCount: number }) {
                   {active && (
                     <NavPill
                       name="pets-tabs-pill"
-                      className="inset-0 rounded-full bg-primary shadow-[0_3px_0_var(--color-primary-dark)]"
+                      className="inset-0 rounded-full bg-primary shadow-3d"
                     />
                   )}
                   <span

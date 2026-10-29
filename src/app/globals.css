@@ -2,22 +2,41 @@
 
 /* Design tokens from the LevelUp design. */
 @theme {
-  /* The original LevelUp hues (violet, sky, magenta) with the saturation turned
-     down so long sessions don't tire the eyes. Violet is the brand and its
-     tints (lavender, line) tint the neutrals; sky marks "good"; magenta is the
-     signal colour for weak and alerts. All text pairs pass 4.5:1. */
-  --color-primary: #7039d0;
-  --color-primary-dark: #4f2e84;
-  --color-ink: #3d2862;
-  --color-ink-muted: #6d5c8a;
-  --color-surface: #f2f1fb;
-  --color-surface-soft: #f8f7fd;
-  --color-lavender: #e0def7;
-  --color-line: #d0cbeb;
-  --color-sky: #d2ebf4;
+  /* The softer palette from the design (canvas «LevelUp — дэлгэцүүд»): near-black
+     violet text on a pale page so white cards lift off it, and the brand
+     purple kept for what matters (selection, the current item, XP). Lavender
+     is the soft purple tint for active pills; sky marks "good"; magenta is
+     the signal colour for weak and alerts. All text pairs pass 4.5:1. */
+  --color-primary: #5b00ed;
+  --color-primary-dark: #4a12b8;
+  --color-ink: #1d1530;
+  --color-ink-muted: #6b6585;
+  --color-surface: #f4f3fa;
+  --color-surface-soft: #f7f6fb;
+  --color-lavender: #efe9fe;
+  --color-line: #e4e0f2;
+  --color-sky: #e3f4fb;
   --color-sky-dark: #aad1df;
   --color-magenta: #b23886;
-  --color-pink: #fbecf5;
+  --color-pink: #fde7f3;
+  /* Soft tints with a dark ink of the same hue, for type badges and icon
+     circles instead of solid blocks (each pair passes 4.5:1). */
+  --color-tint-blue: #e3f4fb;
+  --color-tint-blue-ink: #0e5a73;
+  --color-tint-pink: #fde7f3;
+  --color-tint-pink-ink: #9b0f6b;
+  --color-tint-violet: #eceafb;
+  --color-tint-violet-ink: #4c3d99;
+  --color-tint-periwinkle: #e9eeff;
+  --color-tint-periwinkle-ink: #2f4aa0;
+  --color-tint-purple: #efe9fe;
+  --color-tint-purple-ink: #4a12b8;
+  --color-tint-gray: #ececf2;
+  --color-tint-gray-ink: #33313f;
+  --color-tint-sand: #f5efe6;
+  --color-tint-sand-ink: #70481d;
+  --color-tint-plum: #ebe6f4;
+  --color-tint-plum-ink: #3d2a6b;
   /* Violet-black for the footer and toasts instead of pure black. */
   --color-night: #1e172b;
   /* Card and panel background; dark mode swaps it in theme.css. */
@@ -46,12 +65,15 @@
   --radius-card: 20px;
   --radius-panel: 28px;
 
-  /* Shadows carry the ink hue instead of flat grey. */
-  --shadow-card: rgb(61 40 98 / 0.08) 0 15px 50px;
-  --shadow-float: rgb(61 40 98 / 0.11) 0 20px 60px;
-  /* "3D" buttons: solid offset shadow that collapses on press */
-  --shadow-3d: 0 6px 0 var(--color-primary-dark);
-  --shadow-3d-soft: 0 6px 0 var(--color-line);
+  /* Soft shadows that carry the ink hue instead of flat grey. */
+  --shadow-card: rgb(29 21 48 / 0.06) 0 10px 30px;
+  --shadow-float: rgb(29 21 48 / 0.08) 0 16px 40px;
+  /* Buttons and chips: a purple glow under the main (purple) ones, a faint
+     lift under the rest. Kept the old "3d" names so callers don't change. */
+  --shadow-3d: 0 6px 16px rgb(91 0 237 / 0.28);
+  --shadow-3d-soft: 0 1px 2px rgb(29 21 48 / 0.06), 0 6px 16px rgb(29 21 48 / 0.06);
+  /* A picked tile or option: white with a soft purple glow. */
+  --shadow-pick: 0 8px 18px rgb(91 0 237 / 0.16);
 
   --animate-bob: bob 2.4s ease-in-out infinite;
   --animate-flow: flow 18s ease-in-out infinite alternate;
@@ -74,18 +96,18 @@
     }
   }
 
-  /* expanding ring around the "you are here" node; keeps the 3D shadow */
+  /* expanding ring around the "you are here" node; keeps its soft glow */
   @keyframes pulse-ring {
     0%,
     100% {
       box-shadow:
-        0 8px 0 var(--color-primary-dark),
-        0 0 0 0 rgb(112 57 208 / 0.3);
+        var(--shadow-pick),
+        0 0 0 0 rgb(91 0 237 / 0.3);
     }
     50% {
       box-shadow:
-        0 8px 0 var(--color-primary-dark),
-        0 0 0 14px rgb(112 57 208 / 0);
+        var(--shadow-pick),
+        0 0 0 14px rgb(91 0 237 / 0);
     }
   }
 
@@ -113,9 +135,9 @@
 @utility bg-flow {
   background-color: var(--color-surface-soft);
   background-image:
-    radial-gradient(closest-side at 18% 24%, rgb(210 235 244 / 0.85), rgb(210 235 244 / 0)),
-    radial-gradient(closest-side at 84% 18%, rgb(208 203 235 / 0.8), rgb(208 203 235 / 0)),
-    radial-gradient(closest-side at 70% 80%, rgb(224 222 247), rgb(224 222 247 / 0)),
+    radial-gradient(closest-side at 18% 24%, rgb(227 244 251 / 0.9), rgb(227 244 251 / 0)),
+    radial-gradient(closest-side at 84% 18%, rgb(236 234 251 / 0.9), rgb(236 234 251 / 0)),
+    radial-gradient(closest-side at 70% 80%, rgb(239 233 254), rgb(239 233 254 / 0)),
     radial-gradient(closest-side at 22% 86%, rgb(178 56 134 / 0.08), rgb(178 56 134 / 0));
   background-size: 180% 180%;
 }
