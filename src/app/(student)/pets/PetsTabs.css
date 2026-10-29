@@ -1,16 +1,12 @@
-/* Pets area tabs: the icon wiggles on hover, the current tab pops in when it
-   changes (its icon spins in) and the egg count bounces. The global
-   reduced-motion rule turns all of it off. */
+/* Pets area tabs: the icon wiggles on hover, the current tab's icon spins in
+   (the pill itself slides over, see NavPill) and the egg count bounces. The
+   global reduced-motion rule turns all of it off. */
 
 .pets-tab:hover .pets-tab-icon {
   animation: pets-tab-wiggle 0.5s ease-in-out;
 }
 
-.pets-tab-on {
-  animation: pets-tab-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.pets-tab-on .pets-tab-icon {
+.pets-tab-icon-on {
   animation: pets-tab-spin-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -28,18 +24,6 @@
   }
   75% {
     transform: rotate(14deg);
-  }
-}
-
-@keyframes pets-tab-pop {
-  0% {
-    transform: scale(0.9);
-  }
-  60% {
-    transform: scale(1.08);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 
