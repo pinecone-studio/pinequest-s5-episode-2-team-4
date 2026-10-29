@@ -11,7 +11,7 @@ import {
   getHeatmap,
   getNotifications,
   getQuestionGroups,
-  getSignalSummary,
+  getTodaySignals,
   getSubtopics,
   getTeacherClassBattle,
 } from "@/lib/data";
@@ -53,7 +53,7 @@ export default async function TeacherPage() {
     getHeatmap(),
     getNotifications(),
     getAssignmentDraft(),
-    getSignalSummary(),
+    getTodaySignals(),
     getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
