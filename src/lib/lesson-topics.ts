@@ -58,6 +58,18 @@ export function isoWeekday(day: string): number {
   return weekday === 0 ? 7 : weekday;
 }
 
+/**
+ * The school weeks (Monday to Sunday) up to the one with `today`, newest
+ * first; the current week ends at today.
+ */
+export function recentWeeks(today: string, count: number): { from: string; to: string }[] {
+  const monday = shiftDay(today, 1 - isoWeekday(today));
+  return Array.from({ length: count }, (_, i) => {
+    const from = shiftDay(monday, -7 * i);
+    return { from, to: i === 0 ? today : shiftDay(from, 6) };
+  });
+}
+
 /** The next `count` lesson days from `from` (included), within two months. */
 export function upcomingLessonDays(from: string, lessonDays: number[], count: number): string[] {
   const days: string[] = [];

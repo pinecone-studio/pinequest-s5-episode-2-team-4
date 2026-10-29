@@ -25,7 +25,6 @@ import { NotificationList } from "./NotificationList";
 import { PeerApproval } from "./PeerApproval";
 import { QuestionGroups } from "./QuestionGroups";
 import { SignalPanel } from "./SignalPanel";
-import { LessonDayHistory } from "./LessonDayHistory";
 import { StatCards } from "./StatCards";
 import { SubjectPrompt } from "./SubjectPrompt";
 
@@ -33,7 +32,9 @@ export const metadata: Metadata = {
   title: "Багшийн самбар · LevelUp",
 };
 
-export default async function TeacherPage() {
+export default async function TeacherPage({ searchParams }: PageProps<"/teacher">) {
+  // «Хичээлийн дохио» week: ?week=1 is last week.
+  const { week } = await searchParams;
   const overview = await getClassOverview();
   const [
     subtopics,
@@ -41,7 +42,7 @@ export default async function TeacherPage() {
     notifications,
     draft,
     signals,
-    lessonDays,
+    weekSignals,
     groups,
     questions,
     classGoal,
@@ -55,7 +56,7 @@ export default async function TeacherPage() {
     getNotifications(),
     getAssignmentDraft(),
     getTodaySignals(),
-    getLessonDaySignals({ beforeToday: true }),
+    getLessonDaySignals({ weeksBack: Number(week) || 0, beforeToday: true }),
     getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
@@ -106,15 +107,14 @@ export default async function TeacherPage() {
         testedCount={overview.testedCount}
       />
       <SignalPanel
-        rows={signals.map((s) => ({
+        today={signals.map((s) => ({
           ...s,
           // Class lesson topics too, not only the app lessons.
           title: subtopicById.get(s.subtopicId)?.title ?? topicTitle(s.subtopicId) ?? s.subtopicId,
         }))}
+        signals={weekSignals}
         className="md:mt-5"
       />
-      {/* Earlier lesson days; today is in the panel above. */}
-      <LessonDayHistory days={lessonDays} className="md:mt-5" />
       {/* Demo accounts only for now: real classes have no draft or notifications yet. */}
       {(draft || notifications.length > 0) && (
         <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">

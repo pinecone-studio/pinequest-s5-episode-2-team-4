@@ -4,6 +4,7 @@ import {
   customTopicKey,
   isTopicKey,
   isoWeekday,
+  recentWeeks,
   topicTitle,
   upcomingLessonDays,
 } from "./lesson-topics";
@@ -34,6 +35,17 @@ describe("lesson days", () => {
   it("gives ISO weekdays", () => {
     expect(isoWeekday("2026-10-26")).toBe(1); // Monday
     expect(isoWeekday("2026-11-01")).toBe(7); // Sunday
+  });
+
+  it("lists school weeks back from today, the current one ending today", () => {
+    // Wednesday 28 October 2026.
+    expect(recentWeeks("2026-10-28", 3)).toEqual([
+      { from: "2026-10-26", to: "2026-10-28" },
+      { from: "2026-10-19", to: "2026-10-25" },
+      { from: "2026-10-12", to: "2026-10-18" },
+    ]);
+    // A Sunday belongs to the week before it.
+    expect(recentWeeks("2026-11-01", 1)).toEqual([{ from: "2026-10-26", to: "2026-11-01" }]);
   });
 
   it("finds the next lesson days from today", () => {

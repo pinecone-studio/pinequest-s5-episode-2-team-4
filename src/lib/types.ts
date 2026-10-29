@@ -783,3 +783,13 @@ export type LessonDaySignals = {
   day: string;
   rows: (SignalSummary & { title: string })[];
 };
+
+/** A school week (Monday to Sunday, "YYYY-MM-DD"); the current one ends today. */
+export type SignalWeek = { from: string; to: string };
+
+/** The lesson days of one week, and the weeks a teacher can pick from (newest first). */
+export type WeekSignals = {
+  week: SignalWeek;
+  days: LessonDaySignals[];
+  weeks: SignalWeek[];
+};
