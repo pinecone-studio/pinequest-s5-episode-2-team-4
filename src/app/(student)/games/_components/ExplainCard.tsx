@@ -42,7 +42,7 @@ export function ExplainCard({ card, onContinue }: ExplainCardProps) {
             </span>
             {card.title}
           </p>
-          {card.text ? <p className="text-[15px] text-[var(--game-muted)]">{card.text}</p> : null}
+          {card.text ? <p className="text-base text-[var(--game-muted)]">{card.text}</p> : null}
           {card.note ? <p className="text-sm font-bold text-[var(--game-gold)]">{card.note}</p> : null}
           {card.chips ? (
             <ul className="flex flex-wrap gap-1.5">

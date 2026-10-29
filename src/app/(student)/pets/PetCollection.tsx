@@ -101,7 +101,7 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, o
   return (
     <section aria-labelledby="collection-title" className="mt-8 md:mt-14">
       <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-4">
-        <h2 id="collection-title" className="flex items-baseline gap-3 text-2xl leading-[1.15] font-bold md:text-[40px] md:tracking-[-0.02em]">
+        <h2 id="collection-title" className="flex items-baseline gap-3 type-section-title">
           Цуглуулга
           <span className="text-sm font-bold tracking-normal text-ink-muted md:text-base">
             {owned.length}/{lines.length}
@@ -121,7 +121,7 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, o
                 aria-pressed={on}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "inline-flex min-h-12 shrink-0 cursor-pointer items-center gap-2 rounded-full border-2 pr-3.5 pl-1.5 text-sm font-bold transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none md:min-h-13 md:pr-4.5 md:text-[15px]",
+                  "inline-flex min-h-12 shrink-0 cursor-pointer items-center gap-2 rounded-full border-2 pr-3.5 pl-1.5 text-sm font-bold transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none md:min-h-13 md:pr-4.5 md:text-base",
                   on
                     ? "border-primary bg-primary text-white shadow-[0_4px_0_var(--color-primary-dark)]"
                     : "border-lavender bg-white text-ink shadow-[0_4px_0_var(--color-lavender)]",
@@ -178,7 +178,7 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, o
                     !pet && "opacity-40 brightness-0",
                   )}
                 />
-                <span className="max-w-full truncate text-sm leading-tight font-bold xl:text-[17px]">
+                <span className="max-w-full truncate text-sm leading-tight font-bold xl:text-lg">
                   {pet ? stage.name : "???"}
                 </span>
                 <span className="text-xs leading-tight font-semibold text-ink-muted xl:text-sm">
@@ -187,7 +187,7 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, o
                 {pet?.active ? (
                   <span
                     aria-hidden="true"
-                    className="absolute top-1.5 left-1.5 rounded-full bg-primary px-2 text-[11px] font-bold text-white xl:top-2.5 xl:left-2.5 xl:px-2.5 xl:text-xs"
+                    className="absolute top-1.5 left-1.5 rounded-full bg-primary px-2 text-2xs font-bold text-white xl:top-2.5 xl:left-2.5 xl:px-2.5 xl:text-xs"
                   >
                     Тулаанд
                   </span>
@@ -265,11 +265,11 @@ function PetDetail({ line, pet, pickedStage, onPickStage, onClose, dropsFrom, pe
         </div>
         <div className="flex min-w-0 flex-col items-start gap-1.5 pr-9 xl:mt-4 xl:flex-row xl:items-baseline xl:justify-between xl:gap-2 xl:pr-0">
           <ElementBadge element={line.element} className="xl:hidden" />
-          <h3 id="pet-detail-name" className="text-[22px] leading-[1.1] font-bold xl:text-3xl">
+          <h3 id="pet-detail-name" className="text-2xl leading-[1.1] font-bold xl:text-3xl">
             {pet ? line.stages[stage].name : "Олдоогүй тэжээвэр"}
           </h3>
           {pet ? (
-            <span className="text-[13px] font-bold text-ink-muted xl:text-[15px]">{STAGE_LEVEL_LABELS[stage]}</span>
+            <span className="text-sm font-bold text-ink-muted xl:text-base">{STAGE_LEVEL_LABELS[stage]}</span>
           ) : null}
         </div>
       </div>

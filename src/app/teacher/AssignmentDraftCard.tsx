@@ -17,7 +17,7 @@ type AssignmentDraftCardProps = {
 };
 
 const fieldClass =
-  "h-12 w-full min-w-0 rounded-tile border-2 px-3 text-base text-ink focus:border-primary focus:outline-none md:text-[15px]";
+  "h-12 w-full min-w-0 rounded-tile border-2 px-3 text-base text-ink focus:border-primary focus:outline-none";
 
 const iconProps = {
   viewBox: "0 0 24 24",
@@ -74,7 +74,7 @@ export function AssignmentDraftCard({
     >
       <div className="flex flex-wrap items-center justify-between gap-2 md:gap-4">
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
-          <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-[3px] text-xs font-bold text-primary md:gap-1.5 md:px-3 md:py-1 md:text-[13px]">
+          <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-[3px] text-xs font-bold text-primary md:gap-1.5 md:px-3 md:py-1 md:text-sm">
             <svg {...iconProps} strokeWidth="2.2" className="size-3 md:size-3.5">
               <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
             </svg>
@@ -82,7 +82,7 @@ export function AssignmentDraftCard({
           </span>
           <h2
             id="draft-title"
-            className="text-xl leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]"
+            className="text-xl leading-[1.15] font-bold md:text-3xl md:leading-[1.1]"
           >
             {subtopicTitle}
           </h2>
@@ -109,7 +109,7 @@ export function AssignmentDraftCard({
               <div className="flex items-center gap-2 md:contents">
                 <span
                   aria-hidden="true"
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-lavender text-xs font-bold md:size-8 md:text-[13px]"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-lavender text-xs font-bold md:size-8 md:text-sm"
                 >
                   {num}
                 </span>
@@ -190,7 +190,7 @@ export function AssignmentDraftCard({
               title={draft.assignedTo
                 .map((n) => `№${String(n).padStart(2, "0")}`)
                 .join(", ")}
-              className="flex h-12 items-center rounded-tile bg-surface px-3 text-[15px] font-bold md:px-4"
+              className="flex h-12 items-center rounded-tile bg-surface px-3 text-base font-bold md:px-4"
             >
               {studentCount} сурагч
             </span>
@@ -251,13 +251,13 @@ export function AssignmentDraftCard({
 /** Draft / published state: a two-part switch on desktop, one pill on mobile. */
 function StatusPill({ published }: { published: boolean }) {
   const draftPill = (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-xs font-bold md:bg-white md:px-3.5 md:py-1.5 md:text-[13px] md:shadow-[0_4px_12px_rgb(0_0_0/0.08)]">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-2.5 py-1 text-xs font-bold md:bg-white md:px-3.5 md:py-1.5 md:text-sm md:shadow-[0_4px_12px_rgb(0_0_0/0.08)]">
       <span aria-hidden="true" className="size-2 rounded-full bg-magenta" />
       Ноорог
     </span>
   );
   const publishedPill = (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-xs font-bold md:px-3.5 md:py-1.5 md:text-[13px]">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-xs font-bold md:px-3.5 md:py-1.5 md:text-sm">
       <svg {...iconProps} strokeWidth="3.4" className="size-3">
         <path d="M20 6 9 17l-5-5" />
       </svg>
@@ -267,7 +267,7 @@ function StatusPill({ published }: { published: boolean }) {
   const inactive = (label: string) => (
     <span
       aria-hidden="true"
-      className="hidden px-3.5 py-1.5 text-[13px] font-semibold text-ink-muted md:inline"
+      className="hidden px-3.5 py-1.5 text-sm font-semibold text-ink-muted md:inline"
     >
       {label}
     </span>

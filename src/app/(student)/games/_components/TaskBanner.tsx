@@ -16,7 +16,7 @@ export function TaskBanner({ ref, tag, prompt, marks, highlight }: TaskBannerPro
     <div ref={ref} aria-live="polite" className="game-glass pointer-events-none absolute inset-x-3 top-3 flex items-center gap-2.5 rounded-2xl px-3 py-2.5">
       <span
         className={cn(
-          "flex-none rounded-lg px-2 py-1 text-[10px] font-extrabold tracking-[0.12em] uppercase",
+          "flex-none rounded-lg px-2 py-1 text-2xs font-extrabold tracking-[0.12em] uppercase",
           highlight ? "bg-[var(--game-gold)] text-[#2a1600]" : "game-gradient text-white",
         )}
       >

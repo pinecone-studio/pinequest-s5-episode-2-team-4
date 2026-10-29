@@ -32,7 +32,7 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
         placeholder="Нэргүй асуух…"
         autoComplete="off"
         maxLength={500}
-        className="h-12 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-muted md:h-11 md:text-[15px]"
+        className="h-12 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-muted md:h-11"
       />
       <button
         type="submit"

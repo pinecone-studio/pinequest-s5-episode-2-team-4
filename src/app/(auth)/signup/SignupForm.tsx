@@ -73,7 +73,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
               </PetAvatar>
             </div>
             <p aria-live="polite" className="mt-4 flex items-center justify-center gap-3">
-              <span className="text-[28px] leading-tight font-bold">{pet.stages[0].name}</span>
+              <span className="text-3xl leading-tight font-bold">{pet.stages[0].name}</span>
               <ElementBadge element={pet.element} />
             </p>
             <div

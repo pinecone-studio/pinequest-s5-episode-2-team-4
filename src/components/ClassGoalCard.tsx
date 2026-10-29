@@ -23,7 +23,7 @@ export function ClassGoalCard({ goal, className }: ClassGoalCardProps) {
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2
           id="class-goal-title"
-          className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]"
+          className="type-section-title"
         >
           {goal.classCode} ангийн зорилго
         </h2>

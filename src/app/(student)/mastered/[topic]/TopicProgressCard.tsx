@@ -17,10 +17,10 @@ export function TopicProgressCard({ title, items }: TopicProgressCardProps) {
   return (
     <div className="rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:p-6">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[22px] leading-[1.15] font-bold md:text-2xl">
+        <h2 className="type-section-title">
           {title}
         </h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-[13px] font-bold md:text-sm">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-sm font-bold">
           <StarIcon className="size-[13px] md:size-3.5" />
           {masteredCount} / {items.length}
           <span className="sr-only"> эзэмшсэн</span>
@@ -37,7 +37,7 @@ export function TopicProgressCard({ title, items }: TopicProgressCardProps) {
                 : "border-surface",
             )}
           >
-            <span className="text-[15px] font-bold">{item.title}</span>
+            <span className="text-base font-bold">{item.title}</span>
             <StatusBadge status={item.status} size="sm" />
           </li>
         ))}

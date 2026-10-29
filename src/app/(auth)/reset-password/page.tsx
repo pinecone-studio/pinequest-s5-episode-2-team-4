@@ -21,7 +21,7 @@ export default async function ResetPasswordPage({ searchParams }: PageProps<"/re
       >
         {username && typeof token === "string" ? (
           <>
-            <h1 id="reset-title" className="text-center text-[32px] leading-tight font-bold">
+            <h1 id="reset-title" className="text-center text-3xl leading-tight font-bold">
               Шинэ нууц үг
             </h1>
             <p className="mt-3 text-center text-ink-muted">
@@ -31,7 +31,7 @@ export default async function ResetPasswordPage({ searchParams }: PageProps<"/re
           </>
         ) : (
           <>
-            <h1 id="reset-title" className="text-center text-[32px] leading-tight font-bold">
+            <h1 id="reset-title" className="text-center text-3xl leading-tight font-bold">
               Холбоос хүчингүй
             </h1>
             <p className="mt-3 text-center text-ink-muted">

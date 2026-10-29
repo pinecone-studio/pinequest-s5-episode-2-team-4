@@ -34,15 +34,15 @@ export default async function TestPage({ searchParams }: PageProps<"/test">) {
         aria-labelledby="taken-title"
         className="mx-auto mt-6 flex max-w-160 flex-col items-center gap-5 rounded-panel bg-white px-6 py-8 text-center shadow-float md:mt-10 md:px-12 md:py-10"
       >
-        <h1 id="taken-title" className="text-2xl leading-tight font-bold md:text-[32px]">
+        <h1 id="taken-title" className="text-2xl leading-tight font-bold md:text-3xl">
           Тестээ өгсөн байна
         </h1>
         <p
           aria-label={`${result.total}-аас ${result.correct} зөв`}
-          className="text-[56px] leading-none font-bold"
+          className="text-6xl leading-none font-bold"
         >
           {result.correct}
-          <span className="text-[28px] text-ink-muted">/{result.total}</span>
+          <span className="text-3xl text-ink-muted">/{result.total}</span>
         </p>
         <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
           <ButtonLink href={LESSON_HREF}>Хичээл үргэлжлүүлэх</ButtonLink>

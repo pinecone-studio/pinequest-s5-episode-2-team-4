@@ -49,10 +49,10 @@ export function ResultsSection({
           </h1>
           <p
             aria-label={`${result.total}-аас ${result.correct} зөв`}
-            className="ml-auto text-[44px] leading-none font-bold md:mt-1 md:ml-0 md:text-[64px] md:tracking-[-0.03em]"
+            className="ml-auto text-5xl leading-none font-bold md:mt-1 md:ml-0 md:text-6xl md:tracking-[-0.03em]"
           >
             {result.correct}
-            <span className="text-[22px] text-ink-muted md:text-[32px]">
+            <span className="text-2xl text-ink-muted md:text-3xl">
               /{result.total}
             </span>
           </p>
@@ -71,7 +71,7 @@ export function ResultsSection({
                   s.selected ? "ring-2 ring-primary" : ""
                 }`}
               >
-                <span className="text-[15px] font-bold md:text-base">
+                <span className="text-base font-bold">
                   {s.title}
                   <span className="sr-only">
                     , {s.total}-аас {s.correct} зөв
@@ -80,7 +80,7 @@ export function ResultsSection({
                 <StatusBadge
                   status={s.status}
                   size="sm"
-                  className="justify-self-end md:col-start-3 md:row-start-1 md:px-3 md:text-[13px]"
+                  className="justify-self-end md:col-start-3 md:row-start-1 md:px-3 md:text-sm"
                 />
                 <span
                   aria-hidden="true"

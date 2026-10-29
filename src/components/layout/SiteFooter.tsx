@@ -36,7 +36,7 @@ const footerLinkClass = "inline-flex min-h-11 items-center text-sky no-underline
 
 function FooterHeading({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-1.5 text-[13px] font-bold tracking-[0.04em] text-white uppercase">{children}</p>
+    <p className="mb-1.5 text-sm font-bold tracking-[0.04em] text-white uppercase">{children}</p>
   );
 }
 
@@ -77,7 +77,7 @@ function FullFooter({ pets = [] }: { pets?: PetStage[] }) {
           </p>
         </div>
       </div>
-      <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-primary-dark px-4 pt-5 pb-7 text-[13px] md:px-[clamp(16px,4vw,40px)]">
+      <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-primary-dark px-4 pt-5 pb-7 text-sm md:px-[clamp(16px,4vw,40px)]">
         <span>© 2026 LevelUp баг</span>
         <span>PINEQUEST S5 · SDG 4</span>
       </div>

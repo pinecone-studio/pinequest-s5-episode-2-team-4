@@ -11,7 +11,7 @@ type SkinPickerProps = {
 export function SkinPicker({ stars, value, onChange }: SkinPickerProps) {
   return (
     <fieldset className="flex flex-col items-center gap-2">
-      <legend className="mb-2 text-[11px] font-extrabold tracking-[0.12em] text-[var(--game-muted)] uppercase">Могойгоо сонго</legend>
+      <legend className="mb-2 text-2xs font-extrabold tracking-[0.12em] text-[var(--game-muted)] uppercase">Могойгоо сонго</legend>
       <div className="flex gap-2.5">
         {SKINS.map((skin) => {
           const locked = skin.need > stars;
@@ -35,7 +35,7 @@ export function SkinPicker({ stars, value, onChange }: SkinPickerProps) {
                   background: `radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.7), transparent 45%), conic-gradient(${colors.join(",")},${colors[0]})`,
                 }}
               />
-              <em className={cn("absolute inset-x-0 -bottom-[17px] text-[10px] font-bold not-italic", locked ? "text-[var(--game-gold)]" : "text-[var(--game-muted)]")}>
+              <em className={cn("absolute inset-x-0 -bottom-[17px] text-2xs font-bold not-italic", locked ? "text-[var(--game-gold)]" : "text-[var(--game-muted)]")}>
                 {locked ? `★${skin.need}` : skin.name}
               </em>
             </button>

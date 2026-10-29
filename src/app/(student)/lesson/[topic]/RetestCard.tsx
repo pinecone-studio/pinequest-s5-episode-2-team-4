@@ -16,7 +16,7 @@ export function RetestCard({ href, petStage }: RetestCardProps) {
         {petStage ? (
           <PetSprite stage={petStage} size={64} className="rounded-card bg-white" />
         ) : null}
-        <h3 className="text-2xl leading-tight font-bold md:text-[28px]">
+        <h3 className="text-2xl leading-tight font-bold md:text-3xl">
           Бэлэн үү?
         </h3>
       </div>

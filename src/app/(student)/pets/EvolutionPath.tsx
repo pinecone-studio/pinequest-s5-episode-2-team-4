@@ -66,7 +66,7 @@ export function EvolutionPath({ line, level, xp, discovered = true, className }:
       aria-labelledby="path-title"
       className={cn("md:rounded-panel md:bg-white md:p-8 md:shadow-card", className)}
     >
-      <h2 id="path-title" className="text-2xl leading-[1.15] font-bold md:text-[32px] md:leading-[1.1]">
+      <h2 id="path-title" className="type-section-title">
         Хувьслын зам
       </h2>
       <ol className="mt-4.5 flex flex-col md:mt-6">
@@ -89,7 +89,7 @@ export function EvolutionPath({ line, level, xp, discovered = true, className }:
                   </FormCircle>
                   <span className="flex flex-col items-start gap-0.5 md:gap-1">
                     <span className="text-lg font-bold md:text-2xl md:leading-[1.1]">{form.name}</span>
-                    <span className="text-[13px] font-semibold text-ink-muted md:text-[15px]">
+                    <span className="text-sm font-semibold text-ink-muted md:text-base">
                       {STAGE_LEVEL_LABELS[i]} · Хувьссан
                     </span>
                   </span>
@@ -102,11 +102,11 @@ export function EvolutionPath({ line, level, xp, discovered = true, className }:
                   <span className="flex min-w-0 flex-1 flex-col items-start gap-1.5 md:gap-2">
                     <span className="flex items-center gap-2 md:gap-2.5">
                       <span className="text-lg font-bold md:text-2xl md:leading-[1.1]">{form.name}</span>
-                      <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white md:px-3 md:text-[13px]">
+                      <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white md:px-3 md:text-sm">
                         Чи энд
                       </span>
                     </span>
-                    <span className="text-[13px] font-semibold text-ink-muted md:text-[15px]">{STAGE_LEVEL_LABELS[i]}</span>
+                    <span className="text-sm font-semibold text-ink-muted md:text-base">{STAGE_LEVEL_LABELS[i]}</span>
                     <ProgressBar value={(xp / XP_PER_LEVEL) * 100} label={`Түвшин ${level + 1} хүртэл`} size="sm" className="w-full" />
                     <span className="text-xs font-bold md:text-sm">
                       {xp} / {XP_PER_LEVEL} XP
@@ -130,9 +130,9 @@ export function EvolutionPath({ line, level, xp, discovered = true, className }:
                       <span aria-hidden="true">???</span>
                       <span className="sr-only">Нууц хувьсал</span>
                     </span>
-                    <span className="text-[13px] font-semibold text-ink-muted md:text-[15px]">{STAGE_LEVEL_LABELS[i]}</span>
+                    <span className="text-sm font-semibold text-ink-muted md:text-base">{STAGE_LEVEL_LABELS[i]}</span>
                     {discovered ? (
-                      <span className="rounded-full bg-surface px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-[13px]">
+                      <span className="rounded-full bg-surface px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-sm">
                         {EVOLVE_LEVELS[i - 1] - level} түвшин үлдсэн
                       </span>
                     ) : null}

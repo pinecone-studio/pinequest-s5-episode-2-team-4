@@ -31,13 +31,13 @@ export function Hand({ cards, disabled, onOpen }: HandProps) {
               STYLE[card.power],
             )}
           >
-            <span className="text-[11px] font-extrabold tracking-wide uppercase">{POWER[card.power].label}</span>
+            <span className="text-2xs font-extrabold tracking-wide uppercase">{POWER[card.power].label}</span>
             <span aria-hidden="true" className="text-3xl">
               {card.power === "easy" ? "🍃" : card.power === "medium" ? "⚔️" : "🔥"}
             </span>
             <span className="flex flex-col items-center leading-none">
               <b className="text-2xl font-extrabold">{POWER[card.power].damage}</b>
-              <small className="text-[10px] text-white/70">хохирол</small>
+              <small className="text-2xs text-white/70">хохирол</small>
             </span>
           </button>
         </li>

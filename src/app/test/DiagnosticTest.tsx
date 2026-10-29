@@ -190,7 +190,7 @@ export function DiagnosticTest({
         </ol>
         <p
           aria-label={`${answeredCount} асуултад хариулсан, нийт ${total}`}
-          className="mb-1.5 shrink-0 text-[17px] font-bold md:mb-2 md:text-xl"
+          className="mb-1.5 shrink-0 text-lg font-bold md:mb-2 md:text-xl"
         >
           {answeredCount}
           <span className="text-ink-muted">/{total}</span>
@@ -210,7 +210,7 @@ export function DiagnosticTest({
 
         <Expression
           tokens={question.expression}
-          className="text-[40px] font-bold md:text-[56px]"
+          className="text-4xl font-bold md:text-6xl"
         />
 
         <div className="grid grid-cols-2 gap-3 self-stretch md:grid-cols-4 md:gap-4">
@@ -241,7 +241,7 @@ export function DiagnosticTest({
                 ) : null}
                 <Fraction
                   value={option}
-                  className="text-[32px] font-bold md:text-[40px]"
+                  className="text-3xl font-bold md:text-4xl"
                 />
               </button>
             );

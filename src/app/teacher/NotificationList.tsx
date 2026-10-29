@@ -71,11 +71,11 @@ export function NotificationList({
       <div className="flex items-center justify-between gap-3">
         <h2
           id="alerts-title"
-          className="text-[22px] leading-[1.15] font-bold md:text-[28px] md:leading-[1.1]"
+          className="type-section-title"
         >
           Мэдэгдэл
         </h2>
-        <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-[13px]">
+        <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-sm">
           {alertCount}
           <span className="sr-only"> шинэ</span>
         </span>
@@ -105,8 +105,8 @@ export function NotificationList({
                 {kind.icon}
               </span>
               <span className="flex min-w-0 flex-col">
-                <b className="text-[15px]">{n.title}</b>
-                <span className="text-[13px] text-ink-muted">
+                <b className="text-base">{n.title}</b>
+                <span className="text-sm text-ink-muted">
                   {context} · {n.time}
                 </span>
               </span>

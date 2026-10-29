@@ -10,7 +10,7 @@ type RetryNoteProps = {
 export function RetryNote({ stats, children }: RetryNoteProps) {
   if (!stats.retried && !children) return null;
   return (
-    <p className="max-w-[330px] rounded-[14px] border border-[var(--game-line)] bg-white/5 px-3 py-2 text-left text-[13px] text-[var(--game-muted)]">
+    <p className="max-w-[330px] rounded-[14px] border border-[var(--game-line)] bg-white/5 px-3 py-2 text-left text-sm text-[var(--game-muted)]">
       <b className="text-white">Багшид: </b>
       {stats.retried ? `давталтаар ${stats.fixed}/${stats.retried} засагдсан` : null}
       {children}

@@ -80,10 +80,10 @@ export function TopicMap({ title, nodes, pet }: TopicMapProps) {
       className="mt-7 rounded-[25px] bg-white px-5 py-6 shadow-card md:mt-6 md:rounded-panel md:px-10 md:pt-8 md:pb-10"
     >
       <div className="flex items-center justify-between gap-3 md:justify-start md:gap-3.5">
-        <h2 id="map-title" className="text-[26px] leading-tight font-bold md:text-[32px]">
+        <h2 id="map-title" className="type-section-title">
           {title}
         </h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.25 text-sm font-bold md:px-3.5 md:py-1.5 md:text-[15px]">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.25 text-sm font-bold md:px-3.5 md:py-1.5 md:text-base">
           {BookIcon}
           {done} / {nodes.length}
         </span>
@@ -115,14 +115,14 @@ export function TopicMap({ title, nodes, pet }: TopicMapProps) {
                   )}
                   <span
                     className={cn(
-                      "flex size-18 flex-none items-center justify-center rounded-full text-3xl font-bold md:size-28 md:text-[44px]",
+                      "flex size-18 flex-none items-center justify-center rounded-full text-3xl font-bold md:size-28 md:text-5xl",
                       current ? currentStyle : circleStyles[node.status],
                     )}
                   >
                     {finished ? CheckIcon : node.order}
                   </span>
                   <span className="flex flex-col items-start gap-1 md:items-center md:gap-3">
-                    <span className="text-[17px] font-bold">{node.title}</span>
+                    <span className="text-lg font-bold">{node.title}</span>
                     {!finished && node.status !== "untested" && (
                       <StatusBadge status={node.status} />
                     )}

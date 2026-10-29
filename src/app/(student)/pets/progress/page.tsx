@@ -18,7 +18,7 @@ export default async function EnglishProgressPage() {
     <div className="mx-auto max-w-5xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">
+          <h1 className="type-page-title">
             Англи хэлний ахиц
           </h1>
           <p className="mt-3 text-ink-muted md:text-lg">

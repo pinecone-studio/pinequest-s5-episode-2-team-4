@@ -10,7 +10,7 @@ export default function BattleLayout({ children }: { children: React.ReactNode }
     <main className="flex min-h-dvh flex-col">
       {children}
       {/* The footer is hidden here, but the sprites still need their CC BY-SA credit. */}
-      <p className="mx-auto mb-2 rounded-full bg-black/45 px-3 py-0.5 text-[11px] text-white">
+      <p className="mx-auto mb-2 rounded-full bg-black/45 px-3 py-0.5 text-2xs text-white">
         <TuxemonCredit />
       </p>
     </main>

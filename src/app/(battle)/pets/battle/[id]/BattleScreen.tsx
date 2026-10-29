@@ -793,7 +793,7 @@ function BattleOver({
           className={won ? "opacity-40 grayscale" : ""}
         />
       </div>
-      <h1 id="result-title" className="text-[40px] leading-none font-bold">
+      <h1 id="result-title" className="text-4xl leading-none font-bold">
         {message.title}
       </h1>
       <p className="text-ink-muted">{message.text}</p>

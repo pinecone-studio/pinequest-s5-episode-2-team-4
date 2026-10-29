@@ -48,7 +48,7 @@ export function AssignmentResult({ result }: { result: SessionResult }) {
 
   if (!assignment) return null;
   return (
-    <p role="status" className="max-w-[330px] rounded-[14px] border border-[rgb(124_255_178/0.35)] bg-[rgb(124_255_178/0.08)] px-3 py-2 text-[13px] font-bold text-white">
+    <p role="status" className="max-w-[330px] rounded-[14px] border border-[rgb(124_255_178/0.35)] bg-[rgb(124_255_178/0.08)] px-3 py-2 text-sm font-bold text-white">
       {saved === undefined
         ? "Даалгаврын үр дүнг хадгалж байна…"
         : saved === "error"

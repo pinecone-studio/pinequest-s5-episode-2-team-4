@@ -87,7 +87,7 @@ export default async function TeacherPage() {
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-4 px-4 pt-1 md:block md:px-[clamp(16px,4vw,40px)] md:pt-2">
-      <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:mb-8 md:text-[64px]">
+      <h1 className="type-page-title md:mb-8">
         Багшийн самбар
       </h1>
       <StatCards

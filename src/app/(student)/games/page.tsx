@@ -104,7 +104,7 @@ export default async function GamesPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-2 pb-10 md:px-[clamp(16px,4vw,40px)]">
-      <h1 className="text-[40px] leading-none font-bold tracking-[-0.03em] md:text-[56px]">Тоглоом</h1>
+      <h1 className="type-page-title">Тоглоом</h1>
       <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
         Нэг хичээлийн асуултыг өөр өөр тоглоомоор давт. Аль тоглоомд ч буруу хариулбал тайлбар нь гарна.
       </p>

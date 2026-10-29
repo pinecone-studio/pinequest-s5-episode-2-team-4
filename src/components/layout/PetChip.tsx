@@ -24,7 +24,7 @@ export function PetChip({ name, level, xpPercent, imageSrc }: PetChipProps) {
         <span aria-hidden="true" className="size-12 rounded-full bg-lavender" />
       )}
       <span className="flex flex-col gap-1.25">
-        <span className="text-[13px] leading-none font-bold md:text-sm">
+        <span className="text-sm leading-none font-bold">
           Түв. {level}
         </span>
         <ProgressBar
