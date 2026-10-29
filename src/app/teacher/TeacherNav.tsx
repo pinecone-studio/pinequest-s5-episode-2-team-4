@@ -11,12 +11,23 @@ const LINKS: { href: string; label: string; exact?: boolean; also?: string }[] =
   { href: "/teacher/history", label: "Түүх", also: "/teacher/english" },
 ];
 
-/** The teacher's sections, under the header; scrolls sideways on phones. */
-export function TeacherNav() {
+type TeacherNavProps = {
+  /** "bar" sits in the header row (lg up); "tabs" is the header's second row below lg. */
+  variant: "bar" | "tabs";
+  className?: string;
+};
+
+/** The teacher's sections, inside the header: links on wide screens, scrolling tabs on phones. */
+export function TeacherNav({ variant, className }: TeacherNavProps) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Багшийн цэс" className="mx-auto w-full max-w-[1280px] px-4 md:px-[clamp(16px,4vw,40px)]">
-      <ul className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-2 md:gap-2">
+    <nav aria-label="Багшийн цэс" className={className}>
+      <ul
+        className={cn(
+          "flex",
+          variant === "bar" ? "gap-1" : "-mx-1 gap-1 overflow-x-auto px-1",
+        )}
+      >
         {LINKS.map((link) => {
           const active = link.exact
             ? pathname === link.href
@@ -27,8 +38,13 @@ export function TeacherNav() {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold no-underline md:text-base",
-                  active ? "bg-primary text-white hover:text-white" : "bg-surface text-ink hover:bg-lavender hover:text-ink",
+                  "inline-flex items-center font-semibold whitespace-nowrap text-ink no-underline hover:text-ink",
+                  variant === "bar"
+                    ? cn("min-h-12 rounded-full px-4 hover:bg-white/60 xl:px-5", active && "bg-lavender")
+                    : cn(
+                        "min-h-11 border-b-3 px-3 text-sm",
+                        active ? "border-primary text-primary hover:text-primary" : "border-transparent",
+                      ),
                 )}
               >
                 {link.label}
