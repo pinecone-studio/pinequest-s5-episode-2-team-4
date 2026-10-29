@@ -819,3 +819,27 @@ export type QuestLog = {
   /** Quest ids already claimed today. */
   claimed: string[];
 };
+
+/** What a shop item changes; one item of each is worn at a time. */
+export type ShopSlot = "scene" | "ring" | "aura";
+
+/** The pet scene's artwork colours (the same keys PetScene draws with). */
+export type ScenePalette = Record<
+  "sky" | "haze" | "pink" | "mountain" | "hill" | "ground" | "meadow" | "grass" | "primary" | "bloomPink" | "bloomViolet" | "night" | "white",
+  string
+>;
+
+type ShopItemBase = { id: string; name: string; description: string; price: number };
+
+/** Something to buy with coins: a habitat scene, an XP ring colour or an aura around the pet. */
+export type ShopItem =
+  | (ShopItemBase & { slot: "scene"; palette: ScenePalette })
+  /** One colour, or several for a gradient. */
+  | (ShopItemBase & { slot: "ring"; colors: string[] })
+  | (ShopItemBase & { slot: "aura"; shape: "sparkle" | "heart"; colors: string[] });
+
+/** What the student owns and wears, saved with the account. */
+export type ShopState = { owned: string[]; equipped: Partial<Record<ShopSlot, string>> };
+
+/** A shop item with whether the student owns and wears it. */
+export type ShopEntry = ShopItem & { owned: boolean; equipped: boolean };
