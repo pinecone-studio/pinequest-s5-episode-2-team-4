@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { StudentFooter } from "@/components/layout/StudentFooter";
 import { requireStudent } from "@/lib/auth";
 import {
+  getCoins,
   getCurrentPet,
   getOpenAssignmentCount,
   getPetLines,
@@ -22,13 +23,14 @@ export default async function StudentLayout({
   children: React.ReactNode;
 }) {
   await requireStudent();
-  const [pet, petLines, videos, assignments, subject, lesson] = await Promise.all([
+  const [pet, petLines, videos, assignments, subject, lesson, coins] = await Promise.all([
     getCurrentPet(),
     getPetLines(),
     getUnseenVideoCount(),
     getOpenAssignmentCount(),
     getStudentSubject(),
     getTodayLesson(),
+    getCoins(),
   ]);
   const counts = { videos, assignments, lesson: lesson && !lesson.answered ? 1 : 0 };
   const footerPets = FOOTER_PET_IDS.flatMap((id) => {
@@ -42,6 +44,7 @@ export default async function StudentLayout({
       <SiteHeader
         counts={counts}
         subject={subject && subjectTitle(subject.subject)}
+        coins={coins}
         pet={
           pet && {
             name: pet.stage.name,

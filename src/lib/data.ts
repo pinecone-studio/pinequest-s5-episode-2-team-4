@@ -175,6 +175,12 @@ export async function getPetLine(id: string): Promise<PetLine | undefined> {
   return petLines.find((l) => l.id === id);
 }
 
+/** The current student's coins (0 until they earn some). */
+export async function getCoins(): Promise<number> {
+  const session = await readSession();
+  return session?.role === "student" ? (session.coins ?? 0) : 0;
+}
+
 /** The current user's pet with its line and the stage for its level. */
 export async function getCurrentPet() {
   const pet = (await readSession())?.pet;

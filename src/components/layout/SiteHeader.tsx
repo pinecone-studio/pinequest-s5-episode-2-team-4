@@ -7,6 +7,7 @@ import { usePetPreview } from "@/components/pet/petPreview";
 import { ButtonLink } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { AccountMenu } from "./AccountMenu";
+import { CoinChip } from "./CoinChip";
 import { Logo } from "./Logo";
 import { NavPill } from "./NavPill";
 import { NavBadge } from "./NavBadge";
@@ -35,6 +36,8 @@ type SiteHeaderProps = {
   counts?: NavCounts;
   /** The subject being studied, e.g. "Математик"; links to /subject to change it. */
   subject?: string;
+  /** The student's coins, shown beside the pet. */
+  coins?: number;
   className?: string;
 };
 
@@ -45,7 +48,7 @@ type SiteHeaderProps = {
  * the pet page, changing subject, dark mode and «Гарах». On smaller laptops
  * the bar drops the nav icons (below xl) and the pet's name (below 1360px).
  */
-export function SiteHeader({ pet: realPet, counts = {}, subject, className }: SiteHeaderProps) {
+export function SiteHeader({ pet: realPet, counts = {}, subject, coins, className }: SiteHeaderProps) {
   const pathname = usePathname();
   // The /pets evolution demo shows each stage here too.
   const preview = usePetPreview();
@@ -112,6 +115,7 @@ export function SiteHeader({ pet: realPet, counts = {}, subject, className }: Si
             <PlayIcon className="size-4.5" />
             Тоглох
           </ButtonLink>
+          {coins !== undefined && <CoinChip coins={coins} />}
           <span aria-hidden="true" className="mx-1 hidden h-9 w-px bg-line lg:block" />
           {pet && (
             <AccountMenu
