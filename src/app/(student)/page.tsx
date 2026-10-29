@@ -11,10 +11,12 @@ import {
   getStudentAssignments,
   getStudentClasses,
   getSubtopics,
+  getTodayLesson,
   getTopic,
 } from "@/lib/data";
 import { ClassNotice } from "./_home/ClassNotice";
 import { HomeHero } from "./_home/HomeHero";
+import { LessonCheckCard } from "./_home/LessonCheckCard";
 import { TeacherCard } from "./_home/TeacherCard";
 import { TopicMap } from "./_home/TopicMap";
 
@@ -22,7 +24,7 @@ const TOPIC_ID = "fractions";
 const ORBIT_PET_IDS = ["dollfin", "agnite", "anoleaf", "tweesher", "cardiling"];
 
 export default async function HomePage() {
-  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes] =
+  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes, lesson] =
     await Promise.all([
       getTopic(TOPIC_ID),
       getSubtopics(TOPIC_ID),
@@ -34,6 +36,7 @@ export default async function HomePage() {
       getStudentAssignments(),
       getClassVideos(),
       getStudentClasses(),
+      getTodayLesson(),
     ]);
   if (!topic || !pet) notFound();
 
@@ -58,6 +61,7 @@ export default async function HomePage() {
           testTaken={testTaken}
           orbitPets={orbitPets}
         />
+        {lesson && <LessonCheckCard lesson={lesson} />}
         <StreakCard streak={streak} />
         {classes.length ? (
           <TeacherCard

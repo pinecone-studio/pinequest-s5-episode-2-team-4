@@ -18,6 +18,8 @@ export type NavCounts = {
   videos?: number;
   /** Assignments not finished yet */
   assignments?: number;
+  /** 1 while today's class lesson hasn't been answered («Ойлгосон уу?») */
+  lesson?: number;
 };
 
 // No display or padding here: each link sets its own, so a `hidden`
@@ -53,7 +55,7 @@ export function SiteHeader({ pet: realPet, counts = {}, subject, className }: Si
       : realPet;
 
   const links: { href: string; label: string; icon: React.ReactNode; count?: number; countLabel?: string }[] = [
-    { href: "/", label: "Нүүр", icon: <HomeIcon className={iconClass} /> },
+    { href: "/", label: "Нүүр", icon: <HomeIcon className={iconClass} />, count: counts.lesson, countLabel: "өнөөдрийн хичээлийн асуулт" },
     { href: "/videos", label: "Хичээл", icon: <BookIcon className={iconClass} />, count: counts.videos, countLabel: "шинэ видео" },
     {
       href: "/pets",
