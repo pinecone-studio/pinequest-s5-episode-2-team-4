@@ -11,10 +11,12 @@ import {
   getHeatmap,
   getNotifications,
   getQuestionGroups,
+  getLessonDaySignals,
   getTodaySignals,
   getSubtopics,
   getTeacherClassBattle,
 } from "@/lib/data";
+import { topicTitle } from "@/lib/lesson-topics";
 import { subjectTitle } from "@/lib/subjects";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { ClassBattleCard } from "./ClassBattleCard";
@@ -23,6 +25,7 @@ import { NotificationList } from "./NotificationList";
 import { PeerApproval } from "./PeerApproval";
 import { QuestionGroups } from "./QuestionGroups";
 import { SignalPanel } from "./SignalPanel";
+import { LessonDayHistory } from "./LessonDayHistory";
 import { StatCards } from "./StatCards";
 import { SubjectPrompt } from "./SubjectPrompt";
 
@@ -41,6 +44,7 @@ export default async function TeacherPage() {
     notifications,
     draft,
     signals,
+    lessonDays,
     groups,
     questions,
     classGoal,
@@ -54,6 +58,7 @@ export default async function TeacherPage() {
     getNotifications(),
     getAssignmentDraft(),
     getTodaySignals(),
+    getLessonDaySignals({ beforeToday: true }),
     getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
@@ -107,10 +112,13 @@ export default async function TeacherPage() {
       <SignalPanel
         rows={signals.map((s) => ({
           ...s,
-          title: subtopicById.get(s.subtopicId)?.title ?? s.subtopicId,
+          // Class lesson topics too, not only the app lessons.
+          title: subtopicById.get(s.subtopicId)?.title ?? topicTitle(s.subtopicId) ?? s.subtopicId,
         }))}
         className="md:mt-5"
       />
+      {/* Earlier lesson days; today is in the panel above. */}
+      <LessonDayHistory days={lessonDays} className="md:mt-5" />
       {/* Demo accounts only for now: real classes have no draft or notifications yet. */}
       {(draft || notifications.length > 0) && (
         <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
