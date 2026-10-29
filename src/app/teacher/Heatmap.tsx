@@ -1,6 +1,7 @@
 import { cn } from "@/lib/cn";
-import { summarizeResults, TESTED_STATUSES, type TestedStatus } from "@/lib/class-results";
+import { hardestSubtopic, summarizeResults, TESTED_STATUSES, type TestedStatus } from "@/lib/class-results";
 import type { HeatmapRow } from "@/lib/types";
+import { FocusSubtopic } from "./FocusSubtopic";
 
 // Students who haven't taken the test are left out of every row: a per-row
 // "not taken" count lets the teacher guess who it is (e.g. the one absent
@@ -20,12 +21,14 @@ type HeatmapProps = {
 };
 
 /**
- * The class's test results, one row per subtopic, weakest first. A row opens
- * to show how many students are weak, still learning and good, and what share.
+ * The class's test results, one row per subtopic, weakest first, under the
+ * subtopic to look at first. A row opens to show how many students are weak,
+ * still learning and good, and what share.
  */
 export function Heatmap({ rows, testedCount }: HeatmapProps) {
   const titles = new Map(rows.map((r) => [r.subtopicId, r.title]));
   const results = summarizeResults(rows);
+  const focus = hardestSubtopic(results);
 
   return (
     <section
@@ -55,64 +58,70 @@ export function Heatmap({ rows, testedCount }: HeatmapProps) {
           Ангийн сурагчид оношлох тест өгөөгүй байна. Тест өгмөгц дүн нь энд гарна.
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-line border-y border-line">
-          {results.map((row, i) => (
-            <li key={row.subtopicId}>
-              <details open={i === 0} className="group">
-                <summary className="grid cursor-pointer list-none grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-3.5 md:grid-cols-[minmax(10rem,14rem)_1fr_7rem_auto] [&::-webkit-details-marker]:hidden">
-                  <span className="font-bold">{titles.get(row.subtopicId) ?? row.subtopicId}</span>
-                  <span
-                    role="img"
-                    aria-label={TESTED_STATUSES.map((s) => `${row.counts[s]} ${STATUS[s].label} (${row.shares[s]}%)`).join(", ")}
-                    className="col-span-3 row-start-2 flex h-2.5 gap-0.5 overflow-hidden rounded-full md:col-span-1 md:row-start-auto"
-                  >
-                    {TESTED_STATUSES.map((s) =>
-                      row.counts[s] > 0 ? (
-                        <span
-                          key={s}
-                          style={{ flexGrow: row.counts[s] }}
-                          className={cn("basis-0", STATUS[s].className)}
-                        />
-                      ) : null,
-                    )}
-                  </span>
-                  <span
-                    className={cn(
-                      "justify-self-end text-sm font-bold tabular-nums",
-                      row.counts.weak > 0 ? "text-status-weak-ink" : "text-status-good-ink",
-                    )}
-                  >
-                    {row.counts.weak > 0 ? `${row.counts.weak} сул · ${row.shares.weak}%` : "сул алга"}
-                  </span>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    className="size-4 text-ink-muted transition-transform group-open:rotate-90"
-                  >
-                    <path d="m9 6 6 6-6 6" />
-                  </svg>
-                </summary>
+        <>
+          {focus ? (
+            <FocusSubtopic result={focus} title={titles.get(focus.subtopicId) ?? focus.subtopicId} />
+          ) : null}
+          <ul className="mt-4 divide-y divide-line border-y border-line">
+            {results.map((row, i) => (
+              <li key={row.subtopicId}>
+                {/* The focus card already covers the first row. */}
+                <details open={!focus && i === 0} className="group">
+                  <summary className="grid cursor-pointer list-none grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-3.5 md:grid-cols-[minmax(10rem,14rem)_1fr_7rem_auto] [&::-webkit-details-marker]:hidden">
+                    <span className="font-bold">{titles.get(row.subtopicId) ?? row.subtopicId}</span>
+                    <span
+                      role="img"
+                      aria-label={TESTED_STATUSES.map((s) => `${row.counts[s]} ${STATUS[s].label} (${row.shares[s]}%)`).join(", ")}
+                      className="col-span-3 row-start-2 flex h-2.5 gap-0.5 overflow-hidden rounded-full md:col-span-1 md:row-start-auto"
+                    >
+                      {TESTED_STATUSES.map((s) =>
+                        row.counts[s] > 0 ? (
+                          <span
+                            key={s}
+                            style={{ flexGrow: row.counts[s] }}
+                            className={cn("basis-0", STATUS[s].className)}
+                          />
+                        ) : null,
+                      )}
+                    </span>
+                    <span
+                      className={cn(
+                        "justify-self-end text-sm font-bold tabular-nums",
+                        row.counts.weak > 0 ? "text-status-weak-ink" : "text-status-good-ink",
+                      )}
+                    >
+                      {row.counts.weak > 0 ? `${row.counts.weak} сул · ${row.shares.weak}%` : "сул алга"}
+                    </span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      className="size-4 text-ink-muted transition-transform group-open:rotate-90"
+                    >
+                      <path d="m9 6 6 6-6 6" />
+                    </svg>
+                  </summary>
 
-                <dl className="grid grid-cols-3 gap-2 pb-4">
-                  {TESTED_STATUSES.map((s) => (
-                    <div key={s} className={cn("flex flex-col rounded-tile px-3 py-2.5", STATUS[s].className)}>
-                      <dt className="order-last text-xs font-semibold">{STATUS[s].label}</dt>
-                      <dd className="text-2xl leading-none font-bold tabular-nums">
-                        {row.counts[s]}
-                        <span className="ml-1 text-sm font-semibold">{row.shares[s]}%</span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </details>
-            </li>
-          ))}
-        </ul>
+                  <dl className="grid grid-cols-3 gap-2 pb-4">
+                    {TESTED_STATUSES.map((s) => (
+                      <div key={s} className={cn("flex flex-col rounded-tile px-3 py-2.5", STATUS[s].className)}>
+                        <dt className="order-last text-xs font-semibold">{STATUS[s].label}</dt>
+                        <dd className="text-2xl leading-none font-bold tabular-nums">
+                          {row.counts[s]}
+                          <span className="ml-1 text-sm font-semibold">{row.shares[s]}%</span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </details>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </section>
   );
