@@ -25,11 +25,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#5b00ed",
-};
-
-// Full screen on iPhones, so env(safe-area-inset-bottom) works and the phone
-// dock (MobileNav) can sit above the home bar.
-export const viewport: Viewport = {
+  // Full screen on iPhones, so env(safe-area-inset-bottom) works and the phone
+  // dock (MobileNav) can sit above the home bar.
   viewportFit: "cover",
 };
 
