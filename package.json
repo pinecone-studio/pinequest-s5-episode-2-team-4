@@ -2,6 +2,9 @@
   "name": "pinequest-s5-episode-2-team-4",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

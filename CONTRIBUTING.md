@@ -8,7 +8,7 @@ LevelUp дээр ажиллаж буй багийн гишүүдэд зориу�
 
 ## 1. Нэг удаа тохируулах
 
-1. **Node 20.19+** (Node 22 LTS зөвлөмжтэй): `node -v`
+1. **Node 22+** (`.nvmrc`-д заасан): `node -v`
 2. **GitHub CLI** суулгах (Terminal дээр):
    ```bash
    curl -L -o /tmp/gh.pkg https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_macOS_universal.pkg
