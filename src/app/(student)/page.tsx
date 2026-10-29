@@ -4,6 +4,7 @@ import { StreakCard } from "@/components/StreakCard";
 import {
   getClassGoal,
   getClassVideos,
+  getDailyQuests,
   getLearningStreak,
   getCurrentPet,
   getPetLines,
@@ -15,6 +16,7 @@ import {
   getTopic,
 } from "@/lib/data";
 import { ClassNotice } from "./_home/ClassNotice";
+import { DailyQuestsCard } from "./_home/DailyQuestsCard";
 import { HomeHero } from "./_home/HomeHero";
 import { LessonCheckCard } from "./_home/LessonCheckCard";
 import { TeacherCard } from "./_home/TeacherCard";
@@ -24,7 +26,7 @@ const TOPIC_ID = "fractions";
 const ORBIT_PET_IDS = ["dollfin", "agnite", "anoleaf", "tweesher", "cardiling"];
 
 export default async function HomePage() {
-  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes, lesson] =
+  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes, lesson, quests] =
     await Promise.all([
       getTopic(TOPIC_ID),
       getSubtopics(TOPIC_ID),
@@ -37,6 +39,7 @@ export default async function HomePage() {
       getClassVideos(),
       getStudentClasses(),
       getTodayLesson(),
+      getDailyQuests(),
     ]);
   if (!topic || !pet) notFound();
 
@@ -63,6 +66,7 @@ export default async function HomePage() {
         />
         {lesson && <LessonCheckCard lesson={lesson} />}
         <StreakCard streak={streak} />
+        {quests.length > 0 && <DailyQuestsCard quests={quests} />}
         {classes.length ? (
           <TeacherCard
             assignmentsLeft={assignments.filter((a) => !a.done).length}

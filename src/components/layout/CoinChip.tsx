@@ -11,7 +11,7 @@ const COIN = [
 ];
 const FILL: Record<string, string> = { E: "#b7791f", G: "#f5c542", H: "#fff1a8", S: "#e0a92e" };
 
-function CoinIcon({ className }: { className?: string }) {
+export function CoinIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 8 8" shapeRendering="crispEdges" aria-hidden="true" className={className}>
       {COIN.flatMap((row, y) =>
