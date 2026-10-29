@@ -60,7 +60,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label="Харанхуй / гэрэлтэй горим солих"
       title="Харанхуй / гэрэлтэй горим солих"
-      className="theme-toggle fixed right-4 bottom-24 z-50 flex size-12 cursor-pointer items-center justify-center rounded-full border border-line bg-white text-ink shadow-card md:right-6 md:bottom-6"
+      className="theme-toggle fixed right-4 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-50 flex size-12 cursor-pointer items-center justify-center rounded-full border border-line bg-white text-ink shadow-card md:right-6 md:bottom-6"
     >
       <svg className="theme-moon size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
