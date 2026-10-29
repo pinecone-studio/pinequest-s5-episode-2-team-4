@@ -2,7 +2,7 @@
 // the teacher sees which subtopic the class finds hard and what to do next.
 // Only totals: no student numbers or names leave this module.
 
-import type { HeatmapStatus } from "./types";
+import type { HeatmapRow, HeatmapStatus } from "./types";
 
 export type TestedStatus = Exclude<HeatmapStatus, "untested">;
 
@@ -21,6 +21,16 @@ const REVIEW_SHARE = 0.4;
 /** few: too few results to say anything yet. */
 export type NextStep = "few" | "reexplain" | "review" | "next";
 
+export type SubtopicResult = {
+  subtopicId: string;
+  /** Students who took the test */
+  tested: number;
+  counts: Record<TestedStatus, number>;
+  /** Whole percent of the tested students; 0 when nobody took the test */
+  shares: Record<TestedStatus, number>;
+  step: NextStep;
+};
+
 /** Whole percent of `total`, 0 for an empty class instead of NaN. */
 export const share = (count: number, total: number) =>
   total > 0 ? Math.round((count / total) * 100) : 0;
@@ -36,4 +46,22 @@ export function nextStep(counts: Record<TestedStatus, number>, tested: number): 
     return "review";
   }
   return "next";
+}
+
+/** One subtopic's counts, leaving out students who haven't taken the test. */
+export function summarizeRow(row: HeatmapRow): SubtopicResult {
+  const counts: Record<TestedStatus, number> = { weak: 0, learning: 0, good: 0 };
+  for (const cell of row.cells) if (cell !== "untested") counts[cell]++;
+  const tested = counts.weak + counts.learning + counts.good;
+  return {
+    subtopicId: row.subtopicId,
+    tested,
+    counts,
+    shares: {
+      weak: share(counts.weak, tested),
+      learning: share(counts.learning, tested),
+      good: share(counts.good, tested),
+    },
+    step: nextStep(counts, tested),
+  };
 }
