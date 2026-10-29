@@ -2,6 +2,7 @@ import { cn } from "@/lib/cn";
 import { hardestSubtopic, summarizeResults, TESTED_STATUSES, type TestedStatus } from "@/lib/class-results";
 import type { HeatmapRow } from "@/lib/types";
 import { FocusSubtopic } from "./FocusSubtopic";
+import { NextStepNote } from "./NextStepNote";
 
 // Students who haven't taken the test are left out of every row: a per-row
 // "not taken" count lets the teacher guess who it is (e.g. the one absent
@@ -106,7 +107,7 @@ export function Heatmap({ rows, testedCount }: HeatmapProps) {
                     </svg>
                   </summary>
 
-                  <dl className="grid grid-cols-3 gap-2 pb-4">
+                  <dl className="grid grid-cols-3 gap-2">
                     {TESTED_STATUSES.map((s) => (
                       <div key={s} className={cn("flex flex-col rounded-tile px-3 py-2.5", STATUS[s].className)}>
                         <dt className="order-last text-xs font-semibold">{STATUS[s].label}</dt>
@@ -117,6 +118,7 @@ export function Heatmap({ rows, testedCount }: HeatmapProps) {
                       </div>
                     ))}
                   </dl>
+                  <NextStepNote step={row.step} className="mt-3 pb-4" />
                 </details>
               </li>
             ))}
