@@ -77,7 +77,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
                   stage={pet.stage}
                   size={256}
                   alt={`${pet.stage.name}, чиний тэжээвэр`}
-                  className="relative animate-bob drop-shadow-[0_14px_22px_rgba(79,46,132,0.22)]"
+                  className="relative animate-bob drop-shadow-[0_14px_22px_rgb(29_21_48/0.16)]"
                 />
               </div>
             </div>

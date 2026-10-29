@@ -97,7 +97,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
                     className={cn(
                       "relative flex h-21 cursor-pointer items-center justify-center rounded-card border-3 transition-transform hover:-translate-y-0.75 active:translate-y-0.5",
                       on
-                        ? "border-primary bg-white shadow-[0_5px_0_var(--color-primary-dark)]"
+                        ? "border-primary bg-white shadow-pick"
                         : "border-surface bg-surface",
                     )}
                   >

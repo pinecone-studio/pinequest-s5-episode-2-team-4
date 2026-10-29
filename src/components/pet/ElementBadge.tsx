@@ -2,16 +2,16 @@ import { cn } from "@/lib/cn";
 import { ELEMENT_LABELS } from "@/lib/pets";
 import type { PetElement } from "@/lib/types";
 
-/** Background and text colour per element, also used by the type filters on /pets. */
+/** Soft tint and dark ink per element, also used by the type filters on /pets. */
 export const ELEMENT_COLORS: Record<PetElement, string> = {
-  water: "bg-sky text-ink",
-  fire: "bg-magenta text-white",
-  wood: "bg-line text-ink",
-  ice: "bg-lavender text-ink",
-  sky: "bg-primary text-white",
-  metal: "bg-night text-white",
-  earth: "bg-white text-ink",
-  shadow: "bg-primary-dark text-white",
+  water: "bg-tint-blue text-tint-blue-ink",
+  fire: "bg-tint-pink text-tint-pink-ink",
+  wood: "bg-tint-violet text-tint-violet-ink",
+  ice: "bg-tint-periwinkle text-tint-periwinkle-ink",
+  sky: "bg-tint-purple text-tint-purple-ink",
+  metal: "bg-tint-gray text-tint-gray-ink",
+  earth: "bg-tint-sand text-tint-sand-ink",
+  shadow: "bg-tint-plum text-tint-plum-ink",
 };
 
 export function ElementBadge({
@@ -26,8 +26,6 @@ export function ElementBadge({
       className={cn(
         "inline-flex items-center rounded-full px-3 py-0.75 text-sm font-bold",
         ELEMENT_COLORS[element],
-        // White on white needs an outline.
-        element === "earth" && "border-2 border-ink",
         className,
       )}
     >

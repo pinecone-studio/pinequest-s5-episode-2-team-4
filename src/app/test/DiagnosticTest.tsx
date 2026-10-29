@@ -64,7 +64,7 @@ const CheckIcon = (
 );
 
 const primaryButtonClass =
-  "flex min-h-[60px] flex-1 items-center justify-center gap-2.5 rounded-full bg-primary px-9 text-lg font-bold text-white no-underline shadow-[0_5px_0_var(--color-primary-dark)] transition hover:text-white hover:brightness-110 active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-primary-dark)] md:flex-none md:shadow-3d";
+  "flex min-h-[60px] flex-1 items-center justify-center gap-2.5 rounded-full bg-primary px-9 text-lg font-bold text-white no-underline shadow-3d transition hover:-translate-y-0.5 hover:text-white hover:brightness-110 active:translate-y-0 active:shadow-none md:flex-none";
 
 export function DiagnosticTest({
   questions,
@@ -225,8 +225,8 @@ export function DiagnosticTest({
                 aria-label={sayFraction(option)}
                 className={`relative flex min-h-28 cursor-pointer items-center justify-center rounded-tile border-3 px-2 py-3 transition active:scale-[.98] md:min-h-[148px] md:py-4 ${
                   isSelected
-                    ? "border-primary bg-primary text-white shadow-[0_5px_0_var(--color-primary-dark)] md:shadow-3d"
-                    : "border-lavender bg-white text-ink shadow-[0_5px_0_var(--color-lavender)] hover:border-primary md:shadow-[0_6px_0_var(--color-lavender)]"
+                    ? "border-primary bg-primary text-white shadow-3d"
+                    : "border-lavender bg-white text-ink shadow-3d-soft hover:border-primary"
                 }`}
               >
                 {isSelected ? (
@@ -255,7 +255,7 @@ export function DiagnosticTest({
             type="button"
             onClick={() => setCurrent(current - 1)}
             aria-label="Өмнөх асуулт"
-            className="flex size-[60px] shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-surface text-lg font-bold text-ink shadow-[0_5px_0_var(--color-line)] transition active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-line)] md:w-auto md:px-7 md:shadow-3d-soft"
+            className="flex size-[60px] shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-surface text-lg font-bold text-ink shadow-3d-soft transition hover:-translate-y-0.5 active:translate-y-0 active:shadow-none md:w-auto md:px-7"
           >
             {ArrowLeftIcon}
             <span className="hidden md:inline">Өмнөх</span>

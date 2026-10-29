@@ -24,12 +24,12 @@ const STATUS_LABELS: Record<MapStatus, string> = {
 
 // Circle look per status; the current node overrides it.
 const circleStyles: Record<MapStatus, string> = {
-  untested: "bg-surface shadow-[0_8px_0_var(--color-lavender)]",
-  mastered: "bg-sky shadow-[0_8px_0_var(--color-sky-dark)]",
-  new: "bg-sky shadow-[0_8px_0_var(--color-sky-dark)]",
-  weak: "border-4 border-magenta bg-pink shadow-[0_8px_0_color-mix(in_srgb,var(--color-magenta)_30%,var(--color-pink))]",
-  learning: "bg-line shadow-[0_8px_0_var(--color-lavender)]",
-  good: "bg-lavender shadow-[0_8px_0_var(--color-line)]",
+  untested: "bg-surface shadow-3d-soft",
+  mastered: "bg-sky shadow-3d-soft",
+  new: "bg-sky shadow-3d-soft",
+  weak: "border-4 border-magenta bg-pink shadow-3d-soft",
+  learning: "bg-line shadow-3d-soft",
+  good: "bg-lavender shadow-3d-soft",
 };
 const currentStyle = "bg-primary text-white animate-pulse-ring";
 

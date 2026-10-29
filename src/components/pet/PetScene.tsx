@@ -39,7 +39,7 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
       </div>
       <span
         aria-hidden="true"
-        className="pet-scene-zz absolute top-19 right-20 text-base leading-none font-bold text-primary-dark md:top-22.5 md:right-auto md:left-[62%] md:text-xl"
+        className="pet-scene-zz absolute top-19 right-20 text-base leading-none font-bold text-night md:top-22.5 md:right-auto md:left-[62%] md:text-xl"
       >
         z <span className="text-2xl md:text-3xl">Z</span>
       </span>
@@ -70,14 +70,18 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
 // Fixed artwork colors from the design, like the sprites: the scene looks
 // the same in the dark theme.
 const C = {
-  sky: "#d2ebf4",
-  lavender: "#e0def7",
-  pink: "#fbecf5",
-  hill: "#d0cbeb",
-  ground: "#f2f1fb",
-  primary: "#7039d0",
-  magenta: "#b23886",
-  night: "#4f2e84",
+  sky: "#e6f5fc",
+  haze: "#eeedff",
+  pink: "#fcf1f7",
+  mountain: "#d9d5f5",
+  hill: "#dcd8f6",
+  ground: "#f2f1ff",
+  meadow: "#dad9ff",
+  grass: "#cac4f4",
+  primary: "#5b00ed",
+  bloomPink: "#f3b0d8",
+  bloomViolet: "#b9a8f5",
+  night: "#3f0791",
   white: "#ffffff",
 };
 
@@ -94,17 +98,17 @@ function sparkle(x: number, y: number, r: number) {
 const TREES = [[60, 392], [96, 384], [520, 394], [556, 388], [596, 398]];
 const GRASS = [[36, 512], [120, 500], [470, 500], [566, 512], [250, 540], [380, 546]];
 const FLOWERS: [number, number, string][] = [
-  [80, 520, C.magenta],
-  [190, 548, C.primary],
-  [452, 540, C.magenta],
-  [600, 530, C.primary],
-  [330, 560, C.magenta],
+  [80, 520, C.bloomPink],
+  [190, 548, C.bloomViolet],
+  [452, 540, C.bloomPink],
+  [600, 530, C.bloomViolet],
+  [330, 560, C.bloomPink],
 ];
 const SPARKLES: [number, number, number, string, number][] = [
-  [574, 58, 12, C.magenta, 0],
-  [96, 161, 9, C.primary, -0.8],
+  [574, 58, 12, C.bloomPink, 0],
+  [96, 161, 9, C.bloomViolet, -0.8],
   [250, 103, 7, C.white, -1.6],
-  [400, 52, 8, C.primary, -1.2],
+  [400, 52, 8, C.bloomViolet, -1.2],
   [610, 223, 7, C.white, -0.4],
 ];
 const STARS: [number, number, number, number][] = [
@@ -120,12 +124,12 @@ const STARS: [number, number, number, number][] = [
   [470, 230, 3, -0.2],
 ];
 const RISING: [number, number, number, string, number][] = [
-  [232, 470, 6, C.primary, 0],
-  [402, 476, 5, C.magenta, -1.4],
+  [232, 470, 6, C.bloomViolet, 0],
+  [402, 476, 5, C.bloomPink, -1.4],
   [286, 480, 4, C.white, -2.6],
   [360, 468, 6, C.white, -3.5],
-  [452, 482, 4, C.primary, -0.7],
-  [190, 484, 5, C.magenta, -4.2],
+  [452, 482, 4, C.bloomViolet, -0.7],
+  [190, 484, 5, C.bloomPink, -4.2],
 ];
 
 /** Sky, sun, clouds, hills, trees and meadow; a night sky and stars fade in when the pet is sleepy. */
@@ -140,7 +144,7 @@ function SceneArt() {
       <defs>
         <linearGradient id="pet-scene-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={C.sky} />
-          <stop offset=".52" stopColor={C.lavender} />
+          <stop offset=".52" stopColor={C.haze} />
           <stop offset=".8" stopColor={C.pink} />
         </linearGradient>
         <radialGradient id="pet-scene-glow">
@@ -172,12 +176,12 @@ function SceneArt() {
       {/* Mountains with snowy tops, then the near hill and its trees. */}
       <path
         d="M0 360L70 300l50 30 80-90 70 70 60-40 70 60 70-50 70 50 60-30 40 20V600H0z"
-        fill={C.hill}
-        opacity=".55"
+        fill={C.mountain}
+        opacity=".6"
       />
       <path d="M200 240l22 24-12-2-10 10-10-10-12 2z M470 280l18 20-10-2-8 8-8-8-10 2z" fill={C.white} opacity=".8" />
       <path d="M0 430C110 380 210 390 300 420s200-40 340-10V600H0z" fill={C.hill} />
-      <g fill={C.primary} opacity=".22">
+      <g fill={C.primary} opacity=".1">
         {TREES.map(([x, y]) => (
           <g key={`${x}-${y}`}>
             <rect x={x} y={y} width="14" height="14" />
@@ -190,10 +194,10 @@ function SceneArt() {
       {/* Light behind the pet, the meadow and the pet's spot. */}
       <ellipse cx="320" cy="400" rx="210" ry="170" fill="url(#pet-scene-spot)" />
       <path d="M0 500c140-32 500-32 640 0V600H0z" fill={C.ground} />
-      <path d="M0 524c160-26 480-26 640 0V600H0z" fill={C.lavender} opacity=".6" />
-      <ellipse cx="320" cy="490" rx="134" ry="22" fill={C.lavender} />
-      <ellipse cx="320" cy="488" rx="104" ry="13" fill={C.night} opacity=".16" />
-      <g fill={C.hill}>
+      <path d="M0 524c160-26 480-26 640 0V600H0z" fill={C.meadow} opacity=".4" />
+      <ellipse cx="320" cy="490" rx="134" ry="22" fill={C.meadow} />
+      <ellipse cx="320" cy="488" rx="104" ry="13" fill={C.night} opacity=".1" />
+      <g fill={C.grass}>
         {GRASS.map(([x, y]) => (
           <g key={`${x}-${y}`}>
             <rect x={x} y={y} width="6" height="10" />
@@ -204,7 +208,7 @@ function SceneArt() {
       </g>
       {FLOWERS.map(([x, y, color]) => (
         <g key={`${x}-${y}`}>
-          <rect x={x} y={y} width="3" height="10" fill={C.hill} />
+          <rect x={x} y={y} width="3" height="10" fill={C.grass} />
           <rect x={x - 3} y={y - 8} width="9" height="9" fill={color} />
         </g>
       ))}

@@ -123,16 +123,16 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, o
                 className={cn(
                   "inline-flex min-h-12 shrink-0 cursor-pointer items-center gap-2 rounded-full border-2 pr-3.5 pl-1.5 text-sm font-bold transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none md:min-h-13 md:pr-4.5 md:text-base",
                   on
-                    ? "border-primary bg-primary text-white shadow-[0_4px_0_var(--color-primary-dark)]"
-                    : "border-lavender bg-white text-ink shadow-[0_4px_0_var(--color-lavender)]",
+                    ? "border-primary bg-primary text-white shadow-3d"
+                    : "border-lavender bg-white text-ink shadow-3d-soft",
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
                     "flex size-8 shrink-0 items-center justify-center rounded-full border-2 md:size-9",
-                    f === "all" ? (on ? "bg-white text-primary" : "bg-primary text-white") : ELEMENT_COLORS[f],
-                    on ? "border-white" : f === "earth" ? "border-ink" : "border-transparent",
+                    f === "all" ? (on ? "bg-white text-primary" : "bg-tint-purple text-tint-purple-ink") : ELEMENT_COLORS[f],
+                    on ? "border-white" : "border-transparent",
                   )}
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="size-4 md:size-4.5">
@@ -167,7 +167,7 @@ export function PetCollection({ lines, owned, dropsFrom, myLineId, selectedId, o
                 onClick={() => select(line.id)}
                 className={cn(
                   "relative flex h-31 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-card border-3 px-1 py-2 text-ink transition-transform hover:-translate-y-0.75 active:translate-y-0.5 md:h-40 xl:h-49 xl:p-2",
-                  on ? "border-primary bg-white shadow-[0_5px_0_var(--color-primary-dark)]" : "border-surface bg-surface",
+                  on ? "border-primary bg-white shadow-pick" : "border-surface bg-surface",
                 )}
               >
                 <PetSprite
@@ -294,7 +294,7 @@ function PetDetail({ line, pet, pickedStage, onPickStage, onClose, dropsFrom, pe
                   onClick={() => onPickStage(i)}
                   className={cn(
                     "relative flex h-19.5 min-w-0 flex-1 cursor-pointer items-center justify-center rounded-card border-3 transition-transform hover:-translate-y-0.75 active:translate-y-0.5 xl:h-24",
-                    on ? "border-primary bg-white shadow-[0_4px_0_var(--color-primary-dark)]" : "border-surface bg-surface",
+                    on ? "border-primary bg-white shadow-pick" : "border-surface bg-surface",
                   )}
                 >
                   <PetSprite stage={form} size={64} />

@@ -6,8 +6,8 @@
  */
 
 .el-ring {
-  --el-a: #7039d0;
-  --el-b: #d2ebf4;
+  --el-a: #5b00ed;
+  --el-b: #e3f4fb;
   position: relative;
   isolation: isolate;
 }
