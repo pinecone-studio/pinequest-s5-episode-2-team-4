@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui";
+import { ButtonLink, PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { getDemoTour, getStudentAssignments } from "@/lib/data";
 import { gameTitle, isAssignmentGame } from "@/lib/gamefit";
@@ -28,9 +28,7 @@ export default async function StudentAssignmentsPage() {
 
       {sorted.length === 0 ? (
         <section className="rounded-panel border border-line bg-white p-6 text-center shadow-card">
-          <p className="text-4xl" aria-hidden="true">
-            🎉
-          </p>
+          <PixelIcon name="party" className="mx-auto size-12" />
           <h2 className="mt-2 text-xl font-bold">Одоогоор даалгавар алга</h2>
           <p className="mt-1 text-ink-muted">Багш даалгавар өгөхөөр энд гарна.</p>
           <ButtonLink href="/games" variant="secondary" size="sm" className="mt-4">
@@ -54,7 +52,7 @@ export default async function StudentAssignmentsPage() {
                     aria-hidden="true"
                     className={cn("flex size-12 shrink-0 items-center justify-center rounded-card text-2xl", a.done ? "bg-sky" : "bg-pink")}
                   >
-                    {a.done ? "✓" : "🎮"}
+                    {a.done ? "✓" : <PixelIcon name="gamepad" className="size-7" />}
                   </span>
                   <div className="min-w-0">
                     <h2 className="text-lg leading-snug font-bold">{a.title}</h2>
