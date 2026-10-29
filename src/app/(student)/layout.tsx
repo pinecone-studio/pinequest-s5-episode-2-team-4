@@ -63,7 +63,7 @@ export default async function StudentLayout({
         <PageTransition>{children}</PageTransition>
       </main>
       <StudentFooter pets={footerPets} />
-      <MobileNav petSprite={pet?.stage.sprite} counts={counts} />
+      <MobileNav counts={counts} />
       <AchievementWatcher />
     </>
   );

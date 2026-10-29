@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PetSprite } from "@/components/pet/PetSprite";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { ButtonLink } from "@/components/ui";
 import { cn } from "@/lib/cn";
@@ -60,15 +59,6 @@ export function SiteHeader({ pet: realPet, counts = {}, subject, coins, classNam
   const links: { href: string; label: string; icon: React.ReactNode; count?: number; countLabel?: string }[] = [
     { href: "/", label: "Нүүр", icon: <HomeIcon className={iconClass} />, count: counts.lesson, countLabel: "өнөөдрийн хичээлийн асуулт" },
     { href: "/videos", label: "Хичээл", icon: <BookIcon className={iconClass} />, count: counts.videos, countLabel: "шинэ видео" },
-    {
-      href: "/pets",
-      label: "Тэжээвэр",
-      icon: pet?.imageSrc ? (
-        <PetSprite stage={{ name: "", sprite: pet.imageSrc }} size={24} className="hidden shrink-0 xl:block" />
-      ) : (
-        <span aria-hidden="true" className="hidden size-6 shrink-0 rounded-full bg-lavender xl:block" />
-      ),
-    },
     { href: "/assignments", label: "Даалгавар", icon: <TaskIcon className={iconClass} />, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
   ];
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
