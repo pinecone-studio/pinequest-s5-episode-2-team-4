@@ -1,0 +1,11 @@
+/* The XP ring fills from empty when the page loads. Motion is switched off
+   globally by prefers-reduced-motion in globals.css. */
+.pet-chip-xp {
+  animation: pet-chip-fill 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s both;
+}
+
+@keyframes pet-chip-fill {
+  from {
+    stroke-dashoffset: 157.1;
+  }
+}

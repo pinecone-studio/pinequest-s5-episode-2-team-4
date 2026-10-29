@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PetSprite } from "@/components/pet/PetSprite";
-import { ProgressBar } from "@/components/ui";
+import "./PetChip.css";
 
 type PetChipProps = {
   name: string;
@@ -10,30 +10,58 @@ type PetChipProps = {
   imageSrc?: string;
 };
 
-/** Pet avatar with level and XP bar, links to /pets. */
+/** Length of the XP ring (r = 25), the dash that fills it. */
+const RING = 157.1;
+
+/**
+ * The pet in a circular XP ring with its level, links to /pets (design:
+ * header). Wide screens show the name and «60 / 100 XP» after the ring, phones
+ * the level and XP before it; laptops in between (lg to 1360px, next to the
+ * nav) show the ring alone.
+ */
 export function PetChip({ name, level, xpPercent, imageSrc }: PetChipProps) {
+  const xp = Math.min(100, Math.max(0, Math.round(xpPercent)));
   return (
     <Link
       href="/pets"
-      aria-label={`${name}, түвшин ${level}, ${xpPercent} XP`}
-      className="inline-flex h-13 items-center gap-2 rounded-full bg-surface pr-4 pl-0.5 text-ink no-underline hover:text-ink md:h-14 md:gap-2.5 md:pr-4.5 md:pl-1"
+      aria-label={`${name}, түвшин ${level}, 100-аас ${xp} XP`}
+      className="flex min-h-14 shrink-0 flex-row-reverse items-center gap-2.5 rounded-full pl-3 text-ink no-underline hover:bg-surface hover:text-ink lg:flex-row lg:pl-0 min-[1360px]:gap-3 min-[1360px]:pr-4"
     >
-      {imageSrc ? (
-        <PetSprite stage={{ name, sprite: imageSrc }} size={48} />
-      ) : (
-        <span aria-hidden="true" className="size-12 rounded-full bg-lavender" />
-      )}
-      <span className="flex flex-col gap-1.25">
-        <span className="text-sm leading-none font-bold">
-          Түв. {level}
+      <span className="relative size-14 shrink-0">
+        <svg viewBox="0 0 56 56" aria-hidden="true" className="absolute inset-0 size-full -rotate-90">
+          <circle cx="28" cy="28" r="25" strokeWidth="5" className="fill-card stroke-line" />
+          <circle
+            cx="28"
+            cy="28"
+            r="25"
+            fill="none"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeDasharray={RING}
+            strokeDashoffset={RING * (1 - xp / 100)}
+            className={xp > 0 ? "pet-chip-xp stroke-primary" : "hidden"}
+          />
+        </svg>
+        {imageSrc ? (
+          <PetSprite stage={{ name, sprite: imageSrc }} size={48} className="absolute top-1 left-1 animate-bob" />
+        ) : (
+          <span aria-hidden="true" className="absolute inset-1.5 rounded-full bg-lavender" />
+        )}
+        <span
+          aria-hidden="true"
+          className="absolute -right-1 -bottom-1 flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-card bg-ink px-1.5 text-xs leading-none font-bold text-white"
+        >
+          {level}
         </span>
-        <ProgressBar
-          value={xpPercent}
-          label="XP"
-          size="sm"
-          track="white"
-          className="w-15 md:w-20"
-        />
+      </span>
+      <span aria-hidden="true" className="flex flex-col items-end gap-0.5 leading-tight lg:items-start lg:max-[1360px]:hidden">
+        <span className="text-sm font-bold lg:text-base">
+          <span className="lg:hidden">Түв. {level}</span>
+          <span className="hidden lg:inline">{name}</span>
+        </span>
+        <span className="text-xs font-medium whitespace-nowrap text-ink-muted">
+          <span className="font-bold text-primary">{xp}</span> / 100<span className="hidden lg:inline"> XP</span>
+        </span>
       </span>
     </Link>
   );

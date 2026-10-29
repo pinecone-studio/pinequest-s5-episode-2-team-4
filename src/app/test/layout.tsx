@@ -10,18 +10,17 @@ export default async function TestLayout({ children }: LayoutProps<"/test">) {
 
   return (
     <>
-      <div className="hidden md:block">
-        <SiteHeader
-          pet={
-            pet && {
-              name: pet.stage.name,
-              level: pet.level,
-              xpPercent: pet.xp,
-              imageSrc: pet.stage.sprite,
-            }
+      <SiteHeader
+        className="hidden md:block"
+        pet={
+          pet && {
+            name: pet.stage.name,
+            level: pet.level,
+            xpPercent: pet.xp,
+            imageSrc: pet.stage.sprite,
           }
-        />
-      </div>
+        }
+      />
       <main className="flex-1">{children}</main>
       <div className="mt-8 md:mt-16">
         <SiteFooter />

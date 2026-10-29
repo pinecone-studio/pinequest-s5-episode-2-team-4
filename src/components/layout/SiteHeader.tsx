@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PetSprite } from "@/components/pet/PetSprite";
 import { usePetPreview } from "@/components/pet/petPreview";
+import { ButtonLink } from "@/components/ui";
 import { logOut } from "@/lib/actions";
+import { cn } from "@/lib/cn";
 import { Logo } from "./Logo";
 import { NavPill } from "./NavPill";
 import { NavBadge } from "./NavBadge";
+import { BookIcon, HomeIcon, PlayIcon, TaskIcon } from "./navIcons";
 import { PetChip } from "./PetChip";
 
 export type NavCounts = {
@@ -16,27 +20,30 @@ export type NavCounts = {
   assignments?: number;
 };
 
-const NAV_LINKS: { href: string; label: string; count?: keyof NavCounts; countLabel?: string }[] = [
-  { href: "/games", label: "Тоглоом" },
-  { href: "/pets", label: "Тэжээвэр" },
-  { href: "/videos", label: "Видео хичээл", count: "videos", countLabel: "шинэ видео" },
-  { href: "/assignments", label: "Даалгавар", count: "assignments", countLabel: "биелүүлээгүй даалгавар" },
-];
-
 // No display or padding here: each link sets its own, so a `hidden`
-// never clashes with `inline-flex`.
-const navLinkClass =
-  "min-h-12 items-center rounded-full font-semibold text-ink no-underline transition-colors duration-200 hover:bg-white/60 hover:text-ink";
+// never clashes with `inline-flex`. Colours are separate because `cn`
+// doesn't resolve clashing utilities.
+const navLinkClass = "min-h-12 items-center rounded-full no-underline transition-colors duration-200";
+const idleClass = "font-semibold text-ink hover:bg-surface hover:text-ink";
+// Nav icons from xl: on smaller laptops the labels alone fit.
+const iconClass = "hidden size-5 xl:block";
 
 type SiteHeaderProps = {
   pet?: React.ComponentProps<typeof PetChip>;
   counts?: NavCounts;
   /** The subject being studied, e.g. "Математик"; links to /subject to change it. */
   subject?: string;
+  className?: string;
 };
 
-/** Header for student pages. Nav links move to MobileNav below lg (they don't fit on tablets). */
-export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderProps) {
+/**
+ * Header for student pages (design: header), a floating bar that stays at
+ * the top. Nav links and «Тоглох» move to MobileNav below lg (they don't fit
+ * on tablets); the logo, subject, pet and logout stay. On smaller laptops the
+ * bar drops the nav icons and the subject (below xl) and the pet's name (below
+ * 1360px, where the bar reaches its full width).
+ */
+export function SiteHeader({ pet: realPet, counts = {}, subject, className }: SiteHeaderProps) {
   const pathname = usePathname();
   // The /pets evolution demo shows each stage here too.
   const preview = usePetPreview();
@@ -45,70 +52,71 @@ export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderPro
       ? { ...realPet, name: preview.name, level: preview.level, imageSrc: preview.sprite }
       : realPet;
 
+  const links: { href: string; label: string; icon: React.ReactNode; count?: number; countLabel?: string }[] = [
+    { href: "/", label: "Нүүр", icon: <HomeIcon className={iconClass} /> },
+    { href: "/videos", label: "Хичээл", icon: <BookIcon className={iconClass} />, count: counts.videos, countLabel: "шинэ видео" },
+    {
+      href: "/pets",
+      label: "Тэжээвэр",
+      icon: pet?.imageSrc ? (
+        <PetSprite stage={{ name: "", sprite: pet.imageSrc }} size={24} className="hidden shrink-0 xl:block" />
+      ) : (
+        <span aria-hidden="true" className="hidden size-6 shrink-0 rounded-full bg-lavender xl:block" />
+      ),
+    },
+    { href: "/assignments", label: "Даалгавар", icon: <TaskIcon className={iconClass} />, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
+  ];
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
   return (
     // Named so it stays put while the page below animates (globals.css).
     <header
       style={{ viewTransitionName: "site-header" }}
-      className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]"
+      className={cn("sticky top-0 z-20 px-3 pt-2.5 md:px-[clamp(16px,4vw,40px)] md:pt-4", className)}
     >
-      <div className="flex items-center gap-6">
-        <Link
-          href="/"
-          aria-label="LevelUp — нүүр"
-          className="flex min-h-12 items-center no-underline"
-        >
+      <div className="mx-auto flex h-17 w-full max-w-7xl items-center justify-between gap-2.5 rounded-full border border-line bg-white/90 pr-1.5 pl-4 shadow-card backdrop-blur-md lg:h-19 lg:gap-4 lg:pr-2.5 lg:pl-5.5">
+        <Link href="/" aria-label="LevelUp — нүүр" className="flex min-h-12 shrink-0 items-center no-underline">
           <Logo />
         </Link>
-        <nav aria-label="Үндсэн цэс" className="hidden gap-1 lg:flex">
-          {NAV_LINKS.map((link) => {
-            const active = pathname.startsWith(link.href);
+        <nav aria-label="Үндсэн цэс" className="hidden flex-1 justify-center gap-1 lg:flex xl:gap-1.5">
+          {links.map((link) => {
+            const active = isActive(link.href);
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`${navLinkClass} relative isolate inline-flex gap-2 px-4 whitespace-nowrap xl:px-5`}
+                className={cn(
+                  navLinkClass,
+                  "relative isolate inline-flex gap-2 px-3 whitespace-nowrap min-[1360px]:px-4",
+                  active ? "font-bold text-primary hover:text-primary" : idleClass,
+                )}
               >
                 {active && <NavPill name="header-pill" />}
+                {link.icon}
                 {link.label}
-                {link.count && (
-                  <NavBadge count={counts[link.count] ?? 0} label={`${counts[link.count] ?? 0} ${link.countLabel}`} />
-                )}
+                {link.count ? <NavBadge count={link.count} label={`${link.count} ${link.countLabel}`} /> : null}
               </Link>
             );
           })}
         </nav>
-      </div>
-      <div className="flex items-center gap-2">
-        <Link
-          href="/subject"
-          aria-label={subject ? `Хичээл: ${subject}. Солих` : "Хичээл сонгох"}
-          aria-current={pathname === "/subject" ? "page" : undefined}
-          className={`${navLinkClass} hidden gap-1.5 bg-surface px-4 text-sm sm:inline-flex`}
-        >
-          {subject ?? "Хичээл сонгох"}
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="size-4 text-ink-muted"
+        <div className="flex shrink-0 items-center gap-1.5 lg:gap-2">
+          <ButtonLink
+            href="/games"
+            size="sm"
+            aria-current={pathname.startsWith("/games") ? "page" : undefined}
+            className="max-lg:hidden"
           >
-            <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
-          </svg>
-        </Link>
-        {pet && <PetChip {...pet} />}
-        {/* No teacher link: only students see this header, and /teacher sends them home. */}
-        <form action={logOut}>
-          {/* Icon only on mobile, where the header is tight. */}
-          <button
-            type="submit"
-            aria-label="Гарах"
-            className={`${navLinkClass} inline-flex min-w-12 cursor-pointer justify-center gap-2 px-3 text-sm md:px-4`}
+            <PlayIcon className="size-4.5" />
+            Тоглох
+          </ButtonLink>
+          <Link
+            href="/subject"
+            aria-label={subject ? `Хичээл: ${subject}. Солих` : "Хичээл сонгох"}
+            aria-current={pathname === "/subject" ? "page" : undefined}
+            className={cn(navLinkClass, idleClass, "hidden gap-1.5 bg-surface px-4 text-sm sm:inline-flex lg:hidden xl:inline-flex")}
           >
+            {subject ?? "Хичээл сонгох"}
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -117,15 +125,38 @@ export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderPro
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"
-              className="size-5"
+              className="size-4 text-ink-muted"
             >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <path d="m16 17 5-5-5-5" />
-              <path d="M21 12H9" />
+              <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
             </svg>
-            <span className="hidden md:inline">Гарах</span>
-          </button>
-        </form>
+          </Link>
+          <span aria-hidden="true" className="mx-1 hidden h-9 w-px bg-line lg:block" />
+          {pet && <PetChip {...pet} />}
+          {/* No teacher link: only students see this header, and /teacher sends them home. */}
+          <form action={logOut}>
+            <button
+              type="submit"
+              aria-label="Гарах"
+              title="Гарах"
+              className={cn(navLinkClass, idleClass, "inline-flex min-w-12 cursor-pointer justify-center px-3")}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="size-5"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="m16 17 5-5-5-5" />
+                <path d="M21 12H9" />
+              </svg>
+            </button>
+          </form>
+        </div>
       </div>
     </header>
   );
