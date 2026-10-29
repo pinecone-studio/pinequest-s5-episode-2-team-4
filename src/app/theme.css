@@ -29,8 +29,9 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --color-ink: #ece7f9;
-  --color-ink-muted: #b3a6c9;
+  /* White text, and small text in the lavender white that main text used to be. */
+  --color-ink: #ffffff;
+  --color-ink-muted: #ece7f9;
   --color-surface: #262136;
   --color-surface-soft: #171320;
   --color-lavender: #3a324e;
