@@ -948,19 +948,23 @@ export async function getClassSchedule(): Promise<ClassSchedule | undefined> {
 
 /**
  * The open class's signals of the last two weeks, newest day first, with the
- * topic titles. Demo teachers see today's sample lesson.
+ * topic titles; `beforeToday` leaves today out. Demo teachers see the sample
+ * lesson on a few days.
  */
-export async function getLessonDaySignals(): Promise<LessonDaySignals[]> {
+export async function getLessonDaySignals({ beforeToday = false } = {}): Promise<LessonDaySignals[]> {
   await io();
+  const keep = (days: LessonDaySignals[]) => (beforeToday ? days.filter((d) => d.day < learningDay()) : days);
   const user = await getCurrentUser();
   const active = await getActiveClass();
   const title = (key: string) => topicTitle(key) ?? key;
   if (!active || user?.demo || active.id === "demo" || !signalsStored()) {
-    return [{ day: learningDay(), rows: summarizeSignals(signals).map((s) => ({ ...s, title: title(s.subtopicId) })) }];
+    // The sample lesson today, and on two earlier lesson days.
+    const rows = summarizeSignals(signals).map((s) => ({ ...s, title: title(s.subtopicId) }));
+    return keep([0, -2, -5].map((offset) => ({ day: shiftDay(learningDay(), offset), rows })));
   }
   try {
     const days = await listSignalsSince(active.code, shiftDay(learningDay(), -(HISTORY_DAYS - 1)));
-    return days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) }));
+    return keep(days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) })));
   } catch (error) {
     console.error(error);
     return [];
