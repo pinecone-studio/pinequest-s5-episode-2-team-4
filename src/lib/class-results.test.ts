@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextStep, share, summarizeRow } from "./class-results";
+import { hardestSubtopic, nextStep, share, summarizeResults, summarizeRow } from "./class-results";
 import type { HeatmapStatus } from "./types";
 
 // One letter per student: W weak, L learning, G good, - not tested.
@@ -55,5 +55,27 @@ describe("nextStep", () => {
 
   it("moves on when most students are good", () => {
     expect(nextStep({ weak: 1, learning: 2, good: 7 }, 10)).toBe("next");
+  });
+});
+
+describe("summarizeResults and hardestSubtopic", () => {
+  const rows = [
+    row("a", "WLLGGGGGGG"),
+    row("b", "WWWLGGGGGG"),
+    row("c", "WWWLLLGGGG"),
+  ];
+
+  it("lists the subtopic with the most weak students first, then most learning", () => {
+    expect(summarizeResults(rows).map((r) => r.subtopicId)).toEqual(["c", "b", "a"]);
+  });
+
+  it("picks the top subtopic as the hardest", () => {
+    expect(hardestSubtopic(summarizeResults(rows))?.subtopicId).toBe("c");
+  });
+
+  it("picks none when everyone is good or there are too few results", () => {
+    expect(hardestSubtopic(summarizeResults([row("a", "GGGGG")]))).toBeUndefined();
+    expect(hardestSubtopic(summarizeResults([row("a", "WWW")]))).toBeUndefined();
+    expect(hardestSubtopic([])).toBeUndefined();
   });
 });
