@@ -26,6 +26,7 @@ import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
 import { readSession, writeSession } from "./session";
 import { recordLearningDay } from "./streak";
+import { recordMistake } from "./mistake-records";
 import type { BattleAnswerOutcome, BattleState, EnglishAnswer, HatchResult } from "./types";
 
 async function student() {
@@ -169,7 +170,8 @@ export async function submitBattleAnswer(
     const session = await readSession();
     if (session) {
       const streak = recordLearningDay(session.streak);
-      if (streak !== session.streak) await writeSession({ ...session, streak });
+      const mistakes = recordMistake(session.mistakes, "battle", questionId, answer, result.outcome.correct);
+      if (streak !== session.streak || mistakes !== session.mistakes) await writeSession({ ...session, streak, mistakes });
     }
   }
   return result;

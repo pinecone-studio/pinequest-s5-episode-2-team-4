@@ -8,6 +8,7 @@ import { cache } from "react";
 import { type AccountProgress, findAccountById, saveAccount } from "./accounts";
 import type { User, UserPet } from "./types";
 import type { LearningStreak } from "./streak";
+import type { MistakeRecords } from "./mistake-records";
 
 /** Who is logged in: the account id. */
 const SESSION_COOKIE_NAME = "levelup-session";
@@ -16,6 +17,7 @@ const OLD_ACCOUNTS_COOKIE_NAME = "levelup-accounts";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export type Account = {
+  mistakes?: MistakeRecords;
   id: string;
   streak?: LearningStreak;
   username: string;

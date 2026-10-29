@@ -39,7 +39,7 @@ function empty(): EnglishProgress {
   };
 }
 
-export async function englishProgress(user: User): Promise<EnglishProgress> {
+export async function englishProgress(user: User, mistakeLimit = MISTAKES_SHOWN): Promise<EnglishProgress> {
   const player = await findPlayer(user.username);
   if (!player) return empty();
 
@@ -83,7 +83,7 @@ export async function englishProgress(user: User): Promise<EnglishProgress> {
   // Rows are newest first; a mistake counts until the question is answered right.
   summary.mistakes = rows
     .filter((row) => row.last_correct === false)
-    .slice(0, MISTAKES_SHOWN)
+    .slice(0, mistakeLimit)
     .flatMap((row) => {
       const q = byId.get(row.question_id);
       if (!q) return [];
