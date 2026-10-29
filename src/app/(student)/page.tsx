@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/ui";
 import {
   getClassGoal,
   getClassVideos,
+  getDailyQuests,
   getLearningStreak,
   getCurrentPet,
   getPetLines,
@@ -12,10 +13,13 @@ import {
   getStudentAssignments,
   getStudentClasses,
   getSubtopics,
+  getTodayLesson,
   getTopic,
 } from "@/lib/data";
 import { ClassNotice } from "./_home/ClassNotice";
+import { DailyQuestsCard } from "./_home/DailyQuestsCard";
 import { HomeHero } from "./_home/HomeHero";
+import { LessonCheckCard } from "./_home/LessonCheckCard";
 import { TeacherCard } from "./_home/TeacherCard";
 import { TopicMap } from "./_home/TopicMap";
 
@@ -23,7 +27,7 @@ const TOPIC_ID = "fractions";
 const ORBIT_PET_IDS = ["dollfin", "agnite", "anoleaf", "tweesher", "cardiling"];
 
 export default async function HomePage() {
-  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes] =
+  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes, lesson, quests] =
     await Promise.all([
       getTopic(TOPIC_ID),
       getSubtopics(TOPIC_ID),
@@ -35,6 +39,8 @@ export default async function HomePage() {
       getStudentAssignments(),
       getClassVideos(),
       getStudentClasses(),
+      getTodayLesson(),
+      getDailyQuests(),
     ]);
   if (!topic || !pet) notFound();
 
@@ -51,14 +57,15 @@ export default async function HomePage() {
   });
 
   return (
-    // The animated background runs up under the transparent header.
-    <div className="relative -mt-18 animate-flow overflow-hidden bg-flow pt-18 pb-16 md:-mt-22 md:pt-22">
+    // The pixel landscape behind the page comes from the student layout (LandscapeBackdrop).
+    <div className="relative overflow-hidden pb-16">
       <div className="mx-auto max-w-7xl px-4 md:px-[clamp(16px,4vw,40px)]">
         <HomeHero
           pet={{ stage: pet.stage, level: pet.level }}
           testTaken={testTaken}
           orbitPets={orbitPets}
         />
+        {lesson && <LessonCheckCard lesson={lesson} />}
         <StreakCard streak={streak} />
         <section className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-panel border border-line bg-white p-5 md:mb-10 md:p-7">
           <div>
@@ -67,6 +74,7 @@ export default async function HomePage() {
           </div>
           <ButtonLink href="/mistakes" size="sm">Дэвтрээ нээх →</ButtonLink>
         </section>
+        {quests.length > 0 && <DailyQuestsCard quests={quests} />}
         {classes.length ? (
           <TeacherCard
             assignmentsLeft={assignments.filter((a) => !a.done).length}

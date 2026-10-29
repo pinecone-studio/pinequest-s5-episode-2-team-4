@@ -59,6 +59,12 @@ const TABS: Tab[] = [
     icon: <path d="M12 22c6.23-.05 7.87-5.57 7.5-10-.36-4.34-3.95-9.96-7.5-10-3.55.04-7.14 5.66-7.5 10-.37 4.43 1.27 9.95 7.5 10z" />,
   },
   {
+    href: "/pets/shop",
+    label: "Дэлгүүр",
+    iconColors: "bg-tint-purple text-tint-purple-ink",
+    icon: <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" />,
+  },
+  {
     href: "/pets/progress",
     label: "Ахиц",
     iconColors: "bg-tint-violet text-tint-violet-ink",
@@ -73,8 +79,8 @@ const TABS: Tab[] = [
 ];
 
 /**
- * Tabs for the Pets area (pets and collection, bosses, joining, eggs, English
- * progress, battle history): one track under the header, each tab an icon in
+ * Tabs for the Pets area (pets and collection, bosses, joining, eggs, the
+ * shop, progress, battle history): one track under the header, each tab an icon in
  * a coloured circle, and a purple pill that slides to the current tab.
  */
 export function PetsTabs({ eggCount }: { eggCount: number }) {

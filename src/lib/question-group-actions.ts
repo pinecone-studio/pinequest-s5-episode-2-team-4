@@ -16,9 +16,11 @@ async function asTeacher(change: (classCode: string) => Promise<void>): Promise<
   const user = await getCurrentUser();
   if (user?.role !== "teacher") return { error: "login" };
   if (!questionsStored()) return { error: "offline" };
+  // The same class the dashboard shows.
+  const classCode = await questionClass();
+  if (!classCode) return { error: "failed" };
   try {
-    // The same class the dashboard shows.
-    await change(await questionClass());
+    await change(classCode);
   } catch (error) {
     console.error(error);
     return { error: "failed" };

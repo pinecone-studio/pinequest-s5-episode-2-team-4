@@ -6,6 +6,7 @@
 // (pages, layouts) and pass the result to Client Components as props.
 
 import { io } from "next/cache";
+import { cache } from "react";
 import {
   activeGroupBattleId,
   activeSoloBattleId,
@@ -45,15 +46,42 @@ import {
   countClassMembers,
   findInviteClass,
   listClassMembers,
+  listClassTestAnswers,
   listStudentClasses,
   listTeacherClasses,
 } from "./classes";
+import { type AchievementStats, achievementList } from "./achievements";
+import { questsWithProgress } from "./quests";
+import { findShopItem, shopEntries } from "./shop";
 import { readSession } from "./session";
-import { findSignal, listDaySignals, signalsStored, summarizeSignals } from "./signals";
-import { learningDay, streakSummary } from "./streak";
+import { classOverviewFrom, heatmapFrom, progressFrom, scoreTest, type ClassProgress } from "./scoring";
+import { findSignal, listDaySignals, listSignalsBetween, signalsStored, summarizeSignals } from "./signals";
+import { getLessonDays, listPlans } from "./schedule";
+import {
+  curriculumTopics,
+  isCustomTopic,
+  isoWeekday,
+  recentWeeks,
+  topicTitle,
+  upcomingLessonDays,
+} from "./lesson-topics";
+import { learningDay, shiftDay, streakSummary } from "./streak";
 import type {
+  AchievementProgress,
+  DailyQuest,
+  ShopEntry,
+  ShopItem,
   Assignment,
+  AssignmentDraft,
+  ClassSchedule,
+  LessonDaySignals,
+  LessonTopic,
+  TodayLesson,
+  WeekSignals,
   AssignmentReport,
+  ClassOverview,
+  HeatmapRow,
+  TeacherNotification,
   CurriculumChapter,
   LessonVideo,
   Material,
@@ -154,6 +182,69 @@ export async function getPetLine(id: string): Promise<PetLine | undefined> {
   return petLines.find((l) => l.id === id);
 }
 
+/** The current student's coins (0 until they earn some). */
+export async function getCoins(): Promise<number> {
+  const session = await readSession();
+  return session?.role === "student" ? (session.coins ?? 0) : 0;
+}
+
+/** Today's daily quests with the student's progress (none for teachers). */
+export async function getDailyQuests(): Promise<DailyQuest[]> {
+  const session = await readSession();
+  if (session?.role !== "student") return [];
+  return questsWithProgress(session.quests, Boolean(session.classCode));
+}
+
+/**
+ * What achievements count for the current student: their saved progress plus
+ * boss wins, eggs and pets from the battle tables. Undefined for teachers.
+ */
+export async function getAchievementStats(): Promise<AchievementStats | undefined> {
+  const [session, user] = await Promise.all([readSession(), getCurrentUser()]);
+  if (session?.role !== "student" || !user) return undefined;
+  const [history, collection] = await Promise.all([battleHistory(user), petCollection(user)]);
+  return {
+    testTaken: Object.keys(session.testAnswers ?? {}).length > 0 ? 1 : 0,
+    longestStreak: session.streak?.longest ?? 0,
+    practiceSolved: session.practiceSolved?.length ?? 0,
+    mastered: session.mastered?.length ?? 0,
+    gamesPlayed: session.gamesPlayed ?? 0,
+    bossWins: history.victories,
+    eggsWon: history.eggs,
+    petsCollected: collection.pets.length,
+    petLevel: session.pet?.level ?? 0,
+    videosSeen: session.videosSeen?.length ?? 0,
+    assignmentsDone: session.assignmentsRewarded?.length ?? 0,
+  };
+}
+
+/** Every achievement with the current student's progress (none for teachers). */
+export async function getAchievements(): Promise<AchievementProgress[]> {
+  const [stats, session] = await Promise.all([getAchievementStats(), readSession()]);
+  return stats ? achievementList(stats, session?.achievements) : [];
+}
+
+/** The pet shop for the current student: every item with owned and worn, and their coins. */
+export async function getShop(): Promise<{ items: ShopEntry[]; coins: number } | undefined> {
+  const session = await readSession();
+  if (session?.role !== "student") return undefined;
+  return { items: shopEntries(session.shop), coins: session.coins ?? 0 };
+}
+
+/** The shop items the current student wears: a scene, a ring colour and an aura (each optional). */
+export async function getEquippedItems(): Promise<{
+  scene?: Extract<ShopItem, { slot: "scene" }>;
+  ring?: Extract<ShopItem, { slot: "ring" }>;
+  aura?: Extract<ShopItem, { slot: "aura" }>;
+}> {
+  const equipped = (await readSession())?.shop?.equipped ?? {};
+  const pick = <S extends ShopItem["slot"]>(slot: S) => {
+    const item = equipped[slot] ? findShopItem(equipped[slot]) : undefined;
+    return item?.slot === slot ? (item as Extract<ShopItem, { slot: S }>) : undefined;
+  };
+  return { scene: pick("scene"), ring: pick("ring"), aura: pick("aura") };
+}
+
 /** The current user's pet with its line and the stage for its level. */
 export async function getCurrentPet() {
   const pet = (await readSession())?.pet;
@@ -188,13 +279,7 @@ export async function getSubtopic(id: string): Promise<Subtopic | undefined> {
  */
 export async function getProgress(): Promise<SubtopicProgress[]> {
   const [result, session] = await Promise.all([getTestResult(), readSession()]);
-  const mastered = new Set(session?.mastered);
-  return (
-    result?.subtopics.map(({ subtopicId, status }) => ({
-      subtopicId,
-      status: mastered.has(subtopicId) ? "mastered" : status,
-    })) ?? []
-  );
+  return progressFrom(result, session?.mastered);
 }
 
 export async function getTestQuestions(topicId: string) {
@@ -208,35 +293,7 @@ export async function getTestQuestions(topicId: string) {
  * Undefined until the test is taken.
  */
 export async function getTestResult(): Promise<TestResult | undefined> {
-  const answers = (await readSession())?.testAnswers;
-  const answered = testQuestions.filter((q) => answers?.[q.id] !== undefined);
-  if (!answers || answered.length === 0) return undefined;
-
-  const topicId =
-    topics.find((t) => t.subtopicIds.includes(answered[0].subtopicId))?.id ?? "";
-  const scores = subtopics
-    .filter((s) => s.topicId === topicId)
-    .sort((a, b) => a.order - b.order)
-    .map((s) => {
-      const questions = testQuestions.filter((q) => q.subtopicId === s.id);
-      const correct = questions.filter((q) => answers[q.id] === q.correctIndex).length;
-      return {
-        subtopicId: s.id,
-        status: correct === questions.length ? ("good" as const) : ("weak" as const),
-        correct,
-        total: questions.length,
-      };
-    })
-    .filter((s) => s.total > 0)
-    // Stable sort keeps the topic order for equal scores.
-    .sort((a, b) => a.correct / a.total - b.correct / b.total);
-
-  return {
-    topicId,
-    correct: scores.reduce((sum, s) => sum + s.correct, 0),
-    total: scores.reduce((sum, s) => sum + s.total, 0),
-    subtopics: scores,
-  };
+  return scoreTest((await readSession())?.testAnswers);
 }
 
 /**
@@ -285,15 +342,16 @@ export async function getRetestQuestions(subtopicId: string): Promise<Question[]
   ];
 }
 
-/** Demo answers that fill the diagnostic test (5/8). */
-export async function getSampleTestAnswers(): Promise<Record<string, number>> {
-  return sampleTestAnswers;
+/** Demo answers that fill the diagnostic test (5/8); demo accounts only. */
+export async function getSampleTestAnswers(): Promise<Record<string, number> | undefined> {
+  return (await getCurrentUser())?.demo ? sampleTestAnswers : undefined;
 }
 
-/** Demo answers that pass a subtopic's retest: all correct. */
+/** Demo answers that pass a subtopic's retest: all correct; demo accounts only. */
 export async function getSampleRetestAnswers(
   subtopicId: string,
-): Promise<Record<string, number>> {
+): Promise<Record<string, number> | undefined> {
+  if (!(await getCurrentUser())?.demo) return undefined;
   const questions = await getRetestQuestions(subtopicId);
   return Object.fromEntries(questions.map((q) => [q.id, q.correctIndex]));
 }
@@ -434,20 +492,56 @@ export async function checkEnglishQuestion(
 
 // Teacher
 
-export async function getClassOverview() {
-  return classOverview;
+/** The topic the teacher dashboard shows results for. */
+const DASHBOARD_TOPIC = "fractions";
+
+/**
+ * A real teacher's open class and each student's test progress (undefined
+ * until they take the test), in student number order. Undefined for demo
+ * accounts and servers without Supabase, which show the sample class.
+ */
+const realClassResults = cache(
+  async (): Promise<{ code: string; students: ClassProgress } | undefined> => {
+    const user = await getCurrentUser();
+    if (user?.role !== "teacher" || user.demo || !classesStored()) return undefined;
+    const active = await getActiveClass();
+    if (!active) return { code: "", students: [] };
+    try {
+      const rows = await listClassTestAnswers(active.id);
+      return {
+        code: active.code,
+        students: rows.map((r) => {
+          const result = scoreTest(r.testAnswers);
+          return result && progressFrom(result, r.mastered);
+        }),
+      };
+    } catch (error) {
+      console.error(error);
+      return { code: active.code, students: [] };
+    }
+  },
+);
+
+/** The class's test results in numbers; the sample class for demo accounts. */
+export async function getClassOverview(): Promise<ClassOverview> {
+  const real = await realClassResults();
+  return real ? classOverviewFrom(real.code, DASHBOARD_TOPIC, real.students) : classOverview;
 }
 
-export async function getHeatmap() {
-  return heatmap;
+/** Per subtopic, each student's status (numbered, never named); the sample class for demo accounts. */
+export async function getHeatmap(): Promise<HeatmapRow[]> {
+  const real = await realClassResults();
+  return real ? heatmapFrom(DASHBOARD_TOPIC, real.students) : heatmap;
 }
 
-export async function getAssignmentDraft() {
-  return assignmentDraft;
+/** The sample draft assignment, for demo accounts only. */
+export async function getAssignmentDraft(): Promise<AssignmentDraft | undefined> {
+  return (await realClassResults()) ? undefined : assignmentDraft;
 }
 
-export async function getNotifications() {
-  return notifications;
+/** Sample notifications for demo accounts; real classes have none yet. */
+export async function getNotifications(): Promise<TeacherNotification[]> {
+  return (await realClassResults()) ? [] : notifications;
 }
 
 /** Per student, the XP the class goal asks for: two pet levels each. */
@@ -481,38 +575,52 @@ export async function getClassGoal(): Promise<ClassGoal | undefined> {
 
 // Anonymous questions (answered by the teacher or classmates, not the AI)
 
-/** Class whose questions a user sees; the demo class when they have none. */
-export async function questionClass() {
-  return (await getCurrentUser())?.classCode ?? classOverview.code;
+/** A logged-in account that isn't a demo: it only ever sees real data. */
+async function isRealAccount() {
+  const user = await getCurrentUser();
+  return Boolean(user && !user.demo);
 }
 
 /**
- * Stored questions when Supabase is set up; the sample questions otherwise,
- * and also if loading fails (e.g. the 0011 migration hasn't been run yet),
- * so the lesson and dashboard always show something.
+ * Class whose questions a user sees: their own; the demo class for demo
+ * accounts without one. Undefined for a real account without a class, so
+ * its questions never land in the demo class.
+ */
+export async function questionClass(): Promise<string | undefined> {
+  const user = await getCurrentUser();
+  return user?.classCode ?? (user && !user.demo ? undefined : classOverview.code);
+}
+
+/**
+ * Stored questions of the user's class. Demo accounts (and a server without
+ * Supabase, or one where loading fails) see the sample questions; a real
+ * account never does, and has none without a class.
  */
 export async function getAnonQuestions(subtopicId?: string): Promise<AnonQuestion[]> {
-  if (questionsStored()) {
+  const [real, classCode] = await Promise.all([isRealAccount(), questionClass()]);
+  if (questionsStored() && classCode) {
     try {
-      return await listQuestions(await questionClass(), subtopicId);
+      return await listQuestions(classCode, subtopicId);
     } catch (error) {
       console.error(error);
     }
   }
+  if (real) return [];
   return subtopicId
     ? anonQuestions.filter((q) => q.subtopicId === subtopicId)
     : anonQuestions;
 }
 
 export async function getQuestionGroups(): Promise<QuestionGroup[]> {
-  if (questionsStored()) {
+  const [real, classCode] = await Promise.all([isRealAccount(), questionClass()]);
+  if (questionsStored() && classCode) {
     try {
-      return await listGroups(await questionClass());
+      return await listGroups(classCode);
     } catch (error) {
       console.error(error);
     }
   }
-  return questionGroups;
+  return real ? [] : questionGroups;
 }
 
 // Understanding signals (🟢🟡🔴 sent by students during a lesson)
@@ -520,7 +628,8 @@ export async function getQuestionGroups(): Promise<QuestionGroup[]> {
 /**
  * Today's 🟢/🟡/🔴 counts for the teacher's class, one row per subtopic taught
  * today. Demo teachers see the sample lesson, as does a server without
- * Supabase or one where loading fails (e.g. the 0016 migration isn't run yet).
+ * Supabase. A real teacher only sees their class's signals: none without a
+ * class or when loading fails.
  */
 export async function getTodaySignals(): Promise<SignalSummary[]> {
   // "Today" must use the request's date, never a prerendered date.
@@ -533,7 +642,7 @@ export async function getTodaySignals(): Promise<SignalSummary[]> {
       console.error(error);
     }
   }
-  return summarizeSignals(signals);
+  return user && !user.demo ? [] : summarizeSignals(signals);
 }
 
 /** The signal the logged-in student already sent for this lesson today, if any. */
@@ -846,5 +955,93 @@ export async function getInviteClass(token: string): Promise<SchoolClass | undef
   } catch (error) {
     console.error(error);
     return undefined;
+  }
+}
+
+// Lesson schedule: «Ойлгосон уу?» on lesson days, even when the teacher
+// doesn't open the app that day.
+
+/** How far ahead a teacher plans topics, and how many weeks back they see signals. */
+const PLAN_DAYS = 12;
+const SIGNAL_WEEKS = 12;
+
+/** What a lesson day can be about: the curriculum plus topics the teacher typed before. */
+async function lessonTopics(cls: SchoolClass, today: string): Promise<LessonTopic[]> {
+  const past = cls.id === "demo" ? [] : await listPlans(cls.id, shiftDay(today, -120), today);
+  const typed = [...new Map(past.filter((p) => isCustomTopic(p.topicKey)).map((p) => [p.topicKey, p])).values()];
+  return [...typed.map((p) => ({ key: p.topicKey, title: p.topicTitle, group: "Өөрийн сэдэв" })), ...curriculumTopics(cls.subject, cls.grade)];
+}
+
+/**
+ * Today's class lesson for the logged-in student: the planned topic, or the
+ * topics to pick from. Undefined unless today is a lesson day of their class
+ * (or has a planned topic). Demo students always get one, about fractions.
+ */
+export async function getTodayLesson(): Promise<TodayLesson | undefined> {
+  await io();
+  const [user, session] = await Promise.all([getCurrentUser(), readSession()]);
+  if (user?.role !== "student") return undefined;
+  const day = learningDay();
+  const answered = session?.lessonCheck?.day === day ? session.lessonCheck : undefined;
+  const cls = (await getStudentClasses()).find((c) => c.code === user.classCode);
+  if (!cls) return undefined;
+  if (user.demo || cls.id === "demo") {
+    return { day, topic: { key: "different-denominator", title: topicTitle("different-denominator")! }, options: [], answered };
+  }
+  const [lessonDays, plans] = await Promise.all([getLessonDays(cls.id), listPlans(cls.id, day, day)]);
+  const plan = plans[0];
+  if (!plan && !lessonDays.includes(isoWeekday(day))) return undefined;
+  return {
+    day,
+    topic: plan && { key: plan.topicKey, title: plan.topicTitle },
+    options: plan ? [] : await lessonTopics(cls, day),
+    answered,
+  };
+}
+
+/** The teacher's open class: lesson weekdays and the next lesson days with their topics. */
+export async function getClassSchedule(): Promise<ClassSchedule | undefined> {
+  await io();
+  const active = await getActiveClass();
+  if (!active) return undefined;
+  const today = learningDay();
+  const editable = active.id !== "demo";
+  const lessonDays = editable ? await getLessonDays(active.id) : [1, 3, 5];
+  const plans = editable ? await listPlans(active.id, today, shiftDay(today, PLAN_DAYS * 7)) : [];
+  const days = [...new Set([...upcomingLessonDays(today, lessonDays, PLAN_DAYS), ...plans.map((p) => p.day)])].sort();
+  return {
+    className: active.name,
+    lessonDays,
+    upcoming: days.map((day) => ({ day, plan: plans.find((p) => p.day === day) })),
+    topics: await lessonTopics(active, today),
+    editable,
+  };
+}
+
+/**
+ * The open class's signals in one school week (`weeksBack` 0 is this week),
+ * newest day first, with the topic titles; `beforeToday` leaves today out.
+ * Demo teachers see the sample lesson on Monday, Wednesday and Friday.
+ */
+export async function getLessonDaySignals({ weeksBack = 0, beforeToday = false } = {}): Promise<WeekSignals> {
+  await io();
+  const today = learningDay();
+  const weeks = recentWeeks(today, SIGNAL_WEEKS);
+  const week = weeks[Math.min(Math.max(Math.trunc(weeksBack) || 0, 0), weeks.length - 1)];
+  const keep = (days: LessonDaySignals[]) => ({ week, weeks, days: beforeToday ? days.filter((d) => d.day < today) : days });
+  const user = await getCurrentUser();
+  const active = await getActiveClass();
+  const title = (key: string) => topicTitle(key) ?? key;
+  if (!active || user?.demo || active.id === "demo" || !signalsStored()) {
+    const rows = summarizeSignals(signals).map((s) => ({ ...s, title: title(s.subtopicId) }));
+    const days = [4, 2, 0].map((offset) => shiftDay(week.from, offset)).filter((day) => day <= week.to);
+    return keep(days.map((day) => ({ day, rows })));
+  }
+  try {
+    const days = await listSignalsBetween(active.code, week.from, week.to);
+    return keep(days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) })));
+  } catch (error) {
+    console.error(error);
+    return keep([]);
   }
 }

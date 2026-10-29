@@ -6,7 +6,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { type AccountProgress, findAccountById, saveAccount } from "./accounts";
-import type { User, UserPet } from "./types";
+import type { QuestLog, ShopState, SignalLevel, User, UserPet } from "./types";
 import type { LearningStreak } from "./streak";
 import type { MistakeRecords } from "./mistake-records";
 
@@ -45,8 +45,20 @@ export type Account = {
   videosSeen?: string[];
   /** Assignment ids that already gave XP, so replays don't farm it. */
   assignmentsRewarded?: string[];
+  /** Coins earned from daily quests and achievements, spent in the pet shop. */
+  coins?: number;
+  /** Today's counts toward the daily quests, and the quests already claimed. */
+  quests?: QuestLog;
+  /** Games played to the end, ever (daily quests only count today's). */
+  gamesPlayed?: number;
+  /** Unlocked achievement ids and when (ISO date); each gave its coins once. */
+  achievements?: Record<string, string>;
+  /** Pet shop items bought and the ones worn. */
+  shop?: ShopState;
   /** Assignment demo: the other demo account (teacher or student) and its assignment. */
   demoTour?: { otherId: string; assignmentId: string };
+  /** «Ойлгосон уу?» for the day's class lesson: what the student answered, so the home card shows it. */
+  lessonCheck?: { day: string; topicKey: string; level: SignalLevel };
   /** The latest retest, for the mastered page. */
   lastRetest?: {
     subtopicId: string;

@@ -22,6 +22,7 @@ function sentNote(result: AskResult) {
   if (!("error" in result))
     return result.duplicate ? "Ангийнхан ч асуусан · 🙋 +1" : "Илгээсэн ✓";
   if (result.error === "login") return "Асуухын тулд нэвтэрнэ үү";
+  if (result.error === "noclass") return "Асуухын тулд эхлээд ангидаа нэгдээрэй";
   if (result.error === "failed") return "Илгээж чадсангүй";
   return "Илгээсэн ✓";
 }

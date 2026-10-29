@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 
-/** Line icons for the student menus (SiteHeader, MobileNav), sized by `className`. */
+/** Line icons for the menus (student and teacher headers and docks), sized by `className`. */
 function LineIcon({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <svg
@@ -60,5 +60,83 @@ export function PlayIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={cn("shrink-0", className)}>
       <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" />
     </svg>
+  );
+}
+
+export function GridIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+      <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+      <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+      <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+    </LineIcon>
+  );
+}
+
+export function UsersIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5A6.5 6.5 0 0 1 21.5 20" />
+    </LineIcon>
+  );
+}
+
+export function ClockIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </LineIcon>
+  );
+}
+
+export function PawIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="5.5" cy="10" r="2" />
+      <circle cx="9.5" cy="5.5" r="2" />
+      <circle cx="14.5" cy="5.5" r="2" />
+      <circle cx="18.5" cy="10" r="2" />
+      <path d="M12 12c-3 0-6 4.5-6 7 0 1.5 1.2 2 2.5 2 1.4 0 2.3-.8 3.5-.8s2.1.8 3.5.8c1.3 0 2.5-.5 2.5-2 0-2.5-3-7-6-7Z" />
+    </LineIcon>
+  );
+}
+
+/** «Хичээл солих», «Анги солих» */
+export function SwapIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M4 8h14l-4-4M20 16H6l4 4" />
+    </LineIcon>
+  );
+}
+
+export function MoonIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+    </LineIcon>
+  );
+}
+
+export function SunIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+    </LineIcon>
+  );
+}
+
+export function LogOutIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5" />
+      <path d="M21 12H9" />
+    </LineIcon>
   );
 }

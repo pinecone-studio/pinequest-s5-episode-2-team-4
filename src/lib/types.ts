@@ -737,3 +737,143 @@ export type BattleLog = {
     perStudent: { correct: number; wrong: number; damage: number }[];
   };
 };
+
+// Lesson schedule (supabase/migrations/0018_lesson_schedule.sql)
+
+/** A topic a lesson can be about; `key` is what «Ойлгосон уу?» signals use. */
+export type LessonTopic = {
+  key: string;
+  title: string;
+  /** e.g. the curriculum chapter, to group a long list */
+  group?: string;
+};
+
+/** The topic a teacher planned for one lesson day. */
+export type LessonPlan = {
+  /** "YYYY-MM-DD" */
+  day: string;
+  topicKey: string;
+  topicTitle: string;
+};
+
+/** Today's lesson for a student: asked «Ойлгосон уу?» on lesson days. */
+export type TodayLesson = {
+  day: string;
+  /** The planned topic; without one the student picks from `options`. */
+  topic?: LessonTopic;
+  options: LessonTopic[];
+  /** What the student already answered today */
+  answered?: { topicKey: string; level: SignalLevel };
+};
+
+/** The teacher's open class: lesson weekdays and the next lesson days. */
+export type ClassSchedule = {
+  className: string;
+  /** ISO weekdays, Monday = 1 */
+  lessonDays: number[];
+  upcoming: { day: string; plan?: LessonPlan }[];
+  /** What a day can be about: the curriculum plus topics the teacher typed before */
+  topics: LessonTopic[];
+  /** False for demo teachers: changes aren't saved */
+  editable: boolean;
+};
+
+/** One lesson day's signals for the teacher, per topic. */
+export type LessonDaySignals = {
+  day: string;
+  rows: (SignalSummary & { title: string })[];
+};
+
+/** A school week (Monday to Sunday, "YYYY-MM-DD"); the current one ends today. */
+export type SignalWeek = { from: string; to: string };
+
+/** The lesson days of one week, and the weeks a teacher can pick from (newest first). */
+export type WeekSignals = {
+  week: SignalWeek;
+  days: LessonDaySignals[];
+  weeks: SignalWeek[];
+};
+
+/** What a student does that daily quests count. */
+export type QuestEvent = "game" | "practice" | "video" | "battle" | "assignment";
+
+/** A daily quest: do `goal` of `event` today for a bonus. */
+export type Quest = {
+  id: string;
+  event: QuestEvent;
+  goal: number;
+  title: string;
+  /** The bonus when it's claimed. */
+  xp: number;
+  coins: number;
+};
+
+/** Today's quest with how far the student got. */
+export type DailyQuest = Quest & { progress: number; done: boolean; claimed: boolean };
+
+/** What counts toward the day's quests, saved with the account and reset each day. */
+export type QuestLog = {
+  /** The learning day (Ulaanbaatar) the counts are for. */
+  day: string;
+  counts: Partial<Record<QuestEvent, number>>;
+  /** Quest ids already claimed today. */
+  claimed: string[];
+};
+
+/** What an achievement counts. */
+export type AchievementStat =
+  | "testTaken"
+  | "longestStreak"
+  | "practiceSolved"
+  | "mastered"
+  | "gamesPlayed"
+  | "bossWins"
+  | "eggsWon"
+  | "petsCollected"
+  | "petLevel"
+  | "videosSeen"
+  | "assignmentsDone";
+
+/** A milestone: reach `goal` of `stat` once for its coins. */
+export type Achievement = {
+  id: string;
+  emoji: string;
+  title: string;
+  /** What to do, e.g. "10 боссыг ял". */
+  description: string;
+  stat: AchievementStat;
+  goal: number;
+  coins: number;
+};
+
+/** An achievement with how far the student got. */
+export type AchievementProgress = Achievement & {
+  progress: number;
+  unlocked: boolean;
+  /** When it was unlocked (ISO date). */
+  unlockedAt?: string;
+};
+
+/** What a shop item changes; one item of each is worn at a time. */
+export type ShopSlot = "scene" | "ring" | "aura";
+
+/** The pet scene's artwork colours (the same keys PetScene draws with). */
+export type ScenePalette = Record<
+  "sky" | "haze" | "pink" | "mountain" | "hill" | "ground" | "meadow" | "grass" | "primary" | "bloomPink" | "bloomViolet" | "night" | "white",
+  string
+>;
+
+type ShopItemBase = { id: string; name: string; description: string; price: number };
+
+/** Something to buy with coins: a habitat scene, an XP ring colour or an aura around the pet. */
+export type ShopItem =
+  | (ShopItemBase & { slot: "scene"; palette: ScenePalette })
+  /** One colour, or several for a gradient. */
+  | (ShopItemBase & { slot: "ring"; colors: string[] })
+  | (ShopItemBase & { slot: "aura"; shape: "sparkle" | "heart"; colors: string[] });
+
+/** What the student owns and wears, saved with the account. */
+export type ShopState = { owned: string[]; equipped: Partial<Record<ShopSlot, string>> };
+
+/** A shop item with whether the student owns and wears it. */
+export type ShopEntry = ShopItem & { owned: boolean; equipped: boolean };

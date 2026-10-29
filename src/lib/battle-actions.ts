@@ -24,6 +24,7 @@ import { bosses } from "./mock/bosses";
 import { teacherSubject } from "./subjects";
 import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
+import { recordQuestEvent } from "./quests";
 import { readSession, writeSession } from "./session";
 import { recordLearningDay } from "./streak";
 import { recordMistake } from "./mistake-records";
@@ -169,9 +170,12 @@ export async function submitBattleAnswer(
   if (result.outcome && !result.error) {
     const session = await readSession();
     if (session) {
-      const streak = recordLearningDay(session.streak);
-      const mistakes = recordMistake(session.mistakes, "battle", questionId, answer, result.outcome.correct);
-      if (streak !== session.streak || mistakes !== session.mistakes) await writeSession({ ...session, streak, mistakes });
+      await writeSession({
+        ...session,
+        streak: recordLearningDay(session.streak),
+        mistakes: recordMistake(session.mistakes, "battle", questionId, answer, result.outcome.correct),
+        quests: recordQuestEvent(session.quests, "battle"),
+      });
     }
   }
   return result;
