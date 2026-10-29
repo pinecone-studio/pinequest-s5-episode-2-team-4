@@ -1,8 +1,11 @@
+import { PixelIcon, type PixelIconName } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
 export type ExplainCardState = {
   kind: "good" | "bad";
   title: string;
+  /** Shown after the title, e.g. a heart for «−1». */
+  icon?: PixelIconName;
   text?: string;
   /** Right answers shown as chips after a round. */
   chips?: string[];
@@ -41,6 +44,7 @@ export function ExplainCard({ card, onContinue }: ExplainCardProps) {
               {card.kind === "bad" ? "!" : "✓"}
             </span>
             {card.title}
+            {card.icon ? <PixelIcon name={card.icon} className="size-5" /> : null}
           </p>
           {card.text ? <p className="text-base text-[var(--game-muted)]">{card.text}</p> : null}
           {card.note ? <p className="text-sm font-bold text-[var(--game-gold)]">{card.note}</p> : null}

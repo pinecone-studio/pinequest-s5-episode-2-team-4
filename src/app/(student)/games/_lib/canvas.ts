@@ -2,6 +2,8 @@
 // "world" size (for example 400 × 500) and the canvas scales that world to
 // whatever size CSS gives it, sharp on high-DPI screens.
 
+import { PIXEL_ICONS, type PixelIconName, pixelPaths } from "@/components/ui/PixelIcon";
+
 export type Stage = {
   ctx: CanvasRenderingContext2D;
   /** CSS pixels per world unit. */
@@ -42,6 +44,34 @@ export function startLoop(frame: (dt: number) => void) {
     frame(dt);
   });
   return () => cancelAnimationFrame(id);
+}
+
+/** Each icon's paths, built once. */
+const iconPaths = new Map<PixelIconName, { grid: number; paths: [fill: string, path: Path2D][] }>();
+
+/** Draws a PixelIcon `size` world units wide with its top left at (x, y); its "#" pixels take `color`. */
+export function drawPixelIcon(
+  ctx: CanvasRenderingContext2D,
+  name: PixelIconName,
+  x: number,
+  y: number,
+  size: number,
+  color = "#fff",
+) {
+  let icon = iconPaths.get(name);
+  if (!icon) {
+    const art = PIXEL_ICONS[name];
+    icon = { grid: art.rows.length, paths: pixelPaths(art).map(([fill, d]) => [fill, new Path2D(d)]) };
+    iconPaths.set(name, icon);
+  }
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(size / icon.grid, size / icon.grid);
+  for (const [fill, path] of icon.paths) {
+    ctx.fillStyle = fill === "currentColor" ? color : fill;
+    ctx.fill(path);
+  }
+  ctx.restore();
 }
 
 export function roundRect(

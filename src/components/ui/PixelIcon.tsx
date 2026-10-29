@@ -879,8 +879,11 @@ export const PIXEL_ICONS = {
 
 export type PixelIconName = keyof typeof PIXEL_ICONS;
 
-/** One path per colour, a unit square for each pixel. */
-function pixelPaths({ rows, palette }: PixelArt) {
+/**
+ * One SVG path per colour, a unit square for each pixel ("currentColor" for
+ * "#"). Canvas games fill the same paths with Path2D.
+ */
+export function pixelPaths({ rows, palette }: PixelArt) {
   const paths = new Map<string, string>();
   rows.forEach((row, y) =>
     [...row].forEach((c, x) => {

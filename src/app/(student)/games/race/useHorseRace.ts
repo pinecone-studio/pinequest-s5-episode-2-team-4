@@ -114,7 +114,7 @@ export function useHorseRace(questions: GameQuestion[]) {
     );
     setExplain(
       ok
-        ? { kind: "good", title: combo >= 3 ? `Зөв! Комбо ${combo} 🔥` : "Зөв! Морь чинь +1 нүүдэл", seconds: RIGHT_SECONDS }
+        ? { kind: "good", title: combo >= 3 ? `Зөв! Комбо ${combo}` : "Зөв! Морь чинь +1 нүүдэл", icon: combo >= 3 ? "fire" : undefined, seconds: RIGHT_SECONDS }
         : { kind: "bad", title: "Буруу. Ботууд давхисаар байна!", text: round.question.explanation },
     );
   }

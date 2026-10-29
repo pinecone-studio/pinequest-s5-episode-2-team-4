@@ -1,5 +1,6 @@
 import type { GameAnswer } from "@/lib/types";
-import { roundRect } from "../../_lib/canvas";
+import type { PixelIconName } from "@/components/ui/PixelIcon";
+import { drawPixelIcon, roundRect } from "../../_lib/canvas";
 import { GAME_COLORS, gameFont } from "../../_lib/palette";
 import { drawAnswer, measureAnswer } from "../../_lib/shapes";
 import { LANE, laneX, scaleAt, yAt } from "./world";
@@ -132,7 +133,7 @@ export function drawHero(ctx: CanvasRenderingContext2D, x: number, y: number, k:
 
   // power pill above the head, not scaled with the hero
   const top = y - 92 * k;
-  pill(ctx, x, top - 12, `⚡ ${power}`, opts.strong ? GAME_COLORS.gold : GAME_COLORS.violetLight, opts.strong ? "#2a1600" : "#fff");
+  pill(ctx, x, top - 12, `${power}`, opts.strong ? GAME_COLORS.gold : GAME_COLORS.violetLight, opts.strong ? "#2a1600" : "#fff", "lightning");
 }
 
 /** The boss at the end of the road, with its power above. */
@@ -206,17 +207,27 @@ export function drawBoss(ctx: CanvasRenderingContext2D, d: number, t: number, po
   }
   ctx.restore();
 
-  if (opts.fall < 0.5) pill(ctx, laneX(1, d), y - 128 * k - 10, `👹 ${power}`, GAME_COLORS.bad, "#fff");
+  if (opts.fall < 0.5) pill(ctx, laneX(1, d), y - 128 * k - 10, `${power}`, GAME_COLORS.bad, "#fff", "ogre");
 }
 
-function pill(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, bg: string, fg: string) {
+/** A rounded label; `icon` goes before the text on a dark dot so it reads on any colour. */
+function pill(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, bg: string, fg: string, icon?: PixelIconName) {
   ctx.font = gameFont(800, 14);
-  const w = ctx.measureText(text).width + 18;
+  const iconW = icon ? 20 : 0;
+  const w = ctx.measureText(text).width + 18 + iconW;
   ctx.fillStyle = bg;
   roundRect(ctx, x - w / 2, y - 11, w, 22, 11);
   ctx.fill();
+  if (icon) {
+    const cx = x - w / 2 + 14;
+    ctx.fillStyle = GAME_COLORS.night;
+    ctx.beginPath();
+    ctx.arc(cx, y, 9, 0, Math.PI * 2);
+    ctx.fill();
+    drawPixelIcon(ctx, icon, cx - 6, y - 6, 12, fg);
+  }
   ctx.fillStyle = fg;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, x, y + 1);
+  ctx.fillText(text, x + iconW / 2, y + 1);
 }
