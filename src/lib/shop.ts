@@ -1,6 +1,12 @@
 // The pet shop: items bought once with coins, one of each kind worn at a time.
 
-import type { ShopEntry, ShopItem, ShopSlot, ShopState } from "./types";
+import type { ScenePalette, ShopEntry, ShopItem, ShopSlot, ShopState } from "./types";
+
+/** The free meadow scene everyone starts with (PetScene's own colours). */
+export const DEFAULT_SCENE_PALETTE: ScenePalette = {
+  sky: "#e6f5fc", haze: "#eeedff", pink: "#fcf1f7", mountain: "#d9d5f5", hill: "#dcd8f6", ground: "#f2f1ff",
+  meadow: "#dad9ff", grass: "#cac4f4", primary: "#5b00ed", bloomPink: "#f3b0d8", bloomViolet: "#b9a8f5", night: "#3f0791", white: "#ffffff",
+};
 
 export const SHOP_ITEMS: ShopItem[] = [
   {
