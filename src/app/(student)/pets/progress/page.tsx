@@ -1,27 +1,30 @@
 import type { Metadata } from "next";
 import { ButtonLink, ProgressBar } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { getEnglishProgress } from "@/lib/data";
+import { getAchievements, getEnglishProgress } from "@/lib/data";
 import { SKILL_LABELS } from "../battle/labels";
+import { AchievementShelf } from "./AchievementShelf";
 
 export const metadata: Metadata = {
-  title: "Англи хэлний ахиц · LevelUp",
+  title: "Ахиц · LevelUp",
 };
 
 const percent = (correct: number, attempts: number) =>
   attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
 
-export default async function EnglishProgressPage() {
-  const progress = await getEnglishProgress();
+/** «Ахиц»: the achievements, then the English progress from boss battles. */
+export default async function ProgressPage() {
+  const [progress, achievements] = await Promise.all([getEnglishProgress(), getAchievements()]);
 
   return (
     <div className="mx-auto max-w-5xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <h1 className="type-page-title">Ахиц</h1>
+      <AchievementShelf achievements={achievements} className="mt-6 md:mt-8" />
+
+      <div className="mt-10 flex flex-col gap-3 md:mt-14 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="type-page-title">
-            Англи хэлний ахиц
-          </h1>
-          <p className="mt-3 text-ink-muted md:text-lg">
+          <h2 className="type-section-title">Англи хэлний ахиц</h2>
+          <p className="mt-2 text-ink-muted md:text-lg">
             Боссын тулаанд өгсөн хариултаас тооцоолно.
           </p>
         </div>
@@ -60,9 +63,9 @@ export default async function EnglishProgressPage() {
 
           {/* By skill */}
           <section aria-labelledby="skills-title" className="rounded-panel bg-white p-5 shadow-card md:p-7">
-            <h2 id="skills-title" className="text-2xl font-bold">
+            <h3 id="skills-title" className="text-2xl font-bold">
               Ур чадвар
-            </h2>
+            </h3>
             <ul className="mt-4 grid gap-3 md:grid-cols-2 md:gap-4">
               {progress.bySkill.map((s) => {
                 const weakest = s.skill === progress.weakestSkill;
@@ -93,9 +96,9 @@ export default async function EnglishProgressPage() {
 
           {/* By unit */}
           <section aria-labelledby="units-title" className="rounded-panel bg-white p-5 shadow-card md:p-7">
-            <h2 id="units-title" className="text-2xl font-bold">
+            <h3 id="units-title" className="text-2xl font-bold">
               Бүлэг тус бүрээр
-            </h2>
+            </h3>
             <ul className="mt-4 flex flex-col gap-3">
               {progress.byUnit.map((u) => (
                 <li key={u.unitId} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5">
@@ -118,12 +121,12 @@ export default async function EnglishProgressPage() {
 
           {/* Vocabulary */}
           <section aria-labelledby="vocab-title" className="rounded-panel bg-white p-5 shadow-card md:p-7">
-            <h2 id="vocab-title" className="text-2xl font-bold">
+            <h3 id="vocab-title" className="text-2xl font-bold">
               Сурсан үгс{" "}
               <span className="text-base font-semibold text-ink-muted">
                 {progress.vocabulary.learned.length}/{progress.vocabulary.total}
               </span>
-            </h2>
+            </h3>
             {progress.vocabulary.learned.length > 0 ? (
               <ul lang="en" className="mt-4 flex flex-wrap gap-2">
                 {progress.vocabulary.learned.map((word) => (
@@ -139,9 +142,9 @@ export default async function EnglishProgressPage() {
 
           {/* Recent mistakes */}
           <section aria-labelledby="mistakes-title" className="rounded-panel bg-white p-5 shadow-card md:p-7">
-            <h2 id="mistakes-title" className="text-2xl font-bold">
+            <h3 id="mistakes-title" className="text-2xl font-bold">
               Сүүлийн алдаанууд
-            </h2>
+            </h3>
             {progress.mistakes.length > 0 ? (
               <ul className="mt-4 flex flex-col gap-3">
                 {progress.mistakes.map((m) => (
