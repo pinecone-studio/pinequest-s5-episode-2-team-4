@@ -24,6 +24,7 @@ import { bosses } from "./mock/bosses";
 import { teacherSubject } from "./subjects";
 import { hatchEgg, setActivePet } from "./collection";
 import { getCurrentUser } from "./data";
+import { recordQuestEvent } from "./quests";
 import { readSession, writeSession } from "./session";
 import { recordLearningDay } from "./streak";
 import type { BattleAnswerOutcome, BattleState, EnglishAnswer, HatchResult } from "./types";
@@ -168,8 +169,11 @@ export async function submitBattleAnswer(
   if (result.outcome && !result.error) {
     const session = await readSession();
     if (session) {
-      const streak = recordLearningDay(session.streak);
-      if (streak !== session.streak) await writeSession({ ...session, streak });
+      await writeSession({
+        ...session,
+        streak: recordLearningDay(session.streak),
+        quests: recordQuestEvent(session.quests, "battle"),
+      });
     }
   }
   return result;

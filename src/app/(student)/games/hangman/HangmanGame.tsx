@@ -6,6 +6,7 @@ import { Button } from "@/components/ui";
 import { ALPHABET, MAX_MISTAKES, gameStatus, guessLetter } from "./game";
 import { HANGMAN_WORDS, wordsForLevel } from "./words";
 import { HangmanScene } from "./HangmanScene";
+import { useGamePlayed } from "../_lib/played";
 import "./hangman.css";
 
 const DIFFICULTIES = [
@@ -57,6 +58,8 @@ function HangmanRound({ initialIndex, difficulty, onBack }: { initialIndex: numb
   const entry = HANGMAN_WORDS[round.index];
   const status = gameStatus({ word: entry.word, guesses: round.guesses });
   const completed = status.won && round.level === maxLevel;
+  // A game ends on a loss or after the last level: then it counts for today's quests.
+  useGamePlayed(status.lost || completed);
 
   function guess(letter: string) {
     setRound((previous) => {

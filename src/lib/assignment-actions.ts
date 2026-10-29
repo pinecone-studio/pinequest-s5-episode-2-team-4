@@ -6,6 +6,7 @@
 import { normalClassCode } from "./battle";
 import { getClassAssignment, saveAttempt } from "./content";
 import { addXp } from "./pets";
+import { recordQuestEvent } from "./quests";
 import { readSession, writeSession } from "./session";
 import { recordLearningDay } from "./streak";
 
@@ -54,9 +55,12 @@ export async function submitAssignmentAttempt(
     missedQuestionIds: [...new Set((result.missedIds ?? []).filter((id) => ids.has(id)))],
     xpAwarded: xp,
   });
+  // An assignment is played as a game; it counts as an assignment once it's done.
+  const played = recordQuestEvent(session.quests, "game");
   await writeSession({
     ...session,
     streak: recordLearningDay(session.streak),
+    quests: done ? recordQuestEvent(played, "assignment") : played,
     assignmentsRewarded: firstFinish ? [...(session.assignmentsRewarded ?? []), assignmentId] : session.assignmentsRewarded,
     pet: session.pet && xp ? addXp(session.pet, xp) : session.pet,
   });
