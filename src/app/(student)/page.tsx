@@ -53,8 +53,8 @@ export default async function HomePage() {
   });
 
   return (
-    // The animated background runs up under the transparent header.
-    <div className="relative -mt-18 animate-flow overflow-hidden bg-flow pt-18 pb-16 md:-mt-22 md:pt-22">
+    // The pixel landscape behind the page comes from the student layout (LandscapeBackdrop).
+    <div className="relative overflow-hidden pb-16">
       <div className="mx-auto max-w-7xl px-4 md:px-[clamp(16px,4vw,40px)]">
         <HomeHero
           pet={{ stage: pet.stage, level: pet.level }}

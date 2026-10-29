@@ -6,11 +6,13 @@
      violet text on a pale page so white cards lift off it, and the brand
      purple kept for what matters (selection, the current item, XP). Lavender
      is the soft purple tint for active pills; sky marks "good"; magenta is
-     the signal colour for weak and alerts. All text pairs pass 4.5:1. */
+     the signal colour for weak and alerts. All text pairs pass 4.5:1.
+     ink-muted is darker than the design's #6b6585 so it also passes over
+     the pixel landscape behind student and teacher pages (LandscapeBackdrop). */
   --color-primary: #5b00ed;
   --color-primary-dark: #4a12b8;
   --color-ink: #1d1530;
-  --color-ink-muted: #6b6585;
+  --color-ink-muted: #57516f;
   --color-surface: #f4f3fa;
   --color-surface-soft: #f7f6fb;
   --color-lavender: #efe9fe;

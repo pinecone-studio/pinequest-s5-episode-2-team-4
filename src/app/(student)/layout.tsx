@@ -1,3 +1,4 @@
+import { LandscapeBackdrop } from "@/components/layout/LandscapeBackdrop";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -37,6 +38,7 @@ export default async function StudentLayout({
 
   return (
     <>
+      <LandscapeBackdrop />
       <SiteHeader
         counts={counts}
         subject={subject && subjectTitle(subject.subject)}

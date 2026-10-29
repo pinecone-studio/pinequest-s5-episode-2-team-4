@@ -57,7 +57,7 @@ export default async function TestPage({ searchParams }: PageProps<"/test">) {
         {sampleAnswers && (
           <Link
             href="/test?retake=1&fill=1"
-            className="inline-flex min-h-12 items-center px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 md:min-h-11"
+            className="inline-flex min-h-12 items-center rounded-full bg-white/80 px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 backdrop-blur-sm md:min-h-11"
           >
             Жишээ хариултаар бөглөх
           </Link>

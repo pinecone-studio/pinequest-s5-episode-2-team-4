@@ -64,7 +64,7 @@ export function EvolutionPath({ line, level, xp, discovered = true, className }:
   return (
     <section
       aria-labelledby="path-title"
-      className={cn("md:rounded-panel md:bg-white md:p-8 md:shadow-card", className)}
+      className={cn("rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:p-8", className)}
     >
       <h2 id="path-title" className="type-section-title">
         Хувьслын зам

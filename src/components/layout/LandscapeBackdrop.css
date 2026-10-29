@@ -1,0 +1,44 @@
+/* The scene covers the screen from the bottom centre, like the SVG's own
+   "xMidYMax slice"; the colour shows until the image loads. */
+.landscape {
+  background: #a9dcf2 url("/landscape/light.svg") center bottom / cover no-repeat;
+}
+
+[data-theme="dark"] .landscape {
+  background-color: #0b1430;
+  background-image: url("/landscape/dark.svg");
+}
+
+/* Cards, the header bar and the dock over the scene take a colour from it
+   instead of stark white: a pale lake aqua by day, a night blue in dark mode
+   (theme.css already paints white surfaces with --color-card at night).
+   Surfaces (chips, inner panels) are a step deeper in the same hue. */
+:root:has(.landscape) {
+  --color-card: #e6f2f1;
+  --color-surface: #d9ebea;
+}
+
+:root[data-theme="dark"]:has(.landscape) {
+  --color-card: #13213a;
+  --color-surface: #1c2d4a;
+}
+
+/* :where() keeps these as weak as the utilities they replace, so hover and
+   other state backgrounds still win. */
+@layer utilities {
+  :where(:root:has(.landscape)) .bg-white {
+    background-color: var(--color-card);
+  }
+
+  :where(:root:has(.landscape)) .bg-white\/90 {
+    background-color: color-mix(in oklab, var(--color-card) 90%, transparent);
+  }
+
+  :where(:root:has(.landscape)) .bg-white\/80 {
+    background-color: color-mix(in oklab, var(--color-card) 80%, transparent);
+  }
+
+  :where(:root:has(.landscape)) .bg-white\/70 {
+    background-color: color-mix(in oklab, var(--color-card) 70%, transparent);
+  }
+}

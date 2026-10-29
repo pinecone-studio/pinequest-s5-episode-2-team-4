@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LandscapeBackdrop } from "@/components/layout/LandscapeBackdrop";
 import { Logo } from "@/components/layout/Logo";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { logOut } from "@/lib/actions";
@@ -21,6 +22,7 @@ export default async function ClassesPage() {
 
   return (
     <>
+      <LandscapeBackdrop />
       <header className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:px-[clamp(16px,4vw,40px)]">
         <Link href="/classes" aria-label="LevelUp" className="flex min-h-12 items-center gap-2 no-underline md:gap-2.5">
           <Logo />

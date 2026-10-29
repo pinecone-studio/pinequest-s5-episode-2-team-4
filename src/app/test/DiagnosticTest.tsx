@@ -300,7 +300,7 @@ export function DiagnosticTest({
           <button
             type="button"
             onClick={fillSample}
-            className="min-h-12 cursor-pointer px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 md:min-h-11"
+            className="min-h-12 cursor-pointer rounded-full bg-white/80 px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 backdrop-blur-sm md:min-h-11"
           >
             Жишээ хариултаар бөглөх
           </button>
