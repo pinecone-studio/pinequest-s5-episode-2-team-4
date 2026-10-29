@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CLASS_ONLY_EVENTS, dailyQuests, questsWithProgress, recordQuestEvent } from "./quests";
+import { CLASS_ONLY_EVENTS, dailyQuests, markQuestClaimed, questsWithProgress, recordQuestEvent } from "./quests";
 
 describe("dailyQuests", () => {
   it("picks three quests, each about a different activity", () => {
@@ -60,5 +60,14 @@ describe("questsWithProgress", () => {
   it("ignores a log from another day", () => {
     const old = { day: "2026-10-28", counts: { game: 9, practice: 9, battle: 9, video: 9, assignment: 9 }, claimed: [] };
     expect(questsWithProgress(old, true, day).every((q) => q.progress === 0 && !q.done)).toBe(true);
+  });
+});
+
+describe("markQuestClaimed", () => {
+  it("adds the quest once", () => {
+    const log = { day: "2026-10-29", counts: { game: 1 }, claimed: [] };
+    const once = markQuestClaimed(log, "game-1");
+    expect(once.claimed).toEqual(["game-1"]);
+    expect(markQuestClaimed(once, "game-1")).toBe(once);
   });
 });

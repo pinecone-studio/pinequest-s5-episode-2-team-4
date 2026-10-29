@@ -50,3 +50,8 @@ export function questsWithProgress(log: QuestLog | undefined, inClass: boolean, 
     return { ...q, progress, done: progress >= q.goal, claimed: current?.claimed.includes(q.id) ?? false };
   });
 }
+
+/** The log with a quest marked as claimed (once). */
+export function markQuestClaimed(log: QuestLog, questId: string): QuestLog {
+  return log.claimed.includes(questId) ? log : { ...log, claimed: [...log.claimed, questId] };
+}
