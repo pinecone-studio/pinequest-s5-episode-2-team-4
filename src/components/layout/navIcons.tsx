@@ -62,3 +62,51 @@ export function PlayIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function PawIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="5.5" cy="10" r="2" />
+      <circle cx="9.5" cy="5.5" r="2" />
+      <circle cx="14.5" cy="5.5" r="2" />
+      <circle cx="18.5" cy="10" r="2" />
+      <path d="M12 12c-3 0-6 4.5-6 7 0 1.5 1.2 2 2.5 2 1.4 0 2.3-.8 3.5-.8s2.1.8 3.5.8c1.3 0 2.5-.5 2.5-2 0-2.5-3-7-6-7Z" />
+    </LineIcon>
+  );
+}
+
+/** «Хичээл солих», «Анги солих» */
+export function SwapIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M4 8h14l-4-4M20 16H6l4 4" />
+    </LineIcon>
+  );
+}
+
+export function MoonIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+    </LineIcon>
+  );
+}
+
+export function SunIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+    </LineIcon>
+  );
+}
+
+export function LogOutIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="m16 17 5-5-5-5" />
+      <path d="M21 12H9" />
+    </LineIcon>
+  );
+}
