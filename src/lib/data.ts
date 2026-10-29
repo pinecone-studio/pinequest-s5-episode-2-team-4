@@ -49,6 +49,7 @@ import {
   listTeacherClasses,
 } from "./classes";
 import { readSession } from "./session";
+import { progressFrom, scoreTest } from "./scoring";
 import { findSignal, listDaySignals, signalsStored, summarizeSignals } from "./signals";
 import { learningDay, streakSummary } from "./streak";
 import type {
@@ -188,13 +189,7 @@ export async function getSubtopic(id: string): Promise<Subtopic | undefined> {
  */
 export async function getProgress(): Promise<SubtopicProgress[]> {
   const [result, session] = await Promise.all([getTestResult(), readSession()]);
-  const mastered = new Set(session?.mastered);
-  return (
-    result?.subtopics.map(({ subtopicId, status }) => ({
-      subtopicId,
-      status: mastered.has(subtopicId) ? "mastered" : status,
-    })) ?? []
-  );
+  return progressFrom(result, session?.mastered);
 }
 
 export async function getTestQuestions(topicId: string) {
@@ -208,35 +203,7 @@ export async function getTestQuestions(topicId: string) {
  * Undefined until the test is taken.
  */
 export async function getTestResult(): Promise<TestResult | undefined> {
-  const answers = (await readSession())?.testAnswers;
-  const answered = testQuestions.filter((q) => answers?.[q.id] !== undefined);
-  if (!answers || answered.length === 0) return undefined;
-
-  const topicId =
-    topics.find((t) => t.subtopicIds.includes(answered[0].subtopicId))?.id ?? "";
-  const scores = subtopics
-    .filter((s) => s.topicId === topicId)
-    .sort((a, b) => a.order - b.order)
-    .map((s) => {
-      const questions = testQuestions.filter((q) => q.subtopicId === s.id);
-      const correct = questions.filter((q) => answers[q.id] === q.correctIndex).length;
-      return {
-        subtopicId: s.id,
-        status: correct === questions.length ? ("good" as const) : ("weak" as const),
-        correct,
-        total: questions.length,
-      };
-    })
-    .filter((s) => s.total > 0)
-    // Stable sort keeps the topic order for equal scores.
-    .sort((a, b) => a.correct / a.total - b.correct / b.total);
-
-  return {
-    topicId,
-    correct: scores.reduce((sum, s) => sum + s.correct, 0),
-    total: scores.reduce((sum, s) => sum + s.total, 0),
-    subtopics: scores,
-  };
+  return scoreTest((await readSession())?.testAnswers);
 }
 
 /**
