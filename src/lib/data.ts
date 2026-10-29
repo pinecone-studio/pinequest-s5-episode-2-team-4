@@ -490,38 +490,52 @@ export async function getClassGoal(): Promise<ClassGoal | undefined> {
 
 // Anonymous questions (answered by the teacher or classmates, not the AI)
 
-/** Class whose questions a user sees; the demo class when they have none. */
-export async function questionClass() {
-  return (await getCurrentUser())?.classCode ?? classOverview.code;
+/** A logged-in account that isn't a demo: it only ever sees real data. */
+async function isRealAccount() {
+  const user = await getCurrentUser();
+  return Boolean(user && !user.demo);
 }
 
 /**
- * Stored questions when Supabase is set up; the sample questions otherwise,
- * and also if loading fails (e.g. the 0011 migration hasn't been run yet),
- * so the lesson and dashboard always show something.
+ * Class whose questions a user sees: their own; the demo class for demo
+ * accounts without one. Undefined for a real account without a class, so
+ * its questions never land in the demo class.
+ */
+export async function questionClass(): Promise<string | undefined> {
+  const user = await getCurrentUser();
+  return user?.classCode ?? (user && !user.demo ? undefined : classOverview.code);
+}
+
+/**
+ * Stored questions of the user's class. Demo accounts (and a server without
+ * Supabase, or one where loading fails) see the sample questions; a real
+ * account never does, and has none without a class.
  */
 export async function getAnonQuestions(subtopicId?: string): Promise<AnonQuestion[]> {
-  if (questionsStored()) {
+  const [real, classCode] = await Promise.all([isRealAccount(), questionClass()]);
+  if (questionsStored() && classCode) {
     try {
-      return await listQuestions(await questionClass(), subtopicId);
+      return await listQuestions(classCode, subtopicId);
     } catch (error) {
       console.error(error);
     }
   }
+  if (real) return [];
   return subtopicId
     ? anonQuestions.filter((q) => q.subtopicId === subtopicId)
     : anonQuestions;
 }
 
 export async function getQuestionGroups(): Promise<QuestionGroup[]> {
-  if (questionsStored()) {
+  const [real, classCode] = await Promise.all([isRealAccount(), questionClass()]);
+  if (questionsStored() && classCode) {
     try {
-      return await listGroups(await questionClass());
+      return await listGroups(classCode);
     } catch (error) {
       console.error(error);
     }
   }
-  return questionGroups;
+  return real ? [] : questionGroups;
 }
 
 // Understanding signals (🟢🟡🔴 sent by students during a lesson)
@@ -529,7 +543,8 @@ export async function getQuestionGroups(): Promise<QuestionGroup[]> {
 /**
  * Today's 🟢/🟡/🔴 counts for the teacher's class, one row per subtopic taught
  * today. Demo teachers see the sample lesson, as does a server without
- * Supabase or one where loading fails (e.g. the 0016 migration isn't run yet).
+ * Supabase. A real teacher only sees their class's signals: none without a
+ * class or when loading fails.
  */
 export async function getTodaySignals(): Promise<SignalSummary[]> {
   // "Today" must use the request's date, never a prerendered date.
@@ -542,7 +557,7 @@ export async function getTodaySignals(): Promise<SignalSummary[]> {
       console.error(error);
     }
   }
-  return summarizeSignals(signals);
+  return user && !user.demo ? [] : summarizeSignals(signals);
 }
 
 /** The signal the logged-in student already sent for this lesson today, if any. */
