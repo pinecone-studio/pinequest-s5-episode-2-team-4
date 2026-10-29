@@ -52,12 +52,13 @@ import {
 } from "./classes";
 import { readSession } from "./session";
 import { classOverviewFrom, heatmapFrom, progressFrom, scoreTest, type ClassProgress } from "./scoring";
-import { findSignal, listDaySignals, listSignalsSince, signalsStored, summarizeSignals } from "./signals";
+import { findSignal, listDaySignals, listSignalsBetween, signalsStored, summarizeSignals } from "./signals";
 import { getLessonDays, listPlans } from "./schedule";
 import {
   curriculumTopics,
   isCustomTopic,
   isoWeekday,
+  recentWeeks,
   topicTitle,
   upcomingLessonDays,
 } from "./lesson-topics";
@@ -69,6 +70,7 @@ import type {
   LessonDaySignals,
   LessonTopic,
   TodayLesson,
+  WeekSignals,
   AssignmentReport,
   ClassOverview,
   HeatmapRow,
@@ -889,9 +891,9 @@ export async function getInviteClass(token: string): Promise<SchoolClass | undef
 // Lesson schedule: «Ойлгосон уу?» on lesson days, even when the teacher
 // doesn't open the app that day.
 
-/** How far ahead a teacher plans topics, and how far back they see signals. */
+/** How far ahead a teacher plans topics, and how many weeks back they see signals. */
 const PLAN_DAYS = 12;
-const HISTORY_DAYS = 14;
+const SIGNAL_WEEKS = 12;
 
 /** What a lesson day can be about: the curriculum plus topics the teacher typed before. */
 async function lessonTopics(cls: SchoolClass, today: string): Promise<LessonTopic[]> {
@@ -947,26 +949,29 @@ export async function getClassSchedule(): Promise<ClassSchedule | undefined> {
 }
 
 /**
- * The open class's signals of the last two weeks, newest day first, with the
- * topic titles; `beforeToday` leaves today out. Demo teachers see the sample
- * lesson on a few days.
+ * The open class's signals in one school week (`weeksBack` 0 is this week),
+ * newest day first, with the topic titles; `beforeToday` leaves today out.
+ * Demo teachers see the sample lesson on Monday, Wednesday and Friday.
  */
-export async function getLessonDaySignals({ beforeToday = false } = {}): Promise<LessonDaySignals[]> {
+export async function getLessonDaySignals({ weeksBack = 0, beforeToday = false } = {}): Promise<WeekSignals> {
   await io();
-  const keep = (days: LessonDaySignals[]) => (beforeToday ? days.filter((d) => d.day < learningDay()) : days);
+  const today = learningDay();
+  const weeks = recentWeeks(today, SIGNAL_WEEKS);
+  const week = weeks[Math.min(Math.max(Math.trunc(weeksBack) || 0, 0), weeks.length - 1)];
+  const keep = (days: LessonDaySignals[]) => ({ week, weeks, days: beforeToday ? days.filter((d) => d.day < today) : days });
   const user = await getCurrentUser();
   const active = await getActiveClass();
   const title = (key: string) => topicTitle(key) ?? key;
   if (!active || user?.demo || active.id === "demo" || !signalsStored()) {
-    // The sample lesson today, and on two earlier lesson days.
     const rows = summarizeSignals(signals).map((s) => ({ ...s, title: title(s.subtopicId) }));
-    return keep([0, -2, -5].map((offset) => ({ day: shiftDay(learningDay(), offset), rows })));
+    const days = [4, 2, 0].map((offset) => shiftDay(week.from, offset)).filter((day) => day <= week.to);
+    return keep(days.map((day) => ({ day, rows })));
   }
   try {
-    const days = await listSignalsSince(active.code, shiftDay(learningDay(), -(HISTORY_DAYS - 1)));
+    const days = await listSignalsBetween(active.code, week.from, week.to);
     return keep(days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) })));
   } catch (error) {
     console.error(error);
-    return [];
+    return keep([]);
   }
 }
