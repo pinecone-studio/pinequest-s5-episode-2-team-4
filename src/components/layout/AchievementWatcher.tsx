@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { PixelIcon } from "@/components/ui/PixelIcon";
 import { type Unlocked, checkAchievements } from "@/lib/achievement-actions";
 import { CoinIcon } from "./CoinChip";
 
@@ -52,8 +53,8 @@ export function AchievementWatcher() {
           key={t.id}
           className="pointer-events-auto flex w-full max-w-sm animate-word items-center gap-3 rounded-card bg-night px-4 py-3 text-white shadow-float"
         >
-          <span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10 text-2xl">
-            {t.emoji}
+          <span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10">
+            <PixelIcon name={t.icon} className="size-6" />
           </span>
           <span className="flex min-w-0 flex-col">
             <span className="text-xs font-semibold text-white/75">Амжилт нээгдлээ!</span>
