@@ -73,6 +73,25 @@ export function summarizeSignals(
   return [...bySubtopic.values()];
 }
 
+/** A class's signals from `fromDay` on, per day and topic. */
+export async function listSignalsSince(
+  classCode: string,
+  fromDay: string,
+): Promise<{ day: string; summary: SignalSummary[] }[]> {
+  const { data, error } = await db()
+    .from("understanding_signals")
+    .select("day, subtopic_id, level, created_at")
+    .eq("class_code", classCode)
+    .gte("day", fromDay)
+    .returns<{ day: string; subtopic_id: string; level: SignalLevel; created_at: string }[]>();
+  if (error) throw new Error(`Could not load signals: ${error.message}`);
+  const byDay = new Map<string, Pick<UnderstandingSignal, "subtopicId" | "level" | "time">[]>();
+  for (const r of data) {
+    byDay.set(r.day, [...(byDay.get(r.day) ?? []), { subtopicId: r.subtopic_id, level: r.level, time: clock(r.created_at) }]);
+  }
+  return [...byDay].map(([day, signals]) => ({ day, summary: summarizeSignals(signals) })).sort((a, b) => b.day.localeCompare(a.day));
+}
+
 /** A class's signals for one day, summed per subtopic. */
 export async function listDaySignals(classCode: string, day: string): Promise<SignalSummary[]> {
   const { data, error } = await db()
