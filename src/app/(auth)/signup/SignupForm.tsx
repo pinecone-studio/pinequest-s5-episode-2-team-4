@@ -11,7 +11,7 @@ import { TEACHER_SUBJECTS } from "@/lib/subjects";
 import type { PetLine } from "@/lib/types";
 import { FormError } from "../_components/FormError";
 import { PetAvatar } from "../_components/PetAvatar";
-import { ArrowIcon, ClassCodeField, PasswordField, SubjectPicker, TextField } from "../_components/fields";
+import { ArrowIcon, PasswordField, SubjectPicker, TextField } from "../_components/fields";
 import { type Role, RoleToggle } from "../_components/RoleToggle";
 
 /** `petLines`: the pets a new student can pick; the first is picked to start. */
@@ -19,7 +19,9 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
   const [role, setRole] = useState<Role>("student");
   const [petId, setPetId] = useState(petLines[0]?.id);
   /** The field whose value another account already has. */
-  const [taken, setTaken] = useState<"username" | "email" | null>(null);
+  const [taken, setTaken] = useState<"username" | "email" | "phone" | null>(null);
+  /** The phone number isn't one. */
+  const [badPhone, setBadPhone] = useState(false);
   const [pending, startTransition] = useTransition();
   const pet = petLines.find((l) => l.id === petId) ?? petLines[0];
   const isStudent = role === "student";
@@ -38,11 +40,13 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
         email: String(form.get("email") ?? ""),
         password: String(form.get("password") ?? ""),
         role,
-        classCode: String(form.get("classCode") ?? ""),
+        phone: isStudent ? String(form.get("phone") ?? "") : undefined,
         petLineId: isStudent ? pet.id : undefined,
         subject: isStudent ? undefined : String(form.get("subject") ?? ""),
       });
-      setTaken(result?.error === "taken" ? "username" : result?.error === "emailTaken" ? "email" : null);
+      const error = result?.error;
+      setTaken(error === "taken" ? "username" : error === "emailTaken" ? "email" : error === "phoneTaken" ? "phone" : null);
+      setBadPhone(error === "phone");
     });
   }
 
@@ -163,17 +167,39 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
               minLength={6}
             />
             {isStudent ? (
-              <ClassCodeField id="su-code" name="classCode" label="Ангийн код" hint="заавал биш" />
+              <TextField
+                id="su-phone"
+                name="phone"
+                label="Утасны дугаар"
+                hint="заавал биш · багш ангидаа нэмэхэд"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="9911 2233"
+                aria-invalid={taken === "phone" || badPhone}
+                aria-describedby={taken === "phone" || badPhone ? "signup-error" : undefined}
+                onChange={() => {
+                  setTaken(null);
+                  setBadPhone(false);
+                }}
+              />
             ) : (
               <SubjectPicker name="subject" subjects={TEACHER_SUBJECTS} />
             )}
             {taken && (
               <FormError id="signup-error">
-                {taken === "email" ? "Энэ имэйл бүртгэлтэй байна." : "Энэ нэр бүртгэлтэй байна."}{" "}
+                {taken === "email"
+                  ? "Энэ имэйл бүртгэлтэй байна."
+                  : taken === "phone"
+                    ? "Энэ утасны дугаар бүртгэлтэй байна."
+                    : "Энэ нэр бүртгэлтэй байна."}{" "}
                 <Link href="/login" className="font-bold">
                   Нэвтрэх
                 </Link>
               </FormError>
+            )}
+            {badPhone && (
+              <FormError id="signup-error">Утасны дугаараа 8 оронтойгоор бичээрэй, жишээ нь 9911 2233.</FormError>
             )}
             <button
               type="submit"

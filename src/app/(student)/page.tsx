@@ -9,9 +9,11 @@ import {
   getPetLines,
   getProgress,
   getStudentAssignments,
+  getStudentClasses,
   getSubtopics,
   getTopic,
 } from "@/lib/data";
+import { ClassNotice } from "./_home/ClassNotice";
 import { HomeHero } from "./_home/HomeHero";
 import { TeacherCard } from "./_home/TeacherCard";
 import { TopicMap } from "./_home/TopicMap";
@@ -20,7 +22,7 @@ const TOPIC_ID = "fractions";
 const ORBIT_PET_IDS = ["dollfin", "agnite", "anoleaf", "tweesher", "cardiling"];
 
 export default async function HomePage() {
-  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos] =
+  const [topic, subtopics, progress, pet, petLines, classGoal, streak, assignments, videos, classes] =
     await Promise.all([
       getTopic(TOPIC_ID),
       getSubtopics(TOPIC_ID),
@@ -31,6 +33,7 @@ export default async function HomePage() {
       getLearningStreak(),
       getStudentAssignments(),
       getClassVideos(),
+      getStudentClasses(),
     ]);
   if (!topic || !pet) notFound();
 
@@ -56,10 +59,14 @@ export default async function HomePage() {
           orbitPets={orbitPets}
         />
         <StreakCard streak={streak} />
-        <TeacherCard
-          assignmentsLeft={assignments.filter((a) => !a.done).length}
-          videoCount={videos.length}
-        />
+        {classes.length ? (
+          <TeacherCard
+            assignmentsLeft={assignments.filter((a) => !a.done).length}
+            videoCount={videos.length}
+          />
+        ) : (
+          <ClassNotice />
+        )}
         <TopicMap
           title={topic.title}
           nodes={nodes}

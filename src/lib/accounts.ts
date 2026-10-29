@@ -91,15 +91,26 @@ async function passwordMatches(password: string, hash: string) {
 /** Checked against for unknown usernames, so they take as long as a wrong password. */
 let dummyHash: Promise<string> | undefined;
 
+/**
+ * A Mongolian phone number as 8 digits, from "9911 2233", "+976 99112233"
+ * and the like; undefined if it isn't one.
+ */
+export function normalPhone(text: string | undefined) {
+  const digits = text?.replace(/[\s()+-]/g, "") ?? "";
+  const local = digits.length === 11 && digits.startsWith("976") ? digits.slice(3) : digits;
+  return /^\d{8}$/.test(local) ? local : undefined;
+}
+
 /** A new account, or which of its unique fields another account already has. */
 export async function createAccount(input: {
   username: string;
   email: string;
   password: string;
   role: User["role"];
-  classCode?: string;
+  /** normalPhone() digits; optional */
+  phone?: string;
   progress?: AccountProgress;
-}): Promise<{ account: StoredAccount } | { error: "taken" | "emailTaken" }> {
+}): Promise<{ account: StoredAccount } | { error: "taken" | "emailTaken" | "phoneTaken" }> {
   if ([...input.password].length < MIN_PASSWORD_LENGTH) throw new Error("Password is too short");
   const { data, error } = await db()
     .from("accounts")
@@ -108,14 +119,16 @@ export async function createAccount(input: {
       email: input.email.toLowerCase(),
       password_hash: await hashPassword(input.password),
       role: input.role,
-      class_code: input.classCode ?? null,
+      // Only sent when given, so sign-up works before the 0017 migration adds the column.
+      ...(input.phone ? { phone: input.phone } : {}),
       progress: input.progress ?? {},
     })
     .select(COLUMNS)
     .single<Row>();
   // Unique violation: the message names the index.
   if (error?.code === "23505") {
-    return { error: error.message.includes("accounts_email_key") ? "emailTaken" : "taken" };
+    if (error.message.includes("accounts_email_key")) return { error: "emailTaken" };
+    return { error: error.message.includes("accounts_phone_key") ? "phoneTaken" : "taken" };
   }
   if (error) throw new Error(`Could not create account: ${error.message}`);
   return { account: toAccount(data) };
@@ -217,6 +230,27 @@ export async function findAccountByEmail(email: string): Promise<StoredAccount |
     .maybeSingle<Row>();
   if (error) throw new Error(`Could not load account: ${error.message}`);
   return data ? toAccount(data) : undefined;
+}
+
+/** The account with this phone (normalPhone() digits). Demo accounts have none. */
+export async function findAccountByPhone(phone: string): Promise<StoredAccount | undefined> {
+  const { data, error } = await db()
+    .from("accounts")
+    .select(COLUMNS)
+    .eq("phone", phone)
+    .eq("demo", false)
+    .maybeSingle<Row>();
+  if (error) throw new Error(`Could not load account: ${error.message}`);
+  return data ? toAccount(data) : undefined;
+}
+
+/**
+ * Points another account at a class (or none), e.g. a student just added to
+ * or removed from one. The logged-in user changes their own via writeSession.
+ */
+export async function setAccountClass(id: string, classCode: string | null) {
+  const { error } = await db().from("accounts").update({ class_code: classCode }).eq("id", id);
+  if (error) throw new Error(`Could not set class: ${error.message}`);
 }
 
 /** Replaces the account's password, from a reset link. */
