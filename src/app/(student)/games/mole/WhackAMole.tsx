@@ -33,8 +33,10 @@ export function WhackAMole({ subjects, subjectId, questions }: WhackAMoleProps) 
         <>
           <SubjectSelect subjects={subjects} value={subjectId} basePath="/games/mole" />
           <div className="flex items-center gap-2.5">
-            <span className="text-sm tracking-tight" aria-label={`${hearts} амь`}>
-              {Array.from({ length: HEARTS }, (_, i) => (i < hearts ? "❤️" : "🤍")).join("")}
+            <span className="flex gap-0.5" aria-label={`${hearts} амь`}>
+              {Array.from({ length: HEARTS }, (_, i) => (
+                <PixelIcon key={i} name={i < hearts ? "heart" : "heart-empty"} className="size-4" />
+              ))}
             </span>
             <span
               role="timer"
