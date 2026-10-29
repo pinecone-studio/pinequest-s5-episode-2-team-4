@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { NavPill } from "@/components/layout/NavPill";
 import { cn } from "@/lib/cn";
 import "./PetsTabs.css";
 
@@ -73,67 +74,73 @@ const TABS: Tab[] = [
 
 /**
  * Tabs for the Pets area (pets and collection, bosses, joining, eggs, English
- * progress, battle history), styled like the collection's type chips: an
- * icon in a coloured circle and a 3D press.
+ * progress, battle history): one track under the header, each tab an icon in
+ * a coloured circle, and a purple pill that slides to the current tab.
  */
 export function PetsTabs({ eggCount }: { eggCount: number }) {
   const pathname = usePathname();
 
   return (
     <nav aria-label="Тэжээвэрийн хэсэг" className="mx-auto max-w-7xl px-4 pt-2 md:px-[clamp(16px,4vw,40px)]">
-      {/* Scrolls sideways on narrow screens instead of wrapping; the padding leaves room for the lift and the 3D edge. */}
-      <ul className="-mx-1 flex gap-2 overflow-x-auto px-1 pt-1 pb-3">
-        {TABS.map((tab) => {
-          const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
-          const count = tab.badge === "eggs" ? eggCount : 0;
-          return (
-            <li key={tab.href} className="shrink-0">
-              <Link
-                href={tab.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "pets-tab inline-flex min-h-12 items-center gap-2 rounded-full border-2 pr-4 pl-1.5 text-sm font-bold whitespace-nowrap no-underline transition-[translate,box-shadow] hover:-translate-y-0.5 active:translate-y-1 active:shadow-none md:min-h-13 md:pr-4.5 md:text-base",
-                  active
-                    ? "pets-tab-on border-primary bg-primary text-white shadow-[0_4px_0_var(--color-primary-dark)] hover:text-white"
-                    : "border-lavender bg-white text-ink shadow-[0_4px_0_var(--color-lavender)] hover:text-ink",
-                )}
-              >
-                <span
-                  aria-hidden="true"
+      {/* The track scrolls sideways on narrow screens instead of wrapping. */}
+      <div className="-mx-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
+        <ul className="flex w-max gap-0.5 rounded-full border-2 border-lavender bg-card p-1 shadow-[0_3px_0_var(--color-lavender)] md:gap-1">
+          {TABS.map((tab) => {
+            const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
+            const count = tab.badge === "eggs" ? eggCount : 0;
+            return (
+              <li key={tab.href}>
+                <Link
+                  href={tab.href}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "pets-tab-icon flex size-8 shrink-0 items-center justify-center rounded-full md:size-9",
-                    active ? "bg-white text-primary" : tab.iconColors,
+                    "pets-tab relative isolate inline-flex min-h-11 items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm font-bold whitespace-nowrap no-underline md:pr-4 md:text-base",
+                    active ? "text-white hover:text-white" : "text-ink hover:bg-surface hover:text-ink",
                   )}
                 >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="size-4 md:size-4.5"
-                  >
-                    {tab.icon}
-                  </svg>
-                </span>
-                {tab.label}
-                {count > 0 ? (
+                  {active && (
+                    <NavPill
+                      name="pets-tabs-pill"
+                      className="inset-0 rounded-full bg-primary shadow-[0_3px_0_var(--color-primary-dark)]"
+                    />
+                  )}
                   <span
-                    aria-label={`${count} өндөг`}
+                    aria-hidden="true"
                     className={cn(
-                      "pets-tab-count rounded-full px-2 text-xs leading-5",
-                      active ? "bg-white text-primary" : "bg-magenta text-white",
+                      "pets-tab-icon flex size-8 shrink-0 items-center justify-center rounded-full",
+                      active ? "pets-tab-icon-on bg-white text-primary" : tab.iconColors,
                     )}
                   >
-                    {count}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="size-4"
+                    >
+                      {tab.icon}
+                    </svg>
                   </span>
-                ) : null}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                  {tab.label}
+                  {count > 0 ? (
+                    <span
+                      aria-label={`${count} өндөг`}
+                      className={cn(
+                        "pets-tab-count rounded-full px-2 text-xs leading-5",
+                        active ? "bg-white text-primary" : "bg-magenta text-white",
+                      )}
+                    >
+                      {count}
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 }
