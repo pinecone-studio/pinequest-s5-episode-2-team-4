@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { requireTeacher } from "@/lib/auth";
 import { getActiveClass } from "@/lib/data";
 import { TeacherHeader } from "./TeacherHeader";
+import { TeacherDock } from "./TeacherNav";
 import "./teacher.css";
 
 export default async function TeacherLayout({ children }: LayoutProps<"/teacher">) {
@@ -20,6 +21,7 @@ export default async function TeacherLayout({ children }: LayoutProps<"/teacher"
       <div className="mt-10 md:mt-16">
         <SiteFooter />
       </div>
+      <TeacherDock />
     </>
   );
 }

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 const BATTLE_SCREEN = /^\/(pets|teacher)\/battle\/[0-9a-f-]{36}/i;
 
 /** Pages whose header has an account menu with the theme switch: no floating button there. */
-const HAS_MENU = /^\/(?:$|(?:videos|assignments|pets|games|lesson|mastered|subject|join|test)(?:\/|$))/;
+const HAS_MENU = /^\/(?:$|(?:videos|assignments|pets|games|lesson|mastered|subject|join|test|teacher)(?:\/|$))/;
 
 let transitionTimer: ReturnType<typeof setTimeout> | undefined;
 
