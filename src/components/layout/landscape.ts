@@ -1,5 +1,5 @@
 /*
- * The pixel-art mountain lake behind every student page (LandscapeBackdrop),
+ * The pixel-art mountain lake behind student and teacher pages (LandscapeBackdrop),
  * drawn as an SVG: a dithered sky with a moon, a big mountain, pine forests,
  * a lake, and trees and rocks framing the sides on wide screens. Shapes come
  * from seeded numbers, so the scene is the same on every visit. It is served
@@ -127,10 +127,10 @@ const nearGround = hills(668, [[12, 900, 2.2], [6, 300, 0.4]]);
 const LAKE = 704;
 
 /** Foliage clumps of the trees framing the sides: [x, y, rx, ry]; the right side mirrors the left.
- * Below the top edge they stay left of x = 580, so they show only in the margins beside the page.
+ * They stay left of x = 580, so they show only in the margins beside the page.
  * The moon sits high on the right, clear of the page titles and the test's counter. */
 const CLUMPS: [number, number, number, number][] = [
-  [520, 0, 230, 80], [380, 130, 170, 64], [480, 210, 100, 50], [400, 300, 170, 60],
+  [430, 0, 150, 80], [380, 130, 170, 64], [480, 210, 100, 50], [400, 300, 170, 60],
   [350, 400, 160, 56], [460, 480, 110, 50], [380, 580, 140, 54],
 ];
 const ROCKS: [number, number, number, number][] = [[400, 850, 130, 70], [580, 870, 140, 46], [720, 888, 90, 30]];
@@ -138,7 +138,7 @@ const BUSHES: [number, number, number, number][] = [[650, 806, 60, 34], [770, 83
 const sides = <T extends number[]>(list: T[]) => [...list, ...list.map(mirror)];
 
 const SCENE = {
-  stars: scatter(0, 380, 70, 4, 4, 31),
+  stars: scatter(0, 240, 44, 4, 4, 31),
   moonHalo: ellipse(1780, 110, 72),
   moon: ellipse(1780, 110, 44),
   clouds:
