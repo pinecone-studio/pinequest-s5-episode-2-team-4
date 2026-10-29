@@ -6,7 +6,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { type AccountProgress, findAccountById, saveAccount } from "./accounts";
-import type { QuestLog, SignalLevel, User, UserPet } from "./types";
+import type { QuestLog, ShopState, SignalLevel, User, UserPet } from "./types";
 import type { LearningStreak } from "./streak";
 
 /** Who is logged in: the account id. */
@@ -51,6 +51,8 @@ export type Account = {
   gamesPlayed?: number;
   /** Unlocked achievement ids and when (ISO date); each gave its coins once. */
   achievements?: Record<string, string>;
+  /** Pet shop items bought and the ones worn. */
+  shop?: ShopState;
   /** Assignment demo: the other demo account (teacher or student) and its assignment. */
   demoTour?: { otherId: string; assignmentId: string };
   /** «Ойлгосон уу?» for the day's class lesson: what the student answered, so the home card shows it. */

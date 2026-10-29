@@ -52,6 +52,7 @@ import {
 } from "./classes";
 import { type AchievementStats, achievementList } from "./achievements";
 import { questsWithProgress } from "./quests";
+import { findShopItem, shopEntries } from "./shop";
 import { readSession } from "./session";
 import { classOverviewFrom, heatmapFrom, progressFrom, scoreTest, type ClassProgress } from "./scoring";
 import { findSignal, listDaySignals, listSignalsBetween, signalsStored, summarizeSignals } from "./signals";
@@ -68,6 +69,8 @@ import { learningDay, shiftDay, streakSummary } from "./streak";
 import type {
   AchievementProgress,
   DailyQuest,
+  ShopEntry,
+  ShopItem,
   Assignment,
   AssignmentDraft,
   ClassSchedule,
@@ -219,6 +222,27 @@ export async function getAchievementStats(): Promise<AchievementStats | undefine
 export async function getAchievements(): Promise<AchievementProgress[]> {
   const [stats, session] = await Promise.all([getAchievementStats(), readSession()]);
   return stats ? achievementList(stats, session?.achievements) : [];
+}
+
+/** The pet shop for the current student: every item with owned and worn, and their coins. */
+export async function getShop(): Promise<{ items: ShopEntry[]; coins: number } | undefined> {
+  const session = await readSession();
+  if (session?.role !== "student") return undefined;
+  return { items: shopEntries(session.shop), coins: session.coins ?? 0 };
+}
+
+/** The shop items the current student wears: a scene, a ring colour and an aura (each optional). */
+export async function getEquippedItems(): Promise<{
+  scene?: Extract<ShopItem, { slot: "scene" }>;
+  ring?: Extract<ShopItem, { slot: "ring" }>;
+  aura?: Extract<ShopItem, { slot: "aura" }>;
+}> {
+  const equipped = (await readSession())?.shop?.equipped ?? {};
+  const pick = <S extends ShopItem["slot"]>(slot: S) => {
+    const item = equipped[slot] ? findShopItem(equipped[slot]) : undefined;
+    return item?.slot === slot ? (item as Extract<ShopItem, { slot: S }>) : undefined;
+  };
+  return { scene: pick("scene"), ring: pick("ring"), aura: pick("aura") };
 }
 
 /** The current user's pet with its line and the stage for its level. */
