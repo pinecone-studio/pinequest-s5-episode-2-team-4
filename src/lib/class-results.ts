@@ -65,3 +65,20 @@ export function summarizeRow(row: HeatmapRow): SubtopicResult {
     step: nextStep(counts, tested),
   };
 }
+
+/** Every subtopic, weakest first: most weak students, then most still learning. */
+export function summarizeResults(rows: HeatmapRow[]): SubtopicResult[] {
+  return rows
+    .map(summarizeRow)
+    .sort((a, b) => b.counts.weak - a.counts.weak || b.counts.learning - a.counts.learning);
+}
+
+/**
+ * The subtopic to look at first (the top of the weakest-first list), or none
+ * when there are too few results or every tested student is good at it.
+ */
+export function hardestSubtopic(results: SubtopicResult[]): SubtopicResult | undefined {
+  const [first] = results;
+  if (!first || first.step === "few") return undefined;
+  return first.counts.weak + first.counts.learning > 0 ? first : undefined;
+}
