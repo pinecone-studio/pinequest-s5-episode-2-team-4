@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Nunito } from "next/font/google";
 import { Suspense } from "react";
@@ -17,6 +17,12 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "LevelUp",
   description: "Ойлгоогүйгээ өөрийн хурдаар нөх.",
+};
+
+// Full screen on iPhones, so env(safe-area-inset-bottom) works and the phone
+// dock (MobileNav) can sit above the home bar.
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

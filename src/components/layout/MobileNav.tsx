@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { usePetPreview } from "@/components/pet/petPreview";
+import { cn } from "@/lib/cn";
 import { NavBadge } from "./NavBadge";
 import { NavPill } from "./NavPill";
 import { HomeIcon, PlayIcon, TaskIcon, VideoIcon } from "./navIcons";
@@ -11,13 +12,18 @@ import type { NavCounts } from "./SiteHeader";
 
 function petIcon(sprite?: string) {
   return sprite ? (
-    <PetSprite stage={{ name: "", sprite }} size={24} />
+    <PetSprite stage={{ name: "", sprite }} size={24} className="animate-bob" />
   ) : (
     <span aria-hidden="true" className="size-6 rounded-full bg-lavender" />
   );
 }
 
-/** Sticky bottom navigation for student pages on phones and tablets. */
+/**
+ * Bottom navigation for student pages on phones and tablets: a floating dock
+ * whose current item rises into a purple circle. It stays in the page flow
+ * (sticky), so at the end of the page it sits below the footer instead of
+ * covering it, and it keeps clear of the iPhone home bar.
+ */
 export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: string; counts?: NavCounts }) {
   // The /pets evolution demo shows each stage here too.
   const petSprite = usePetPreview()?.sprite ?? realSprite;
@@ -31,35 +37,48 @@ export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: 
   ];
 
   return (
-    // The white bar is this wrapper, not the nav: the nav is named for page
-    // transitions, and its snapshot must be transparent so the sliding pill
-    // shows beneath the labels.
-    <div className="sticky bottom-0 z-10 bg-white shadow-[0_-8px_24px_rgb(63_7_145/0.1)] lg:hidden">
-      <nav
-        aria-label="Үндсэн цэс"
-        style={{ viewTransitionName: "bottom-nav" }}
-        className="grid grid-cols-5 gap-1 px-3 pt-2 pb-3"
-      >
-        {LINKS.map((link) => {
-          const active =
-            link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-current={active ? "page" : undefined}
-              className="relative isolate flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-card text-xs font-bold text-ink no-underline hover:text-ink"
-            >
-              {active && <NavPill name="mobile-pill" className="inset-0 rounded-card bg-lavender" />}
-              {link.icon}
-              {link.label}
-              {link.count ? (
-                <NavBadge count={link.count} label={`${link.count} ${link.countLabel}`} className="absolute top-1 right-[calc(50%-24px)]" />
-              ) : null}
-            </Link>
-          );
-        })}
-      </nav>
+    <div className="sticky bottom-0 z-10 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+      <div className="relative mx-auto max-w-md">
+        {/* The white dock is its own layer, not the nav: the nav is named for
+            page transitions, and its snapshot must be transparent so the
+            sliding circle shows beneath the icons. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full border border-line bg-white/90 shadow-float backdrop-blur-md"
+        />
+        <nav
+          aria-label="Үндсэн цэс"
+          style={{ viewTransitionName: "bottom-nav" }}
+          className="relative grid grid-cols-5 gap-1 px-2 py-1.5"
+        >
+          {LINKS.map((link) => {
+            const active =
+              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className="flex min-h-15 flex-col items-center justify-end gap-0.5 rounded-card pb-1 text-xs font-bold text-ink no-underline hover:text-ink"
+              >
+                <span
+                  className={cn(
+                    "relative isolate flex size-11 items-center justify-center rounded-full",
+                    active ? "-translate-y-3.5 text-white" : "text-ink",
+                  )}
+                >
+                  {active && <NavPill name="mobile-pill" className="inset-0 rounded-full bg-primary shadow-3d" />}
+                  {link.icon}
+                  {link.count ? (
+                    <NavBadge count={link.count} label={`${link.count} ${link.countLabel}`} className="absolute -top-1 -right-1.5" />
+                  ) : null}
+                </span>
+                <span className={active ? "text-primary" : undefined}>{link.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }
