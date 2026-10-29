@@ -7,8 +7,8 @@ This is a team project. Every team member works with Claude Code, so follow thes
 ## Stack
 
 - Next.js (App Router) + React + TypeScript + Tailwind CSS, source in `src/`, import alias `@/*`.
-- npm only (`package-lock.json` is committed). Do not use yarn/pnpm/bun.
-- Before every commit run `npm run lint` and `npm run build`; both must pass.
+- Node 22 (`.nvmrc`; run `nvm use`). npm only (`package-lock.json` is committed). Do not use yarn/pnpm/bun.
+- Before every commit run `npm run lint`, `npm test` and `npm run build`; all three must pass.
 
 ## Product and design
 
