@@ -53,13 +53,15 @@ export default async function TestPage({ searchParams }: PageProps<"/test">) {
         <p className="text-sm font-semibold text-ink-muted">
           Дахин өгвөл энэ дүн шинэ дүнгээр солигдоно. Эзэмшсэн сэдвүүд хэвээр үлдэнэ.
         </p>
-        {/* Demo: retake with the sample answers already filled in. */}
-        <Link
-          href="/test?retake=1&fill=1"
-          className="inline-flex min-h-12 items-center px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 md:min-h-11"
-        >
-          Жишээ хариултаар бөглөх
-        </Link>
+        {/* Demo accounts: retake with the sample answers already filled in. */}
+        {sampleAnswers && (
+          <Link
+            href="/test?retake=1&fill=1"
+            className="inline-flex min-h-12 items-center px-4 text-sm font-semibold text-ink-muted underline underline-offset-4 md:min-h-11"
+          >
+            Жишээ хариултаар бөглөх
+          </Link>
+        )}
       </section>
     );
   }
