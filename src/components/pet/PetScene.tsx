@@ -1,7 +1,9 @@
 import { cn } from "@/lib/cn";
 import { PET_MOOD_LABELS, type PetMood } from "@/lib/pets";
-import type { PetElement, PetStage } from "@/lib/types";
+import { DEFAULT_SCENE_PALETTE } from "@/lib/shop";
+import type { PetElement, PetStage, ScenePalette } from "@/lib/types";
 import { ElementBadge } from "./ElementBadge";
+import { type Aura, PetAura } from "./PetAura";
 import { PetSprite } from "./PetSprite";
 import "./PetScene.css";
 
@@ -13,6 +15,10 @@ type PetSceneProps = {
   mood: PetMood;
   /** False for a pet the student hasn't found yet: a silhouette named «???», no level. */
   discovered?: boolean;
+  /** The worn shop scene's colours; the meadow by default. */
+  palette?: ScenePalette;
+  /** The worn shop aura around the pet. */
+  aura?: Aura;
   className?: string;
 };
 
@@ -20,7 +26,16 @@ type PetSceneProps = {
  * A pet in its pixel-art habitat (design: Тэжээвэр), with its name, level
  * and type. The mood sets how it moves and whether it's night.
  */
-export function PetScene({ stage, level, element, mood, discovered = true, className }: PetSceneProps) {
+export function PetScene({
+  stage,
+  level,
+  element,
+  mood,
+  discovered = true,
+  palette = DEFAULT_SCENE_PALETTE,
+  aura,
+  className,
+}: PetSceneProps) {
   const alt = discovered ? `${PET_MOOD_LABELS[mood]} ${stage.name}` : "Олдоогүй тэжээвэр";
   const silhouette = !discovered && "opacity-40 brightness-0";
   return (
@@ -32,10 +47,11 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
         className,
       )}
     >
-      <SceneArt />
+      <SceneArt c={palette} />
       <div className="pet-scene-pet absolute bottom-14 left-1/2 -ml-24 w-48 md:bottom-26 md:-ml-32 md:w-64">
         <PetSprite stage={stage} size={192} alt={alt} className={cn("md:hidden", silhouette)} />
         <PetSprite stage={stage} size={256} alt={alt} className={cn("hidden md:block", silhouette)} />
+        {aura && discovered ? <PetAura {...aura} /> : null}
       </div>
       <span
         aria-hidden="true"
@@ -67,23 +83,9 @@ export function PetScene({ stage, level, element, mood, discovered = true, class
   );
 }
 
-// Fixed artwork colors from the design, like the sprites: the scene looks
-// the same in the dark theme.
-const C = {
-  sky: "#e6f5fc",
-  haze: "#eeedff",
-  pink: "#fcf1f7",
-  mountain: "#d9d5f5",
-  hill: "#dcd8f6",
-  ground: "#f2f1ff",
-  meadow: "#dad9ff",
-  grass: "#cac4f4",
-  primary: "#5b00ed",
-  bloomPink: "#f3b0d8",
-  bloomViolet: "#b9a8f5",
-  night: "#3f0791",
-  white: "#ffffff",
-};
+// Artwork colours come from a palette (the meadow, or a worn shop scene),
+// fixed like the sprites: the scene looks the same in the dark theme.
+type Colour = keyof ScenePalette;
 
 const round = (n: number) => Math.round(n * 10) / 10;
 
@@ -97,19 +99,19 @@ function sparkle(x: number, y: number, r: number) {
 /** Positions in the 640×600 scene, from the design. */
 const TREES = [[60, 392], [96, 384], [520, 394], [556, 388], [596, 398]];
 const GRASS = [[36, 512], [120, 500], [470, 500], [566, 512], [250, 540], [380, 546]];
-const FLOWERS: [number, number, string][] = [
-  [80, 520, C.bloomPink],
-  [190, 548, C.bloomViolet],
-  [452, 540, C.bloomPink],
-  [600, 530, C.bloomViolet],
-  [330, 560, C.bloomPink],
+const FLOWERS: [number, number, Colour][] = [
+  [80, 520, "bloomPink"],
+  [190, 548, "bloomViolet"],
+  [452, 540, "bloomPink"],
+  [600, 530, "bloomViolet"],
+  [330, 560, "bloomPink"],
 ];
-const SPARKLES: [number, number, number, string, number][] = [
-  [574, 58, 12, C.bloomPink, 0],
-  [96, 161, 9, C.bloomViolet, -0.8],
-  [250, 103, 7, C.white, -1.6],
-  [400, 52, 8, C.bloomViolet, -1.2],
-  [610, 223, 7, C.white, -0.4],
+const SPARKLES: [number, number, number, Colour, number][] = [
+  [574, 58, 12, "bloomPink", 0],
+  [96, 161, 9, "bloomViolet", -0.8],
+  [250, 103, 7, "white", -1.6],
+  [400, 52, 8, "bloomViolet", -1.2],
+  [610, 223, 7, "white", -0.4],
 ];
 const STARS: [number, number, number, number][] = [
   [40, 40, 4, 0],
@@ -123,17 +125,17 @@ const STARS: [number, number, number, number][] = [
   [160, 220, 3, -1.8],
   [470, 230, 3, -0.2],
 ];
-const RISING: [number, number, number, string, number][] = [
-  [232, 470, 6, C.bloomViolet, 0],
-  [402, 476, 5, C.bloomPink, -1.4],
-  [286, 480, 4, C.white, -2.6],
-  [360, 468, 6, C.white, -3.5],
-  [452, 482, 4, C.bloomViolet, -0.7],
-  [190, 484, 5, C.bloomPink, -4.2],
+const RISING: [number, number, number, Colour, number][] = [
+  [232, 470, 6, "bloomViolet", 0],
+  [402, 476, 5, "bloomPink", -1.4],
+  [286, 480, 4, "white", -2.6],
+  [360, 468, 6, "white", -3.5],
+  [452, 482, 4, "bloomViolet", -0.7],
+  [190, 484, 5, "bloomPink", -4.2],
 ];
 
 /** Sky, sun, clouds, hills, trees and meadow; a night sky and stars fade in when the pet is sleepy. */
-function SceneArt() {
+function SceneArt({ c: C }: { c: ScenePalette }) {
   return (
     <svg
       aria-hidden="true"
@@ -209,7 +211,7 @@ function SceneArt() {
       {FLOWERS.map(([x, y, color]) => (
         <g key={`${x}-${y}`}>
           <rect x={x} y={y} width="3" height="10" fill={C.grass} />
-          <rect x={x - 3} y={y - 8} width="9" height="9" fill={color} />
+          <rect x={x - 3} y={y - 8} width="9" height="9" fill={C[color]} />
         </g>
       ))}
       {SPARKLES.map(([x, y, r, color, delay]) => (
@@ -217,7 +219,7 @@ function SceneArt() {
           key={`${x}-${y}`}
           className="pet-scene-twinkle"
           style={{ animationDelay: `${delay}s` }}
-          fill={color}
+          fill={C[color]}
           d={sparkle(x, y, r)}
         />
       ))}
@@ -246,7 +248,7 @@ function SceneArt() {
           y={y}
           width={size}
           height={size}
-          fill={color}
+          fill={C[color]}
         />
       ))}
     </svg>

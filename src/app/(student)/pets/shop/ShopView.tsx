@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import { CoinIcon } from "@/components/layout/CoinChip";
+import { PetAura } from "@/components/pet/PetAura";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { Button } from "@/components/ui";
 import { cn } from "@/lib/cn";
@@ -80,22 +81,12 @@ function RingPreview({ colors, sprite }: { colors?: string[]; sprite?: string })
   );
 }
 
-const SPARKLE = "M6 0l1.8 4.2L12 6l-4.2 1.8L6 12 4.2 7.8 0 6l4.2-1.8z";
-const HEART = "M6 11 1 6a3 3 0 0 1 5-3 3 3 0 0 1 5 3z";
-const AURA_SPOTS = [[6, 10], [62, 6], [70, 44], [2, 52], [36, 0]];
-
 /** The pet with sparkles or hearts around it. */
 function AuraPreview({ shape, colors, sprite }: { shape?: "sparkle" | "heart"; colors?: string[]; sprite?: string }) {
   return (
     <span className="relative flex size-20 items-center justify-center">
       {sprite && <PetSprite stage={{ name: "", sprite }} size={56} className={shape ? "animate-bob" : undefined} />}
-      {shape &&
-        colors &&
-        AURA_SPOTS.map(([x, y], i) => (
-          <svg key={i} viewBox="0 0 12 12" aria-hidden="true" className="absolute size-3.5" style={{ left: x, top: y }}>
-            <path d={shape === "heart" ? HEART : SPARKLE} fill={colors[i % colors.length]} stroke="rgb(0 0 0 / 0.15)" strokeWidth=".6" />
-          </svg>
-        ))}
+      {shape && colors && <PetAura shape={shape} colors={colors} />}
     </span>
   );
 }

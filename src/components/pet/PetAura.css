@@ -1,0 +1,17 @@
+/* Each aura shape twinkles in turn. Motion is switched off globally by
+   prefers-reduced-motion in globals.css. */
+.pet-aura {
+  animation: pet-aura-twinkle 2.4s ease-in-out infinite;
+}
+
+@keyframes pet-aura-twinkle {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.75);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { Aura } from "@/components/pet/PetAura";
 import { PetScene } from "@/components/pet/PetScene";
 import { type PetMood, stageIndex } from "@/lib/pets";
-import type { OwnedPet, PetLine, UserPet } from "@/lib/types";
+import type { OwnedPet, PetLine, ScenePalette, UserPet } from "@/lib/types";
 import { EvolutionPath } from "./EvolutionPath";
 import { PetCollection } from "./PetCollection";
 
@@ -14,6 +15,10 @@ type PetsViewProps = {
   /** The student's own pet, which levels up as they learn. */
   myPet: UserPet | undefined;
   mood: PetMood;
+  /** The worn shop scene, for every pet's habitat. */
+  palette?: ScenePalette;
+  /** The worn shop aura, on the student's own pet only. */
+  aura?: Aura;
 };
 
 /**
@@ -21,7 +26,7 @@ type PetsViewProps = {
  * below; with nothing picked, the student's own pet. Pets not found yet stay
  * silhouettes.
  */
-export function PetsView({ lines, owned, dropsFrom, myPet, mood }: PetsViewProps) {
+export function PetsView({ lines, owned, dropsFrom, myPet, mood, palette, aura }: PetsViewProps) {
   const [selectedId, setSelectedId] = useState<string | null>(myPet?.lineId ?? lines[0]?.id ?? null);
 
   // The student's own pet shows its learning level everywhere here, like the
@@ -42,6 +47,8 @@ export function PetsView({ lines, owned, dropsFrom, myPet, mood }: PetsViewProps
             element={line.element}
             mood={mood}
             discovered={pet !== undefined}
+            palette={palette}
+            aura={line.id === myPet?.lineId ? aura : undefined}
           />
           <EvolutionPath line={line} level={pet?.level ?? 1} xp={pet?.exp ?? 0} discovered={pet !== undefined} />
         </div>
