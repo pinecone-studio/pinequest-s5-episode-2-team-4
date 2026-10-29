@@ -86,6 +86,7 @@ export const notifications: TeacherNotification[] = [
 
 export const classGoal: ClassGoal = {
   classCode: "7А",
+  name: "7А",
   targetXp: 5000,
   currentXp: 3200,
   reward: "Ангиараа шинэ тэжээвэр нээнэ",

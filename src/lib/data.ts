@@ -40,6 +40,7 @@ import { isAssignmentGame } from "./gamefit";
 import { grade7MathCurriculum } from "./mock/curriculum";
 import { DEMO_CLASS_CODE } from "./accounts";
 import {
+  classPetXp,
   classesStored,
   countClassMembers,
   findInviteClass,
@@ -88,6 +89,7 @@ import type {
   User,
   SchoolClass,
   ClassMember,
+  ClassOption,
 } from "./types";
 import {
   helperConversation,
@@ -448,8 +450,33 @@ export async function getNotifications() {
   return notifications;
 }
 
-export async function getClassGoal(): Promise<ClassGoal> {
-  return classGoal;
+/** Per student, the XP the class goal asks for: two pet levels each. */
+const GOAL_XP_PER_STUDENT = 2 * XP_PER_LEVEL;
+
+/**
+ * The current class's shared XP goal: its students' pet XP added up, for the
+ * teacher's open class or the student's chosen one. Demo accounts (and
+ * servers without Supabase) see the sample class; no class means no goal.
+ */
+export async function getClassGoal(): Promise<ClassGoal | undefined> {
+  const user = await getCurrentUser();
+  if (!user || user.demo || !classesStored()) return classGoal;
+  const active = user.role === "teacher" ? await getActiveClass() : (await getStudentSubject())?.class;
+  if (!active) return undefined;
+  try {
+    const found = await classPetXp(active.code);
+    if (!found) return undefined;
+    return {
+      classCode: active.code,
+      name: active.name,
+      targetXp: Math.max(1, found.students) * GOAL_XP_PER_STUDENT,
+      currentXp: found.xp,
+      reward: classGoal.reward,
+    };
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 }
 
 // Anonymous questions (answered by the teacher or classmates, not the AI)
@@ -600,16 +627,28 @@ export async function getClassSize(classCode: string): Promise<number> {
   return (await countClassMembers(classCode).catch(() => undefined)) ?? countClassStudents(classCode);
 }
 
-/** Class codes the teacher has used, to offer when publishing. */
-export async function getTeacherClassCodes(): Promise<string[]> {
+/**
+ * The classes a teacher can publish assignments and videos to, the current
+ * one first. Codes they published to before classes existed (typed by hand)
+ * stay listed, so that old work can still be edited.
+ */
+export async function getTeacherClassOptions(): Promise<ClassOption[]> {
   const session = await readSession();
   if (session?.role !== "teacher") return [];
-  const [assignments, videos] = await Promise.all([
+  const [classes, assignments, videos] = await Promise.all([
+    getTeacherClasses(),
     listTeacherAssignments(session.id),
     listTeacherVideos(session.id),
   ]);
-  const codes = [session.classCode, ...assignments.map((a) => a.classCode), ...videos.map((v) => v.classCode)];
-  return [...new Set(codes.filter((c): c is string => Boolean(c)))];
+  const options = [...classes]
+    .sort((a, b) => Number(b.code === session.classCode) - Number(a.code === session.classCode))
+    .map((c) => ({ code: c.code, name: c.name }));
+  for (const { classCode } of [...assignments, ...videos]) {
+    if (classCode && !options.some((o) => o.code === classCode)) {
+      options.push({ code: classCode, name: `${classCode} (хуучин)` });
+    }
+  }
+  return options;
 }
 
 export type StudentAssignment = Assignment & {
