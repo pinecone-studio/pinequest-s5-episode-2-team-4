@@ -48,7 +48,7 @@ export function LessonSection({
 
       <div className="mt-4 grid gap-4 md:mt-7 md:gap-6 min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] min-[1100px]:gap-x-7">
         <div className="flex min-w-0 flex-col gap-4 md:gap-6">{children}</div>
-        <div className="min-w-0 min-[1100px]:sticky min-[1100px]:top-6 min-[1100px]:row-span-2 min-[1100px]:self-start">
+        <div className="min-w-0 min-[1100px]:sticky min-[1100px]:top-28 min-[1100px]:row-span-2 min-[1100px]:self-start">
           {helper}
         </div>
         <div className="min-w-0 min-[1100px]:col-start-1">{footer}</div>

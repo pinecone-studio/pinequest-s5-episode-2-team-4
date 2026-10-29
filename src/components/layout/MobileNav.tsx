@@ -6,67 +6,8 @@ import { PetSprite } from "@/components/pet/PetSprite";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { NavBadge } from "./NavBadge";
 import { NavPill } from "./NavPill";
+import { HomeIcon, PlayIcon, TaskIcon, VideoIcon } from "./navIcons";
 import type { NavCounts } from "./SiteHeader";
-
-const HomeIcon = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className="size-5.5"
-  >
-    <path d="M3 10.5 12 3l9 7.5" />
-    <path d="M5 9.5V21h14V9.5" />
-  </svg>
-);
-
-const PlayIcon = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-    className="size-5.5"
-  >
-    <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" />
-  </svg>
-);
-
-const VideoIcon = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className="size-5.5"
-  >
-    <rect x="3" y="5" width="13" height="14" rx="2.5" />
-    <path d="m16 10 5-3v10l-5-3" />
-  </svg>
-);
-
-const TaskIcon = (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    className="size-5.5"
-  >
-    <rect x="5" y="4" width="14" height="17" rx="2.5" />
-    <path d="M9 4.5V3h6v1.5" />
-    <path d="m9 12.5 2 2 4-4" />
-  </svg>
-);
 
 function petIcon(sprite?: string) {
   return sprite ? (
@@ -82,10 +23,10 @@ export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: 
   const petSprite = usePetPreview()?.sprite ?? realSprite;
   const pathname = usePathname();
   const LINKS = [
-    { href: "/", label: "Нүүр", icon: HomeIcon },
-    { href: "/games", label: "Тоглоом", icon: PlayIcon },
-    { href: "/videos", label: "Видео", icon: VideoIcon, count: counts.videos, countLabel: "шинэ видео" },
-    { href: "/assignments", label: "Даалгавар", icon: TaskIcon, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
+    { href: "/", label: "Нүүр", icon: <HomeIcon className="size-5.5" /> },
+    { href: "/games", label: "Тоглоом", icon: <PlayIcon className="size-5.5" /> },
+    { href: "/videos", label: "Видео", icon: <VideoIcon className="size-5.5" />, count: counts.videos, countLabel: "шинэ видео" },
+    { href: "/assignments", label: "Даалгавар", icon: <TaskIcon className="size-5.5" />, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
     { href: "/pets", label: "Тэжээвэр", icon: petIcon(petSprite) },
   ];
 

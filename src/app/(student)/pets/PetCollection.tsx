@@ -238,7 +238,7 @@ function PetDetail({ line, pet, pickedStage, onPickStage, onClose, dropsFrom, pe
   return (
     <aside
       aria-labelledby="pet-detail-name"
-      className="pets-detail-in relative order-first rounded-[25px] bg-white p-3.5 shadow-float xl:sticky xl:top-6 xl:order-last xl:rounded-panel xl:p-5"
+      className="pets-detail-in relative order-first rounded-[25px] bg-white p-3.5 shadow-float xl:sticky xl:top-28 xl:order-last xl:rounded-panel xl:p-5"
     >
       <button
         type="button"
