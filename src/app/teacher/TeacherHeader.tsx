@@ -15,7 +15,8 @@ export async function TeacherHeader() {
   const active = await getActiveClass();
 
   return (
-    <header className="mb-6 border-b border-line md:mb-8">
+    // Named so it stays put while the page below animates (globals.css).
+    <header style={{ viewTransitionName: "site-header" }} className="mb-6 border-b border-line md:mb-8">
       <div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
         <div className="flex items-center gap-6">
           <Link

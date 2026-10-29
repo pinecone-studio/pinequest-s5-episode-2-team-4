@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { logOut } from "@/lib/actions";
 import { Logo } from "./Logo";
+import { NavPill } from "./NavPill";
 import { NavBadge } from "./NavBadge";
 import { PetChip } from "./PetChip";
 
@@ -25,7 +26,7 @@ const NAV_LINKS: { href: string; label: string; count?: keyof NavCounts; countLa
 // No display or padding here: each link sets its own, so a `hidden`
 // never clashes with `inline-flex`.
 const navLinkClass =
-  "min-h-12 items-center rounded-full font-semibold text-ink no-underline hover:bg-white/60 hover:text-ink";
+  "min-h-12 items-center rounded-full font-semibold text-ink no-underline transition-colors duration-200 hover:bg-white/60 hover:text-ink";
 
 type SiteHeaderProps = {
   pet?: React.ComponentProps<typeof PetChip>;
@@ -45,7 +46,11 @@ export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderPro
       : realPet;
 
   return (
-    <header className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]">
+    // Named so it stays put while the page below animates (globals.css).
+    <header
+      style={{ viewTransitionName: "site-header" }}
+      className="relative z-10 mx-auto flex h-18 w-full max-w-7xl items-center justify-between gap-3 px-4 md:h-22 md:gap-4 md:px-[clamp(16px,4vw,40px)]"
+    >
       <div className="flex items-center gap-6">
         <Link
           href="/"
@@ -62,8 +67,9 @@ export function SiteHeader({ pet: realPet, counts = {}, subject }: SiteHeaderPro
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`${navLinkClass} inline-flex gap-2 px-4 whitespace-nowrap xl:px-5 ${active ? "bg-lavender" : ""}`}
+                className={`${navLinkClass} relative isolate inline-flex gap-2 px-4 whitespace-nowrap xl:px-5`}
               >
+                {active && <NavPill name="header-pill" />}
                 {link.label}
                 {link.count && (
                   <NavBadge count={counts[link.count] ?? 0} label={`${counts[link.count] ?? 0} ${link.countLabel}`} />
