@@ -737,3 +737,59 @@ export type BattleLog = {
     perStudent: { correct: number; wrong: number; damage: number }[];
   };
 };
+
+// Lesson schedule (supabase/migrations/0018_lesson_schedule.sql)
+
+/** A topic a lesson can be about; `key` is what «Ойлгосон уу?» signals use. */
+export type LessonTopic = {
+  key: string;
+  title: string;
+  /** e.g. the curriculum chapter, to group a long list */
+  group?: string;
+};
+
+/** The topic a teacher planned for one lesson day. */
+export type LessonPlan = {
+  /** "YYYY-MM-DD" */
+  day: string;
+  topicKey: string;
+  topicTitle: string;
+};
+
+/** Today's lesson for a student: asked «Ойлгосон уу?» on lesson days. */
+export type TodayLesson = {
+  day: string;
+  /** The planned topic; without one the student picks from `options`. */
+  topic?: LessonTopic;
+  options: LessonTopic[];
+  /** What the student already answered today */
+  answered?: { topicKey: string; level: SignalLevel };
+};
+
+/** The teacher's open class: lesson weekdays and the next lesson days. */
+export type ClassSchedule = {
+  className: string;
+  /** ISO weekdays, Monday = 1 */
+  lessonDays: number[];
+  upcoming: { day: string; plan?: LessonPlan }[];
+  /** What a day can be about: the curriculum plus topics the teacher typed before */
+  topics: LessonTopic[];
+  /** False for demo teachers: changes aren't saved */
+  editable: boolean;
+};
+
+/** One lesson day's signals for the teacher, per topic. */
+export type LessonDaySignals = {
+  day: string;
+  rows: (SignalSummary & { title: string })[];
+};
+
+/** A school week (Monday to Sunday, "YYYY-MM-DD"); the current one ends today. */
+export type SignalWeek = { from: string; to: string };
+
+/** The lesson days of one week, and the weeks a teacher can pick from (newest first). */
+export type WeekSignals = {
+  week: SignalWeek;
+  days: LessonDaySignals[];
+  weeks: SignalWeek[];
+};

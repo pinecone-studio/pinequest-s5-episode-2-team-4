@@ -1,18 +1,20 @@
 import Link from "next/link";
+import { AccountMenu } from "@/components/layout/AccountMenu";
 import { Logo } from "@/components/layout/Logo";
-import { logOut } from "@/lib/actions";
-import { getActiveClass } from "@/lib/data";
+import { SwapIcon } from "@/components/layout/navIcons";
+import { getActiveClass, getCurrentUser } from "@/lib/data";
 import { subjectTitle } from "@/lib/subjects";
-import { TeacherNav } from "./TeacherNav";
+import { SectionTabs, TeacherNav } from "./TeacherNav";
 
 /**
- * Header for the teacher dashboard, laid out like the student one: logo with a
- * "Багш" tag and the sections, then the current class and log out. Below lg the
- * sections move to a second row of tabs inside the header.
+ * Header for the teacher pages: logo with a "Багш" tag and the four sections
+ * (lg up; the dock has them below lg), then the current class and the
+ * account menu (dark mode, «Гарах»). A section with two pages shows them as
+ * tabs under the header.
  */
 export async function TeacherHeader() {
   // The layout makes sure there is one.
-  const active = await getActiveClass();
+  const [active, user] = await Promise.all([getActiveClass(), getCurrentUser()]);
 
   return (
     // Named so it stays put while the page below animates (globals.css).
@@ -29,7 +31,7 @@ export async function TeacherHeader() {
               Багш
             </span>
           </Link>
-          <TeacherNav variant="bar" className="hidden lg:block" />
+          <TeacherNav className="hidden lg:block" />
         </div>
 
         <div className="flex items-center gap-2">
@@ -55,37 +57,22 @@ export async function TeacherHeader() {
               <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
             </svg>
           </Link>
-          <form action={logOut}>
-            {/* Icon only on mobile, where the header is tight. */}
-            <button
-              type="submit"
-              aria-label="Гарах"
-              className="inline-flex min-h-12 min-w-12 cursor-pointer items-center justify-center gap-2 rounded-full px-3 text-sm font-semibold text-ink hover:bg-white/60 md:px-4"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                className="size-5"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <path d="m16 17 5-5-5-5" />
-                <path d="M21 12H9" />
-              </svg>
-              <span className="hidden md:inline">Гарах</span>
-            </button>
-          </form>
+          <AccountMenu
+            label="Бүртгэлийн цэс"
+            title={user?.username ?? "Багш"}
+            subtitle={active ? `${active.name} анги · ${subjectTitle(active.subject)}` : undefined}
+            links={[{ href: "/classes", label: "Анги солих", icon: <SwapIcon /> }]}
+            trigger={
+              <span className="flex size-12 items-center justify-center rounded-full bg-ink text-base font-bold text-white">
+                {(user?.username ?? "Б").slice(0, 1).toUpperCase()}
+              </span>
+            }
+            triggerClassName="rounded-full"
+          />
         </div>
       </div>
 
-      <TeacherNav
-        variant="tabs"
-        className="mx-auto w-full max-w-7xl px-4 md:px-[clamp(16px,4vw,40px)] lg:hidden"
-      />
+      <SectionTabs className="mx-auto w-full max-w-7xl px-4 md:px-[clamp(16px,4vw,40px)]" />
     </header>
   );
 }

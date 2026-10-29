@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { usePetPreview } from "@/components/pet/petPreview";
 import { ButtonLink } from "@/components/ui";
-import { logOut } from "@/lib/actions";
 import { cn } from "@/lib/cn";
+import { AccountMenu } from "./AccountMenu";
 import { Logo } from "./Logo";
 import { NavPill } from "./NavPill";
 import { NavBadge } from "./NavBadge";
-import { BookIcon, HomeIcon, PlayIcon, TaskIcon } from "./navIcons";
+import { BookIcon, HomeIcon, PawIcon, PlayIcon, SwapIcon, TaskIcon } from "./navIcons";
 import { PetChip } from "./PetChip";
 
 export type NavCounts = {
@@ -18,6 +18,8 @@ export type NavCounts = {
   videos?: number;
   /** Assignments not finished yet */
   assignments?: number;
+  /** 1 while today's class lesson hasn't been answered («Ойлгосон уу?») */
+  lesson?: number;
 };
 
 // No display or padding here: each link sets its own, so a `hidden`
@@ -39,9 +41,9 @@ type SiteHeaderProps = {
 /**
  * Header for student pages (design: header), a floating bar that stays at
  * the top. Nav links and «Тоглох» move to MobileNav below lg (they don't fit
- * on tablets); the logo, subject, pet and logout stay. On smaller laptops the
- * bar drops the nav icons and the subject (below xl) and the pet's name (below
- * 1360px, where the bar reaches its full width).
+ * on tablets); the logo and the pet stay. The pet opens the account menu:
+ * the pet page, changing subject, dark mode and «Гарах». On smaller laptops
+ * the bar drops the nav icons (below xl) and the pet's name (below 1360px).
  */
 export function SiteHeader({ pet: realPet, counts = {}, subject, className }: SiteHeaderProps) {
   const pathname = usePathname();
@@ -53,7 +55,7 @@ export function SiteHeader({ pet: realPet, counts = {}, subject, className }: Si
       : realPet;
 
   const links: { href: string; label: string; icon: React.ReactNode; count?: number; countLabel?: string }[] = [
-    { href: "/", label: "Нүүр", icon: <HomeIcon className={iconClass} /> },
+    { href: "/", label: "Нүүр", icon: <HomeIcon className={iconClass} />, count: counts.lesson, countLabel: "өнөөдрийн хичээлийн асуулт" },
     { href: "/videos", label: "Хичээл", icon: <BookIcon className={iconClass} />, count: counts.videos, countLabel: "шинэ видео" },
     {
       href: "/pets",
@@ -110,52 +112,20 @@ export function SiteHeader({ pet: realPet, counts = {}, subject, className }: Si
             <PlayIcon className="size-4.5" />
             Тоглох
           </ButtonLink>
-          <Link
-            href="/subject"
-            aria-label={subject ? `Хичээл: ${subject}. Солих` : "Хичээл сонгох"}
-            aria-current={pathname === "/subject" ? "page" : undefined}
-            className={cn(navLinkClass, idleClass, "hidden gap-1.5 bg-surface px-4 text-sm sm:inline-flex lg:hidden xl:inline-flex")}
-          >
-            {subject ?? "Хичээл сонгох"}
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="size-4 text-ink-muted"
-            >
-              <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
-            </svg>
-          </Link>
           <span aria-hidden="true" className="mx-1 hidden h-9 w-px bg-line lg:block" />
-          {pet && <PetChip {...pet} />}
-          {/* No teacher link: only students see this header, and /teacher sends them home. */}
-          <form action={logOut}>
-            <button
-              type="submit"
-              aria-label="Гарах"
-              title="Гарах"
-              className={cn(navLinkClass, idleClass, "inline-flex min-w-12 cursor-pointer justify-center px-3")}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                className="size-5"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <path d="m16 17 5-5-5-5" />
-                <path d="M21 12H9" />
-              </svg>
-            </button>
-          </form>
+          {pet && (
+            <AccountMenu
+              label={`${pet.name}, түвшин ${pet.level}. Бүртгэлийн цэс`}
+              title={`${pet.name} · Түв. ${pet.level}`}
+              subtitle={subject ? `Хичээл: ${subject}` : undefined}
+              links={[
+                { href: "/pets", label: "Миний тэжээвэр", icon: <PawIcon /> },
+                { href: "/subject", label: "Хичээл солих", detail: subject, icon: <SwapIcon /> },
+              ]}
+              trigger={<PetChip {...pet} />}
+              triggerClassName="rounded-full hover:bg-surface"
+            />
+          )}
         </div>
       </div>
     </header>

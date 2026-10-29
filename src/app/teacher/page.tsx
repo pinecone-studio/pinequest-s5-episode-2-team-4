@@ -11,10 +11,12 @@ import {
   getHeatmap,
   getNotifications,
   getQuestionGroups,
+  getLessonDaySignals,
   getTodaySignals,
   getSubtopics,
   getTeacherClassBattle,
 } from "@/lib/data";
+import { topicTitle } from "@/lib/lesson-topics";
 import { subjectTitle } from "@/lib/subjects";
 import { AssignmentDraftCard } from "./AssignmentDraftCard";
 import { ClassBattleCard } from "./ClassBattleCard";
@@ -30,10 +32,9 @@ export const metadata: Metadata = {
   title: "Багшийн самбар · LevelUp",
 };
 
-// The demo student (student-17) is outlined in the heatmap.
-const HIGHLIGHTED_STUDENT = 17;
-
-export default async function TeacherPage() {
+export default async function TeacherPage({ searchParams }: PageProps<"/teacher">) {
+  // «Хичээлийн дохио» week: ?week=1 is last week.
+  const { week } = await searchParams;
   const overview = await getClassOverview();
   const [
     subtopics,
@@ -41,6 +42,7 @@ export default async function TeacherPage() {
     notifications,
     draft,
     signals,
+    weekSignals,
     groups,
     questions,
     classGoal,
@@ -54,6 +56,7 @@ export default async function TeacherPage() {
     getNotifications(),
     getAssignmentDraft(),
     getTodaySignals(),
+    getLessonDaySignals({ weeksBack: Number(week) || 0, beforeToday: true }),
     getQuestionGroups(),
     getAnonQuestions(),
     getClassGoal(),
@@ -102,28 +105,36 @@ export default async function TeacherPage() {
       <Heatmap
         rows={rows}
         testedCount={overview.testedCount}
-        highlight={HIGHLIGHTED_STUDENT}
       />
       <SignalPanel
-        rows={signals.map((s) => ({
+        today={signals.map((s) => ({
           ...s,
-          title: subtopicById.get(s.subtopicId)?.title ?? s.subtopicId,
+          // Class lesson topics too, not only the app lessons.
+          title: subtopicById.get(s.subtopicId)?.title ?? topicTitle(s.subtopicId) ?? s.subtopicId,
         }))}
+        signals={weekSignals}
         className="md:mt-5"
       />
-      <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
-        <AssignmentDraftCard
-          draft={draft}
-          subtopicTitle={subtopicById.get(draft.subtopicId)?.title ?? ""}
-          className="md:flex-[3_1_560px]"
-        />
-        <NotificationList
-          notifications={notifications}
-          subtopicTitles={new Map(subtopics.map((s) => [s.id, s.title]))}
-          alertCount={alertCount}
-          className="md:flex-[2_1_340px]"
-        />
-      </div>
+      {/* Demo accounts only for now: real classes have no draft or notifications yet. */}
+      {(draft || notifications.length > 0) && (
+        <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
+          {draft && (
+            <AssignmentDraftCard
+              draft={draft}
+              subtopicTitle={subtopicById.get(draft.subtopicId)?.title ?? ""}
+              className="md:flex-[3_1_560px]"
+            />
+          )}
+          {notifications.length > 0 && (
+            <NotificationList
+              notifications={notifications}
+              subtopicTitles={new Map(subtopics.map((s) => [s.id, s.title]))}
+              alertCount={alertCount}
+              className="md:flex-[2_1_340px]"
+            />
+          )}
+        </div>
+      )}
       <QuestionGroups groups={questionGroups} className="md:mt-5" />
       <PeerApproval questions={pendingAnswers} className="md:mt-5" />
       {classGoal && <ClassGoalCard goal={classGoal} className="md:mt-5" />}
