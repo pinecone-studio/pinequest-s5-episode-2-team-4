@@ -47,6 +47,10 @@ export type Account = {
   coins?: number;
   /** Today's counts toward the daily quests, and the quests already claimed. */
   quests?: QuestLog;
+  /** Games played to the end, ever (daily quests only count today's). */
+  gamesPlayed?: number;
+  /** Unlocked achievement ids and when (ISO date); each gave its coins once. */
+  achievements?: Record<string, string>;
   /** Pet shop items bought and the ones worn. */
   shop?: ShopState;
   /** Assignment demo: the other demo account (teacher or student) and its assignment. */

@@ -50,6 +50,7 @@ import {
   listStudentClasses,
   listTeacherClasses,
 } from "./classes";
+import { type AchievementStats, achievementList } from "./achievements";
 import { questsWithProgress } from "./quests";
 import { findShopItem, shopEntries } from "./shop";
 import { readSession } from "./session";
@@ -66,6 +67,7 @@ import {
 } from "./lesson-topics";
 import { learningDay, shiftDay, streakSummary } from "./streak";
 import type {
+  AchievementProgress,
   DailyQuest,
   ShopEntry,
   ShopItem,
@@ -191,6 +193,35 @@ export async function getDailyQuests(): Promise<DailyQuest[]> {
   const session = await readSession();
   if (session?.role !== "student") return [];
   return questsWithProgress(session.quests, Boolean(session.classCode));
+}
+
+/**
+ * What achievements count for the current student: their saved progress plus
+ * boss wins, eggs and pets from the battle tables. Undefined for teachers.
+ */
+export async function getAchievementStats(): Promise<AchievementStats | undefined> {
+  const [session, user] = await Promise.all([readSession(), getCurrentUser()]);
+  if (session?.role !== "student" || !user) return undefined;
+  const [history, collection] = await Promise.all([battleHistory(user), petCollection(user)]);
+  return {
+    testTaken: Object.keys(session.testAnswers ?? {}).length > 0 ? 1 : 0,
+    longestStreak: session.streak?.longest ?? 0,
+    practiceSolved: session.practiceSolved?.length ?? 0,
+    mastered: session.mastered?.length ?? 0,
+    gamesPlayed: session.gamesPlayed ?? 0,
+    bossWins: history.victories,
+    eggsWon: history.eggs,
+    petsCollected: collection.pets.length,
+    petLevel: session.pet?.level ?? 0,
+    videosSeen: session.videosSeen?.length ?? 0,
+    assignmentsDone: session.assignmentsRewarded?.length ?? 0,
+  };
+}
+
+/** Every achievement with the current student's progress (none for teachers). */
+export async function getAchievements(): Promise<AchievementProgress[]> {
+  const [stats, session] = await Promise.all([getAchievementStats(), readSession()]);
+  return stats ? achievementList(stats, session?.achievements) : [];
 }
 
 /** The pet shop for the current student: every item with owned and worn, and their coins. */
