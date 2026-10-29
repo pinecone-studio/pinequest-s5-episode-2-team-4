@@ -12,7 +12,11 @@ import { learningDay } from "./streak";
 export async function recordGamePlayed() {
   const session = await readSession();
   if (session?.role !== "student") return;
-  await writeSession({ ...session, quests: recordQuestEvent(session.quests, "game") });
+  await writeSession({
+    ...session,
+    quests: recordQuestEvent(session.quests, "game"),
+    gamesPlayed: (session.gamesPlayed ?? 0) + 1,
+  });
 }
 
 export type ClaimResult = { ok: true; xp: number; coins: number } | { error: "notdone" | "claimed" | "failed" };

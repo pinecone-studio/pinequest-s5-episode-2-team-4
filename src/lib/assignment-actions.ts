@@ -61,6 +61,7 @@ export async function submitAssignmentAttempt(
     ...session,
     streak: recordLearningDay(session.streak),
     quests: done ? recordQuestEvent(played, "assignment") : played,
+    gamesPlayed: (session.gamesPlayed ?? 0) + 1,
     assignmentsRewarded: firstFinish ? [...(session.assignmentsRewarded ?? []), assignmentId] : session.assignmentsRewarded,
     pet: session.pet && xp ? addXp(session.pet, xp) : session.pet,
   });

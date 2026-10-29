@@ -819,3 +819,37 @@ export type QuestLog = {
   /** Quest ids already claimed today. */
   claimed: string[];
 };
+
+/** What an achievement counts. */
+export type AchievementStat =
+  | "testTaken"
+  | "longestStreak"
+  | "practiceSolved"
+  | "mastered"
+  | "gamesPlayed"
+  | "bossWins"
+  | "eggsWon"
+  | "petsCollected"
+  | "petLevel"
+  | "videosSeen"
+  | "assignmentsDone";
+
+/** A milestone: reach `goal` of `stat` once for its coins. */
+export type Achievement = {
+  id: string;
+  emoji: string;
+  title: string;
+  /** What to do, e.g. "10 боссыг ял". */
+  description: string;
+  stat: AchievementStat;
+  goal: number;
+  coins: number;
+};
+
+/** An achievement with how far the student got. */
+export type AchievementProgress = Achievement & {
+  progress: number;
+  unlocked: boolean;
+  /** When it was unlocked (ISO date). */
+  unlockedAt?: string;
+};
