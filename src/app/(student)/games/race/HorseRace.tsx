@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
 import { ChoiceGrid } from "../_components/ChoiceGrid";
@@ -64,9 +65,9 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
             <StartOverlay
               title="Морин уралдаан"
               steps={[
-                { icon: "✅", text: "Зөв хариулбал +1 нүүдэл" },
+                { icon: <PixelIcon name="check" className="size-6" />, text: "Зөв хариулбал +1 нүүдэл" },
                 { icon: <HorseSprite silk="#ffcf5a" coat="#8a5a34" number={1} className="h-8 w-10" />, text: "Ботууд зогсохгүй давхина" },
-                { icon: "🏁", text: `${FINISH} нүүдэлд түрүүлж хүр` },
+                { icon: <PixelIcon name="finish" className="size-6" />, text: `${FINISH} нүүдэлд түрүүлж хүр` },
               ]}
               buttonLabel="Уралдаан эхлэх"
               onStart={start}

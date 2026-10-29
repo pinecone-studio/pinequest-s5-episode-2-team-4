@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import type { GameQuestion } from "@/lib/types";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
@@ -64,9 +65,9 @@ export function WhackAMole({ subjects, subjectId, questions }: WhackAMoleProps) 
             <StartOverlay
               title="Мэнгэ цохих"
               steps={[
-                { icon: "🔨", text: "Тохирох хариулттай мэнгийг цохи" },
-                { icon: "❤️", text: `Буруу цохивол −1 амь (${HEARTS})` },
-                { icon: "⏱️", text: `${SECONDS} секунд` },
+                { icon: <PixelIcon name="hammer" className="size-6" />, text: "Тохирох хариулттай мэнгийг цохи" },
+                { icon: <PixelIcon name="heart" className="size-6" />, text: `Буруу цохивол −1 амь (${HEARTS})` },
+                { icon: <PixelIcon name="timer" className="size-6" />, text: `${SECONDS} секунд` },
               ]}
               buttonLabel="Цохиж эхлэх"
               onStart={start}

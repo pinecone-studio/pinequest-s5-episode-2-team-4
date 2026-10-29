@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import type { GameQuestion } from "@/lib/types";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
@@ -59,9 +60,9 @@ export function Hoops({ subjects, subjectId, questions }: HoopsProps) {
             <StartOverlay
               title="Сагсан бөмбөг"
               steps={[
-                { icon: "🏀", text: "Бөмбөг бүр дээр хариулт бий" },
-                { icon: "👆", text: "Зөвийг нь дээш гулсуулж шид" },
-                { icon: "👇", text: "Буруугаа доош гулсуулж хая" },
+                { icon: <PixelIcon name="basketball" className="size-6" />, text: "Бөмбөг бүр дээр хариулт бий" },
+                { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Зөвийг нь дээш гулсуулж шид" },
+                { icon: <PixelIcon name="pointer-down" className="size-6" />, text: "Буруугаа доош гулсуулж хая" },
               ]}
               buttonLabel="Тоглож эхлэх"
               onStart={start}

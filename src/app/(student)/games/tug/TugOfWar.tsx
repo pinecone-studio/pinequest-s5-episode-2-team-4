@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
 import { ChoiceGrid } from "../_components/ChoiceGrid";
@@ -69,9 +70,9 @@ export function TugOfWar({ subjects, subjectId, questions }: TugOfWarProps) {
             <StartOverlay
               title="Олс таталт"
               steps={[
-                { icon: "✅", text: "Зөв хариулбал олсыг татна" },
-                { icon: "🤖", text: "Ботууд зогсохгүй татна" },
-                { icon: "🚩", text: "Тугийг шугамаас давуул" },
+                { icon: <PixelIcon name="check" className="size-6" />, text: "Зөв хариулбал олсыг татна" },
+                { icon: <PixelIcon name="robot" className="size-6" />, text: "Ботууд зогсохгүй татна" },
+                { icon: <PixelIcon name="flag" className="size-6" />, text: "Тугийг шугамаас давуул" },
               ]}
               buttonLabel="Татаж эхлэх"
               onStart={start}
