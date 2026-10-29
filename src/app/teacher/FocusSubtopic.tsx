@@ -1,4 +1,5 @@
 import { share, type SubtopicResult } from "@/lib/class-results";
+import { NextStepNote } from "./NextStepNote";
 
 type FocusSubtopicProps = {
   result: SubtopicResult;
@@ -18,6 +19,7 @@ export function FocusSubtopic({ result, title }: FocusSubtopicProps) {
       <p className="font-semibold">
         {struggling} сурагч ({share(struggling, result.tested)}%) хүндэрч байна: {weak} сул, {learning} нөхөж буй.
       </p>
+      <NextStepNote step={result.step} className="mt-1" />
     </div>
   );
 }
