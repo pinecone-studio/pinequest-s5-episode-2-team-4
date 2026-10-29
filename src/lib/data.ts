@@ -258,15 +258,16 @@ export async function getRetestQuestions(subtopicId: string): Promise<Question[]
   ];
 }
 
-/** Demo answers that fill the diagnostic test (5/8). */
-export async function getSampleTestAnswers(): Promise<Record<string, number>> {
-  return sampleTestAnswers;
+/** Demo answers that fill the diagnostic test (5/8); demo accounts only. */
+export async function getSampleTestAnswers(): Promise<Record<string, number> | undefined> {
+  return (await getCurrentUser())?.demo ? sampleTestAnswers : undefined;
 }
 
-/** Demo answers that pass a subtopic's retest: all correct. */
+/** Demo answers that pass a subtopic's retest: all correct; demo accounts only. */
 export async function getSampleRetestAnswers(
   subtopicId: string,
-): Promise<Record<string, number>> {
+): Promise<Record<string, number> | undefined> {
+  if (!(await getCurrentUser())?.demo) return undefined;
   const questions = await getRetestQuestions(subtopicId);
   return Object.fromEntries(questions.map((q) => [q.id, q.correctIndex]));
 }
