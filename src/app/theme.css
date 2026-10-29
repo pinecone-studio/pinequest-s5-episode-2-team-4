@@ -87,15 +87,15 @@
   }
 
   [data-theme="dark"] .bg-white\/70 {
-    background-color: rgb(31 26 43 / 0.7);
+    background-color: color-mix(in oklab, var(--color-card) 70%, transparent);
   }
 
   [data-theme="dark"] .bg-white\/80 {
-    background-color: rgb(31 26 43 / 0.8);
+    background-color: color-mix(in oklab, var(--color-card) 80%, transparent);
   }
 
   [data-theme="dark"] .bg-white\/90 {
-    background-color: rgb(31 26 43 / 0.9);
+    background-color: color-mix(in oklab, var(--color-card) 90%, transparent);
   }
 
   [data-theme="dark"] .hover\:bg-white\/60:hover {
@@ -139,6 +139,11 @@
 
   [data-theme="dark"] .text-primary {
     color: #c2a8f0;
+  }
+
+  /* Magenta text (rarity stars, alerts) is too dark on dark cards. */
+  [data-theme="dark"] .text-magenta {
+    color: #e483c4;
   }
 
   [data-theme="dark"] .bg-\[\#f5fcff\] {

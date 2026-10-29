@@ -1,3 +1,4 @@
+import { LandscapeBackdrop } from "@/components/layout/LandscapeBackdrop";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { requireStudent } from "@/lib/auth";
@@ -10,6 +11,7 @@ export default async function TestLayout({ children }: LayoutProps<"/test">) {
 
   return (
     <>
+      <LandscapeBackdrop />
       <SiteHeader
         className="hidden md:block"
         pet={
