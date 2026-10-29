@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 
-/** Line icons for the student menus (SiteHeader, MobileNav), sized by `className`. */
+/** Line icons for the menus (student and teacher headers and docks), sized by `className`. */
 function LineIcon({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
     <svg
@@ -60,6 +60,36 @@ export function PlayIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={cn("shrink-0", className)}>
       <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z" />
     </svg>
+  );
+}
+
+export function GridIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+      <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+      <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+      <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+    </LineIcon>
+  );
+}
+
+export function UsersIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5A6.5 6.5 0 0 1 21.5 20" />
+    </LineIcon>
+  );
+}
+
+export function ClockIcon({ className }: { className?: string }) {
+  return (
+    <LineIcon className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </LineIcon>
   );
 }
 
