@@ -6,6 +6,7 @@
 // (pages, layouts) and pass the result to Client Components as props.
 
 import { io } from "next/cache";
+import { cache } from "react";
 import {
   activeGroupBattleId,
   activeSoloBattleId,
@@ -45,16 +46,21 @@ import {
   countClassMembers,
   findInviteClass,
   listClassMembers,
+  listClassTestAnswers,
   listStudentClasses,
   listTeacherClasses,
 } from "./classes";
 import { readSession } from "./session";
-import { progressFrom, scoreTest } from "./scoring";
+import { classOverviewFrom, heatmapFrom, progressFrom, scoreTest, type ClassProgress } from "./scoring";
 import { findSignal, listDaySignals, signalsStored, summarizeSignals } from "./signals";
 import { learningDay, streakSummary } from "./streak";
 import type {
   Assignment,
+  AssignmentDraft,
   AssignmentReport,
+  ClassOverview,
+  HeatmapRow,
+  TeacherNotification,
   CurriculumChapter,
   LessonVideo,
   Material,
@@ -401,20 +407,56 @@ export async function checkEnglishQuestion(
 
 // Teacher
 
-export async function getClassOverview() {
-  return classOverview;
+/** The topic the teacher dashboard shows results for. */
+const DASHBOARD_TOPIC = "fractions";
+
+/**
+ * A real teacher's open class and each student's test progress (undefined
+ * until they take the test), in student number order. Undefined for demo
+ * accounts and servers without Supabase, which show the sample class.
+ */
+const realClassResults = cache(
+  async (): Promise<{ code: string; students: ClassProgress } | undefined> => {
+    const user = await getCurrentUser();
+    if (user?.role !== "teacher" || user.demo || !classesStored()) return undefined;
+    const active = await getActiveClass();
+    if (!active) return { code: "", students: [] };
+    try {
+      const rows = await listClassTestAnswers(active.id);
+      return {
+        code: active.code,
+        students: rows.map((r) => {
+          const result = scoreTest(r.testAnswers);
+          return result && progressFrom(result, r.mastered);
+        }),
+      };
+    } catch (error) {
+      console.error(error);
+      return { code: active.code, students: [] };
+    }
+  },
+);
+
+/** The class's test results in numbers; the sample class for demo accounts. */
+export async function getClassOverview(): Promise<ClassOverview> {
+  const real = await realClassResults();
+  return real ? classOverviewFrom(real.code, DASHBOARD_TOPIC, real.students) : classOverview;
 }
 
-export async function getHeatmap() {
-  return heatmap;
+/** Per subtopic, each student's status (numbered, never named); the sample class for demo accounts. */
+export async function getHeatmap(): Promise<HeatmapRow[]> {
+  const real = await realClassResults();
+  return real ? heatmapFrom(DASHBOARD_TOPIC, real.students) : heatmap;
 }
 
-export async function getAssignmentDraft() {
-  return assignmentDraft;
+/** The sample draft assignment, for demo accounts only. */
+export async function getAssignmentDraft(): Promise<AssignmentDraft | undefined> {
+  return (await realClassResults()) ? undefined : assignmentDraft;
 }
 
-export async function getNotifications() {
-  return notifications;
+/** Sample notifications for demo accounts; real classes have none yet. */
+export async function getNotifications(): Promise<TeacherNotification[]> {
+  return (await realClassResults()) ? [] : notifications;
 }
 
 /** Per student, the XP the class goal asks for: two pet levels each. */
