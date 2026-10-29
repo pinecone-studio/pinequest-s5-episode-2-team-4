@@ -9,5 +9,9 @@ import { readSession, writeSession } from "./session";
 export async function recordGamePlayed() {
   const session = await readSession();
   if (session?.role !== "student") return;
-  await writeSession({ ...session, quests: recordQuestEvent(session.quests, "game") });
+  await writeSession({
+    ...session,
+    quests: recordQuestEvent(session.quests, "game"),
+    gamesPlayed: (session.gamesPlayed ?? 0) + 1,
+  });
 }
