@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MaterialLink } from "@/components/MaterialLink";
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { AnonQuestion } from "@/lib/types";
 
@@ -53,7 +54,7 @@ export function ChatQuestion({
           onClick={onMeToo}
           className={chip(meToo)}
         >
-          🙋 Би ч бас {q.meToo + (meToo ? 1 : 0)}
+          <PixelIcon name="hand" className="inline-block size-3.5 align-[-0.15em]" /> Би ч бас {q.meToo + (meToo ? 1 : 0)}
         </button>
         {answer || replied || replying ? null : (
           <button
@@ -84,7 +85,8 @@ export function ChatQuestion({
               onClick={() => setKudos(true)}
               className={cn(chip(kudos), "mt-2 border-2 border-lavender")}
             >
-              {kudos ? "Баярлалаа!" : "Чи сайн тайлбарласан"} 👏{" "}
+              {kudos ? "Баярлалаа!" : "Чи сайн тайлбарласан"}{" "}
+              <PixelIcon name="clap" className="inline-block size-3.5 align-[-0.15em]" />{" "}
               {answer.kudos + (kudos ? 1 : 0)}
             </button>
           ) : null}

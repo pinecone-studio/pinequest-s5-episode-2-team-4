@@ -6,6 +6,7 @@ import {
   setMeToo as saveMeToo,
   type AskResult,
 } from "@/lib/question-actions";
+import { PixelIcon } from "@/components/ui";
 import type { AnonQuestion } from "@/lib/types";
 import { ChatComposer } from "./ChatComposer";
 import { ChatQuestion } from "./ChatQuestion";
@@ -18,9 +19,15 @@ type QuestionPanelProps = {
 };
 
 /** Short line under a question the student sent, from what the server said. */
-function sentNote(result: AskResult) {
+function sentNote(result: AskResult): React.ReactNode {
   if (!("error" in result))
-    return result.duplicate ? "Ангийнхан ч асуусан · 🙋 +1" : "Илгээсэн ✓";
+    return result.duplicate ? (
+      <>
+        Ангийнхан ч асуусан · <PixelIcon name="hand" className="inline-block size-3 align-[-0.15em]" /> +1
+      </>
+    ) : (
+      "Илгээсэн ✓"
+    );
   if (result.error === "login") return "Асуухын тулд нэвтэрнэ үү";
   if (result.error === "noclass") return "Асуухын тулд эхлээд ангидаа нэгдээрэй";
   if (result.error === "failed") return "Илгээж чадсангүй";
@@ -49,7 +56,7 @@ const iconProps = {
  */
 export function QuestionPanel({ subtopicId, questions }: QuestionPanelProps) {
   const [mine, setMine] = useState<
-    { text: string; time: string; note: string }[]
+    { text: string; time: string; note: React.ReactNode }[]
   >([]);
   const [meToo, setMeToo] = useState<Set<string>>(new Set());
   const scroller = useRef<HTMLDivElement>(null);

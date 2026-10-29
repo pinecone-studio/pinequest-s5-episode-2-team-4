@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { PixelIcon, type PixelIconName } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { sendSignal, type SignalResult } from "@/lib/signal-actions";
 import type { SignalLevel } from "@/lib/types";
 
-const options: { level: SignalLevel; emoji: string; label: string }[] = [
-  { level: "got", emoji: "🟢", label: "Ойлгосон" },
-  { level: "unsure", emoji: "🟡", label: "Сайн мэдэхгүй" },
-  { level: "lost", emoji: "🔴", label: "Ойлгосонгүй" },
+const options: { level: SignalLevel; icon: PixelIconName; label: string }[] = [
+  { level: "got", icon: "signal-got", label: "Ойлгосон" },
+  { level: "unsure", icon: "signal-unsure", label: "Сайн мэдэхгүй" },
+  { level: "lost", icon: "signal-lost", label: "Ойлгосонгүй" },
 ];
 
 const errors: Record<Exclude<SignalResult, { ok: true }>["error"], string> = {
@@ -75,9 +76,7 @@ export function SignalCheck({ subtopicId, initial }: SignalCheckProps) {
                 : "border-line hover:border-primary",
             )}
           >
-            <span aria-hidden="true" className="text-2xl md:text-xl">
-              {o.emoji}
-            </span>
+            <PixelIcon name={o.icon} className="size-6 md:size-5" />
             {o.label}
           </button>
         ))}
