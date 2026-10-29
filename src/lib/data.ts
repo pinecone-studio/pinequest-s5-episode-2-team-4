@@ -52,11 +52,23 @@ import {
 } from "./classes";
 import { readSession } from "./session";
 import { classOverviewFrom, heatmapFrom, progressFrom, scoreTest, type ClassProgress } from "./scoring";
-import { findSignal, listDaySignals, signalsStored, summarizeSignals } from "./signals";
-import { learningDay, streakSummary } from "./streak";
+import { findSignal, listDaySignals, listSignalsSince, signalsStored, summarizeSignals } from "./signals";
+import { getLessonDays, listPlans } from "./schedule";
+import {
+  curriculumTopics,
+  isCustomTopic,
+  isoWeekday,
+  topicTitle,
+  upcomingLessonDays,
+} from "./lesson-topics";
+import { learningDay, shiftDay, streakSummary } from "./streak";
 import type {
   Assignment,
   AssignmentDraft,
+  ClassSchedule,
+  LessonDaySignals,
+  LessonTopic,
+  TodayLesson,
   AssignmentReport,
   ClassOverview,
   HeatmapRow,
@@ -871,5 +883,86 @@ export async function getInviteClass(token: string): Promise<SchoolClass | undef
   } catch (error) {
     console.error(error);
     return undefined;
+  }
+}
+
+// Lesson schedule: «Ойлгосон уу?» on lesson days, even when the teacher
+// doesn't open the app that day.
+
+/** How far ahead a teacher plans topics, and how far back they see signals. */
+const PLAN_DAYS = 12;
+const HISTORY_DAYS = 14;
+
+/** What a lesson day can be about: the curriculum plus topics the teacher typed before. */
+async function lessonTopics(cls: SchoolClass, today: string): Promise<LessonTopic[]> {
+  const past = cls.id === "demo" ? [] : await listPlans(cls.id, shiftDay(today, -120), today);
+  const typed = [...new Map(past.filter((p) => isCustomTopic(p.topicKey)).map((p) => [p.topicKey, p])).values()];
+  return [...typed.map((p) => ({ key: p.topicKey, title: p.topicTitle, group: "Өөрийн сэдэв" })), ...curriculumTopics(cls.subject, cls.grade)];
+}
+
+/**
+ * Today's class lesson for the logged-in student: the planned topic, or the
+ * topics to pick from. Undefined unless today is a lesson day of their class
+ * (or has a planned topic). Demo students always get one, about fractions.
+ */
+export async function getTodayLesson(): Promise<TodayLesson | undefined> {
+  await io();
+  const [user, session] = await Promise.all([getCurrentUser(), readSession()]);
+  if (user?.role !== "student") return undefined;
+  const day = learningDay();
+  const answered = session?.lessonCheck?.day === day ? session.lessonCheck : undefined;
+  const cls = (await getStudentClasses()).find((c) => c.code === user.classCode);
+  if (!cls) return undefined;
+  if (user.demo || cls.id === "demo") {
+    return { day, topic: { key: "different-denominator", title: topicTitle("different-denominator")! }, options: [], answered };
+  }
+  const [lessonDays, plans] = await Promise.all([getLessonDays(cls.id), listPlans(cls.id, day, day)]);
+  const plan = plans[0];
+  if (!plan && !lessonDays.includes(isoWeekday(day))) return undefined;
+  return {
+    day,
+    topic: plan && { key: plan.topicKey, title: plan.topicTitle },
+    options: plan ? [] : await lessonTopics(cls, day),
+    answered,
+  };
+}
+
+/** The teacher's open class: lesson weekdays and the next lesson days with their topics. */
+export async function getClassSchedule(): Promise<ClassSchedule | undefined> {
+  await io();
+  const active = await getActiveClass();
+  if (!active) return undefined;
+  const today = learningDay();
+  const editable = active.id !== "demo";
+  const lessonDays = editable ? await getLessonDays(active.id) : [1, 3, 5];
+  const plans = editable ? await listPlans(active.id, today, shiftDay(today, PLAN_DAYS * 7)) : [];
+  const days = [...new Set([...upcomingLessonDays(today, lessonDays, PLAN_DAYS), ...plans.map((p) => p.day)])].sort();
+  return {
+    className: active.name,
+    lessonDays,
+    upcoming: days.map((day) => ({ day, plan: plans.find((p) => p.day === day) })),
+    topics: await lessonTopics(active, today),
+    editable,
+  };
+}
+
+/**
+ * The open class's signals of the last two weeks, newest day first, with the
+ * topic titles. Demo teachers see today's sample lesson.
+ */
+export async function getLessonDaySignals(): Promise<LessonDaySignals[]> {
+  await io();
+  const user = await getCurrentUser();
+  const active = await getActiveClass();
+  const title = (key: string) => topicTitle(key) ?? key;
+  if (!active || user?.demo || active.id === "demo" || !signalsStored()) {
+    return [{ day: learningDay(), rows: summarizeSignals(signals).map((s) => ({ ...s, title: title(s.subtopicId) })) }];
+  }
+  try {
+    const days = await listSignalsSince(active.code, shiftDay(learningDay(), -(HISTORY_DAYS - 1)));
+    return days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) }));
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 }
