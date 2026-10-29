@@ -177,6 +177,12 @@ export async function getPetLine(id: string): Promise<PetLine | undefined> {
   return petLines.find((l) => l.id === id);
 }
 
+/** The current student's coins (0 until they earn some). */
+export async function getCoins(): Promise<number> {
+  const session = await readSession();
+  return session?.role === "student" ? (session.coins ?? 0) : 0;
+}
+
 /** Today's daily quests with the student's progress (none for teachers). */
 export async function getDailyQuests(): Promise<DailyQuest[]> {
   const session = await readSession();

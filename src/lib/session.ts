@@ -43,6 +43,8 @@ export type Account = {
   videosSeen?: string[];
   /** Assignment ids that already gave XP, so replays don't farm it. */
   assignmentsRewarded?: string[];
+  /** Coins earned from daily quests and achievements, spent in the pet shop. */
+  coins?: number;
   /** Today's counts toward the daily quests, and the quests already claimed. */
   quests?: QuestLog;
   /** Assignment demo: the other demo account (teacher or student) and its assignment. */
