@@ -1,0 +1,45 @@
+/* Pixel-art background of the pets area: clouds drift, sparkles and stars
+   twinkle, hearts and eggs float. The global reduced-motion rule stops it. */
+
+.pets-bg-drift {
+  animation: pets-bg-drift 14s ease-in-out infinite alternate;
+}
+
+.pets-bg-twinkle {
+  animation: pets-bg-twinkle 2.8s ease-in-out infinite;
+}
+
+.pets-bg-float {
+  animation: pets-bg-float 4s ease-in-out infinite;
+}
+
+@keyframes pets-bg-drift {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 36px 0;
+  }
+}
+
+@keyframes pets-bg-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    scale: 0.7;
+  }
+  50% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes pets-bg-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
