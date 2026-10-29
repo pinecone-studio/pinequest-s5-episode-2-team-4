@@ -110,9 +110,9 @@ export async function logIn(credentials: Credentials & { next?: string }): Promi
   redirect(account.role === "student" && JOIN_PATH.test(next) ? next : homeFor(account.role));
 }
 
-/** Logs in a new throwaway demo student: Dollfin, a common pet, at level 1, no test taken yet. */
+/** Logs in a new throwaway demo student: Anoleaf, a common pet, at level 1, no test taken yet. */
 export async function demoLogIn() {
-  const account = await createDemoAccount({ pet: { lineId: "dollfin", level: 1, xp: 0 } });
+  const account = await createDemoAccount({ pet: { lineId: "anoleaf", level: 1, xp: 0 } });
   await startSession(account.id);
   // Each demo is a new account; clear out old ones once the response is sent.
   after(deleteOldDemoAccounts);
@@ -148,7 +148,7 @@ export async function assignmentDemoLogIn() {
   });
   await setAssignmentStatus(teacher.id, assignmentId, "published");
   const student = await createDemoAccount(
-    { pet: { lineId: "dollfin", level: 1, xp: 0 }, demoTour: { otherId: teacher.id, assignmentId } },
+    { pet: { lineId: "anoleaf", level: 1, xp: 0 }, demoTour: { otherId: teacher.id, assignmentId } },
     "student",
     classCode,
   );
