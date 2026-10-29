@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { useGamePlayed } from "../_lib/played";
 import type { SessionResult } from "../_lib/session";
 import { AssignmentResult, useAssignment } from "./AssignmentContext";
 
@@ -30,6 +31,8 @@ function Star({ on, big, delay }: { on: boolean; big?: boolean; delay: number })
 export function ResultPanel({ result, onAgain, otherHref, children }: ResultPanelProps) {
   // Played for an assignment: "other game" goes back to the assignments.
   const assignment = useAssignment();
+  // Free play counts for today's quests here; an assignment counts when its result is saved.
+  useGamePlayed(!assignment);
   const stats = [
     { value: result.score, label: "оноо" },
     { value: `${result.accuracy}%`, label: "нарийвчлал" },

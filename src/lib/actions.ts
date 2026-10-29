@@ -16,6 +16,7 @@ import { petLines } from "./mock/pets";
 import { testQuestions } from "./mock/questions";
 import { subtopics } from "./mock/topics";
 import { XP_PER_LEVEL, addXp, isStarterPet } from "./pets";
+import { recordQuestEvent } from "./quests";
 import { clearSession, readSession, startSession, writeSession } from "./session";
 import type { User } from "./types";
 import { recordLearningDay } from "./streak";
@@ -216,6 +217,7 @@ export async function savePractice(questionId: string, index: number) {
     streak: recordLearningDay(session.streak),
     practiceSolved: firstCorrect ? [...solved, questionId] : solved,
     pet: session.pet && firstCorrect ? addXp(session.pet, PRACTICE_XP) : session.pet,
+    quests: recordQuestEvent(session.quests, "practice"),
   });
 }
 

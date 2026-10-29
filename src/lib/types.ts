@@ -793,3 +793,29 @@ export type WeekSignals = {
   days: LessonDaySignals[];
   weeks: SignalWeek[];
 };
+
+/** What a student does that daily quests count. */
+export type QuestEvent = "game" | "practice" | "video" | "battle" | "assignment";
+
+/** A daily quest: do `goal` of `event` today for a bonus. */
+export type Quest = {
+  id: string;
+  event: QuestEvent;
+  goal: number;
+  title: string;
+  /** The bonus when it's claimed. */
+  xp: number;
+  coins: number;
+};
+
+/** Today's quest with how far the student got. */
+export type DailyQuest = Quest & { progress: number; done: boolean; claimed: boolean };
+
+/** What counts toward the day's quests, saved with the account and reset each day. */
+export type QuestLog = {
+  /** The learning day (Ulaanbaatar) the counts are for. */
+  day: string;
+  counts: Partial<Record<QuestEvent, number>>;
+  /** Quest ids already claimed today. */
+  claimed: string[];
+};

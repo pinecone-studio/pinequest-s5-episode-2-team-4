@@ -50,6 +50,7 @@ import {
   listStudentClasses,
   listTeacherClasses,
 } from "./classes";
+import { questsWithProgress } from "./quests";
 import { readSession } from "./session";
 import { classOverviewFrom, heatmapFrom, progressFrom, scoreTest, type ClassProgress } from "./scoring";
 import { findSignal, listDaySignals, listSignalsBetween, signalsStored, summarizeSignals } from "./signals";
@@ -64,6 +65,7 @@ import {
 } from "./lesson-topics";
 import { learningDay, shiftDay, streakSummary } from "./streak";
 import type {
+  DailyQuest,
   Assignment,
   AssignmentDraft,
   ClassSchedule,
@@ -179,6 +181,13 @@ export async function getPetLine(id: string): Promise<PetLine | undefined> {
 export async function getCoins(): Promise<number> {
   const session = await readSession();
   return session?.role === "student" ? (session.coins ?? 0) : 0;
+}
+
+/** Today's daily quests with the student's progress (none for teachers). */
+export async function getDailyQuests(): Promise<DailyQuest[]> {
+  const session = await readSession();
+  if (session?.role !== "student") return [];
+  return questsWithProgress(session.quests, Boolean(session.classCode));
 }
 
 /** The current user's pet with its line and the stage for its level. */
