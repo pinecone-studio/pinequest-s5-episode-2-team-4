@@ -33,9 +33,6 @@ export const metadata: Metadata = {
   title: "Багшийн самбар · LevelUp",
 };
 
-// The demo student (student-17) is outlined in the heatmap.
-const HIGHLIGHTED_STUDENT = 17;
-
 export default async function TeacherPage() {
   const overview = await getClassOverview();
   const [
@@ -107,7 +104,6 @@ export default async function TeacherPage() {
       <Heatmap
         rows={rows}
         testedCount={overview.testedCount}
-        highlight={user?.demo ? HIGHLIGHTED_STUDENT : undefined}
       />
       <SignalPanel
         rows={signals.map((s) => ({
