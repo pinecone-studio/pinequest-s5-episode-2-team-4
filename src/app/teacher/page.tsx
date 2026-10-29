@@ -102,7 +102,7 @@ export default async function TeacherPage() {
       <Heatmap
         rows={rows}
         testedCount={overview.testedCount}
-        highlight={HIGHLIGHTED_STUDENT}
+        highlight={user?.demo ? HIGHLIGHTED_STUDENT : undefined}
       />
       <SignalPanel
         rows={signals.map((s) => ({
@@ -111,19 +111,26 @@ export default async function TeacherPage() {
         }))}
         className="md:mt-5"
       />
-      <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
-        <AssignmentDraftCard
-          draft={draft}
-          subtopicTitle={subtopicById.get(draft.subtopicId)?.title ?? ""}
-          className="md:flex-[3_1_560px]"
-        />
-        <NotificationList
-          notifications={notifications}
-          subtopicTitles={new Map(subtopics.map((s) => [s.id, s.title]))}
-          alertCount={alertCount}
-          className="md:flex-[2_1_340px]"
-        />
-      </div>
+      {/* Demo accounts only for now: real classes have no draft or notifications yet. */}
+      {(draft || notifications.length > 0) && (
+        <div className="flex flex-col gap-4 md:mt-5 md:flex-row md:flex-wrap md:items-start md:gap-5">
+          {draft && (
+            <AssignmentDraftCard
+              draft={draft}
+              subtopicTitle={subtopicById.get(draft.subtopicId)?.title ?? ""}
+              className="md:flex-[3_1_560px]"
+            />
+          )}
+          {notifications.length > 0 && (
+            <NotificationList
+              notifications={notifications}
+              subtopicTitles={new Map(subtopics.map((s) => [s.id, s.title]))}
+              alertCount={alertCount}
+              className="md:flex-[2_1_340px]"
+            />
+          )}
+        </div>
+      )}
       <QuestionGroups groups={questionGroups} className="md:mt-5" />
       <PeerApproval questions={pendingAnswers} className="md:mt-5" />
       {classGoal && <ClassGoalCard goal={classGoal} className="md:mt-5" />}

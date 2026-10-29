@@ -20,7 +20,7 @@ type HeatmapProps = {
   rows: (HeatmapRow & { title: string; lessonTitle: string })[];
   testedCount: number;
   /** Student number shown outlined in the lists (the demo student). */
-  highlight: number;
+  highlight?: number;
 };
 
 /**
@@ -64,58 +64,64 @@ export function Heatmap({ rows, testedCount, highlight }: HeatmapProps) {
         ))}
       </ul>
 
-      <ul className="mt-4 divide-y divide-line border-y border-line">
-        {subtopics.map((row, i) => (
-          <li key={row.subtopicId}>
-            <details open={i === 0} className="group">
-              <summary className="grid cursor-pointer list-none grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-3.5 md:grid-cols-[minmax(10rem,14rem)_1fr_6rem_auto] [&::-webkit-details-marker]:hidden">
-                <span className="font-bold">{row.title}</span>
-                <span
-                  role="img"
-                  aria-label={ORDER.map((s) => `${row.counts[s]} ${STATUS[s].label}`).join(", ")}
-                  className="col-span-3 row-start-2 flex h-2.5 gap-0.5 overflow-hidden rounded-full md:col-span-1 md:row-start-auto"
-                >
-                  {ORDER.map((s) =>
-                    row.counts[s] > 0 ? (
-                      <span
-                        key={s}
-                        style={{ flexGrow: row.counts[s] }}
-                        className={cn("basis-0", STATUS[s].className)}
-                      />
-                    ) : null,
-                  )}
-                </span>
-                <span
-                  className={cn(
-                    "justify-self-end text-sm font-bold tabular-nums",
-                    row.counts.weak > 0 ? "text-status-weak-ink" : "text-status-good-ink",
-                  )}
-                >
-                  {row.counts.weak > 0 ? `${row.counts.weak} сул` : "сул алга"}
-                </span>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  className="size-4 text-ink-muted transition-transform group-open:rotate-90"
-                >
-                  <path d="m9 6 6 6-6 6" />
-                </svg>
-              </summary>
+      {testedCount === 0 ? (
+        <p className="mt-4 rounded-card bg-surface px-4 py-5 text-ink-muted">
+          Ангийн сурагчид оношлох тест өгөөгүй байна. Тест өгмөгц дүн нь энд гарна.
+        </p>
+      ) : (
+        <ul className="mt-4 divide-y divide-line border-y border-line">
+          {subtopics.map((row, i) => (
+            <li key={row.subtopicId}>
+              <details open={i === 0} className="group">
+                <summary className="grid cursor-pointer list-none grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-3.5 md:grid-cols-[minmax(10rem,14rem)_1fr_6rem_auto] [&::-webkit-details-marker]:hidden">
+                  <span className="font-bold">{row.title}</span>
+                  <span
+                    role="img"
+                    aria-label={ORDER.map((s) => `${row.counts[s]} ${STATUS[s].label}`).join(", ")}
+                    className="col-span-3 row-start-2 flex h-2.5 gap-0.5 overflow-hidden rounded-full md:col-span-1 md:row-start-auto"
+                  >
+                    {ORDER.map((s) =>
+                      row.counts[s] > 0 ? (
+                        <span
+                          key={s}
+                          style={{ flexGrow: row.counts[s] }}
+                          className={cn("basis-0", STATUS[s].className)}
+                        />
+                      ) : null,
+                    )}
+                  </span>
+                  <span
+                    className={cn(
+                      "justify-self-end text-sm font-bold tabular-nums",
+                      row.counts.weak > 0 ? "text-status-weak-ink" : "text-status-good-ink",
+                    )}
+                  >
+                    {row.counts.weak > 0 ? `${row.counts.weak} сул` : "сул алга"}
+                  </span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="size-4 text-ink-muted transition-transform group-open:rotate-90"
+                  >
+                    <path d="m9 6 6 6-6 6" />
+                  </svg>
+                </summary>
 
-              <div className="flex flex-col gap-3 pb-4">
-                <StudentList label="Тусламж хэрэгтэй" students={row.weak} highlight={highlight} status="weak" />
-                <StudentList label="Нөхөж буй" students={row.learning} highlight={highlight} status="learning" />
-                <p className="text-xs font-semibold text-ink-muted">{row.counts.good} сурагч сайн</p>
-              </div>
-            </details>
-          </li>
-        ))}
-      </ul>
+                <div className="flex flex-col gap-3 pb-4">
+                  <StudentList label="Тусламж хэрэгтэй" students={row.weak} highlight={highlight} status="weak" />
+                  <StudentList label="Нөхөж буй" students={row.learning} highlight={highlight} status="learning" />
+                  <p className="text-xs font-semibold text-ink-muted">{row.counts.good} сурагч сайн</p>
+                </div>
+              </details>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -123,7 +129,7 @@ export function Heatmap({ rows, testedCount, highlight }: HeatmapProps) {
 type StudentListProps = {
   label: string;
   students: number[];
-  highlight: number;
+  highlight?: number;
   status: TestedStatus;
 };
 

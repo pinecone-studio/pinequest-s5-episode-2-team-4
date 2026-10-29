@@ -107,6 +107,23 @@ export async function classPetXp(code: string): Promise<{ students: number; xp: 
   };
 }
 
+/**
+ * Each student's saved test answers and mastered subtopics, in the order they
+ * joined, so student numbers (№01, №02, …) stay the same. No names.
+ */
+export async function listClassTestAnswers(
+  classId: string,
+): Promise<{ testAnswers?: Record<string, number>; mastered?: string[] }[]> {
+  const { data, error } = await db()
+    .from("class_members")
+    .select("added_at, accounts(progress)")
+    .eq("class_id", classId)
+    .order("added_at", { ascending: true })
+    .returns<{ accounts: { progress: { testAnswers?: Record<string, number>; mastered?: string[] } | null } | null }[]>();
+  if (error) throw new Error(`Could not load test results: ${error.message}`);
+  return data.flatMap((r) => (r.accounts ? [r.accounts.progress ?? {}] : []));
+}
+
 /** The class's students, by name. */
 export async function listClassMembers(classId: string): Promise<ClassMember[]> {
   const { data, error } = await db()
