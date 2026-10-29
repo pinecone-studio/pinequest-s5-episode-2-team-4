@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getBosses, getCurrentPet, getLearningStreak, getPetCollection, getPetLines } from "@/lib/data";
+import { getBosses, getCurrentPet, getEquippedItems, getLearningStreak, getPetCollection, getPetLines } from "@/lib/data";
 import { petMood } from "@/lib/pets";
 import { PetsView } from "./PetsView";
 import "./pets.css";
@@ -10,12 +10,13 @@ export const metadata: Metadata = {
 
 /** A pet in its habitat and its evolution path, then every pet line (design: Тэжээвэр). */
 export default async function PetsPage() {
-  const [pet, lines, collection, bosses, streak] = await Promise.all([
+  const [pet, lines, collection, bosses, streak, equipped] = await Promise.all([
     getCurrentPet(),
     getPetLines(),
     getPetCollection(),
     getBosses(),
     getLearningStreak(),
+    getEquippedItems(),
   ]);
   // Which bosses can drop each pet line's egg (for undiscovered pets).
   const dropsFrom: Record<string, string[]> = {};
@@ -32,6 +33,8 @@ export default async function PetsPage() {
         dropsFrom={dropsFrom}
         myPet={pet && { lineId: pet.lineId, level: pet.level, xp: pet.xp }}
         mood={petMood(streak)}
+        palette={equipped.scene?.palette}
+        aura={equipped.aura}
       />
     </div>
   );
