@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ClassGoalCard } from "@/components/ClassGoalCard";
 import { StreakCard } from "@/components/StreakCard";
+import { ButtonLink } from "@/components/ui";
 import {
   getClassGoal,
   getClassVideos,
@@ -66,6 +67,13 @@ export default async function HomePage() {
         />
         {lesson && <LessonCheckCard lesson={lesson} />}
         <StreakCard streak={streak} />
+        <section className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-panel border border-line bg-white p-5 md:mb-10 md:p-7">
+          <div>
+            <h2 className="text-xl font-bold">Алдааны дэвтэр</h2>
+            <p className="mt-1 text-sm text-ink-muted">Алдсан асуултаа тайлбартай нь харж, дахин бодоорой.</p>
+          </div>
+          <ButtonLink href="/mistakes" size="sm">Дэвтрээ нээх →</ButtonLink>
+        </section>
         {quests.length > 0 && <DailyQuestsCard quests={quests} />}
         {classes.length ? (
           <TeacherCard

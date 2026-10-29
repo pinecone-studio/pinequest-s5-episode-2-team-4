@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { AppInstall } from "@/components/AppInstall";
 import { PageLoading } from "@/components/PageLoading";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { StreakActivity } from "@/components/StreakActivity";
 import "./globals.css";
 import "./theme.css";
 
@@ -44,6 +45,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
         <AppInstall />
         <Suspense fallback={<PageLoading />}>{children}</Suspense>
+        <Suspense fallback={null}>
+          <StreakActivity />
+        </Suspense>
         {/* The toggle reads the URL (it hides on battle screens), so it streams too. */}
         <Suspense fallback={null}>
           <ThemeToggle />

@@ -20,6 +20,7 @@ import { recordQuestEvent } from "./quests";
 import { clearSession, readSession, startSession, writeSession } from "./session";
 import type { User } from "./types";
 import { recordLearningDay } from "./streak";
+import { recordMistake } from "./mistake-records";
 import { teacherSubject } from "./subjects";
 
 type Credentials = {
@@ -183,14 +184,16 @@ export async function submitTest(answers: Record<string, number>) {
   if (!session) redirect("/login");
 
   const testAnswers: Record<string, number> = {};
+  let mistakes = session.mistakes;
   for (const q of testQuestions) {
     const index = answers[q.id];
     if (Number.isInteger(index) && index >= 0 && index < q.options.length) {
       testAnswers[q.id] = index;
+      mistakes = recordMistake(mistakes, "math", q.id, index, index === q.correctIndex);
     }
   }
   await writeSession({
-    ...session, testAnswers,
+    ...session, testAnswers, mistakes,
     streak: Object.keys(testAnswers).length > 0 ? recordLearningDay(session.streak) : session.streak,
   });
 }
@@ -216,6 +219,7 @@ export async function savePractice(questionId: string, index: number) {
     ...session,
     streak: recordLearningDay(session.streak),
     practiceSolved: firstCorrect ? [...solved, questionId] : solved,
+    mistakes: recordMistake(session.mistakes, "math", questionId, index, index === question.correctIndex),
     pet: session.pet && firstCorrect ? addXp(session.pet, PRACTICE_XP) : session.pet,
     quests: recordQuestEvent(session.quests, "practice"),
   });
@@ -242,10 +246,18 @@ export async function submitRetest(subtopicId: string, answers: Record<string, n
   const firstTime = passed && !mastered.includes(subtopicId);
   const pet = session.pet && firstTime ? addXp(session.pet, XP_PER_LEVEL) : session.pet;
   const level = session.pet?.level ?? 1;
+  let mistakes = session.mistakes;
+  for (const q of questions) {
+    const answer = answers[q.id];
+    if (Number.isInteger(answer) && answer >= 0 && answer < q.options.length) {
+      mistakes = recordMistake(mistakes, "math", q.id, answer, answer === q.correctIndex);
+    }
+  }
 
   await writeSession({
     ...session,
     pet,
+    mistakes,
     streak: questions.some((q) => Number.isInteger(answers[q.id]) && answers[q.id] >= 0 && answers[q.id] < q.options.length)
       ? recordLearningDay(session.streak) : session.streak,
     mastered: firstTime ? [...mastered, subtopicId] : mastered,

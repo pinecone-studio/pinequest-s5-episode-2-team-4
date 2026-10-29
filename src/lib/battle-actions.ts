@@ -27,6 +27,7 @@ import { getCurrentUser } from "./data";
 import { recordQuestEvent } from "./quests";
 import { readSession, writeSession } from "./session";
 import { recordLearningDay } from "./streak";
+import { recordMistake } from "./mistake-records";
 import type { BattleAnswerOutcome, BattleState, EnglishAnswer, HatchResult } from "./types";
 
 async function student() {
@@ -172,6 +173,7 @@ export async function submitBattleAnswer(
       await writeSession({
         ...session,
         streak: recordLearningDay(session.streak),
+        mistakes: recordMistake(session.mistakes, "battle", questionId, answer, result.outcome.correct),
         quests: recordQuestEvent(session.quests, "battle"),
       });
     }
