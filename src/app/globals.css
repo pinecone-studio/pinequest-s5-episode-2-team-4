@@ -8,15 +8,17 @@
      is the soft purple tint for active pills; sky marks "good"; magenta is
      the signal colour for weak and alerts. All text pairs pass 4.5:1.
      ink-muted is darker than the design's #6b6585 so it also passes over
-     the pixel landscape behind student and teacher pages (LandscapeBackdrop). */
+     the pixel landscape behind student and teacher pages (LandscapeBackdrop).
+     The page, surfaces and lines are a step darker than the design and cards
+     an off-white, so the light theme isn't glaring and cards stand out. */
   --color-primary: #5b00ed;
   --color-primary-dark: #4a12b8;
   --color-ink: #1d1530;
-  --color-ink-muted: #57516f;
-  --color-surface: #f4f3fa;
-  --color-surface-soft: #f7f6fb;
-  --color-lavender: #efe9fe;
-  --color-line: #e4e0f2;
+  --color-ink-muted: #4d4766;
+  --color-surface: #e6e3f0;
+  --color-surface-soft: #f1f0f6;
+  --color-lavender: #e7defd;
+  --color-line: #cdc7e0;
   --color-sky: #e3f4fb;
   --color-sky-dark: #aad1df;
   --color-magenta: #b23886;
@@ -41,8 +43,9 @@
   --color-tint-plum-ink: #3d2a6b;
   /* Violet-black for the footer and toasts instead of pure black. */
   --color-night: #1e172b;
-  /* Card and panel background; dark mode swaps it in theme.css. */
-  --color-card: #ffffff;
+  /* Card and panel background (bg-white uses it too, see theme.css); dark
+     mode swaps it in theme.css. */
+  --color-card: #fbfaff;
   /* Progress statuses as a soft traffic light, matching the 🟢🟡🔴 signals
      students send: a pastel fill with a darker ink of the same hue for the
      icon or number on it (each pair passes 4.5:1). */
@@ -67,9 +70,10 @@
   --radius-card: 20px;
   --radius-panel: 28px;
 
-  /* Soft shadows that carry the ink hue instead of flat grey. */
-  --shadow-card: rgb(29 21 48 / 0.06) 0 10px 30px;
-  --shadow-float: rgb(29 21 48 / 0.08) 0 16px 40px;
+  /* Soft shadows that carry the ink hue instead of flat grey; cards also get
+     a hairline edge so they don't melt into the page. */
+  --shadow-card: 0 0 0 1px rgb(29 21 48 / 0.07), rgb(29 21 48 / 0.1) 0 10px 30px;
+  --shadow-float: rgb(29 21 48 / 0.12) 0 16px 40px;
   /* Buttons and chips: a purple glow under the main (purple) ones, a faint
      lift under the rest. Kept the old "3d" names so callers don't change. */
   --shadow-3d: 0 6px 16px rgb(91 0 237 / 0.28);
@@ -291,7 +295,7 @@ dialog[open]::backdrop {
 
 @layer base {
   body {
-    @apply bg-white font-sans text-ink;
+    @apply bg-surface-soft font-sans text-ink;
   }
 
   a {

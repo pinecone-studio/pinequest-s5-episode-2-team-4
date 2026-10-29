@@ -81,9 +81,11 @@
   display: none;
 }
 
-/* Override backgrounds separately so white button text and artwork stay intact. */
+/* bg-white is the card colour in both themes (off-white in light, dark in
+   dark), set apart from --color-white so white button text and artwork stay
+   intact. The see-through ones only change in dark mode. */
 @layer utilities {
-  [data-theme="dark"] .bg-white {
+  :root .bg-white {
     background-color: var(--color-card);
   }
 
@@ -103,21 +105,21 @@
     background-color: rgb(58 50 78 / 0.6);
   }
 
-  /* White only from a breakpoint up: darken it at the same widths. */
+  /* White only from a breakpoint up: the card colour at the same widths. */
   @media (width >= 48rem) {
-    [data-theme="dark"] .md\:bg-white {
+    :root .md\:bg-white {
       background-color: var(--color-card);
     }
   }
 
   @media (width >= 64rem) {
-    [data-theme="dark"] .lg\:bg-white {
+    :root .lg\:bg-white {
       background-color: var(--color-card);
     }
   }
 
   @media (width >= 80rem) {
-    [data-theme="dark"] .xl\:bg-white {
+    :root .xl\:bg-white {
       background-color: var(--color-card);
     }
   }
