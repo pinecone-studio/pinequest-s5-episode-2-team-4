@@ -1,5 +1,5 @@
 /*
- * The pixel-art mountain lake behind student and teacher pages (LandscapeBackdrop),
+ * The pixel-art mountain lake behind student and login pages (LandscapeBackdrop),
  * drawn as an SVG: a dithered sky with a moon, a big mountain, pine forests,
  * a lake, and trees and rocks framing the sides on wide screens. Shapes come
  * from seeded numbers, so the scene is the same on every visit. It is served

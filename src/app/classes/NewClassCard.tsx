@@ -21,7 +21,7 @@ export function NewClassCard({ demo }: { demo: boolean }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-full min-h-36 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-panel border-2 border-dashed border-line bg-white/70 p-6 text-lg font-bold text-primary transition-colors hover:border-primary hover:bg-surface"
+        className="flex h-full min-h-36 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-panel border-2 border-dashed border-line p-6 text-lg font-bold text-primary transition-colors hover:border-primary hover:bg-surface"
       >
         <span aria-hidden="true" className="text-4xl leading-none">
           +
