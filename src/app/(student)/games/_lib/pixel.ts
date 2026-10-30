@@ -43,3 +43,39 @@ export function pixelArc(ctx: CanvasRenderingContext2D, cx: number, cy: number, 
     ctx.fillRect(snap(cx + Math.cos(a) * rx, size), snap(cy + Math.sin(a) * ry, size), size, size);
   }
 }
+
+/** Letter → colour for a sprite grid; letters missing from it are transparent. */
+export type Palette = Record<string, string>;
+
+const sprites = new Map<string, HTMLCanvasElement>();
+
+/** A grid drawn one canvas pixel per art pixel, built once per grid and palette. */
+export function sprite(grid: string[], palette: Palette) {
+  const key = grid.join("/") + JSON.stringify(palette);
+  let canvas = sprites.get(key);
+  if (canvas) return canvas;
+  canvas = document.createElement("canvas");
+  canvas.width = Math.max(...grid.map((row) => row.length));
+  canvas.height = grid.length;
+  const ctx = canvas.getContext("2d");
+  grid.forEach((row, y) =>
+    [...row].forEach((ch, x) => {
+      if (!ctx || !palette[ch]) return;
+      ctx.fillStyle = palette[ch];
+      ctx.fillRect(x, y, 1, 1);
+    }),
+  );
+  sprites.set(key, canvas);
+  return canvas;
+}
+
+/** Draws a sprite with `cell` world units per art pixel from its top left; `flip` mirrors it. */
+export function blit(ctx: CanvasRenderingContext2D, img: HTMLCanvasElement, x: number, y: number, cell = PIXEL, flip = false) {
+  const w = img.width * cell, h = img.height * cell;
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.translate(snap(x, cell), snap(y, cell));
+  if (flip) ctx.scale(-1, 1);
+  ctx.drawImage(img, flip ? -w : 0, 0, w, h);
+  ctx.restore();
+}
