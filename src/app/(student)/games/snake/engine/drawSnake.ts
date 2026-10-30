@@ -1,4 +1,6 @@
+import { darken } from "../../_lib/color";
 import { GAME_COLORS } from "../../_lib/palette";
+import { PIXEL as P, pixelDisc, snap } from "../../_lib/pixel";
 import { drawFace } from "./drawFace";
 import { SNAKE_RADIUS as RADIUS, type Point, type Snake, type SnakeLook } from "./types";
 
@@ -20,42 +22,23 @@ export function bodyPoints(snake: Snake): Point[] {
   return pts;
 }
 
-// Highlight and rim-shadow gradients per bead size, built once and reused.
-const shadeCache = new Map<number, { hi: CanvasGradient; lo: CanvasGradient }>();
-export const clearShadeCache = () => shadeCache.clear();
+type Bead = { x: number; y: number; r: number; color: string };
 
-function shade(ctx: CanvasRenderingContext2D, r: number) {
-  const key = Math.round(r * 2);
-  let s = shadeCache.get(key);
-  if (!s) {
-    const hi = ctx.createRadialGradient(-r * 0.35, -r * 0.42, 0, -r * 0.35, -r * 0.42, r * 0.95);
-    hi.addColorStop(0, "rgba(255,255,255,.75)");
-    hi.addColorStop(0.25, "rgba(255,255,255,.28)");
-    hi.addColorStop(1, "rgba(255,255,255,0)");
-    const lo = ctx.createRadialGradient(r * 0.1, r * 0.15, r * 0.35, 0, 0, r * 1.02);
-    lo.addColorStop(0, "rgba(0,0,0,0)");
-    lo.addColorStop(0.75, "rgba(0,0,0,.18)");
-    lo.addColorStop(1, "rgba(0,0,0,.55)");
-    s = { hi, lo };
-    shadeCache.set(key, s);
+/**
+ * Pixel balls: every darker rim first, then every colour inside, so the body
+ * reads as one outlined snake; one light pixel at the top left of each.
+ */
+function drawBeads(ctx: CanvasRenderingContext2D, beads: Bead[]) {
+  for (const b of beads) {
+    ctx.fillStyle = darken(b.color, 0.45);
+    pixelDisc(ctx, b.x, b.y, b.r);
   }
-  return s;
-}
-
-/** A glossy ball: flat colour, darker rim, light from the top left. */
-function bead(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string) {
-  const s = shade(ctx, r);
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.beginPath();
-  ctx.arc(0, 0, r, 0, Math.PI * 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.fillStyle = s.lo;
-  ctx.fill();
-  ctx.fillStyle = s.hi;
-  ctx.fill();
-  ctx.restore();
+  for (const b of beads) {
+    ctx.fillStyle = b.color;
+    pixelDisc(ctx, b.x, b.y, b.r - P);
+  }
+  ctx.fillStyle = "rgba(255,255,255,.6)";
+  for (const b of beads) if (b.r > 2 * P) ctx.fillRect(snap(b.x - b.r / 2), snap(b.y - b.r / 2), P, P);
 }
 
 export function drawSnake(ctx: CanvasRenderingContext2D, snake: Snake, look: SnakeLook) {
@@ -64,33 +47,25 @@ export function drawSnake(ctx: CanvasRenderingContext2D, snake: Snake, look: Sna
     const tail = n - 1 - i;
     return tail < 8 ? RADIUS * (0.45 + (0.55 * tail) / 8) : RADIUS;
   };
-  ctx.save();
-  ctx.lineCap = ctx.lineJoin = "round";
-  ctx.lineWidth = RADIUS * 2;
-  ctx.beginPath();
-  pts.forEach((p, i) => (i ? ctx.lineTo(p.x + 4, p.y + 7) : ctx.moveTo(p.x + 4, p.y + 7)));
-  ctx.strokeStyle = "rgba(0,0,0,.35)";
-  ctx.stroke();
+  // shadow on the floor, then the glow as a ring of pixels one step out
+  ctx.fillStyle = "#07051a";
+  for (let i = n - 1; i >= 0; i--) pixelDisc(ctx, pts[i].x + P, pts[i].y + 2 * P, radiusAt(i));
   if (look.glow) {
-    ctx.globalCompositeOperation = "lighter";
-    ctx.shadowColor = look.glow;
-    ctx.shadowBlur = 26;
-    ctx.beginPath();
-    pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
-    ctx.strokeStyle = "rgba(255,255,255,.08)";
-    ctx.stroke();
+    ctx.fillStyle = darken(look.glow, 0.25);
+    for (let i = n - 1; i >= 0; i--) pixelDisc(ctx, pts[i].x, pts[i].y, radiusAt(i) + P);
   }
-  ctx.restore();
   const { bands } = look.skin;
+  const beads: Bead[] = [];
   for (let i = n - 1; i >= 1; i--) {
-    bead(ctx, pts[i].x, pts[i].y, radiusAt(i), flashRed ? GAME_COLORS.bad : bands[Math.floor(i / 3) % bands.length]);
-    if (look.skin.sparkle && i % 6 === 2) {
-      ctx.fillStyle = "rgba(255,255,255,.9)";
-      ctx.beginPath();
-      ctx.arc(pts[i].x + Math.sin(i) * 4, pts[i].y + Math.cos(i) * 4, 0.8 + 0.7 * Math.abs(Math.sin(look.time * 3 + i)), 0, Math.PI * 2);
-      ctx.fill();
+    beads.push({ x: pts[i].x, y: pts[i].y, r: radiusAt(i), color: flashRed ? GAME_COLORS.bad : bands[Math.floor(i / 3) % bands.length] });
+  }
+  beads.push({ x: snake.x, y: snake.y, r: RADIUS + 1.5, color: flashRed ? GAME_COLORS.bad : bands[0] });
+  drawBeads(ctx, beads);
+  if (look.skin.sparkle) {
+    ctx.fillStyle = "#ffffff";
+    for (let i = 2; i < n; i += 6) {
+      if (Math.sin(look.time * 3 + i) > 0) ctx.fillRect(snap(pts[i].x + Math.sin(i) * 4), snap(pts[i].y + Math.cos(i) * 4), P, P);
     }
   }
-  bead(ctx, snake.x, snake.y, RADIUS + 1.5, flashRed ? GAME_COLORS.bad : bands[0]);
   drawFace(ctx, snake, look);
 }
