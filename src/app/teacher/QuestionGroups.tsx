@@ -53,10 +53,10 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
           id="questions-title"
           className="type-section-title"
         >
-          Нэргүй асуултууд
+          Сурагчдын нэргүй асуулт
         </h2>
         <p className="text-sm font-semibold text-ink-muted">
-          <PixelIcon name="robot" className="inline-block size-4 align-[-0.15em]" /> AI бүлэглэж, буруу ойлголтыг олсон
+          <PixelIcon name="robot" className="inline-block size-4 align-[-0.15em]" /> Төстэй агуулгатай асуултуудыг бүлэглэн харуулна
         </p>
       </div>
 
@@ -89,11 +89,11 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
         <p className="mt-5 text-base text-ink-muted">
           {tab === "open" ? (
             <>
-              Бүх асуултад хариулсан байна{" "}
+              Хариулт хүлээж буй асуулт алга.{" "}
               <PixelIcon name="clap" className="inline-block size-4 align-[-0.15em]" />
             </>
           ) : (
-            "Хариулсан асуулт алга."
+            "Одоогоор хариулсан асуулт алга."
           )}
         </p>
       ) : (
@@ -119,9 +119,9 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
       {tab === "open" && offTopic.length > 0 ? (
         <details className="mt-6 rounded-card border-2 border-dashed border-line px-4 py-3">
           <summary className="cursor-pointer text-sm font-bold">
-            <PixelIcon name="warning" className="inline-block size-4 align-[-0.15em]" /> Шалгах шаардлагатай ({offTopic.length})
+            <PixelIcon name="warning" className="inline-block size-4 align-[-0.15em]" /> Агуулгыг нягтлах шаардлагатай ({offTopic.length})
             <span className="ml-1 font-semibold text-ink-muted">
-              · хичээлтэй хамааралгүй байж магадгүй
+              · хичээлийн агуулгатай холбоогүй байж болзошгүй
             </span>
           </summary>
           <ul className="mt-3 flex flex-col gap-2">

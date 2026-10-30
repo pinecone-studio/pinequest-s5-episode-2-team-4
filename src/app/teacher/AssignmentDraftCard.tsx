@@ -96,7 +96,7 @@ export function AssignmentDraftCard({
       >
         <span />
         <span>Асуулт</span>
-        <span>Хариу</span>
+        <span>Зөв хариулт</span>
       </div>
       <ol className="mt-4 flex flex-col gap-2.5 md:mt-2">
         {items.map((item, i) => {
@@ -167,14 +167,14 @@ export function AssignmentDraftCard({
         <svg {...iconProps} strokeWidth="2.4" className="size-4">
           <path d="M5 12h14M12 5v14" />
         </svg>
-        Нэмэх
+        Асуулт нэмэх
       </button>
 
       <div className="mt-3.5 flex flex-col gap-3.5 md:mt-6 md:flex-row md:flex-wrap md:items-end md:justify-between md:gap-4 md:border-t-2 md:border-surface md:pt-6">
         <div className="grid grid-cols-2 gap-2.5 md:flex md:flex-wrap md:gap-3">
           <div className="flex min-w-0 flex-col gap-1.5">
             <label htmlFor="due" className="text-xs font-bold text-ink-muted">
-              Хугацаа
+              Дуусах хугацаа
             </label>
             <input
               id="due"
@@ -185,7 +185,7 @@ export function AssignmentDraftCard({
             />
           </div>
           <div className="flex min-w-0 flex-col gap-1.5">
-            <span className="text-xs font-bold text-ink-muted">Хэнд</span>
+            <span className="text-xs font-bold text-ink-muted">Хүлээн авах сурагчид</span>
             <span
               title={draft.assignedTo
                 .map((n) => `№${String(n).padStart(2, "0")}`)
@@ -228,7 +228,7 @@ export function AssignmentDraftCard({
               <svg {...iconProps} strokeWidth="2.6" className="size-[18px]">
                 <path d="M20 6 9 17l-5-5" />
               </svg>
-              Батлаад ангид оноох
+              Баталгаажуулж сурагчдад өгөх
             </Button>
           )}
         </div>

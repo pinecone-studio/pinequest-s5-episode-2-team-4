@@ -34,7 +34,7 @@ export function GroupForm({ id, kind, initial = "", pending, children, onSubmit,
       className="mt-3 flex flex-col gap-2"
     >
       <label htmlFor={inputId} className="sr-only">
-        {kind === "rename" ? "Бүлгийн нэр" : "Ангид хариулт бичих"}
+        {kind === "rename" ? "Бүлгийн нэр" : "Ангид өгөх тайлбараа бичих"}
       </label>
       {kind === "rename" ? (
         <input
@@ -53,14 +53,14 @@ export function GroupForm({ id, kind, initial = "", pending, children, onSubmit,
           rows={3}
           maxLength={1000}
           autoFocus
-          placeholder="Нэг хариулт бүх ангид очно…"
+          placeholder="Энэ тайлбар ангийн бүх сурагчид харагдана…"
           className={cn(field, "resize-none")}
         />
       )}
       {children}
       <div className="flex flex-wrap justify-end gap-2">
         <Button variant="white" size="sm" onClick={onCancel}>
-          Болих
+          Цуцлах
         </Button>
         <Button type="submit" size="sm" disabled={!draft.trim() || pending}>
           {kind === "rename" ? "Хадгалах" : "Бүх ангид илгээх"}

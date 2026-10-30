@@ -30,7 +30,7 @@ export function StatCards({
     {
       value: testedCount,
       total: studentCount,
-      label: "тест өгсөн",
+      label: "Тест өгсөн сурагч",
       tile: "bg-lavender",
       icon: (
         <svg {...iconProps}>
@@ -42,7 +42,7 @@ export function StatCards({
     },
     {
       value: weakestCount,
-      label: "сул",
+      label: "Давтлага хэрэгтэй",
       detail: weakestTitle,
       tile: "border-2 border-magenta bg-pink",
       alert: true,
@@ -56,7 +56,7 @@ export function StatCards({
     },
     {
       value: notificationCount,
-      label: "мэдэгдэл",
+      label: "Анхаарах мэдэгдэл",
       tile: "bg-sky",
       icon: (
         <svg {...iconProps}>
@@ -69,7 +69,7 @@ export function StatCards({
 
   return (
     <section
-      aria-label="Тойм"
+      aria-label="Ангийн суралцах явцын тойм"
       className="grid grid-cols-3 gap-2 md:grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] md:gap-5"
     >
       {stats.map((stat) => (

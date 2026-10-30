@@ -14,11 +14,11 @@ export function FocusSubtopic({ result, title }: FocusSubtopicProps) {
   return (
     <div className="mt-4 flex flex-col gap-2 rounded-card border-2 border-magenta bg-pink p-4 md:p-5">
       <p className="text-sm font-bold text-status-weak-ink">
-        <PixelIcon name="warning" className="inline-block size-4 align-[-0.15em]" /> Анхаарах сэдэв
+        <PixelIcon name="warning" className="inline-block size-4 align-[-0.15em]" /> Түрүүлж давтах сэдэв
       </p>
       <h3 className="text-lg font-bold md:text-xl">{title}</h3>
       <p className="font-semibold">
-        {struggling} сурагч ({share(struggling, result.tested)}%) хүндэрч байна: {weak} сул, {learning} нөхөж буй.
+        {struggling} сурагчид ({share(struggling, result.tested)}%) нэмэлт давтлага хэрэгтэй: {weak} сурагч дахин тайлбарлуулах шаардлагатай, {learning} сурагч сэдвээ бататгах шаардлагатай.
       </p>
       <NextStepNote step={result.step} className="mt-1" />
     </div>

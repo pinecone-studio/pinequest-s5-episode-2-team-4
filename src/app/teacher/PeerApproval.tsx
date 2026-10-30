@@ -39,7 +39,7 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
           id="peer-title"
           className="type-section-title"
         >
-          Сурагчдын хариулт
+          Хянаж батлах хариултууд
         </h2>
         <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-sm">
           {pendingCount}
@@ -47,12 +47,12 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
         </span>
       </div>
       <p className="mt-1 text-sm font-semibold text-ink-muted">
-        Батлагдсан хариулт л ангийнхандаа харагдана.
+        Сурагчийн бичсэн тайлбарыг нягтлаад батлах эсэхээ сонгоно уу. Баталсан тайлбар бусад сурагчдад харагдана.
       </p>
 
       {questions.length === 0 ? (
         <p className="mt-4 rounded-card bg-surface px-4 py-3 text-center text-sm font-semibold text-ink-muted">
-          Батлах хариулт алга.
+          Одоогоор хянаж батлах хариулт алга.
         </p>
       ) : (
         <ul className="mt-4 flex flex-col gap-3">
@@ -74,7 +74,7 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
                   <p role="status" className="mt-2.5 text-sm font-bold">
                     {decision === "approved"
                       ? `Батлагдлаа · №${pad(q.answer?.studentNo ?? 0)} +${HELP_XP} XP авлаа`
-                      : "Татгалзсан · ангийнхандаа харагдахгүй"}
+                      : "Хариултыг зөвшөөрөөгүй · бусад сурагчид харагдахгүй"}
                   </p>
                 ) : (
                   <div className="mt-2.5 flex flex-wrap gap-2">
@@ -93,7 +93,7 @@ export function PeerApproval({ questions, className }: PeerApprovalProps) {
                         setDecided((prev) => ({ ...prev, [q.id]: "rejected" }))
                       }
                     >
-                      Татгалзах
+                      Зөвшөөрөхгүй
                     </Button>
                   </div>
                 )}

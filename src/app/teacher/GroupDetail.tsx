@@ -16,8 +16,8 @@ import { sharedAnswer, type GroupView } from "./question-inbox";
 
 const errorText: Record<Exclude<GroupResult, { ok: true }>["error"], string> = {
   login: "Багшаар нэвтэрнэ үү",
-  empty: "Хоосон байна",
-  offline: "Өгөгдлийн сан холбогдоогүй байна",
+  empty: "Хадгалах текстээ оруулна уу.",
+  offline: "Өгөгдлийн сантай холбогдоогүй байна. Дараа дахин оролдоно уу.",
   failed: "Хадгалж чадсангүй. Дахин оролдоорой",
 };
 
@@ -51,7 +51,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
   function sendAnswer(text: string) {
     const checked = material && parseMaterial(material);
     if (material && !checked)
-      return setError("Холбоос https://-ээр эхлэх ёстой");
+      return setError("Холбоос https:// гэж эхлэх шаардлагатай.");
     run(
       () => answerQuestionGroup(g.id, text, checked),
       () => setSent({ text, material: checked ?? undefined }),
@@ -103,7 +103,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
       {answer ? (
         <div className="rounded-field bg-white px-3.5 py-2.5">
           <p className="text-xs font-bold text-primary">
-            Таны хариулт · бүх ангид илгээгдсэн
+            Таны тайлбар · ангийн бүх сурагчид харагдана
           </p>
           <p className="mt-0.5 text-base whitespace-pre-line">
             {answer.text}

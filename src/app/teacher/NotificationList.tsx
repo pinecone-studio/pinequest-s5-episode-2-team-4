@@ -77,7 +77,7 @@ export function NotificationList({
         </h2>
         <span className="rounded-full border-2 border-magenta bg-pink px-2.5 py-0.5 text-xs font-bold md:px-3 md:text-sm">
           {alertCount}
-          <span className="sr-only"> шинэ</span>
+          <span className="sr-only"> анхаарах шаардлагатай мэдэгдэл</span>
         </span>
       </div>
       <ul className="mt-3.5 flex flex-col gap-2 md:mt-4">
@@ -85,7 +85,7 @@ export function NotificationList({
           const kind = KINDS[n.kind];
           const context =
             n.kind === "common-mistake"
-              ? "Ижил алдаа"
+              ? "Давтагдсан алдаа"
               : subtopicTitles.get(n.subtopicId);
           return (
             <li
