@@ -31,7 +31,7 @@ export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, c
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 id="class-battle-title" className="type-section-title">
-          Ангийн босс тулаан
+          Босстой хийх ангийн хамтын тулаан
         </h2>
         <Link href={`/teacher/history?class=${encodeURIComponent(open?.classCode ?? classCode)}`} className="font-bold">
           Тулааны түүх →
@@ -58,11 +58,11 @@ export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, c
       ) : (
         <form action={createClassBossBattle} className="mt-3">
           <p className="text-ink-muted">
-            Бүх анги нэг боссыг хамтдаа ялна. Боссоо сонгоод тулааныг нээгээрэй: асуултууд зөвхөн таны заадаг
-            хичээлээс гарна. Сурагчид ангийн кодоороо эсвэл дэлгэц дээрх кодоор нэгдэнэ.
+            Ангийн сурагчид асуултад хариулж, нэг боссыг хамтдаа ялах зорилготой. Боссыг сонгоод тулааны өрөөг нээнэ үү. Асуултууд таны заадаг
+            хичээлээс гарна. Сурагчид ангийн код эсвэл тулааны өрөөний кодоор нэгдэнэ.
           </p>
           <fieldset className="mt-4">
-            <legend className="mb-2 font-bold">Босс</legend>
+            <legend className="mb-2 font-bold">Тулалдах боссыг сонгох</legend>
             <div className="grid grid-cols-3 gap-2 md:grid-cols-6">
               {bosses.map((boss, i) => (
                 <label
@@ -114,7 +114,7 @@ export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, c
               />
             </label>
             <button type="submit" className={buttonClass({ size: "sm" })}>
-              Тулаан нээх
+              Тулааны өрөө нээх
             </button>
           </div>
         </form>

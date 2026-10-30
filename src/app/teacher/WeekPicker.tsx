@@ -21,7 +21,7 @@ export function WeekPicker({ labels, selected }: { labels: string[]; selected: n
     <div aria-busy={pending} className={cn("flex w-full items-center gap-1 sm:w-auto", pending && "opacity-60")}>
       <button
         type="button"
-        aria-label="Өмнөх 7 хоног"
+        aria-label="Өмнөх долоо хоног"
         disabled={selected === labels.length - 1}
         onClick={() => go(selected + 1)}
         className={arrowClass}
@@ -29,7 +29,7 @@ export function WeekPicker({ labels, selected }: { labels: string[]; selected: n
         <Chevron className="rotate-180" />
       </button>
       <select
-        aria-label="7 хоног сонгох"
+        aria-label="Долоо хоног сонгох"
         value={selected}
         onChange={(e) => go(Number(e.target.value))}
         className="h-11 min-w-0 flex-1 cursor-pointer rounded-tile border-2 border-lavender bg-card px-3 text-sm font-bold text-ink focus:border-primary focus:outline-none"
@@ -42,7 +42,7 @@ export function WeekPicker({ labels, selected }: { labels: string[]; selected: n
       </select>
       <button
         type="button"
-        aria-label="Дараагийн 7 хоног"
+        aria-label="Дараагийн долоо хоног"
         disabled={selected === 0}
         onClick={() => go(selected - 1)}
         className={arrowClass}

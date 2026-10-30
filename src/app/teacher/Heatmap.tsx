@@ -11,9 +11,9 @@ import { NextStepNote } from "./NextStepNote";
 // each row gives how many students are weak, still learning and good.
 
 const STATUS: Record<TestedStatus, { label: string; className: string }> = {
-  weak: { label: "сул", className: "bg-status-weak text-status-weak-ink" },
-  learning: { label: "нөхөж буй", className: "bg-status-mid text-status-mid-ink" },
-  good: { label: "сайн", className: "bg-status-good text-status-good-ink" },
+  weak: { label: "Давтах шаардлагатай", className: "bg-status-weak text-status-weak-ink" },
+  learning: { label: "Бататгах хэрэгтэй", className: "bg-status-mid text-status-mid-ink" },
+  good: { label: "Сайн эзэмшсэн", className: "bg-status-good text-status-good-ink" },
 };
 
 type HeatmapProps = {
@@ -38,14 +38,14 @@ export function Heatmap({ rows, testedCount }: HeatmapProps) {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 id="heatmap-title" className="type-section-title">
-          Тестийн дүн · дэд сэдвээр
+          Тестийн дүн — сэдэв тус бүрээр
         </h2>
         <p className="text-sm font-semibold text-ink-muted">
-          {testedCount} сурагчийн дүнгээр · хамгийн сул нь эхэнд
+          {testedCount} сурагчийн дүн · давтлага шаардлагатай сэдвүүд эхэнд
         </p>
       </div>
 
-      <ul aria-label="Тайлбар" className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold text-ink-muted">
+      <ul aria-label="Сэдвийн эзэмшилтийн түвшин" className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold text-ink-muted">
         {TESTED_STATUSES.map((s) => (
           <li key={s} className="inline-flex items-center gap-1.5">
             <span aria-hidden="true" className={cn("size-2.5 rounded-full", STATUS[s].className)} />
@@ -56,7 +56,7 @@ export function Heatmap({ rows, testedCount }: HeatmapProps) {
 
       {testedCount === 0 ? (
         <p className="mt-4 rounded-card bg-surface px-4 py-5 text-ink-muted">
-          Ангийн сурагчид оношлох тест өгөөгүй байна. Тест өгмөгц дүн нь энд гарна.
+          Одоогоор энэ ангийн сурагчдаас оношлох тест өгсөн сурагч алга. Тестийн дүн бүртгэгдсэнээр сэдэв тус бүрийн мэдээлэл энд харагдана.
         </p>
       ) : (
         <>
@@ -91,7 +91,7 @@ export function Heatmap({ rows, testedCount }: HeatmapProps) {
                         row.counts.weak > 0 ? "text-status-weak-ink" : "text-status-good-ink",
                       )}
                     >
-                      {row.counts.weak > 0 ? `${row.counts.weak} сул · ${row.shares.weak}%` : "сул алга"}
+                      {row.counts.weak > 0 ? `${row.counts.weak} сурагч давтах · ${row.shares.weak}%` : "Давтах сурагч алга"}
                     </span>
                     <svg
                       viewBox="0 0 24 24"

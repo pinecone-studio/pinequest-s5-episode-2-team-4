@@ -4,19 +4,19 @@ import { MIN_TESTED, type NextStep } from "@/lib/class-results";
 
 const ADVICE: Record<NextStep, { text: string; className: string }> = {
   few: {
-    text: `Дүн цөөн байна. Дор хаяж ${MIN_TESTED} сурагч тест өгсний дараа зөвлөмж гарна.`,
+    text: `Зөвлөмж гаргахад тестийн дүн хангалтгүй байна. Дор хаяж ${MIN_TESTED} сурагч тест өгсний дараа зөвлөмж харагдана.`,
     className: "bg-surface text-ink-muted",
   },
   reexplain: {
-    text: "Олон сурагч сул байна. Дараагийн хичээл дээр ангиараа дахин тайлбарлаж, 2–3 дасгал хамт бодоорой.",
+    text: "Энэ сэдвийг дахин тайлбарлах шаардлагатай сурагч олон байна. Дараагийн хичээлээр гол ойлголтыг тайлбарлаж, 2–3 дасгалыг ангиараа хамт бодоорой.",
     className: "bg-status-weak text-status-weak-ink",
   },
   review: {
-    text: "Нөхөж буй сурагч олон байна. Богино давтлага хийж, нэмэлт материал өгөөрэй.",
+    text: "Энэ сэдвийг бататгах шаардлагатай сурагч олон байна. Богино давтлага хийж, нэмэлт дасгал эсвэл тайлбар материал өгөөрэй.",
     className: "bg-status-mid text-status-mid-ink",
   },
   next: {
-    text: "Ихэнх нь сайн байна. Дараагийн сэдэв рүү шилжиж болно.",
+    text: "Тестийн дүнгээр ихэнх сурагч энэ сэдвийг сайн эзэмшсэн байна. Дараагийн сэдэв рүү шилжих боломжтой.",
     className: "bg-status-good text-status-good-ink",
   },
 };
@@ -41,7 +41,7 @@ export function NextStepNote({ step, className }: NextStepNoteProps) {
             Даалгавар өгөх
           </ButtonLink>
           <ButtonLink href="/teacher/videos/new" size="sm" variant="secondary">
-            Видео нэмэх
+            Тайлбар видео бэлтгэх
           </ButtonLink>
         </div>
       ) : null}

@@ -11,10 +11,10 @@ export function SubjectPrompt({ className }: { className?: string }) {
       className={cn("rounded-panel border-2 border-dashed border-primary bg-surface p-5 md:p-7", className)}
     >
       <h2 id="subject-prompt-title" className="type-section-title">
-        Аль хичээл заадаг вэ?
+        Заадаг хичээлээ сонгоно уу
       </h2>
       <p className="mt-1 text-ink-muted">
-        Босс тулаан, даалгавар, хичээлийн видео бүгд энэ хичээлээр явна. Нэг удаа сонгоно, дараа солих боломжгүй.
+        Таны сонгосон хичээлд тохирсон тулааны асуулт, даалгавар, тайлбар видео бэлтгэх боломжтой болно. Хичээлийг нэг удаа сонгох тул баталгаажуулахаасаа өмнө нягтална уу.
       </p>
       <form action={chooseTeacherSubject} className="mt-4 flex flex-col gap-3 md:flex-row md:items-end">
         <label className="flex flex-col gap-1.5 font-bold">
@@ -26,7 +26,7 @@ export function SubjectPrompt({ className }: { className?: string }) {
             className="h-12 w-full rounded-tile border-2 border-lavender bg-white px-3 text-base text-ink focus:border-primary focus:outline-none md:w-64"
           >
             <option value="" disabled>
-              Сонгох
+              Хичээлээ сонгоно уу
             </option>
             {TEACHER_SUBJECTS.map((s) => (
               <option key={s.id} value={s.id}>
@@ -36,7 +36,7 @@ export function SubjectPrompt({ className }: { className?: string }) {
           </select>
         </label>
         <button type="submit" className={buttonClass({ size: "sm" })}>
-          Хадгалах
+          Хичээлийг баталгаажуулах
         </button>
       </form>
     </section>

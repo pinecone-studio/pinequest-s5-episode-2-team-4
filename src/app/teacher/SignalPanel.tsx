@@ -7,7 +7,7 @@ import { WeekPicker } from "./WeekPicker";
 // The 🟢🟡🔴 the students sent, in the same status colours as the heatmap.
 const LEVELS: { level: SignalLevel; icon: PixelIconName; label: string; className: string }[] = [
   { level: "got", icon: "signal-got", label: "Ойлгосон", className: "bg-status-good text-status-good-ink" },
-  { level: "unsure", icon: "signal-unsure", label: "Сайн мэдэхгүй", className: "bg-status-mid text-status-mid-ink" },
+  { level: "unsure", icon: "signal-unsure", label: "Эргэлзэж байна", className: "bg-status-mid text-status-mid-ink" },
   { level: "lost", icon: "signal-lost", label: "Ойлгоогүй", className: "bg-status-weak text-status-weak-ink" },
 ];
 
@@ -20,12 +20,12 @@ const UNSURE_SHARE = 0.4;
 function verdict({ got, unsure, lost }: SignalSummary["counts"]) {
   const total = got + unsure + lost;
   if (lost / total >= REEXPLAIN_SHARE) {
-    return { text: `${lost} сурагч ойлгоогүй · дахин тайлбарлах`, className: LEVELS[2].className };
+    return { text: `${lost} сурагч ойлгоогүй гэж хариулсан · дахин тайлбарлаарай`, className: LEVELS[2].className };
   }
   if ((unsure + lost) / total >= UNSURE_SHARE) {
-    return { text: `${unsure + lost} сурагч эргэлзэж байна · жишээ нэмэх`, className: LEVELS[1].className };
+    return { text: `${unsure + lost} сурагч бүрэн ойлгоогүй байна · нэмэлт жишээгээр тайлбарлаарай`, className: LEVELS[1].className };
   }
-  return { text: "Ихэнх нь ойлгосон · дараагийн сэдэв рүү", className: LEVELS[0].className };
+  return { text: "Ихэнх сурагч ойлгосон гэж хариулсан · дараагийн сэдэв рүү шилжиж болно", className: LEVELS[0].className };
 }
 
 type Row = SignalSummary & { title: string };
@@ -43,7 +43,7 @@ const rangeLabel = ({ from, to }: SignalWeek) =>
   `${month(from)}/${date(from)}–${month(to) === month(from) ? "" : `${month(to)}/`}${date(to)}`;
 
 const weekLabel = (week: SignalWeek, i: number) =>
-  i === 0 ? `Энэ 7 хоног · ${rangeLabel(week)}` : i === 1 ? `Өмнөх 7 хоног · ${rangeLabel(week)}` : rangeLabel(week);
+  i === 0 ? `Энэ долоо хоног · ${rangeLabel(week)}` : i === 1 ? `Өмнөх долоо хоног · ${rangeLabel(week)}` : rangeLabel(week);
 
 type SignalPanelProps = {
   /** Today's lessons, in the order they were taught */
@@ -75,16 +75,16 @@ export function SignalPanel({ today, signals, className }: SignalPanelProps) {
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div>
           <h2 id="signals-title" className="type-section-title">
-            Хичээлийн дохио
+            Сурагчдын ойлголтын үнэлгээ
           </h2>
-          <p className="text-sm font-semibold text-ink-muted">Нэргүй · сурагчдын илгээсэн</p>
+          <p className="text-sm font-semibold text-ink-muted">Сурагчдын өөрсдийн үнэлгээ · нэрийг харуулахгүй</p>
         </div>
         <WeekPicker labels={weeks.map(weekLabel)} selected={selected} />
       </div>
 
       {empty ? (
         <p className="mt-4 rounded-card border-2 border-dashed border-line px-5 py-6 text-center text-sm font-semibold text-ink-muted">
-          {current ? "Энэ" : "Тэр"} 7 хоногт дохио ирээгүй байна. Сурагчид хичээлийн «Ойлгосон уу?» хэсгээс, эсвэл хуваарьт хичээлийн өдөр нүүр хуудаснаасаа илгээнэ.
+          {current ? "Энэ" : "Сонгосон"} долоо хоногт сурагчдын үнэлгээ ирээгүй байна. Сурагчид хичээлийн “Ойлгосон уу?” хэсгээс, эсвэл хуваарьт хичээлийн өдөр нүүр хуудаснаасаа үнэлгээгээ илгээнэ.
         </p>
       ) : (
         <ol className="mt-4 flex flex-col gap-5">
@@ -92,7 +92,7 @@ export function SignalPanel({ today, signals, className }: SignalPanelProps) {
             <li>
               <h3 className="text-sm font-bold text-ink-muted">Өнөөдөр</h3>
               {today.length === 0 ? (
-                <p className="mt-2 text-sm font-semibold text-ink-muted">Өнөөдөр дохио ирээгүй байна.</p>
+                <p className="mt-2 text-sm font-semibold text-ink-muted">Өнөөдөр сурагчдаас ойлголтын үнэлгээ ирээгүй байна.</p>
               ) : (
                 <TopicList rows={today} open />
               )}
