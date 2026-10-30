@@ -42,6 +42,59 @@
   background: radial-gradient(70% 60% at 50% 40%, rgb(91 0 237 / 0.35), rgb(13 10 34 / 0.9));
 }
 
+/* Pixel art for the start screen. `--px` is one art pixel; a frame is a
+   border with its corners notched out, drawn with hard box shadows. */
+.pixel-frame {
+  --px: 3px;
+  --frame: var(--game-line);
+  margin: var(--px);
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame),
+    0 var(--px) 0 0 var(--frame),
+    calc(-1 * var(--px)) 0 0 0 var(--frame),
+    var(--px) 0 0 0 var(--frame);
+}
+
+/* A chosen option (e.g. the snake's skin) gets a gold frame. */
+.pixel-frame[aria-pressed="true"] {
+  --frame: var(--game-gold);
+}
+
+/* Big text with a stepped shadow instead of a glow. */
+.pixel-title {
+  text-shadow:
+    3px 3px 0 var(--color-primary),
+    6px 6px 0 #1d1647;
+}
+
+/* A chunky button: a darker frame, a lighter top row and a darker bottom
+   row; it drops one art pixel when pressed. */
+.pixel-button {
+  --px: 4px;
+  --frame: #2a0a6b;
+  border-radius: 0;
+  background: var(--color-primary);
+  box-shadow:
+    inset 0 var(--px) 0 0 #8b5cff,
+    inset 0 calc(-1 * var(--px)) 0 0 #3d0aa8,
+    0 calc(-1 * var(--px)) 0 0 var(--frame),
+    0 var(--px) 0 0 var(--frame),
+    calc(-1 * var(--px)) 0 0 0 var(--frame),
+    var(--px) 0 0 0 var(--frame),
+    0 calc(2 * var(--px)) 0 0 rgb(0 0 0 / 0.45);
+  transition: translate 80ms steps(1);
+}
+
+.pixel-button:hover {
+  background: #6a14ff;
+}
+
+.pixel-button:active {
+  translate: 0 var(--px);
+}
+
 .game-gradient {
   background: linear-gradient(135deg, var(--color-primary), var(--color-magenta));
 }
