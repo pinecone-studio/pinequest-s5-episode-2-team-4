@@ -837,6 +837,11 @@ export async function getSeenVideoIds(): Promise<string[]> {
   return (await readSession())?.videosSeen ?? [];
 }
 
+export async function getBookmarkedVideoIds(): Promise<string[]> {
+  const session = await readSession();
+  return session?.role === "student" ? session.bookmarkedVideos ?? [] : [];
+}
+
 /** Published class videos the student hasn't opened yet, for the menu badge. */
 export async function getUnseenVideoCount(): Promise<number> {
   const session = await readSession();
