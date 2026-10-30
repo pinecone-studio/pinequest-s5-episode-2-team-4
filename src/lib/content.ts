@@ -407,17 +407,27 @@ async function listQuestions(assignmentId: string): Promise<GameQuestion[]> {
   return (data ?? []).map(toQuestion);
 }
 
-/** Published assignments for a class, newest first. */
-export async function listClassAssignments(classCode: string): Promise<Assignment[]> {
+/**
+ * Published assignments for a class, newest first, each with whether this
+ * student has finished it. One query: the student's finished attempts come
+ * embedded, so the menu badge doesn't wait for a second round trip.
+ */
+export async function listClassAssignments(
+  classCode: string,
+  studentId: string,
+): Promise<(Assignment & { done: boolean })[]> {
   const { data } = await db()
     .from("assignments")
-    .select("*")
+    .select("*, assignment_attempts(assignment_id)")
     .eq("class_code", classCode)
     .eq("status", "published")
+    .eq("assignment_attempts.student_id", studentId)
+    // Done means at least one right answer, as in submitAssignmentAttempt.
+    .gt("assignment_attempts.accuracy", 0)
     .order("published_at", { ascending: false })
     .limit(50)
-    .returns<AssignmentRow[]>();
-  return (data ?? []).map(toAssignment);
+    .returns<(AssignmentRow & { assignment_attempts: { assignment_id: string }[] })[]>();
+  return (data ?? []).map((r) => ({ ...toAssignment(r), done: r.assignment_attempts.length > 0 }));
 }
 
 /** A published assignment of the class with its questions. */
@@ -461,20 +471,6 @@ export async function saveAttempt(attempt: {
     xp_awarded: attempt.xpAwarded,
   });
   if (error) fail("Save attempt", error);
-}
-
-/** Assignment ids the student has finished at least once. */
-export async function finishedAssignmentIds(studentId: string, assignmentIds: string[]): Promise<Set<string>> {
-  if (assignmentIds.length === 0) return new Set();
-  const { data } = await db()
-    .from("assignment_attempts")
-    .select("assignment_id")
-    .eq("student_id", studentId)
-    .in("assignment_id", assignmentIds)
-    // Done means at least one right answer, as in submitAssignmentAttempt.
-    .gt("accuracy", 0)
-    .returns<{ assignment_id: string }[]>();
-  return new Set((data ?? []).map((r) => r.assignment_id));
 }
 
 /** All attempts of an assignment, for the teacher's counts. */
