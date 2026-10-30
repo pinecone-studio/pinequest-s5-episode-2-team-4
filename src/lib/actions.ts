@@ -6,8 +6,9 @@
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { randomBytes } from "node:crypto";
-import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, findAccountById, normalPhone, saveAccount } from "./accounts";
+import { checkLogin, createAccount, createDemoAccount, deleteOldDemoAccounts, findAccountById, normalPhone, saveAccount, setAccountClass } from "./accounts";
 import { demoQuestions } from "./ai/fallback";
+import { classesStored, createClass } from "./classes";
 import { saveAssignment, setAssignmentStatus } from "./content";
 import { getRetestQuestions } from "./data";
 import { clearLoginFailures, loginBlockedMinutes, recordLoginFailure } from "./login-limit";
@@ -119,9 +120,17 @@ export async function demoLogIn() {
   redirect("/");
 }
 
-/** A fresh demo teacher in the same class as the demo students. */
+/**
+ * A fresh demo teacher with a real class of its own (7А), so it can show a QR
+ * that people join with their phones (e.g. judges at a pitch). The sample
+ * class data still shows alongside what they do.
+ */
 export async function demoTeacherLogIn() {
   const account = await createDemoAccount({ subject: "math" }, "teacher");
+  if (classesStored()) {
+    const own = await createClass(account.id, "7А", "math");
+    await setAccountClass(account.id, own.code);
+  }
   await startSession(account.id);
   after(deleteOldDemoAccounts);
   redirect("/classes");
