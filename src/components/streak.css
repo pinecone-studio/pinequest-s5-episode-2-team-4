@@ -14,8 +14,8 @@
   --streak-panel-background:
     radial-gradient(ellipse at 92% 0%, rgb(172 132 239 / .15), transparent 58%),
     radial-gradient(ellipse at 8% 100%, rgb(255 185 116 / .18), transparent 54%),
-    linear-gradient(135deg, #fff, #f8f5ff 65%, #fff8f0);
-  --streak-stat-background: radial-gradient(ellipse at 100% 0%, rgb(172 132 239 / .1), transparent 75%), linear-gradient(145deg, #fff, #f5f0fc);
+    linear-gradient(135deg, rgb(255 255 255 / .6), rgb(248 245 255 / .54) 65%, rgb(255 248 240 / .56));
+  --streak-stat-background: radial-gradient(ellipse at 100% 0%, rgb(172 132 239 / .1), transparent 75%), linear-gradient(145deg, rgb(255 255 255 / .6), rgb(245 240 252 / .56));
   --streak-pattern: rgb(114 83 167 / .25);
   --streak-shadow: 0 16px 44px rgb(80 49 115 / .07), inset 0 1px 0 #fff;
   color: var(--streak-text);
@@ -37,8 +37,8 @@
   --streak-panel-background:
     radial-gradient(ellipse at 92% 0%, rgb(140 88 226 / .22), transparent 58%),
     radial-gradient(ellipse at 8% 100%, rgb(231 116 49 / .14), transparent 54%),
-    linear-gradient(135deg, #261c39, #191525 65%, #21172c);
-  --streak-stat-background: radial-gradient(ellipse at 100% 0%, rgb(133 87 210 / .13), transparent 75%), linear-gradient(145deg, #261e36, #1c1728);
+    linear-gradient(135deg, rgb(38 28 57 / .68), rgb(25 21 37 / .64) 65%, rgb(33 23 44 / .68));
+  --streak-stat-background: radial-gradient(ellipse at 100% 0%, rgb(133 87 210 / .13), transparent 75%), linear-gradient(145deg, rgb(38 30 54 / .68), rgb(28 23 40 / .64));
   --streak-pattern: rgb(219 194 255 / .28);
   --streak-shadow: 0 16px 44px rgb(30 15 50 / .16), inset 0 1px 0 rgb(255 255 255 / .05);
 }
@@ -140,4 +140,21 @@
   .streak-stat { border-radius: 16px; padding: 18px 8px; }
   .streak-stat-label { font-size: 10px; }
   .streak-stat strong { font-size: 24px; }
+}
+
+/* The custom streak gradients use the same frosted surface as other panels. */
+.streak-panel,
+.streak-stat {
+  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  backdrop-filter: blur(10px) saturate(115%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .streak-panel, .streak-stat { background: var(--color-card); }
+}
+@media (prefers-contrast: more) {
+  .streak-panel, .streak-stat {
+    background: var(--color-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }

@@ -16,7 +16,7 @@ export function ClassGoalCard({ goal, className }: ClassGoalCardProps) {
     <section
       aria-labelledby="class-goal-title"
       className={cn(
-        "rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-6",
+        "glass-panel rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-6",
         className,
       )}
     >

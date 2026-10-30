@@ -64,7 +64,7 @@ export function ScheduleEditor({ schedule }: { schedule: ClassSchedule }) {
         </p>
       )}
 
-      <section aria-labelledby="weekdays-title" className="rounded-panel bg-card p-5 shadow-card md:p-7">
+      <section aria-labelledby="weekdays-title" className="glass-panel rounded-panel bg-card p-5 shadow-card md:p-7">
         <h2 id="weekdays-title" className="type-section-title">
           {schedule.className} анги хичээл орох гарагууд
         </h2>
@@ -91,7 +91,7 @@ export function ScheduleEditor({ schedule }: { schedule: ClassSchedule }) {
         </div>
       </section>
 
-      <section aria-labelledby="upcoming-title" className="rounded-panel bg-card p-5 shadow-card md:p-7">
+      <section aria-labelledby="upcoming-title" className="glass-panel rounded-panel bg-card p-5 shadow-card md:p-7">
         <h2 id="upcoming-title" className="type-section-title">
           Ирэх хичээлүүд
         </h2>

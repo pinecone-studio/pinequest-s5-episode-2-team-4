@@ -20,7 +20,7 @@ export default async function StudentVideosPage() {
       </div>
 
       {videos.length === 0 ? (
-        <section className="rounded-panel border border-line bg-white p-6 text-center shadow-card">
+        <section className="glass-panel rounded-panel border border-line bg-white p-6 text-center shadow-card">
           <h2 className="text-xl font-bold">Одоогоор видео алга</h2>
           <p className="mt-1 text-ink-muted">Багш видео нийтлэхээр энд гарна.</p>
           <ButtonLink href="/" variant="secondary" size="sm" className="mt-4">
@@ -33,7 +33,7 @@ export default async function StudentVideosPage() {
             <li key={v.id}>
               <Link
                 href={`/videos/${v.id}`}
-                className="flex h-full items-center gap-4 rounded-panel border border-line bg-white p-4 text-ink no-underline shadow-card hover:text-ink hover:ring-2 hover:ring-primary"
+                className="glass-panel flex h-full items-center gap-4 rounded-panel border border-line bg-white p-4 text-ink no-underline shadow-card hover:text-ink hover:ring-2 hover:ring-primary"
               >
                 <span aria-hidden="true" className="flex h-20 w-12 shrink-0 items-center justify-center rounded-tile bg-linear-to-b from-primary to-primary-dark text-white">
                   <PixelIcon name="play" className="size-6" />

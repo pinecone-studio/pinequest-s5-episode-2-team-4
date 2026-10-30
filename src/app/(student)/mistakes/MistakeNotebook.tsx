@@ -37,7 +37,7 @@ export function MistakeNotebook({ items }: { items: NotebookItem[] }) {
       </div>
       <p role="status" aria-live="polite" className="mt-4 min-h-6 text-sm font-semibold">{notice}</p>
       {!visible.length ? (
-        <div className="mt-3 rounded-panel border border-line bg-surface p-8 text-center">
+        <div className="glass-panel mt-3 rounded-panel border border-line bg-surface p-8 text-center">
           <p className="text-xl font-bold">{items.length === 0 ? "Одоогоор бүртгэгдсэн алдаа алга" : tab === "pending" ? "Давтах алдаа алга!" : "Одоогоор давтсан асуулт алга"}</p>
           <p className="mt-3 text-sm text-ink-muted">{items.length === 0 ? "Тест, дасгал эсвэл boss-ийн асуултад буруу хариулбал энд автоматаар нэмэгдэнэ." : "Хичээлийн шүүлтүүрээ солих эсвэл бусад асуултаа давтаарай."}</p>
           <ButtonLink href="/test" size="sm" className="mt-5">Тест рүү очих</ButtonLink>
@@ -75,7 +75,7 @@ function ReviewCard({ item, onReviewed }: { item: NotebookItem; onReviewed: (cor
   }
 
   return (
-    <article className="rounded-panel border border-line bg-white p-5 shadow-card md:p-7">
+    <article className="glass-panel rounded-panel border border-line bg-white p-5 shadow-card md:p-7">
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
         <span className="rounded-full bg-surface px-3 py-1.5">{item.subject}</span>
         <span className="text-ink-muted">{item.resolved ? "✓ Давтсан" : "Давтах"}</span>

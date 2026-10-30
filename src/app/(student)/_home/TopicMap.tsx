@@ -77,7 +77,7 @@ export function TopicMap({ title, nodes, pet }: TopicMapProps) {
   return (
     <section
       aria-labelledby="map-title"
-      className="mt-7 rounded-[25px] bg-white px-5 py-6 shadow-card md:mt-6 md:rounded-panel md:px-10 md:pt-8 md:pb-10"
+      className="glass-panel mt-7 rounded-[25px] bg-white px-5 py-6 shadow-card md:mt-6 md:rounded-panel md:px-10 md:pt-8 md:pb-10"
     >
       <div className="flex items-center justify-between gap-3 md:justify-start md:gap-3.5">
         <h2 id="map-title" className="type-section-title">

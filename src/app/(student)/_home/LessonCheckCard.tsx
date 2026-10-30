@@ -57,7 +57,7 @@ export function LessonCheckCard({ lesson }: { lesson: TodayLesson }) {
   return (
     <section
       aria-labelledby="lesson-check-title"
-      className="my-6 flex flex-col gap-4 rounded-panel border-2 border-primary/30 bg-card p-5 shadow-card md:my-10 md:p-7"
+      className="glass-panel my-6 flex flex-col gap-4 rounded-panel border-2 border-primary/30 bg-card p-5 shadow-card md:my-10 md:p-7"
     >
       <div className="flex items-start gap-3">
         <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender">
