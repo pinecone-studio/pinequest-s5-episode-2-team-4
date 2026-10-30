@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { Expression } from "@/components/Fraction";
 import { Button, ButtonLink } from "@/components/ui";
@@ -12,12 +12,20 @@ type ReviewResult = Awaited<ReturnType<typeof reviewMistake>>;
 export function MistakeNotebook({ items }: { items: NotebookItem[] }) {
   const [tab, setTab] = useState<"pending" | "resolved">("pending");
   const [subject, setSubject] = useState("all");
+  const [query, setQuery] = useState("");
+  const searchInput = useRef<HTMLInputElement>(null);
   const [updates, setUpdates] = useState<Record<string, boolean>>({});
   const [notice, setNotice] = useState("");
   const isResolved = (item: NotebookItem) => updates[item.id] ?? item.resolved;
   const pending = items.filter((item) => !isResolved(item)).length;
   const subjects = [...new Set(items.map((item) => item.subject))];
-  const visible = items.filter((item) => isResolved(item) === (tab === "resolved") && (subject === "all" || item.subject === subject));
+  const normalizeSearch = (text: string) => text.normalize("NFC").toLocaleLowerCase().replace(/\s+/g, " ").trim();
+  const search = normalizeSearch(query);
+  const visible = items.filter((item) =>
+    isResolved(item) === (tab === "resolved") &&
+    (subject === "all" || item.subject === subject) &&
+    (!search || normalizeSearch(`${item.prompt} ${item.display ?? ""}`).includes(search)),
+  );
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pt-4 pb-12 md:px-8">
@@ -35,12 +43,40 @@ export function MistakeNotebook({ items }: { items: NotebookItem[] }) {
           </select>
         </label>
       </div>
+      <div className="mt-5">
+        <label htmlFor="mistake-search" className="text-sm font-semibold">Асуулт хайх</label>
+        <div className="mt-2 flex gap-2">
+          <input
+            ref={searchInput}
+            id="mistake-search"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Асуултын текстээр хайх…"
+            maxLength={150}
+            aria-describedby={search ? "mistake-search-count" : undefined}
+            className="min-h-12 w-full min-w-0 rounded-field border border-line bg-white px-4 text-ink placeholder:text-ink-muted"
+          />
+          {query && <Button variant="secondary" size="sm" onClick={() => {
+            setQuery("");
+            searchInput.current?.focus();
+          }}>Арилгах</Button>}
+        </div>
+        <p id="mistake-search-count" role="status" aria-live="polite" className="mt-2 text-sm text-ink-muted">
+          {search ? `${visible.length} асуулт олдлоо` : ""}
+        </p>
+      </div>
       <p role="status" aria-live="polite" className="mt-4 min-h-6 text-sm font-semibold">{notice}</p>
       {!visible.length ? (
         <div className="glass-panel mt-3 rounded-panel border border-line bg-surface p-8 text-center">
-          <p className="text-xl font-bold">{items.length === 0 ? "Одоогоор бүртгэгдсэн алдаа алга" : tab === "pending" ? "Давтах алдаа алга!" : "Одоогоор давтсан асуулт алга"}</p>
-          <p className="mt-3 text-sm text-ink-muted">{items.length === 0 ? "Тест, дасгал эсвэл boss-ийн асуултад буруу хариулбал энд автоматаар нэмэгдэнэ." : "Хичээлийн шүүлтүүрээ солих эсвэл бусад асуултаа давтаарай."}</p>
-          <ButtonLink href="/test" size="sm" className="mt-5">Тест рүү очих</ButtonLink>
+          <p className="text-xl font-bold">{items.length === 0 ? "Одоогоор бүртгэгдсэн алдаа алга" : search ? "Хайлтад тохирох асуулт олдсонгүй" : tab === "pending" ? "Давтах алдаа алга!" : "Одоогоор давтсан асуулт алга"}</p>
+          <p className="mt-3 text-sm text-ink-muted">{items.length === 0 ? "Тест, дасгал эсвэл boss-ийн асуултад буруу хариулбал энд автоматаар нэмэгдэнэ." : search ? "Өөр түлхүүр үгээр хайх эсвэл хайлтаа арилгаарай. Хичээл болон төлөвийн шүүлтүүр мөн үйлчилж байна." : "Хичээлийн шүүлтүүрээ солих эсвэл бусад асуултаа давтаарай."}</p>
+          {search && items.length > 0
+            ? <Button variant="secondary" size="sm" className="mt-5" onClick={() => {
+              setQuery("");
+              searchInput.current?.focus();
+            }}>Хайлт арилгах</Button>
+            : <ButtonLink href="/test" size="sm" className="mt-5">Тест рүү очих</ButtonLink>}
         </div>
       ) : (
         <div className="mt-3 flex flex-col gap-5">
