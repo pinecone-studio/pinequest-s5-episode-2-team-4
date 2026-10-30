@@ -23,3 +23,23 @@ export function pixelBox(ctx: CanvasRenderingContext2D, x: number, y: number, w:
   ctx.fillRect(x + n, y, w - 2 * n, h);
   ctx.fillRect(x, y + n, w, h - 2 * n);
 }
+
+/** A filled circle of radius `r`, one row of art pixels at a time. */
+export function pixelDisc(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, size = PIXEL) {
+  const x = snap(cx, size), y = snap(cy, size);
+  const rows = Math.max(1, Math.round(r / size));
+  for (let j = -rows; j < rows; j++) {
+    const mid = (j + 0.5) * size;
+    const cells = Math.round(Math.sqrt(Math.max(0, r * r - mid * mid)) / size);
+    if (cells > 0) ctx.fillRect(x - cells * size, y + j * size, cells * 2 * size, size);
+  }
+}
+
+/** Part of an ellipse in `size` art pixels, angles a0…a1. */
+export function pixelArc(ctx: CanvasRenderingContext2D, cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, size = PIXEL) {
+  const steps = Math.ceil(((a1 - a0) * Math.max(rx, ry)) / size);
+  for (let i = 0; i <= steps; i++) {
+    const a = a0 + ((a1 - a0) * i) / steps;
+    ctx.fillRect(snap(cx + Math.cos(a) * rx, size), snap(cy + Math.sin(a) * ry, size), size, size);
+  }
+}
