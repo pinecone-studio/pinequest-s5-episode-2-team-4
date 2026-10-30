@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { StreakActivity } from "@/components/StreakActivity";
 import "./globals.css";
 import "./theme.css";
+import "./glass.css";
 
 // One family for Latin, digits and Cyrillic, so a line never mixes two fonts.
 // ө and ү live in the cyrillic-ext subset.

@@ -53,7 +53,7 @@ export function DailyQuestsCard({ quests }: { quests: DailyQuest[] }) {
   }
 
   return (
-    <section aria-labelledby="quests-title" className="my-6 rounded-panel border border-line bg-white p-5 shadow-card md:my-10 md:p-7">
+    <section aria-labelledby="quests-title" className="glass-panel my-6 rounded-panel border border-line bg-white p-5 shadow-card md:my-10 md:p-7">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender text-3xl">

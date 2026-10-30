@@ -12,7 +12,7 @@ export function TeacherCard({ assignmentsLeft, videoCount }: TeacherCardProps) {
   return (
     <section
       aria-labelledby="teacher-card-title"
-      className="mb-6 flex flex-col gap-4 rounded-panel border border-line bg-white p-5 shadow-card md:mb-10 md:flex-row md:items-center md:justify-between md:p-7"
+      className="glass-panel mb-6 flex flex-col gap-4 rounded-panel border border-line bg-white p-5 shadow-card md:mb-10 md:flex-row md:items-center md:justify-between md:p-7"
     >
       <div className="flex items-center gap-3">
         <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender text-3xl">

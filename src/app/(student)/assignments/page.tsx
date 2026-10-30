@@ -27,7 +27,7 @@ export default async function StudentAssignmentsPage() {
       {tour && <DemoTour assignment={assignments.find((a) => a.id === tour.assignmentId)} />}
 
       {sorted.length === 0 ? (
-        <section className="rounded-panel border border-line bg-white p-6 text-center shadow-card">
+        <section className="glass-panel rounded-panel border border-line bg-white p-6 text-center shadow-card">
           <p className="text-4xl" aria-hidden="true">
             🎉
           </p>
@@ -45,7 +45,7 @@ export default async function StudentAssignmentsPage() {
               <li
                 key={a.id}
                 className={cn(
-                  "flex flex-col gap-3 rounded-panel border border-line bg-white p-4 shadow-card md:flex-row md:items-center md:justify-between md:p-5",
+                  "glass-panel flex flex-col gap-3 rounded-panel border border-line bg-white p-4 shadow-card md:flex-row md:items-center md:justify-between md:p-5",
                   a.done && "opacity-80",
                 )}
               >

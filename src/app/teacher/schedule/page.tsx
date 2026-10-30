@@ -25,7 +25,7 @@ export default async function SchedulePage() {
       {schedule ? (
         <ScheduleEditor schedule={schedule} />
       ) : (
-        <section className="mt-6 flex flex-col items-start gap-3 rounded-panel bg-card p-5 shadow-card md:p-7">
+        <section className="glass-panel mt-6 flex flex-col items-start gap-3 rounded-panel bg-card p-5 shadow-card md:p-7">
           <h2 className="text-xl font-bold">Анги сонгоогүй байна</h2>
           <p className="text-ink-muted">Хуваарь ангид хамаардаг тул эхлээд ангиа сонгоорой.</p>
           <ButtonLink href="/classes" size="sm">

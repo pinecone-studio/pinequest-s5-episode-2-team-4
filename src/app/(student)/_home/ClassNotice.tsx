@@ -5,7 +5,7 @@ export function ClassNotice() {
   return (
     <section
       aria-labelledby="class-notice-title"
-      className="mt-6 flex flex-col gap-4 rounded-panel bg-card p-5 shadow-card md:mt-10 md:flex-row md:items-center md:gap-6 md:p-7"
+      className="glass-panel mt-6 flex flex-col gap-4 rounded-panel bg-card p-5 shadow-card md:mt-10 md:flex-row md:items-center md:gap-6 md:p-7"
     >
       <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender text-3xl">
         🏫
