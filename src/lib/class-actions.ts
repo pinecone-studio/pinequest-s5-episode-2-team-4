@@ -6,8 +6,17 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import QRCode from "qrcode";
-import { findAccountByEmail, findAccountById, findAccountByPhone, normalPhone, setAccountClass } from "./accounts";
+import {
+  createGuestAccount,
+  deleteOldDemoAccounts,
+  findAccountByEmail,
+  findAccountById,
+  findAccountByPhone,
+  normalPhone,
+  setAccountClass,
+} from "./accounts";
 import { requireStudent, requireTeacher } from "./auth";
 import { normalClassCode } from "./battle";
 import {
@@ -15,12 +24,14 @@ import {
   closeInvites,
   createClass,
   findInviteClass,
+  findOpenInvite,
+  listJoinedNames,
   openInvite,
   refreshInvite,
   removeMember,
 } from "./classes";
 import { getActiveClass, getStudentClasses, getTeacherClasses } from "./data";
-import { readSession, writeSession } from "./session";
+import { readSession, startSession, writeSession } from "./session";
 import { OPEN_GRADES, teacherSubject } from "./subjects";
 
 async function setOwnClass(classCode: string | undefined) {
@@ -128,6 +139,43 @@ export async function startInvite(): Promise<InviteResult> {
   }
 }
 
+/**
+ * A QR people join with only their name (/q/<token>), for the live join
+ * panel. Reuses the class's open invite, so moving between pages keeps the
+ * same QR and someone typing their name isn't cut off.
+ */
+export async function showNameQr(): Promise<InviteResult> {
+  const active = await teacherClass();
+  if (active.id === "demo") return { error: "demo" };
+  try {
+    const token = (await findOpenInvite(active.id)) ?? (await openInvite(active.id));
+    const h = await headers();
+    const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
+    const url = `${origin}/q/${token}`;
+    const svg = await QRCode.toString(url, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
+    return { token, url, svg };
+  } catch (error) {
+    console.error(error);
+    return { error: "failed" };
+  }
+}
+
+/**
+ * Polled while the live join panel is on screen: keeps its invite alive and
+ * returns who has joined, the latest first. `alive` is false once it lapsed.
+ */
+export async function pollNameQr(token: string): Promise<{ alive: boolean; names: string[] }> {
+  const active = await teacherClass();
+  if (active.id === "demo") return { alive: false, names: [] };
+  try {
+    const [alive, names] = await Promise.all([refreshInvite(active.id, String(token)), listJoinedNames(active.id)]);
+    return { alive, names };
+  } catch (error) {
+    console.error(error);
+    return { alive: true, names: [] };
+  }
+}
+
 /** Called every few seconds while the QR is on screen; false once it has stopped working. */
 export async function keepInvite(token: string): Promise<boolean> {
   const active = await teacherClass();
@@ -166,6 +214,38 @@ export async function joinClass(token: string): Promise<JoinResult> {
     console.error(error);
     return { error: "failed" };
   }
+  redirect("/");
+}
+
+export type JoinByNameResult = { error: "name" | "expired" | "failed" } | void;
+
+/**
+ * Someone without an account joins the class of a QR that is still shown,
+ * with only their name (e.g. judges at a pitch): a guest student account is
+ * made in their name and logged in. Already logged in as a student, they
+ * just join.
+ */
+export async function joinByName(token: string, name: string): Promise<JoinByNameResult> {
+  const clean = String(name).replace(/\s+/g, " ").trim();
+  if (!clean) return { error: "name" };
+  try {
+    const found = await findInviteClass(String(token));
+    if (!found) return { error: "expired" };
+    const session = await readSession();
+    if (session?.role === "student" && !session.demo) {
+      await addMember(found.id, session.id);
+      await setOwnClass(found.code);
+    } else {
+      const guest = await createGuestAccount(clean, { pet: { lineId: "anoleaf", level: 1, xp: 0 } });
+      await addMember(found.id, guest.id);
+      await setAccountClass(guest.id, found.code);
+      await startSession(guest.id);
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: "failed" };
+  }
+  after(deleteOldDemoAccounts);
   redirect("/");
 }
 

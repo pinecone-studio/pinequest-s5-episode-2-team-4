@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getActiveClass, getClassMembers } from "@/lib/data";
 import { subjectTitle } from "@/lib/subjects";
 import { AddStudentForm } from "./AddStudentForm";
+import { LiveJoinQr } from "../LiveJoinQr";
 import { InviteQr } from "./InviteQr";
 import { MemberList } from "./MemberList";
 
@@ -46,6 +47,8 @@ export default async function StudentsPage() {
           <InviteQr classTitle={active?.name ?? ""} disabled={demo} />
           {demo && <p className="text-sm font-semibold text-ink-muted">Демо горимд сурагч нэмэх боломжгүй.</p>}
         </section>
+        {/* Without an account: just a name (e.g. judges at a pitch). */}
+        {!demo && <LiveJoinQr className="lg:col-start-2" />}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@
 
 import "server-only";
 import { randomBytes, randomInt } from "node:crypto";
+import { GUEST_EMAIL_DOMAIN } from "./accounts";
 import { normalClassCode } from "./battle";
 import { getSupabaseAdmin } from "./supabase";
 import { XP_PER_LEVEL } from "./pets";
@@ -134,7 +135,12 @@ export async function listClassMembers(classId: string): Promise<ClassMember[]> 
   if (error) throw new Error(`Could not load students: ${error.message}`);
   return data
     .flatMap((r) => (r.accounts ? [r.accounts] : []))
-    .map((a) => ({ id: a.id, username: a.username, contact: a.email ?? a.phone ?? undefined }))
+    .map((a) => ({
+      id: a.id,
+      username: a.username,
+      // A QR guest's email is made up, so it isn't shown.
+      contact: a.email?.endsWith(GUEST_EMAIL_DOMAIN) ? "QR-аар нэгдсэн" : (a.email ?? a.phone ?? undefined),
+    }))
     .sort((a, b) => a.username.localeCompare(b.username));
 }
 
@@ -173,6 +179,31 @@ export async function refreshInvite(classId: string, token: string): Promise<boo
     .select("token");
   if (error) throw new Error(`Could not refresh invite: ${error.message}`);
   return data.length > 0;
+}
+
+/** The class's invite that still works, if one is open (so another screen can show the same QR). */
+export async function findOpenInvite(classId: string): Promise<string | undefined> {
+  const { data, error } = await db()
+    .from("class_invites")
+    .select("token")
+    .eq("class_id", classId)
+    .gt("expires_at", new Date().toISOString())
+    .limit(1)
+    .returns<{ token: string }[]>();
+  if (error) throw new Error(`Could not load invite: ${error.message}`);
+  return data[0]?.token;
+}
+
+/** Names of the class's students, the latest to join first. */
+export async function listJoinedNames(classId: string): Promise<string[]> {
+  const { data, error } = await db()
+    .from("class_members")
+    .select("added_at, accounts(username)")
+    .eq("class_id", classId)
+    .order("added_at", { ascending: false })
+    .returns<{ added_at: string; accounts: { username: string } | null }[]>();
+  if (error) throw new Error(`Could not load students: ${error.message}`);
+  return data.flatMap((r) => (r.accounts ? [r.accounts.username] : []));
 }
 
 /** Ends every invite of the class: the teacher closed the QR. */

@@ -27,6 +27,8 @@ export type Account = {
   classCode?: string;
   /** A throwaway «Демо нэвтрэх» account. */
   demo?: boolean;
+  /** Joined a class from a QR with only a name (e.g. a judge at a pitch); deleted after a day. */
+  guest?: boolean;
   pet?: UserPet;
   /** Selected option index per diagnostic test question id. */
   testAnswers?: Record<string, number>;
