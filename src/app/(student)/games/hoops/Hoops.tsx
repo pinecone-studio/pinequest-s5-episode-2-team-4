@@ -32,8 +32,10 @@ export function Hoops({ subjects, subjectId, questions }: HoopsProps) {
         <>
           <SubjectSelect subjects={subjects} value={subjectId} basePath="/games/hoops" />
           <div className="flex items-center gap-3">
-            <span className="text-sm" aria-label={`${hearts} амь`}>
-              {Array.from({ length: HEARTS }, (_, i) => (i < hearts ? "❤️" : "🤍")).join("")}
+            <span className="flex gap-0.5" aria-label={`${hearts} амь`}>
+              {Array.from({ length: HEARTS }, (_, i) => (
+                <PixelIcon key={i} name={i < hearts ? "heart" : "heart-empty"} className="size-4" />
+              ))}
             </span>
             <div className="flex-1">
               <RoundProgress current={game ? Math.min(game.index, PROMPTS) : 0} total={PROMPTS} />
@@ -79,7 +81,7 @@ export function Hoops({ subjects, subjectId, questions }: HoopsProps) {
           </p>
           {question ? (
             <button type="button" onClick={discard} className="game-chip min-h-12 cursor-pointer rounded-xl px-4 font-extrabold">
-              🗑️ Хаях
+              <PixelIcon name="trash" className="inline-block size-4 align-[-0.15em]" /> Хаях
             </button>
           ) : null}
         </div>
@@ -87,7 +89,11 @@ export function Hoops({ subjects, subjectId, questions }: HoopsProps) {
         {result ? (
           <ResultPanel result={result} onAgain={start} otherHref="/games">
             <p className="text-sm font-extrabold text-[var(--game-gold)]">
-              {game && game.hearts <= 0 ? "Амь дууслаа. Дахиад нэг үз!" : `🏀 ${game?.right ?? 0} зөв бөмбөг сагсанд орлоо!`}
+              {game && game.hearts <= 0 ? "Амь дууслаа. Дахиад нэг үз!" : (
+                <>
+                  <PixelIcon name="basketball" className="inline-block size-4 align-[-0.15em]" /> {game?.right ?? 0} зөв бөмбөг сагсанд орлоо!
+                </>
+              )}
             </p>
           </ResultPanel>
         ) : null}

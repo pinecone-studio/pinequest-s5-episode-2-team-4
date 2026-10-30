@@ -1,3 +1,4 @@
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { AnswerView } from "../_components/AnswerView";
 import type { Mole } from "./useWhackAMole";
@@ -87,8 +88,10 @@ export function MoleField({ moles, swing, onHit, disabled }: MoleFieldProps) {
           {/* front lip of the hole, over the mole */}
           <span aria-hidden="true" className="mole-lip absolute inset-x-[2%] bottom-[4%] h-[18%] rounded-[50%]" />
           {mole?.hit === "good" ? (
-            <span aria-hidden="true" className="mole-stars pointer-events-none absolute inset-x-0 top-[20%] z-20 text-center text-xl">
-              ⭐✨⭐
+            <span aria-hidden="true" className="mole-stars pointer-events-none absolute inset-x-0 top-[20%] z-20 flex justify-center gap-0.5">
+              <PixelIcon name="star" className="size-5" />
+              <PixelIcon name="sparkle" className="size-5" />
+              <PixelIcon name="star" className="size-5" />
             </span>
           ) : null}
           {swing?.hole === hole ? (

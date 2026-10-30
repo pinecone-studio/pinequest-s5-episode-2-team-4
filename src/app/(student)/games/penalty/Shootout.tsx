@@ -121,7 +121,11 @@ export function Shootout({ subjects, subjectId, questions }: ShootoutProps) {
         {result ? (
           <ResultPanel result={result} onAgain={start} otherHref="/games">
             <p className="text-sm font-extrabold text-[var(--game-gold)]">
-              {won ? `🏆 ${goals.you} : ${goals.bot}. Чи яллаа!` : goals.you === goals.bot ? `${goals.you} : ${goals.bot}. Тэнцлээ!` : `${goals.you} : ${goals.bot}. Бот баг яллаа. Дахиад нэг!`}
+              {won ? (
+                <>
+                  <PixelIcon name="trophy" className="inline-block size-4 align-[-0.15em]" /> {goals.you} : {goals.bot}. Чи яллаа!
+                </>
+              ) : goals.you === goals.bot ? `${goals.you} : ${goals.bot}. Тэнцлээ!` : `${goals.you} : ${goals.bot}. Бот баг яллаа. Дахиад нэг!`}
             </p>
           </ResultPanel>
         ) : null}
