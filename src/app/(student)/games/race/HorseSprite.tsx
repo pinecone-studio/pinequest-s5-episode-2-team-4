@@ -1,3 +1,4 @@
+import { pixelPaths } from "@/components/ui/PixelIcon";
 import { cn } from "@/lib/cn";
 
 type HorseSpriteProps = {
@@ -11,43 +12,51 @@ type HorseSpriteProps = {
   className?: string;
 };
 
-/** Side-view horse with a jockey, facing right; the legs swing while running. */
-export function HorseSprite({ silk, coat, number, running, className }: HorseSpriteProps) {
-  const legs = [
-    { x: 21, group: "a" },
-    { x: 25, group: "b" },
-    { x: 39, group: "b" },
-    { x: 43, group: "a" },
-  ];
+// Pixel art on a 32 × 25 grid, 2 viewBox units per pixel: each letter is a
+// palette colour, "." is empty. C coat, D mane/tail/hooves, S silk, W saddle
+// cloth and helmet stripe, J breeches, K eye.
+
+const BODY = [
+  "................SSS.............", "...............SSSSW............", "...............SSSS......C......",
+  "................SS......CCC.....", "...............SSSS....DCCCC....", "..............SSSSSS..DCCCKCC...",
+  "..............SSSSSSS.DCCCCCCC..", "...............SSSSSSDCCC..CCCC.", "..............JSSSS.DCCC........",
+  ".........CCCCWWWWWWCDCCC........", ".......CCCCCCWWWWWWCCCCC........", "......DCCCCCCWWWWWWCCCCCC.......",
+  ".....DDCCCCCCWWWWWWCCCCCC.......", "....DD.CCCCCCCCCCCCCCCCCC.......", "...DD...CCCCCCCCCCCCCCCC........",
+  "...D.....CCCCCCCCCCCCCC.........", "..D.......CC.CC....CC.CC........",
+];
+/** Legs together, then stretched out: the two gallop frames. */
+const LEGS = {
+  a: [
+    "..........CC.CC....CC.CC........", "..........CC.CC....CC.CC........", "..........CC.CC....CC.CC........",
+    "..........CC.CC....CC.CC........", "..........CC.CC....CC.CC........", "..........DD.DD....DD.DD........",
+  ],
+  b: [
+    ".........CC...CC..CC...CC.......", "........CC.....CC.CC....CC......", ".......CC......CCCC......CC.....",
+    "......CC........CC........CC....", ".....DD.........DD.........DD...",
+  ],
+};
+
+function Frame({ rows, palette, className }: { rows: string[]; palette: Record<string, string>; className: string }) {
   return (
-    <svg viewBox="0 0 64 50" aria-hidden="true" className={cn("overflow-visible", running && "race-running", className)}>
-      {/* tail */}
-      <path d="M15 22c-5 1-8 5-9 11 3-2 6-4 8-5" fill="none" stroke="#2b1a10" strokeWidth="3" strokeLinecap="round" />
-      {/* legs */}
-      {legs.map((l) => (
-        <g key={l.x} className={`race-leg race-leg-${l.group}`} style={{ transformOrigin: `${l.x + 1.5}px 30px` }}>
-          <rect x={l.x} y="29" width="3.2" height="14" rx="1.6" fill={coat} />
-          <rect x={l.x - 0.3} y="41" width="3.8" height="3" rx="1" fill="#2b1a10" />
-        </g>
+    <g transform="scale(2)" className={className}>
+      {pixelPaths({ rows, palette }).map(([fill, d]) => (
+        <path key={fill} fill={fill} d={d} />
       ))}
-      {/* body, neck and head */}
-      <ellipse cx="32" cy="26" rx="16" ry="8.5" fill={coat} />
-      <path d="M41 23 48 9l6 2-6 17z" fill={coat} />
-      <path d="M47 8c4-2 9 0 12 4 1 2 0 4-2 4l-8-1z" fill={coat} />
-      <path d="M44 22 49 9" stroke="#2b1a10" strokeWidth="3" strokeLinecap="round" />
-      <path d="m49 8 1-4 2 4z" fill={coat} />
-      <circle cx="54" cy="10.5" r="1" fill="#111" />
-      {/* saddle cloth with the number */}
-      <rect x="26" y="18" width="11" height="9" rx="2" fill="#fff" />
-      <text x="31.5" y="25.3" textAnchor="middle" fontSize="7" fontWeight="800" fill="#1d1647">
+    </g>
+  );
+}
+
+/** Side-view pixel horse with a jockey, facing right; two leg frames swap while running. */
+export function HorseSprite({ silk, coat, number, running, className }: HorseSpriteProps) {
+  const palette = { C: coat, D: "#2b1a10", S: silk, W: "#fff", J: "#f4efe6", K: "#111" };
+  return (
+    <svg viewBox="0 0 64 50" shapeRendering="crispEdges" aria-hidden="true" className={cn("overflow-visible", running && "race-running", className)}>
+      <Frame rows={[...BODY, ...LEGS.a]} palette={palette} className="race-frame-a" />
+      <Frame rows={[...BODY, ...LEGS.b]} palette={palette} className="race-frame-b" />
+      {/* the number on the saddle cloth */}
+      <text x="32" y="24.5" textAnchor="middle" fontSize="7" fontWeight="800" fill="#1d1647">
         {number}
       </text>
-      {/* jockey */}
-      <path d="M30 18c0-5 3-8 7-8 2 0 3 2 2 4l-3 5z" fill={silk} />
-      <path d="M36 13l6 4" stroke={silk} strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx="36.5" cy="7" r="3.6" fill={silk} />
-      <path d="M36.5 3.4a3.6 3.6 0 0 1 3.6 3.6H44" fill="none" stroke="#fff" strokeWidth="1.2" />
-      <path d="M31 19l-2 6" stroke="#f4efe6" strokeWidth="2.4" strokeLinecap="round" />
     </svg>
   );
 }
