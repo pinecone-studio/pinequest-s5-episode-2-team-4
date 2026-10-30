@@ -110,7 +110,7 @@ export default async function GamesPage() {
       </p>
 
       <ul className="mt-6 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
-        {GAMES.map((game) => (
+        {GAMES.map((game, index) => (
           <li key={game.href}>
             <Link
               href={game.href}
@@ -121,6 +121,7 @@ export default async function GamesPage() {
                   src={game.shot}
                   alt=""
                   fill
+                  loading={index === 0 ? "eager" : "lazy"}
                   sizes="(min-width: 1024px) 380px, (min-width: 768px) 45vw, 100vw"
                   className="object-cover"
                   style={{ objectPosition: game.focus }}

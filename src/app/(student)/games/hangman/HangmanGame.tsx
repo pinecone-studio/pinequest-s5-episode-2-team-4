@@ -7,6 +7,7 @@ import { ALPHABET, MAX_MISTAKES, gameStatus, guessLetter } from "./game";
 import { HANGMAN_WORDS, wordsForLevel } from "./words";
 import { HangmanScene } from "./HangmanScene";
 import { useGamePlayed } from "../_lib/played";
+import "../_components/games.css";
 import "./hangman.css";
 
 const DIFFICULTIES = [
@@ -34,7 +35,7 @@ export function HangmanGame() {
   return (
     <div className="hangman mx-auto w-full max-w-4xl px-4 pt-2 pb-12 md:px-8">
       <Link href="/games" className="inline-flex min-h-12 items-center text-sm font-semibold">← Тоглоом руу буцах</Link>
-      <section aria-labelledby="difficulty-title" className="hangman-board hangman-start mt-2 p-5 sm:p-8">
+      <section aria-labelledby="difficulty-title" className="hangman-board game-panel hangman-start mt-2 p-5 sm:p-8">
         <h1 id="difficulty-title" className="mt-3 text-3xl font-bold md:text-4xl">HANGMAN</h1>
         <p className="mt-3 text-sm text-ink-muted">Түвшнээ сонгоод тоглоорой.</p>
         <div className="hangman-start-layout"><div className="hangman-mode-list">
@@ -96,7 +97,7 @@ function HangmanRound({ initialIndex, difficulty, onBack }: { initialIndex: numb
 
   return (
     <div className="hangman mx-auto w-full max-w-4xl px-4 py-4 md:px-8">
-      <section aria-labelledby="hangman-title" className="hangman-board">
+      <section aria-labelledby="hangman-title" className="hangman-board game-panel">
         <header className="hangman-board-header">
           <Link href="/games" aria-label="Тоглоом руу буцах" className="hangman-back">←</Link>
           <h1 id="hangman-title">HANGMAN</h1>
