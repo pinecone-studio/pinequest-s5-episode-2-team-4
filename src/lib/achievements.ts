@@ -17,6 +17,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "level-5", icon: "dumbbell", title: "Хүчирхэг тэжээвэр", description: "Тэжээврээ 5-р түвшинд хүргэ", stat: "petLevel", goal: 5, coins: 60 },
   { id: "videos-5", icon: "clapper", title: "Видео сонирхогч", description: "5 хичээлийн видео үз", stat: "videosSeen", goal: 5, coins: 30 },
   { id: "assignments-3", icon: "clipboard", title: "Хичээнгүй", description: "Багшийн 3 даалгавар биелүүл", stat: "assignmentsDone", goal: 3, coins: 50 },
+  { id: "quests-all", icon: "target", title: "Өдрийн баатар", description: "Нэг өдрийн 3 зорилтыг бүгдийг биелүүл", stat: "questDays", goal: 1, coins: 50 },
 ];
 
 export type AchievementStats = Record<AchievementStat, number>;

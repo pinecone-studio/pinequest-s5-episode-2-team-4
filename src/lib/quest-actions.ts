@@ -4,7 +4,7 @@
 // and claiming a finished quest's bonus.
 
 import { addXp } from "./pets";
-import { markQuestClaimed, questsWithProgress, recordQuestEvent } from "./quests";
+import { allQuestsClaimed, markQuestClaimed, questsWithProgress, recordQuestEvent } from "./quests";
 import { readSession, writeSession } from "./session";
 import { learningDay } from "./streak";
 
@@ -29,11 +29,15 @@ export async function claimQuest(questId: string): Promise<ClaimResult> {
   const quest = questsWithProgress(session.quests, Boolean(session.classCode), today).find((q) => q.id === questId);
   if (!quest?.done || !session.quests) return { error: "notdone" };
   if (quest.claimed) return { error: "claimed" };
+  const quests = markQuestClaimed(session.quests, quest.id);
+  // Claiming the day's last quest completes the day (once: each quest is claimed once).
+  const dayDone = allQuestsClaimed(quests, Boolean(session.classCode), today);
   await writeSession({
     ...session,
-    quests: markQuestClaimed(session.quests, quest.id),
+    quests,
     coins: (session.coins ?? 0) + quest.coins,
     pet: session.pet ? addXp(session.pet, quest.xp) : session.pet,
+    questDays: (session.questDays ?? 0) + (dayDone ? 1 : 0),
   });
   return { ok: true, xp: quest.xp, coins: quest.coins };
 }

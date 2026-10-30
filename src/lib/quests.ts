@@ -55,3 +55,8 @@ export function questsWithProgress(log: QuestLog | undefined, inClass: boolean, 
 export function markQuestClaimed(log: QuestLog, questId: string): QuestLog {
   return log.claimed.includes(questId) ? log : { ...log, claimed: [...log.claimed, questId] };
 }
+
+/** Whether every one of the day's quests is claimed in this log. */
+export function allQuestsClaimed(log: QuestLog | undefined, inClass: boolean, today = learningDay()): boolean {
+  return questsWithProgress(log, inClass, today).every((q) => q.claimed);
+}

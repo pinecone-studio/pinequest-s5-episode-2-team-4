@@ -834,7 +834,8 @@ export type AchievementStat =
   | "petsCollected"
   | "petLevel"
   | "videosSeen"
-  | "assignmentsDone";
+  | "assignmentsDone"
+  | "questDays";
 
 /** A milestone: reach `goal` of `stat` once for its coins. */
 export type Achievement = {
