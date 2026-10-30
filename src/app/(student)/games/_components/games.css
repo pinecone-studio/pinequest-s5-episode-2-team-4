@@ -38,8 +38,9 @@
   border: 1px solid var(--game-line);
 }
 
+/* A pixel dither over the field: a checker of two darks, in 4px art pixels. */
 .game-overlay {
-  background: radial-gradient(70% 60% at 50% 40%, rgb(91 0 237 / 0.35), rgb(13 10 34 / 0.9));
+  background: repeating-conic-gradient(rgb(13 10 34 / 0.92) 0 25%, rgb(29 22 71 / 0.86) 0 50%) 0 0 / 8px 8px;
 }
 
 /* Pixel art for the start screen. `--px` is one art pixel; a frame is a
