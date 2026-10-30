@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { PetSprite } from "@/components/pet/PetSprite";
 import { ButtonLink, buttonClass } from "@/components/ui";
 import { createClassBossBattle } from "@/lib/battle-actions";
@@ -25,21 +24,9 @@ const STATUS = { lobby: "Сурагчид нэгдэж байна", active: "Т�
 export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, classCode, className }: ClassBattleCardProps) {
   const openBoss = open && bosses.find((b) => b.id === open.bossId);
   return (
-    <section
-      aria-labelledby="class-battle-title"
-      className={cn("rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-6", className)}
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="class-battle-title" className="type-section-title">
-          Ангийн босс тулаан
-        </h2>
-        <Link href={`/teacher/history?class=${encodeURIComponent(open?.classCode ?? classCode)}`} className="font-bold">
-          Тулааны түүх →
-        </Link>
-      </div>
-
+    <section className={cn("rounded-[25px] bg-white p-5 shadow-card md:rounded-panel md:px-8 md:py-6", className)}>
       {open ? (
-        <div className="mt-4 flex flex-col gap-4 rounded-card bg-surface p-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 rounded-card bg-surface p-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             {openBoss ? <PetSprite stage={{ name: openBoss.name, sprite: openBoss.sprite }} size={64} /> : null}
             <div>
@@ -56,7 +43,7 @@ export function ClassBattleCard({ bosses, subjects, teacherSubjectTitle, open, c
           </ButtonLink>
         </div>
       ) : (
-        <form action={createClassBossBattle} className="mt-3">
+        <form action={createClassBossBattle}>
           <p className="text-ink-muted">
             Бүх анги нэг боссыг хамтдаа ялна. Боссоо сонгоод тулааныг нээгээрэй: асуултууд зөвхөн таны заадаг
             хичээлээс гарна. Сурагчид ангийн кодоороо эсвэл дэлгэц дээрх кодоор нэгдэнэ.

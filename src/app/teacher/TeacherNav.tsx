@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
 type Page = { href: string; label: string; exact?: boolean; also?: string };
 type Section = { label: string; icon: (className: string) => React.ReactNode; pages: Page[] };
 
-/** The teacher's four sections; Анги and Агуулга hold two pages each. */
+/** The teacher's four sections; Анги and Агуулга hold more than one page. */
 export const SECTIONS: Section[] = [
   { label: "Самбар", icon: (c) => <GridIcon className={c} />, pages: [{ href: "/teacher", label: "Самбар", exact: true }] },
   {
@@ -19,6 +19,7 @@ export const SECTIONS: Section[] = [
     pages: [
       { href: "/teacher/students", label: "Сурагчид" },
       { href: "/teacher/schedule", label: "Хуваарь" },
+      { href: "/teacher/battle", label: "Босс тулаан" },
     ],
   },
   {
