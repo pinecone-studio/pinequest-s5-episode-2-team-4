@@ -1,134 +1,127 @@
 import { GAME_COLORS } from "../../_lib/palette";
-import { CX, H, HORIZON, LANE, ROAD, W, scaleAt, yAt } from "./world";
+import { CX, FEET_Y, H, HORIZON, LANE, ROAD, W, scaleAt, yAt } from "./world";
 
-const STARS = Array.from({ length: 40 }, (_, i) => ({
-  x: (i * 97) % W,
-  y: (i * 53) % (HORIZON - 20),
-  r: i % 5 === 0 ? 1.4 : 0.8,
-}));
+// The scene as pixel art: everything is filled in rows of 4-unit art pixels,
+// so the road's perspective comes out as stepped edges.
 
-/** Night sky, a neon sun, mountains, and the road with scrolling lane marks and lamp posts. */
+/** World units per art pixel. */
+const P = 4;
+const snap = (v: number) => Math.round(v / P) * P;
+/** Perspective scale of a screen row on the road (1 at the hero's feet). */
+const rowScale = (y: number) => (y - HORIZON) / (FEET_Y - HORIZON);
+
+const SKY = ["#0d0a22", "#150e33", "#1d1245", "#261657", "#301a69", "#3b1d7a"];
+const STARS = Array.from({ length: 30 }, (_, i) => ({ x: snap((i * 97) % W), y: snap((i * 53) % (HORIZON - 24)) }));
+const SUN = [GAME_COLORS.gold, "#ffb85a", "#ff9a5a", "#ff6f7f", "#f0479c", GAME_COLORS.magenta];
+const PEAKS = [0, 18, 40, 10, 70, 28, 110, 6, 150, 30, 250, 34, 290, 8, 330, 26, 370, 12, 400, 22];
+const GROUND = ["#1a0f3d", "#1f1247", "#241451", "#2a1660"];
+
+/** Height of the mountains at x, from the peak list. */
+function peakAt(x: number) {
+  for (let i = 0; i < PEAKS.length - 2; i += 2) {
+    const [x0, h0, x1, h1] = PEAKS.slice(i, i + 4);
+    if (x >= x0 && x <= x1) return h0 + ((h1 - h0) * (x - x0)) / (x1 - x0);
+  }
+  return 0;
+}
+
+/** Fills the road's rows between two distances. */
+function roadRows(ctx: CanvasRenderingContext2D, d0: number, d1: number) {
+  const top = snap(yAt(d1)), bottom = snap(yAt(d0));
+  for (let y = top; y < bottom; y += P) {
+    const half = snap(ROAD * rowScale(y + P / 2));
+    ctx.fillRect(CX - half, y, half * 2, P);
+  }
+}
+
+/** Night sky, a striped pixel sun, stepped mountains, and the road with scrolling lane marks and lamp posts. */
 export function drawScene(ctx: CanvasRenderingContext2D, run: number, t: number) {
-  // sky
-  const sky = ctx.createLinearGradient(0, 0, 0, HORIZON);
-  sky.addColorStop(0, "#0d0a22");
-  sky.addColorStop(1, "#3b1d7a");
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, W, HORIZON + 1);
-  for (const s of STARS) {
-    ctx.globalAlpha = 0.4 + 0.4 * Math.sin(t * 2 + s.x);
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
+  ctx.imageSmoothingEnabled = false;
+  // sky in bands, with twinkling stars
+  const band = Math.ceil(HORIZON / SKY.length / P) * P;
+  SKY.forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(0, i * band, W, band);
+  });
+  STARS.forEach((s, i) => {
+    ctx.fillStyle = Math.sin(t * 2 + i * 1.9) > 0.2 ? "#f6f3ff" : "#5a4a9a";
+    ctx.fillRect(s.x, s.y, i % 5 ? 2 : P, i % 5 ? 2 : P);
+  });
+
+  // striped sun, built row by row from its circle
+  const r = 56;
+  for (let y = HORIZON - r; y < HORIZON; y += P) {
+    const dy = HORIZON - (y + P / 2);
+    const row = Math.floor(((y - (HORIZON - r)) / r) * SUN.length);
+    if (row >= 3 && (y / P) % 3 === 0) continue;
+    const half = snap(Math.sqrt(Math.max(0, r * r - dy * dy)));
+    ctx.fillStyle = SUN[Math.min(SUN.length - 1, row)];
+    ctx.fillRect(CX - half, y, half * 2, P);
   }
-  ctx.globalAlpha = 1;
 
-  // striped neon sun on the horizon
-  const sun = ctx.createLinearGradient(0, HORIZON - 70, 0, HORIZON);
-  sun.addColorStop(0, GAME_COLORS.gold);
-  sun.addColorStop(1, GAME_COLORS.magenta);
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(CX, HORIZON, 58, Math.PI, 0);
-  ctx.clip();
-  ctx.fillStyle = sun;
-  ctx.fillRect(CX - 60, HORIZON - 60, 120, 60);
-  ctx.fillStyle = "#3b1d7a";
-  for (let i = 0; i < 5; i++) ctx.fillRect(CX - 60, HORIZON - 26 + i * 6, 120, 1.5 + i * 0.6);
-  ctx.restore();
-
-  // mountains
+  // mountains as columns of art pixels
   ctx.fillStyle = "#26124f";
-  ctx.beginPath();
-  ctx.moveTo(0, HORIZON);
-  const peaks = [0, 18, 40, 10, 70, 28, 110, 6, 150, 30, 250, 34, 290, 8, 330, 26, 370, 12, 400, 22];
-  for (let i = 0; i < peaks.length; i += 2) ctx.lineTo(peaks[i], HORIZON - peaks[i + 1]);
-  ctx.lineTo(W, HORIZON);
-  ctx.fill();
-
-  // ground on both sides of the road
-  const ground = ctx.createLinearGradient(0, HORIZON, 0, H);
-  ground.addColorStop(0, "#1a0f3d");
-  ground.addColorStop(1, "#2a1660");
-  ctx.fillStyle = ground;
-  ctx.fillRect(0, HORIZON, W, H - HORIZON);
-
-  // road
-  const far = 4000;
-  ctx.fillStyle = "#1d1647";
-  ctx.beginPath();
-  ctx.moveTo(CX - ROAD * scaleAt(far), yAt(far));
-  ctx.lineTo(CX + ROAD * scaleAt(far), yAt(far));
-  ctx.lineTo(CX + ROAD * scaleAt(-60), yAt(-60));
-  ctx.lineTo(CX - ROAD * scaleAt(-60), yAt(-60));
-  ctx.closePath();
-  ctx.fill();
-
-  // scrolling stripes across the road, for a sense of speed
-  for (let k = 0; k < 40; k++) {
-    const d = k * 90 - (run % 90) - 40;
-    if (k % 2) continue;
-    const y0 = yAt(d), y1 = yAt(d + 45);
-    ctx.fillStyle = "rgb(91 0 237 / 0.12)";
-    ctx.beginPath();
-    ctx.moveTo(CX - ROAD * scaleAt(d), y0);
-    ctx.lineTo(CX + ROAD * scaleAt(d), y0);
-    ctx.lineTo(CX + ROAD * scaleAt(d + 45), y1);
-    ctx.lineTo(CX - ROAD * scaleAt(d + 45), y1);
-    ctx.fill();
+  for (let x = 0; x < W; x += P) {
+    const h = snap(peakAt(x + P / 2));
+    ctx.fillRect(x, HORIZON - h, P, h);
   }
 
-  // lane marks
-  ctx.strokeStyle = "rgb(246 243 255 / 0.55)";
-  ctx.lineCap = "round";
-  for (const side of [-0.5, 0.5]) {
-    for (let k = 0; k < 30; k++) {
-      const d = k * 70 - (run % 70) - 30;
-      const a = scaleAt(d), b = scaleAt(d + 34);
-      ctx.lineWidth = 3 * a;
-      ctx.beginPath();
-      ctx.moveTo(CX + side * LANE * a, yAt(d));
-      ctx.lineTo(CX + side * LANE * b, yAt(d + 34));
-      ctx.stroke();
+  // ground in bands
+  const ground = Math.ceil((H - HORIZON) / GROUND.length / P) * P;
+  GROUND.forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(0, HORIZON + i * ground, W, ground);
+  });
+
+  // road, then the stripes that scroll across it
+  ctx.fillStyle = "#1d1647";
+  roadRows(ctx, -60, 4000);
+  ctx.fillStyle = "rgb(91 0 237 / 0.16)";
+  for (let k = 0; k < 40; k += 2) {
+    const d = k * 90 - (run % 90) - 40;
+    roadRows(ctx, d, d + 45);
+  }
+
+  // lane marks: short dashes either side of the middle lane
+  ctx.fillStyle = "rgb(246 243 255 / 0.6)";
+  for (let k = 0; k < 30; k++) {
+    const d = k * 70 - (run % 70) - 30;
+    const top = snap(yAt(d + 34)), bottom = snap(yAt(d));
+    for (let y = top; y < bottom; y += P) {
+      const s = rowScale(y + P / 2);
+      const w = Math.max(P, snap(3 * s));
+      for (const side of [-0.5, 0.5]) ctx.fillRect(snap(CX + side * LANE * s - w / 2), y, w, P);
     }
   }
 
-  // neon edges
+  // neon edges with a one-pixel glow outside
   for (const [side, color] of [
     [-1, GAME_COLORS.violetLight],
     [1, GAME_COLORS.magenta],
   ] as const) {
-    ctx.strokeStyle = color;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(CX + side * ROAD * scaleAt(far), yAt(far));
-    ctx.lineTo(CX + side * ROAD * scaleAt(-60), yAt(-60));
-    ctx.stroke();
+    for (let y = snap(yAt(4000)); y < H; y += P) {
+      const x = snap(CX + side * ROAD * rowScale(y + P / 2));
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = color;
+      ctx.fillRect(x + (side > 0 ? 0 : -P), y, P, P);
+      ctx.globalAlpha = 1;
+      ctx.fillRect(x + (side > 0 ? -P : 0), y, P, P);
+    }
   }
-  ctx.shadowBlur = 0;
 
-  // lamp posts passing by
+  // lamp posts passing by: a pole and a square lamp with a halo
   for (let k = 12; k >= 0; k--) {
     const d = k * 200 - (run % 200) + 20;
-    const p = scaleAt(d), y = yAt(d);
+    const p = scaleAt(d), y = snap(yAt(d));
+    const pole = Math.max(2, snap(3 * p)), lamp = Math.max(P, snap(10 * p)), h = snap(90 * p);
     for (const side of [-1, 1]) {
-      const x = CX + side * (ROAD + 26) * p;
-      ctx.strokeStyle = "#4b3a8f";
-      ctx.lineWidth = 3 * p;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x, y - 90 * p);
-      ctx.stroke();
+      const x = snap(CX + side * (ROAD + 26) * p);
+      ctx.fillStyle = "#4b3a8f";
+      ctx.fillRect(x - pole / 2, y - h, pole, h);
+      ctx.fillStyle = "rgb(255 207 90 / 0.25)";
+      ctx.fillRect(x - lamp, y - h - lamp * 1.5, lamp * 2, lamp * 2);
       ctx.fillStyle = GAME_COLORS.gold;
-      ctx.shadowColor = GAME_COLORS.gold;
-      ctx.shadowBlur = 12 * p;
-      ctx.beginPath();
-      ctx.arc(x, y - 92 * p, 5 * p, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.fillRect(x - lamp / 2, y - h - lamp, lamp, lamp);
     }
   }
 }
