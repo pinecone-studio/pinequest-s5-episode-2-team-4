@@ -143,6 +143,8 @@ export type User = {
   subject?: string;
   /** A throwaway «Демо нэвтрэх» account, which gets demo shortcuts. */
   demo?: boolean;
+  /** Joined a class from a QR with only a name (e.g. a judge at a pitch). */
+  guest?: boolean;
 };
 
 /** A class a teacher created; its content (assignments, videos, …) is keyed by `code`. */

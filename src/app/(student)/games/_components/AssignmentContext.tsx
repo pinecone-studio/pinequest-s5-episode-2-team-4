@@ -2,9 +2,10 @@
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { type AttemptInput, submitAssignmentAttempt } from "@/lib/assignment-actions";
+import type { GameQuestion } from "@/lib/types";
 import type { SessionResult } from "../_lib/session";
 
-type AssignmentInfo = { id: string; title: string; game: string };
+type AssignmentInfo = { id: string; title: string; game: string; questions: GameQuestion[]; guest: boolean };
 
 const AssignmentContext = createContext<AssignmentInfo | undefined>(undefined);
 

@@ -162,6 +162,7 @@ export async function getCurrentUser(): Promise<User | undefined> {
     pet: session.pet,
     subject: session.subject,
     demo: session.demo,
+    guest: session.guest,
   };
 }
 
