@@ -1,3 +1,5 @@
+import type { PixelIconName } from "@/components/ui/PixelIcon";
+import { drawPixelIcon } from "./canvas";
 import { GAME_COLORS } from "./palette";
 
 type Particle = {
@@ -7,7 +9,7 @@ type Particle = {
   gravity?: number;
   spin?: number;
 };
-type FloatText = { x: number; y: number; text: string; color: string; life: number; small?: boolean };
+type FloatText = { x: number; y: number; text: string; color: string; life: number; small?: boolean; icon?: PixelIconName };
 type Ring = { x: number; y: number; t: number; color: string };
 
 /** Sparks, confetti, "+10" texts and shock rings, drawn on top of a game scene. */
@@ -40,8 +42,9 @@ export class Effects {
     }
   }
 
-  float(x: number, y: number, text: string, color: string = GAME_COLORS.gold, small = false) {
-    this.texts.push({ x, y, text, color, life: 0, small });
+  /** A rising "+10"; `icon` is drawn after the text. */
+  float(x: number, y: number, text: string, color: string = GAME_COLORS.gold, small = false, icon?: PixelIconName) {
+    this.texts.push({ x, y, text, color, life: 0, small, icon });
   }
 
   ring(x: number, y: number, color: string = GAME_COLORS.good) {
@@ -107,9 +110,17 @@ export class Effects {
     for (const t of this.texts) {
       ctx.globalAlpha = Math.max(0, 1 - t.life / 1.1);
       ctx.font = font(800, t.small ? 14 : 22);
-      ctx.strokeText(t.text, t.x, t.y - 22);
+      // With an icon, text and icon are centred together on x.
+      const m = ctx.measureText(t.text);
+      const size = t.icon ? (t.small ? 14 : 20) : 0;
+      const x = t.icon ? t.x - (size + 4) / 2 : t.x;
+      ctx.strokeText(t.text, x, t.y - 22);
       ctx.fillStyle = t.color;
-      ctx.fillText(t.text, t.x, t.y - 22);
+      ctx.fillText(t.text, x, t.y - 22);
+      if (t.icon) {
+        const mid = t.y - 22 + (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+        drawPixelIcon(ctx, t.icon, x + m.width / 2 + 4, mid - size / 2, size, t.color);
+      }
     }
     ctx.restore();
   }

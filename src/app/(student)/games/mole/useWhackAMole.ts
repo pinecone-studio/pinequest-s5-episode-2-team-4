@@ -171,7 +171,7 @@ export function useWhackAMole(questions: GameQuestion[]) {
         ? done
           ? { kind: "good", title: "Бүгдийг нь оллоо! Шинэ даалгавар", seconds: 1.4 }
           : null
-        : { kind: "bad", title: "Буруу мэнгэ! −1 ❤️", text: q.explanation, seconds: 3 },
+        : { kind: "bad", title: "Буруу мэнгэ! −1", icon: "heart", text: q.explanation, seconds: 3 },
     );
     // Functional update: the clock may have ticked since this render.
     setGame((g) => {
