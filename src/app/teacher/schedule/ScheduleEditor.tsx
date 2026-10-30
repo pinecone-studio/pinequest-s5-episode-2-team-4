@@ -146,7 +146,7 @@ function DayRow({ day, planKey, topics, locked, onSave }: DayRowProps) {
           onChange={(e) => choose(e.target.value)}
           className={fieldClass}
         >
-          <option value="">— Сурагчид өөрсдөө сонгоно —</option>
+          <option value="">— Сэдэв сонгогдоогүй —</option>
           {!known && planKey && <option value={planKey}>{planKey.replace(/^t:/, "")}</option>}
           {groups(topics).map(([group, list]) =>
             group ? (
