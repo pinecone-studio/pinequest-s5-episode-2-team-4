@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getClassVideo } from "@/lib/data";
+import { getBookmarkedVideoIds, getClassVideo } from "@/lib/data";
+import { VideoBookmarkButton } from "@/components/VideoBookmarkButton";
 import { MarkSeen } from "./MarkSeen";
 import { VideoTabs } from "./VideoTabs";
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function StudentVideoPage({ params }: PageProps<"/videos/[id]">) {
   const { id } = await params;
-  const video = await getClassVideo(id);
+  const [video, bookmarks] = await Promise.all([getClassVideo(id), getBookmarkedVideoIds()]);
   if (!video) notFound();
 
   return (
@@ -20,6 +21,7 @@ export default async function StudentVideoPage({ params }: PageProps<"/videos/[i
         ← Бүх видео
       </Link>
       <h1 className="type-page-title">{video.script.title}</h1>
+      <VideoBookmarkButton videoId={video.id} saved={bookmarks.includes(video.id)} />
       <VideoTabs video={video} />
       <MarkSeen videoId={video.id} />
     </div>
