@@ -1,5 +1,5 @@
 import { GAME_COLORS } from "../../_lib/palette";
-import { PIXEL as P, snap } from "../../_lib/pixel";
+import { PIXEL as P, pixelLine, snap } from "../../_lib/pixel";
 import { SNAKE_RADIUS as RADIUS, type Snake, type SnakeLook } from "./types";
 
 /** Eyes that follow the target, blink and go dizzy; tongue or open mouth; crown on a streak. */
@@ -12,16 +12,10 @@ export function drawFace(ctx: CanvasRenderingContext2D, snake: Snake, look: Snak
     ctx.fillRect(snap(hx + ex * 8) - P, snap(hy + ey * 8) - P, 2 * P, 2 * P);
   } else if (look.tongue && !look.paused) {
     const tx = hx + ex * R, ty = hy + ey * R, L = 6 + 3 * Math.sin(look.time * 30);
-    ctx.strokeStyle = GAME_COLORS.bad;
-    ctx.lineWidth = 1.8;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(tx, ty);
-    ctx.lineTo(tx + ex * L, ty + ey * L);
-    ctx.lineTo(tx + ex * (L + 4) + nx * 3, ty + ey * (L + 4) + ny * 3);
-    ctx.moveTo(tx + ex * L, ty + ey * L);
-    ctx.lineTo(tx + ex * (L + 4) - nx * 3, ty + ey * (L + 4) - ny * 3);
-    ctx.stroke();
+    ctx.fillStyle = GAME_COLORS.bad;
+    pixelLine(ctx, tx, ty, tx + ex * L, ty + ey * L, P / 2);
+    pixelLine(ctx, tx + ex * L, ty + ey * L, tx + ex * (L + 4) + nx * 3, ty + ey * (L + 4) + ny * 3, P / 2);
+    pixelLine(ctx, tx + ex * L, ty + ey * L, tx + ex * (L + 4) - nx * 3, ty + ey * (L + 4) - ny * 3, P / 2);
   }
   const gaze = t ? Math.atan2(t.y - hy, t.x - hx) : a;
   for (const s of [1, -1]) {
