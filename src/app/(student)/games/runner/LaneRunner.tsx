@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import type { GameQuestion } from "@/lib/types";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
@@ -70,9 +71,9 @@ export function LaneRunner({ subjects, subjectId, questions }: LaneRunnerProps) 
             <StartOverlay
               title="Боссын зам"
               steps={[
-                { icon: "↔️", text: "Зам солиод зөв хаалгаар ор" },
-                { icon: "💪", text: "Зөв бүрт томорч хүчтэй болно" },
-                { icon: "👹", text: `Төгсгөлд ${BOSS_POWER}-ийн хүчтэй босс` },
+                { icon: <PixelIcon name="arrows" className="size-6" />, text: "Зам солиод зөв хаалгаар ор" },
+                { icon: <PixelIcon name="dumbbell" className="size-6" />, text: "Зөв бүрт томорч хүчтэй болно" },
+                { icon: <PixelIcon name="ogre" className="size-6" />, text: `Төгсгөлд ${BOSS_POWER}-ийн хүчтэй босс` },
               ]}
               buttonLabel="Гүйж эхлэх"
               onStart={start}

@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
 import { ChoiceGrid } from "../_components/ChoiceGrid";
@@ -82,9 +83,9 @@ export function Shootout({ subjects, subjectId, questions }: ShootoutProps) {
             <StartOverlay
               title="Пенальти"
               steps={[
-                { icon: "⚽", text: "Зөв булан руу өшиглө" },
-                { icon: "🧤", text: `${DEFEND_SECONDS} секундэд хариулж хамгаал` },
-                { icon: "🏆", text: `${KICKS} өшиглөлтөөр бот багийг ял` },
+                { icon: <PixelIcon name="ball" className="size-6" />, text: "Зөв булан руу өшиглө" },
+                { icon: <PixelIcon name="glove" className="size-6" />, text: `${DEFEND_SECONDS} секундэд хариулж хамгаал` },
+                { icon: <PixelIcon name="trophy" className="size-6" />, text: `${KICKS} өшиглөлтөөр бот багийг ял` },
               ]}
               buttonLabel="Тоглолт эхлэх"
               onStart={start}

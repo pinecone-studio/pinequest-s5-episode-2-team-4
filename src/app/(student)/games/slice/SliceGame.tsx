@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { PixelIcon } from "@/components/ui";
 import type { GameQuestion } from "@/lib/types";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
@@ -20,9 +21,9 @@ type SliceGameProps = {
 };
 
 const STEPS = [
-  { icon: "👆", text: "Хуруугаараа шудар" },
-  { icon: "✅", text: "Таарах 3-ыг зүс" },
-  { icon: "💡", text: "Буруу бол тайлбар" },
+  { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Хуруугаараа шудар" },
+  { icon: <PixelIcon name="check" className="size-6" />, text: "Таарах 3-ыг зүс" },
+  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Буруу бол тайлбар" },
 ];
 
 /** Knowledge slice: swipe the tossed answers that fit the task; a wrong slice pauses on its explanation. */
