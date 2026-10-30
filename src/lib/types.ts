@@ -189,15 +189,6 @@ export type HeatmapRow = {
   cells: HeatmapStatus[];
 };
 
-export type AssignmentDraft = {
-  id: string;
-  subtopicId: string;
-  status: "draft" | "published";
-  items: { question: string; answer: string }[];
-  /** Student numbers the assignment goes to */
-  assignedTo: number[];
-};
-
 export type TeacherNotification = {
   id: string;
   kind: "failed" | "common-mistake" | "mastered";

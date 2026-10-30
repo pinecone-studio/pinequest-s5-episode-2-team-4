@@ -71,7 +71,6 @@ import type {
   ShopEntry,
   ShopItem,
   Assignment,
-  AssignmentDraft,
   ClassSchedule,
   LessonDaySignals,
   LessonTopic,
@@ -127,7 +126,6 @@ import {
 } from "./mock/lessons";
 import { sampleTestAnswers, testQuestions } from "./mock/questions";
 import {
-  assignmentDraft,
   classGoal,
   classOverview,
   heatmap,
@@ -532,11 +530,6 @@ export async function getClassOverview(): Promise<ClassOverview> {
 export async function getHeatmap(): Promise<HeatmapRow[]> {
   const real = await realClassResults();
   return real ? heatmapFrom(DASHBOARD_TOPIC, real.students) : heatmap;
-}
-
-/** The sample draft assignment, for demo accounts only. */
-export async function getAssignmentDraft(): Promise<AssignmentDraft | undefined> {
-  return (await realClassResults()) ? undefined : assignmentDraft;
 }
 
 /**
