@@ -1,12 +1,13 @@
-/* Tug of war: the rope glides with the flag; teams heave and strain. */
+/* Tug of war in pixel art: the rope glides with the flag; teams heave and
+   strain. Moves go in frames (steps) like a sprite. */
 
 .tug-rope {
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
+  transition: transform 0.35s steps(4, end);
 }
 
 /* The player's team leans back hard on every right answer. */
 .tug-heave .tug-lean {
-  animation: tug-heave 0.45s ease-out;
+  animation: tug-heave 0.45s steps(3, end);
 }
 
 @keyframes tug-heave {
@@ -17,7 +18,7 @@
 
 /* The bots keep straining while the game runs. */
 .tug-strain .tug-lean {
-  animation: tug-strain 0.6s ease-in-out infinite alternate;
+  animation: tug-strain 0.6s steps(2, end) infinite alternate;
 }
 
 @keyframes tug-strain {
@@ -26,13 +27,16 @@
   }
 }
 
+/* The pennant flaps between two frames. */
 .tug-flag {
-  animation: tug-wave 0.5s ease-in-out infinite alternate;
+  animation: tug-wave 0.5s steps(1, end) infinite alternate;
+  transform-box: fill-box;
+  transform-origin: left center;
 }
 
 @keyframes tug-wave {
   to {
-    transform: scaleX(0.7) skewY(8deg);
+    transform: scaleX(0.7);
   }
 }
 
@@ -47,11 +51,11 @@
 }
 
 .tug-crowd {
-  animation: tug-cheer 0.8s ease-in-out infinite alternate;
+  animation: tug-cheer 0.8s steps(1, end) infinite alternate;
 }
 
 @keyframes tug-cheer {
   to {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 }
