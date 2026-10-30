@@ -102,7 +102,7 @@ function HangmanRound({ initialIndex, difficulty, onBack }: { initialIndex: numb
           <Link href="/games" aria-label="Тоглоом руу буцах" className="hangman-back">←</Link>
           <h1 id="hangman-title">HANGMAN</h1>
           <span className="hangman-level">{difficulty.title} · {round.level}/{maxLevel}</span>
-          <button type="button" onClick={onBack} className="hangman-change-mode">Төрөл солих</button>
+          <button type="button" onClick={onBack} className="hangman-change-mode">Хүндрэлийг солих</button>
         </header>
 
         <div className="hangman-word-area">
@@ -136,11 +136,11 @@ function HangmanRound({ initialIndex, difficulty, onBack }: { initialIndex: numb
         <footer className="hangman-board-footer">
           <div role="status" aria-live="polite" aria-atomic="true" className="hangman-result">
             {status.finished ? (
-              <><p className="hangman-result-title">{completed ? "Бүх level-ийг давлаа!" : status.won ? "Яллаа!" : "Хожигдлоо. Дахиад оролдоорой!"}</p><p>Зөв хариу: <strong lang="en">{entry.word}</strong> — {entry.translation}</p></>
+              <><p className="hangman-result-title">{completed ? "Бүх үеийг амжилттай давлаа!" : status.won ? "Яллаа!" : "Хожигдлоо. Дахиад оролдоорой!"}</p><p>Зөв хариулт: <strong lang="en">{entry.word}</strong> — {entry.translation}</p></>
             ) : <p>{MAX_MISTAKES - status.mistakes} / {MAX_MISTAKES} бөмбөлөг</p>}
           </div>
           {status.finished && (completed
-            ? <Button onClick={onBack} size="sm">Төрөл сонгох</Button>
+            ? <Button onClick={onBack} size="sm">Хүндрэлийг сонгох</Button>
             : <Button onClick={nextLevel} size="sm">Next →</Button>)}
         </footer>
       </section>

@@ -106,7 +106,7 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
       // Start with the best-fitting games picked.
       setGames(suggestGames(result.questions).filter((g) => g.fit === "best").slice(0, 2).map((g) => g.id));
     } catch {
-      setError("Асуулт гаргаж чадсангүй. Дахин оролдоно уу.");
+      setError("Асуулт үүсгэж чадсангүй. Дахин оролдоно уу.");
     } finally {
       setBusy(undefined);
     }
@@ -220,7 +220,7 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
               </div>
               <SubjectField id={`${id}-subject`} value={subject} locked={Boolean(teacherSubject)} onChange={setSubject} />
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor={`${id}-count`}>Тоо</Label>
+                <Label htmlFor={`${id}-count`}>Асуултын тоо</Label>
                 <input id={`${id}-count`} type="number" min={3} max={10} value={count} onChange={(e) => setCount(Number(e.target.value))} className={cn(fieldClass, "h-12")} />
               </div>
               <Button size="sm" onClick={() => generate()} disabled={!topic.trim() || busy === "generate"} aria-busy={busy === "generate"}>
@@ -360,7 +360,7 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
           <p className="text-sm text-ink-muted">
             {gameMode === "fixed"
               ? "1–3 тоглоом сонгоно. Сурагч эхнийхийг нь нээнэ."
-              : "1–3 тоглоом сонгоно. Сурагч бүр эдгээрээс өөрийн дуртайгаар нь тоглоно."}
+              : "1–3 тоглоом сонгоно. Сурагч бүр сонгосон тоглоомуудаас өөрийн дуртайг тоглоно."}
           </p>
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
             {fits.map((g) => {
@@ -381,7 +381,7 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
                       {g.title} {on && <span className="text-primary">✓</span>}
                     </span>
                     <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", g.fit === "best" ? "bg-sky" : g.fit === "ok" ? "bg-lavender" : "bg-pink")}>
-                      {g.fit === "best" ? "Хамгийн тохиромжтой" : g.fit === "ok" ? "Тохирно" : "Тохиромж муу"}
+                      {g.fit === "best" ? "Хамгийн тохиромжтой" : g.fit === "ok" ? "Тохирно" : "Тохиромж багатай"}
                     </span>
                     <span className="text-xs text-ink-muted">{g.reason}</span>
                   </button>
@@ -419,20 +419,20 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor={`${id}-due`} hint="заавал биш">
-                Хугацаа
+                Дуусах хугацаа
               </Label>
               <input id={`${id}-due`} type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} className={cn(fieldClass, "h-12")} />
             </div>
           </div>
           <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 text-sm font-bold">Хэнд</legend>
+            <legend className="mb-1 text-sm font-bold">Хүлээн авах сурагчид</legend>
             <label className="flex min-h-11 items-center gap-2 font-semibold">
               <input type="radio" name={`${id}-target`} checked={target === "class"} onChange={() => setTarget("class")} className="size-5 accent-primary" />
-              Бүх анги
+              Ангийн бүх сурагч
             </label>
             <label className="flex min-h-11 flex-wrap items-center gap-2 font-semibold">
               <input type="radio" name={`${id}-target`} checked={target === "weak"} onChange={() => setTarget("weak")} disabled={subtopics.length === 0} className="size-5 accent-primary" />
-              Зөвхөн энэ сэдэв дээр сул сурагчид:
+              Зөвхөн энэ сэдвийг давтах шаардлагатай сурагчид:
               <select
                 aria-label="Сэдэв"
                 value={targetSubtopicId}
@@ -447,7 +447,7 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
                 ))}
               </select>
             </label>
-            <p className="text-xs text-ink-muted">Сул эсэхийг сурагчийн оношлох тестээр тодорхойлно. Хэн болохыг багшид харуулахгүй.</p>
+            <p className="text-xs text-ink-muted">Давтлага шаардлагатай эсэхийг оношлох тестийн дүнгээр тодорхойлно. Тухайн сурагчдын нэрийг багшид харуулахгүй.</p>
           </fieldset>
 
           {error && <ErrorNote>{error}</ErrorNote>}

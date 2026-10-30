@@ -68,7 +68,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
         {isStudent && (
           <Card>
             <h2 id="pick-title" className="text-xl leading-tight font-bold md:text-2xl">
-              Тэжээвэрээ сонго
+              Тэжээврээ сонгоорой
             </h2>
             <div className="mt-4 flex h-52 items-center justify-center md:h-62">
               <PetAvatar className="size-44 md:size-54">
@@ -161,7 +161,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
               id="su-pass"
               name="password"
               label="Нууц үг"
-              hint="дор хаяж 6 тэмдэгт"
+              hint="хамгийн багадаа 6 тэмдэгт"
               autoComplete="new-password"
               required
               minLength={6}
@@ -171,7 +171,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
                 id="su-phone"
                 name="phone"
                 label="Утасны дугаар"
-                hint="заавал биш · багш ангидаа нэмэхэд"
+                hint="заавал биш · багш таныг ангид нэмэхэд ашиглана"
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
@@ -192,7 +192,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
                   ? "Энэ имэйл бүртгэлтэй байна."
                   : taken === "phone"
                     ? "Энэ утасны дугаар бүртгэлтэй байна."
-                    : "Энэ нэр бүртгэлтэй байна."}{" "}
+                    : "Энэ нэвтрэх нэрийг өөр хэрэглэгч ашиглаж байна."}{" "}
                 <Link href="/login" className="font-bold">
                   Нэвтрэх
                 </Link>
@@ -207,7 +207,7 @@ export function SignupForm({ petLines }: { petLines: PetLine[] }) {
               aria-busy={pending}
               className={buttonClass({ size: "lg", className: "mt-2 w-full" })}
             >
-              {isStudent ? "Эхлэх" : "Бүртгүүлэх"}
+              {isStudent ? "Бүртгүүлж эхлэх" : "Бүртгүүлэх"}
               {ArrowIcon}
             </button>
           </form>

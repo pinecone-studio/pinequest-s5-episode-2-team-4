@@ -27,7 +27,7 @@ async function VideoList({ searchParams }: Pick<PageProps<"/videos">, "searchPar
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-4 py-6 md:gap-7 md:px-[clamp(16px,4vw,40px)] md:py-10">
       <div>
         <h1 className="type-page-title">Хичээлийн видео</h1>
-        <p className="mt-3 text-ink-muted md:text-lg">Багшийн бэлдсэн 1 минутын видео. Номын хэлбэрээр уншиж ч болно.</p>
+        <p className="mt-3 text-ink-muted md:text-lg">Багшийн бэлтгэсэн богино видео хичээлүүдийг үзээрэй. Тайлбарыг нь номын хэлбэрээр унших боломжтой.</p>
       </div>
 
       <nav aria-label="Хичээлийн жагсаалтын шүүлтүүр" className="flex flex-wrap gap-3">
@@ -38,7 +38,7 @@ async function VideoList({ searchParams }: Pick<PageProps<"/videos">, "searchPar
       {visible.length === 0 ? (
         <section className="glass-panel rounded-panel border border-line bg-white p-6 text-center shadow-card">
           <h2 className="text-xl font-bold">{savedOnly ? "Хадгалсан хичээл алга" : "Одоогоор видео алга"}</h2>
-          <p className="mt-1 text-ink-muted">{savedOnly ? "Хичээлийн хадгалах товчийг дарахад энэ жагсаалтад нэмэгдэнэ. Зөвхөн таны ангид нийтлэгдсэн хичээлүүд харагдана." : "Багш видео нийтлэхээр энд гарна."}</p>
+          <p className="mt-1 text-ink-muted">{savedOnly ? "Хичээлийн хадгалах товчийг дарахад энэ жагсаалтад нэмэгдэнэ. Зөвхөн таны ангид нийтлэгдсэн хичээлүүд харагдана." : "Багшийн нийтэлсэн видео хичээлүүд энд харагдана."}</p>
           <ButtonLink href={savedOnly ? "/videos" : "/"} variant="secondary" size="sm" className="mt-4">
             {savedOnly ? "Бүх хичээл" : "Нүүр хуудас"}
           </ButtonLink>

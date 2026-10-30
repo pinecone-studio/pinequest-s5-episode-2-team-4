@@ -24,7 +24,7 @@ export default async function SubjectPage() {
       {classes.length ? (
         <>
           <p className="mt-2 text-base font-semibold text-ink-muted">
-            Видео хичээл, даалгавар, тоглоомын асуулт сонгосон хичээлээс гарна.
+            Сонгосон хичээлд тохирох видео, даалгавар, тоглоомын асуултууд харагдана.
           </p>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {classes.map((c) => {

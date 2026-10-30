@@ -74,9 +74,9 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
     e.preventDefault();
     // With text or files the AI finds the topic; with neither there is nothing to go on.
     if (!topic.trim() && !text.trim() && files.length === 0) {
-      return setError("Сэдвээ бичих эсвэл текст, файл оруулна уу");
+      return setError("Сэдэв, тайлбар текст эсвэл сургалтын файл оруулна уу.");
     }
-    if (withClass && !classCode.trim()) return setError("Ангийн кодоо бичнэ үү");
+    if (withClass && !classCode.trim()) return setError("Ангийн кодыг оруулна уу.");
     setBusy(true);
     setError(undefined);
     const addStep = (step: Step) => setSteps((all) => [...all, step]);
@@ -111,7 +111,7 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor={`${id}-topic`} hint="хоосон орхивол AI материалаас таньж бөглөнө">
+          <Label htmlFor={`${id}-topic`} hint="хоосон орхивол AI оруулсан материалаас сэдвийг тодорхойлно">
             Сэдэв
           </Label>
           <input
@@ -120,7 +120,7 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             maxLength={120}
-            placeholder="Заавал биш: AI зураг, текстээс таньна"
+            placeholder="Заавал биш: сэдвийг зураг, текстээс тодорхойлно"
             className={cn(fieldClass, "h-12")}
           />
           <datalist id={`${id}-topics`}>
@@ -142,7 +142,7 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
 
       {withClass && (
         <div className="flex flex-col gap-1.5 md:max-w-xs">
-          <Label htmlFor={`${id}-class`} hint="видео энэ ангид харагдана">
+          <Label htmlFor={`${id}-class`} hint="нийтэлсэн видео энэ ангийн сурагчдад харагдана">
             Анги
           </Label>
           <select
@@ -192,7 +192,7 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
           dragging ? "border-primary bg-surface" : "border-line bg-white",
         )}
       >
-        <p className="font-bold">Номын хуудасны зураг, screenshot, PDF, .txt</p>
+        <p className="font-bold">Номын хуудас, дэлгэцийн зураг, PDF эсвэл .txt файл</p>
         <p className="text-sm text-ink-muted">
           Энд чирж оруулах эсвэл{" "}
           <button type="button" onClick={() => input.current?.click()} className="cursor-pointer font-bold text-primary underline">

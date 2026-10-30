@@ -11,7 +11,7 @@ export { subjectTitle as subjectLabel } from "@/lib/subjects";
 
 export const VIDEO_STATUS: Record<LessonVideoStatus, { label: string; className: string }> = {
   draft: { label: "Ноорог", className: "border-2 border-dashed border-line" },
-  approved: { label: "Зөвшөөрсөн", className: "bg-lavender" },
+  approved: { label: "Баталгаажуулсан", className: "bg-lavender" },
   published: { label: "Нийтэлсэн", className: "bg-sky" },
 };
 
@@ -24,7 +24,7 @@ export function SourceBadge({ source }: { source: "ai" | "demo" }) {
         source === "ai" ? "bg-surface text-primary" : "border-2 border-dashed border-magenta bg-pink text-ink",
       )}
     >
-      {source === "ai" ? "✦ AI-ийн санал" : "Жишээ өгөгдөл (AI холбогдоогүй)"}
+      {source === "ai" ? "✦ AI-ийн санал" : "Туршилтын жишээ агуулга (AI холбогдоогүй)"}
     </span>
   );
 }

@@ -14,10 +14,10 @@ export type MapNode = Subtopic & {
 };
 
 const STATUS_LABELS: Record<MapStatus, string> = {
-  untested: "шалгаагүй",
-  weak: "сул",
-  learning: "нөхөж буй",
-  good: "сайн",
+  untested: "тест өгөөгүй",
+  weak: "давтах шаардлагатай",
+  learning: "бататгах хэрэгтэй",
+  good: "сайн эзэмшсэн",
   mastered: "эзэмшсэн",
   new: "эзэмшсэн",
 };

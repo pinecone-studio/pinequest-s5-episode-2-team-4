@@ -41,12 +41,12 @@ export function ForgotForm() {
             Хэрэв <span className="font-bold break-all">{sentTo}</span> хаягаар бүртгэл байвал нууц үг
             шинэчлэх холбоос илгээлээ. Холбоос 30 минут хүчинтэй.
           </p>
-          <p className="text-sm text-ink-muted">Имэйл ирэхгүй бол Spam хавтсаа шалгаарай.</p>
+          <p className="text-sm text-ink-muted">Имэйл ирээгүй бол хаягаа зөв бичсэн эсэх болон Spam (хэрэггүй шуудан) хавтсаа шалгаарай.</p>
         </div>
       ) : (
         <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
           <p className="text-ink-muted">
-            Бүртгэлтэй имэйлээ оруулаарай. Нууц үгээ шинэчлэх холбоос илгээнэ.
+            Бүртгүүлсэн имэйл хаягаа оруулна уу. Нууц үг шинэчлэх холбоосыг тухайн хаягт илгээнэ.
           </p>
           <TextField
             id="forgot-mail"
@@ -74,7 +74,7 @@ export function ForgotForm() {
       )}
       <p className="mt-5 text-center text-sm font-semibold">
         <Link href="/login" className="inline-flex min-h-11 items-center font-bold">
-          Нэвтрэх рүү буцах
+          Нэвтрэх хуудас руу буцах
         </Link>
       </p>
     </section>

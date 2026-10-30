@@ -14,8 +14,8 @@ const OPTIONS: { level: SignalLevel; icon: PixelIconName; label: string }[] = [
 ];
 
 const ERRORS: Record<Exclude<SignalResult, { ok: true }>["error"], string> = {
-  noclass: "Ангид бүртгэлгүй тул багшид илгээгдсэнгүй.",
-  failed: "Илгээж чадсангүй. Дахин дарж үзээрэй.",
+  noclass: "Ангид бүртгүүлсний дараа үнэлгээгээ багшид илгээх боломжтой.",
+  failed: "Илгээж чадсангүй. Дахин оролдоорой.",
 };
 
 /** Topics grouped for the <select>, keeping their order. */
@@ -69,7 +69,7 @@ export function LessonCheckCard({ lesson }: { lesson: TodayLesson }) {
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
             {lesson.topic
-              ? "Ангидаа үзсэн сэдвээ ойлгосон уу? Нэргүй, багш зөвхөн ангийн дүнг харна."
+              ? "Ангидаа үзсэн сэдвээ ойлгосон уу? Нэрийг чинь харуулахгүй, багш зөвхөн ангийн нэгтгэсэн үнэлгээг харна."
               : "Өнөөдөр ангидаа ямар сэдэв үзсэн бэ? Сонгоод ойлгосон эсэхээ хэлээрэй."}
           </p>
         </div>
@@ -122,7 +122,7 @@ export function LessonCheckCard({ lesson }: { lesson: TodayLesson }) {
         ))}
       </div>
       <p role="status" className={cn("text-sm font-bold", error ? "text-magenta" : "text-ink-muted")}>
-        {error ?? (sent ? "Багшид нэргүйгээр илгээгдлээ. Хүссэн үедээ солиж болно." : "")}
+        {error ?? (sent ? "Багшид нэргүйгээр илгээгдлээ. Үнэлгээгээ хүссэн үедээ өөрчилж болно." : "")}
       </p>
     </section>
   );

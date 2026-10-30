@@ -95,7 +95,7 @@ export function LoginForm({ pet, next }: { pet: PetStage; next?: string }) {
         )}
         {blocked > 0 && (
           <FormError id="login-error">
-            Хэт олон удаа буруу оруулсан. {blocked} минутын дараа дахин оролдоно уу.
+            Нэвтрэх мэдээллийг олон удаа буруу оруулсан байна. {blocked} минутын дараа дахин оролдоно уу.
           </FormError>
         )}
         <button
@@ -116,13 +116,13 @@ export function LoginForm({ pet, next }: { pet: PetStage; next?: string }) {
           type="submit"
           className={buttonClass({ variant: "secondary", className: "w-full" })}
         >
-          {isStudent ? "Сурагчийн демо" : "Багшийн демо"}
+          {isStudent ? "Сурагчаар турших" : "Багшаар турших"}
         </button>
       </form>
 
       <div className="mt-5 flex items-center justify-between gap-3 text-sm font-semibold">
         <Link href="/forgot-password" className="inline-flex min-h-11 items-center text-ink-muted">
-          Нууц үг мартсан?
+          Нууц үгээ мартсан уу?
         </Link>
         <Link href="/signup" className="inline-flex min-h-11 items-center font-bold">
           Бүртгүүлэх

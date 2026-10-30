@@ -22,7 +22,7 @@ type FlightGameProps = {
 const STEPS = [
   { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Товшиж дүүл" },
   { icon: <PixelIcon name="door" className="size-6" />, text: "Зөв хариулттай завсраар нис" },
-  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Буруу бол тайлбар" },
+  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Алдааны тайлбар харна" },
 ];
 
 /** Knowledge flight: flap a falcon through the gap with the right answer; a wrong gap pauses on its explanation. */

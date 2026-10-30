@@ -12,7 +12,7 @@ export function VideoTabs({ video }: { video: LessonVideo }) {
   const [tab, setTab] = useState<"video" | "book">("video");
   const tabs = [
     { id: "video" as const, label: "Видео" },
-    ...(video.book ? [{ id: "book" as const, label: "Номын хэлбэрээр" }] : []),
+    ...(video.book ? [{ id: "book" as const, label: "Текстээр унших" }] : []),
   ];
 
   return (

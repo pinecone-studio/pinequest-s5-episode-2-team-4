@@ -76,7 +76,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
   const rewrite = (i: number) =>
     run(`rewrite-${i}`, async () => {
       const result = await rewriteSectionAction(video.id, script, i, notes[i] ?? "");
-      if (!result) return "Дахин бичиж чадсангүй";
+      if (!result) return "Хэсгийн агуулгыг дахин үүсгэж чадсангүй.";
       update(i, result.section);
       setRewritten((r) => ({ ...r, [i]: result.source }));
     });
@@ -118,7 +118,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
             onChange={(e) => setScript({ ...script, title: e.target.value })}
             className={cn(fieldClass, "h-12 font-bold")}
           />
-          {locked && <p className="text-sm text-ink-muted">Нийтэлсэн видеог засахгүй. Өөрчлөх бол шинэ видео бэлдээрэй.</p>}
+          {locked && <p className="text-sm text-ink-muted">Нийтэлсэн видеог шууд өөрчлөх боломжгүй. Агуулгыг шинэчлэх бол шинэ видео бэлтгэнэ үү.</p>}
         </Card>
 
         <ol className="flex flex-col gap-3">
@@ -201,7 +201,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
                           onChange={(e) => setChecked(e.target.checked ? [...checked, i] : checked.filter((x) => x !== i))}
                           className="size-5 accent-primary"
                         />
-                        Би шалгасан
+                        Агуулгыг хянасан
                       </label>
                     )}
                   </div>
@@ -239,7 +239,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
       <aside className="flex flex-col items-center gap-3 lg:sticky lg:top-24">
         <ReelPlayer script={script} timings={preview.timings} audioUrl={preview.audioUrl} />
         <p className="text-center text-xs text-ink-muted">
-          {preview.audioUrl ? "Дуу хоолойтой" : changed || video.status === "draft" ? "Дуугүй урьдчилан харах. Зөвшөөрөхөд дуу хоолой үүснэ." : "Дуу хоолой үүсээгүй (ElevenLabs тохируулаагүй)."}
+          {preview.audioUrl ? "Дуу хоолойтой" : changed || video.status === "draft" ? "Дуугүй урьдчилан харах. Агуулгыг баталгаажуулсны дараа дуу хоолой үүснэ." : "Дуу хоолой үүсээгүй (ElevenLabs тохируулаагүй)."}
         </p>
         {error && <ErrorNote>{error}</ErrorNote>}
         {busy === "approve" && (

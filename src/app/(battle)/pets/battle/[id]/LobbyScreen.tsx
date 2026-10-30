@@ -23,7 +23,7 @@ const MAX_PLAYERS = 8;
 
 const START_ERRORS: Record<string, string> = {
   need_two: "Эхлүүлэхэд дор хаяж 2 хүн хэрэгтэй.",
-  not_host: "Зөвхөн хост эхлүүлж чадна.",
+  not_host: "Тулааныг зөвхөн өрөө үүсгэсэн тоглогч эхлүүлнэ.",
   started: "Тулаан аль хэдийн эхэлсэн.",
 };
 
@@ -87,11 +87,11 @@ export function LobbyScreen({ initial, boss, lines }: LobbyScreenProps) {
       <>
         <Backdrop arena={boss.arena} />
         <section className="mx-auto mt-10 flex max-w-md flex-col items-center gap-4 rounded-panel bg-white px-6 py-8 text-center shadow-float">
-          <h1 className="text-2xl font-bold">Лобби хаагдсан</h1>
+          <h1 className="text-2xl font-bold">Тулааны өрөө хаагдсан</h1>
           <p className="text-ink-muted">
-            {isClass ? "Багш энэ тулааныг хаасан байна." : "Хост энэ бүлгийг хаасан байна."}
+            {isClass ? "Багш энэ тулааныг хаасан байна." : "Өрөө үүсгэсэн тоглогч энэ тулааныг хаасан байна."}
           </p>
-          <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
+          <ButtonLink href="/pets/battle">Боссын тулаан руу буцах</ButtonLink>
         </section>
       </>
     );

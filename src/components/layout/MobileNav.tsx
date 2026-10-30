@@ -20,7 +20,7 @@ export function MobileNav({ counts = {} }: { counts?: NavCounts }) {
   const LINKS = [
     { href: "/", label: "Нүүр", icon: <HomeIcon className="size-5.5" />, count: counts.lesson, countLabel: "өнөөдрийн хичээлийн асуулт" },
     { href: "/games", label: "Тоглоом", icon: <PlayIcon className="size-5.5" /> },
-    { href: "/videos", label: "Видео", icon: <VideoIcon className="size-5.5" />, count: counts.videos, countLabel: "шинэ видео" },
+    { href: "/videos", label: "Хичээл", icon: <VideoIcon className="size-5.5" />, count: counts.videos, countLabel: "шинэ видео" },
     { href: "/assignments", label: "Даалгавар", icon: <TaskIcon className="size-5.5" />, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
   ];
 

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const STATUS: Record<BattleStatus, string> = {
-  lobby: "Лобби",
+  lobby: "Нэгдэхийг хүлээж байна",
   active: "Явагдаж байна",
   paused: "Түр зогссон",
   won: "Ялалт",
@@ -52,7 +52,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
         <div>
           <h1 className="type-page-title">Тулааны түүх</h1>
           <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
-            Ангийн босс тулаан бүрд асуулт тус бүрд хэрхэн хариулсныг харна. Сурагчийн нэр гарахгүй.
+            Ангийн тулаан бүрийн оролцоо, асуулт тус бүрийн хариултын дүнг харуулна. Сурагчдын нэрийг харуулахгүй.
           </p>
         </div>
         <form className="flex items-end gap-2">
@@ -76,7 +76,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
       {log.battles.length === 0 ? (
         <Card className="flex flex-col items-start gap-2">
           <h2 className="text-xl font-bold">Тулаан алга</h2>
-          <p className="text-ink-muted">Самбараас ангийн босс тулаан нээхэд энд гарна.</p>
+          <p className="text-ink-muted">Багшийн самбараас ангийн тулаан үүсгэсний дараа үр дүн нь энд харагдана.</p>
           <Link href="/teacher" className="font-bold">
             Багшийн самбар руу →
           </Link>
@@ -179,7 +179,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
               {selected.perStudent.length > 0 && (
                 <Card className="flex flex-col gap-3">
                   <h3 className="type-section-title">Сурагч бүрээр</h3>
-                  <p className="text-sm text-ink-muted">Нэгдсэн дарааллаар дугаарласан. Нэр, эрэмбэ харагдахгүй.</p>
+                  <p className="text-sm text-ink-muted">Оролцогчдыг нэгдсэн дарааллаар дугаарласан. Нэр болон онооны эрэмбийг харуулахгүй.</p>
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[420px] text-left">
                       <thead>
@@ -187,7 +187,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
                           <th scope="col" className="py-2 pr-3 font-bold">Сурагч</th>
                           <th scope="col" className="py-2 pr-3 font-bold">Зөв</th>
                           <th scope="col" className="py-2 pr-3 font-bold">Буруу</th>
-                          <th scope="col" className="py-2 pr-3 font-bold">Зөв хувь</th>
+                          <th scope="col" className="py-2 pr-3 font-bold">Зөв хариултын хувь</th>
                           <th scope="col" className="py-2 font-bold">Хохирол</th>
                         </tr>
                       </thead>
@@ -213,7 +213,7 @@ export default async function BattleHistoryPage({ searchParams }: PageProps<"/te
             </div>
           ) : (
             <Card>
-              <p className="text-ink-muted">Сурагч нэгдсэн тулаан алга.</p>
+              <p className="text-ink-muted">Одоогоор сурагч оролцсон тулаан алга.</p>
             </Card>
           )}
         </div>

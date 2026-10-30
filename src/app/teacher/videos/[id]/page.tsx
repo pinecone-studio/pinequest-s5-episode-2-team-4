@@ -33,7 +33,7 @@ export default async function VideoPage({ params }: PageProps<"/teacher/videos/[
       <ReelLab key={video.updatedAt} video={video} />
       {video.book && (
         <details className="group">
-          <summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">Номын хэлбэрээр (сурагчид харагдана)</summary>
+          <summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">Унших тайлбар (сурагчдад харагдах хувилбар)</summary>
           <BookView book={video.book} title={video.script.title} />
         </details>
       )}

@@ -68,7 +68,7 @@ export function RecognitionEditor({ value, onChange, topicDetected }: Recognitio
           Сэдэв
           {topicDetected && (
             <span className="rounded-full bg-surface px-2.5 py-0.5 text-xs font-bold text-primary">
-              ✦ AI материалаас таньсан · засаж болно
+              ✦ Материалаас AI-ийн ялгасан агуулга · хянаж засна уу
             </span>
           )}
         </label>
@@ -98,7 +98,7 @@ export function RecognitionEditor({ value, onChange, topicDetected }: Recognitio
           render={(m, i) => (
             <>
               {input(m.wrong, (v) => update("mistakes", i, { wrong: v }), "Алдаатай бодолт", "border-magenta/40")}
-              {input(m.why, (v) => update("mistakes", i, { why: v }), "Яагаад буруу")}
+              {input(m.why, (v) => update("mistakes", i, { why: v }), "Алдааны шалтгаан")}
             </>
           )}
         />

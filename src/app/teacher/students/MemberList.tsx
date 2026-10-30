@@ -13,13 +13,13 @@ export function MemberList({ members }: { members: ClassMember[] }) {
   if (members.length === 0) {
     return (
       <p className="mt-4 rounded-card border-2 border-dashed border-line px-5 py-6 text-center text-sm font-semibold text-ink-muted">
-        Ангид сурагч алга. Баруун талын хэсгээс нэмээрэй.
+        Одоогоор ангид бүртгэлтэй сурагч алга. “Сурагч нэмэх” хэсгээс сурагчдаа нэмээрэй.
       </p>
     );
   }
 
   function remove(member: ClassMember) {
-    if (!window.confirm(`${member.username}-г ангиас хасах уу?`)) return;
+    if (!window.confirm(`“${member.username}” сурагчийг ангиас хасах уу?`)) return;
     startTransition(async () => {
       if (await removeStudent(member.id)) router.refresh();
     });

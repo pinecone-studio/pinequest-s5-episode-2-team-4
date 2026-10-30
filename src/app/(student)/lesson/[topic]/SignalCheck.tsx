@@ -8,13 +8,13 @@ import type { SignalLevel } from "@/lib/types";
 
 const options: { level: SignalLevel; icon: PixelIconName; label: string }[] = [
   { level: "got", icon: "signal-got", label: "Ойлгосон" },
-  { level: "unsure", icon: "signal-unsure", label: "Сайн мэдэхгүй" },
-  { level: "lost", icon: "signal-lost", label: "Ойлгосонгүй" },
+  { level: "unsure", icon: "signal-unsure", label: "Эргэлзэж байна" },
+  { level: "lost", icon: "signal-lost", label: "Ойлгоогүй" },
 ];
 
 const errors: Record<Exclude<SignalResult, { ok: true }>["error"], string> = {
   noclass: "Ангид бүртгэлгүй тул багшид илгээгдсэнгүй. Багшдаа хэлж ангидаа бүртгүүлээрэй.",
-  failed: "Илгээж чадсангүй. Дахин дарж үзээрэй.",
+  failed: "Илгээж чадсангүй. Дахин оролдоорой.",
 };
 
 type SignalCheckProps = {
@@ -57,8 +57,8 @@ export function SignalCheck({ subtopicId, initial }: SignalCheckProps) {
         <p role="status" className={cn("text-sm font-bold", error ? "text-magenta" : "text-ink-muted")}>
           {error ??
             (sent
-              ? "Багшид нэргүйгээр илгээгдлээ. Хүссэн үедээ солиж болно."
-              : "Нэргүй. Багш зөвхөн ангийн дүнг харна.")}
+              ? "Багшид нэргүйгээр илгээгдлээ. Үнэлгээгээ хүссэн үедээ өөрчилж болно."
+              : "Нэрийг чинь харуулахгүй. Багшид ангийн нэгтгэсэн үнэлгээ харагдана.")}
         </p>
       </div>
       <div className="grid grid-cols-3 gap-2 md:flex md:gap-3">

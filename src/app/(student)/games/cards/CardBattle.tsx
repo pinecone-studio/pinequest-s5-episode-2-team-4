@@ -53,7 +53,7 @@ export function CardBattle({ subjects, subjectId, questions, petSprite }: CardBa
         {card ? <QuestionSheet card={card} picked={picked} combo={battle.combo} onChoose={choose} onPlay={play} /> : null}
         {result ? (
           <ResultPanel result={result} onAgain={again} otherHref="/games">
-            <p className="text-sm font-extrabold text-[var(--game-gold)]">Мангас унлаа! {battle.right} зөв, {battle.wrong} дахин үзэх.</p>
+            <p className="text-sm font-extrabold text-[var(--game-gold)]">Мангасыг яллаа! {battle.right} зөв, {battle.wrong} дахин үзэх.</p>
           </ResultPanel>
         ) : null}
       </div>

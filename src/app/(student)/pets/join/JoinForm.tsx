@@ -5,8 +5,8 @@ import { Button } from "@/components/ui";
 import { joinGroupBossBattle } from "@/lib/battle-actions";
 
 const ERRORS: Record<string, string> = {
-  format: "Нэгдэх код 6 тэмдэгттэй, ангийн код 10 хүртэл тэмдэгттэй.",
-  no_code: "Ийм код эсвэл тулаан явагдаж буй анги олдсонгүй.",
+  format: "Тулааны код 6 тэмдэгттэй байна. Ангийн код хамгийн ихдээ 10 тэмдэгттэй байж болно.",
+  no_code: "Энэ кодтой нээлттэй тулаан олдсонгүй. Кодоо шалгаад дахин оролдоорой.",
   started: "Энэ бүлгийн тулаан аль хэдийн эхэлсэн.",
   full: "Энэ бүлэг дүүрсэн байна (8 хүн).",
 };
@@ -40,7 +40,7 @@ export function JoinForm() {
       </div>
       {state?.error ? (
         <p id="join-error" role="alert" className="rounded-tile border-2 border-magenta bg-pink px-4 py-3 font-semibold">
-          {ERRORS[state.error] ?? "Нэгдэж чадсангүй."}
+          {ERRORS[state.error] ?? "Тулаанд нэгдэж чадсангүй. Дахин оролдоорой."}
         </p>
       ) : null}
     </form>

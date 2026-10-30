@@ -41,7 +41,7 @@ export function NewVideoFlow({
     const result = await createVideoAction(recognized).catch(() => undefined);
     if (!result?.ok) {
       setBusy(false);
-      return setError(result?.error ?? "Скрипт бичиж чадсангүй. Дахин оролдоно уу.");
+      return setError(result?.error ?? "Видеоны зохиол үүсгэж чадсангүй. Дахин оролдоно уу.");
     }
     router.push(`/teacher/videos/${result.id}`);
   }
@@ -86,11 +86,11 @@ export function NewVideoFlow({
       {recognized && (
         <Card className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <StepTitle n={2}>AI-ийн таньсан зүйлийг шалгах</StepTitle>
+            <StepTitle n={2}>Материалаас ялгасан агуулгыг хянах</StepTitle>
             <SourceBadge source={recognized.source} />
           </div>
           <p className="text-sm text-ink-muted">
-            Буруу, илүүц зүйлийг засаж хасна уу. Видеоны скрипт зөвхөн эндээс бичигдэнэ.
+            Танигдсан агуулгыг нягталж, алдаатай эсвэл шаардлагагүй хэсгийг засаарай. Видеоны зохиолыг зөвхөн энэ агуулгад үндэслэн үүсгэнэ.
           </p>
           <RecognitionEditor
             // Only the AI really reads a topic; demo content just borrows the first line.
@@ -101,12 +101,12 @@ export function NewVideoFlow({
           {error && <ErrorNote>{error}</ErrorNote>}
           {busy && (
             <AiWorking
-              steps={["Видеоны скрипт, номын текст бичиж байна"]}
+              steps={["Видеоны зохиол болон унших тайлбар бэлтгэж байна"]}
               activity={[
                 "Сонирхол татах эхлэл бодож байна…",
                 "Алхам алхмаар тайлбар бичиж байна…",
                 "Жишээ бодлого сонгож байна…",
-                "Номын хэлбэрийн текст бичиж байна…",
+                "Унших тайлбар бэлтгэж байна…",
                 "Томъёонуудыг шалгаж байна…",
                 "Бараг боллоо…",
               ]}
@@ -114,7 +114,7 @@ export function NewVideoFlow({
             />
           )}
           <Button onClick={writeScript} disabled={busy} aria-busy={busy} className="self-start">
-            {busy ? "Скрипт бичиж байна…" : "✦ Видеоны скрипт бичүүлэх"}
+            {busy ? "Видеоны зохиол бэлтгэж байна…" : "✦ Видеоны зохиол бэлтгэх"}
           </Button>
         </Card>
       )}

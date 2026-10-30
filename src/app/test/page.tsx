@@ -35,7 +35,7 @@ export default async function TestPage({ searchParams }: PageProps<"/test">) {
         className="mx-auto mt-6 flex max-w-160 flex-col items-center gap-5 rounded-panel bg-white px-6 py-8 text-center shadow-float md:mt-10 md:px-12 md:py-10"
       >
         <h1 id="taken-title" className="text-2xl leading-tight font-bold md:text-3xl">
-          Тестээ өгсөн байна
+          Тестээ өгч дуусгасан байна
         </h1>
         <p
           aria-label={`${result.total}-аас ${result.correct} зөв`}
@@ -51,7 +51,7 @@ export default async function TestPage({ searchParams }: PageProps<"/test">) {
           </ButtonLink>
         </div>
         <p className="text-sm font-semibold text-ink-muted">
-          Дахин өгвөл энэ дүн шинэ дүнгээр солигдоно. Эзэмшсэн сэдвүүд хэвээр үлдэнэ.
+          Тестийг дахин өгвөл өмнөх дүн шинэчлэгдэнэ. Өмнө эзэмшсэн сэдвүүд өөрчлөгдөхгүй.
         </p>
         {/* Demo accounts: retake with the sample answers already filled in. */}
         {sampleAnswers && (

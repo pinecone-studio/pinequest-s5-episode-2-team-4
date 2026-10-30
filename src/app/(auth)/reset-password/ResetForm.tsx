@@ -32,7 +32,7 @@ export function ResetForm({ token }: { token: string }) {
         id="reset-pass"
         name="password"
         label="Шинэ нууц үг"
-        hint="дор хаяж 6 тэмдэгт"
+        hint="хамгийн багадаа 6 тэмдэгт"
         autoComplete="new-password"
         required
         minLength={6}
@@ -49,7 +49,7 @@ export function ResetForm({ token }: { token: string }) {
         aria-describedby={error ? "reset-error" : undefined}
         onChange={() => setError(null)}
       />
-      {error === "mismatch" && <FormError id="reset-error">Нууц үг таарахгүй байна.</FormError>}
+      {error === "mismatch" && <FormError id="reset-error">Оруулсан хоёр нууц үг хоорондоо таарахгүй байна.</FormError>}
       {error === "expired" && (
         <FormError id="reset-error">
           Холбоосын хугацаа дууссан эсвэл ашиглагдсан байна.{" "}
@@ -64,7 +64,7 @@ export function ResetForm({ token }: { token: string }) {
         aria-busy={pending}
         className={buttonClass({ size: "lg", className: "mt-2 w-full" })}
       >
-        Хадгалах
+        Шинэ нууц үг хадгалах
         {ArrowIcon}
       </button>
     </form>

@@ -21,7 +21,7 @@ export default async function StudentAssignmentsPage() {
     <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-4 py-6 md:gap-7 md:px-[clamp(16px,4vw,40px)] md:py-10">
       <div>
         <h1 className="type-page-title">Даалгавар</h1>
-        <p className="mt-3 text-ink-muted md:text-lg">Багшийн өгсөн асуултуудаар тоглоод тэжээвэртээ XP цуглуул.</p>
+        <p className="mt-3 text-ink-muted md:text-lg">Багшийн бэлтгэсэн асуултаар тоглож, даалгавраа биелүүлэн тэжээвэртээ XP цуглуулаарай.</p>
       </div>
 
       {tour && <DemoTour assignment={assignments.find((a) => a.id === tour.assignmentId)} />}
@@ -30,9 +30,9 @@ export default async function StudentAssignmentsPage() {
         <section className="glass-panel rounded-panel border border-line bg-white p-6 text-center shadow-card">
           <PixelIcon name="party" className="mx-auto size-12" />
           <h2 className="mt-2 text-xl font-bold">Одоогоор даалгавар алга</h2>
-          <p className="mt-1 text-ink-muted">Багш даалгавар өгөхөөр энд гарна.</p>
+          <p className="mt-1 text-ink-muted">Багшийн нийтэлсэн даалгаврууд энд харагдана.</p>
           <ButtonLink href="/games" variant="secondary" size="sm" className="mt-4">
-            Тоглоомууд руу
+            Тоглоом сонгох
           </ButtonLink>
         </section>
       ) : (

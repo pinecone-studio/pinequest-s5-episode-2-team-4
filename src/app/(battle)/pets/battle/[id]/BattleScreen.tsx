@@ -747,7 +747,7 @@ const END_MESSAGES: Record<NonNullable<BattleState["endReason"]>, { title: strin
 
 /** What the teacher reads at the end of a class battle. */
 const CLASS_END_MESSAGES: Record<NonNullable<BattleState["endReason"]>, { title: string; text: string }> = {
-  won: { title: "Анги ялсан!", text: "Сурагчид хамтдаа боссыг ялсан." },
+  won: { title: "Ангийнхан хамтдаа яллаа!", text: "Сурагчид хамтдаа боссыг ялсан." },
   fainted: { title: "Ялагдлаа", text: "Бүх тэжээвэр ухаан алдлаа." },
   timeout: { title: "Хугацаа дууслаа", text: "Энэ удаа амжсангүй." },
   left: { title: "Тулаан дууслаа", text: "" },
@@ -803,8 +803,8 @@ function BattleOver({
         <div role="status" className="arena-reward flex w-full flex-col items-center gap-3 rounded-card bg-surface p-4">
           <p className="text-lg font-bold">Шагнал</p>
           <div className="flex flex-wrap justify-center gap-2">
-            <span className="rounded-full bg-primary px-3 py-1 font-bold text-white">+{state.rewards.exp} EXP</span>
-            <span className="rounded-full bg-sky px-3 py-1 font-bold">Тэжээвэр +{state.rewards.petExp} EXP</span>
+            <span className="rounded-full bg-primary px-3 py-1 font-bold text-white">+{state.rewards.exp} XP</span>
+            <span className="rounded-full bg-sky px-3 py-1 font-bold">Тэжээвэр +{state.rewards.petExp} XP</span>
           </div>
           {state.rewards.egg ? (
             <div className="flex items-center gap-3">
@@ -823,7 +823,7 @@ function BattleOver({
       ) : null}
       {state.mode !== "solo" ? (
         <div className="w-full text-left">
-          <h2 className="mb-2 font-bold">Хэн хэр хохирол учруулсан</h2>
+          <h2 className="mb-2 font-bold">Оролцогчдын оруулсан хувь нэмэр</h2>
           <ol className="flex flex-col gap-1.5">
             {[...state.team]
               .sort((a, b) => b.damage - a.damage)
@@ -854,7 +854,7 @@ function BattleOver({
         <ButtonLink href="/teacher">Багшийн самбар руу</ButtonLink>
       ) : (
         <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
-          <ButtonLink href="/pets/battle">Боссууд руу буцах</ButtonLink>
+          <ButtonLink href="/pets/battle">Боссын тулаан руу буцах</ButtonLink>
           {state.rewards?.egg ? (
             <ButtonLink href="/pets/eggs" variant="secondary">
               Өндөг хагалах

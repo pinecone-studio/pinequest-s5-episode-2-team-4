@@ -54,7 +54,7 @@ export function HomeHero({ pet, testTaken, orbitPets }: HomeHeroProps) {
           className="order-last w-full pr-10 pl-8 md:order-none md:w-auto"
         >
           {PlayIcon}
-          {testTaken ? "Тоглох" : "Тест эхлэх"}
+          {testTaken ? "Тоглох" : "Тест эхлүүлэх"}
         </ButtonLink>
       </div>
 
