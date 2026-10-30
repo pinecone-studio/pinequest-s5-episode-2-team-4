@@ -539,9 +539,13 @@ export async function getAssignmentDraft(): Promise<AssignmentDraft | undefined>
   return (await realClassResults()) ? undefined : assignmentDraft;
 }
 
-/** Sample notifications for demo accounts; real classes have none yet. */
+/**
+ * Sample notifications for demo teachers (and servers without Supabase);
+ * real classes have none yet. Read in the header, so it stays cheap.
+ */
 export async function getNotifications(): Promise<TeacherNotification[]> {
-  return (await realClassResults()) ? [] : notifications;
+  const user = await getCurrentUser();
+  return user?.role === "teacher" && (user.demo || !classesStored()) ? notifications : [];
 }
 
 /** Per student, the XP the class goal asks for: two pet levels each. */

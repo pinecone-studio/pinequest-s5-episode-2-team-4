@@ -2,19 +2,21 @@ import Link from "next/link";
 import { AccountMenu } from "@/components/layout/AccountMenu";
 import { Logo } from "@/components/layout/Logo";
 import { SwapIcon } from "@/components/layout/navIcons";
-import { getActiveClass, getCurrentUser } from "@/lib/data";
+import { getActiveClass, getCurrentUser, getNotifications } from "@/lib/data";
+import { topicTitle } from "@/lib/lesson-topics";
 import { subjectTitle } from "@/lib/subjects";
+import { NotificationMenu } from "./NotificationMenu";
 import { SectionTabs, TeacherNav } from "./TeacherNav";
 
 /**
  * Header for the teacher pages: logo with a "Багш" tag and the four sections
- * (lg up; the dock has them below lg), then the current class and the
- * account menu (dark mode, «Гарах»). A section with two pages shows them as
+ * (lg up; the dock has them below lg), then the current class, the
+ * notifications and the account menu (dark mode, «Гарах»). A section with more pages shows them as
  * tabs under the header.
  */
 export async function TeacherHeader() {
   // The layout makes sure there is one.
-  const [active, user] = await Promise.all([getActiveClass(), getCurrentUser()]);
+  const [active, user, notifications] = await Promise.all([getActiveClass(), getCurrentUser(), getNotifications()]);
 
   return (
     // Named so it stays put while the page below animates (globals.css).
@@ -34,7 +36,8 @@ export async function TeacherHeader() {
           <TeacherNav className="hidden lg:block" />
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Positioned, so on a phone the notifications panel spans this group, not just the bell. */}
+        <div className="relative flex items-center gap-1 sm:gap-2">
           <Link
             href="/classes"
             aria-label={`Анги ${active?.name}, ${active ? subjectTitle(active.subject) : ""}. Анги солих`}
@@ -52,18 +55,24 @@ export async function TeacherHeader() {
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden="true"
-              className="mr-1 size-4 text-ink-muted"
+              className="mr-1 hidden size-4 text-ink-muted sm:block"
             >
               <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
             </svg>
           </Link>
+          <NotificationMenu
+            notifications={notifications.map((n) => ({
+              ...n,
+              context: n.kind === "common-mistake" ? "Ижил алдаа" : topicTitle(n.subtopicId),
+            }))}
+          />
           <AccountMenu
             label="Бүртгэлийн цэс"
             title={user?.username ?? "Багш"}
             subtitle={active ? `${active.name} анги · ${subjectTitle(active.subject)}` : undefined}
             links={[{ href: "/classes", label: "Анги солих", icon: <SwapIcon /> }]}
             trigger={
-              <span className="flex size-12 items-center justify-center rounded-full bg-ink text-base font-bold text-white">
+              <span className="flex size-11 items-center justify-center rounded-full bg-ink text-base font-bold text-white sm:size-12">
                 {(user?.username ?? "Б").slice(0, 1).toUpperCase()}
               </span>
             }
