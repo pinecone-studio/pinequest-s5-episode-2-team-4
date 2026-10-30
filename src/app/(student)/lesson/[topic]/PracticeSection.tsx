@@ -74,7 +74,7 @@ function PracticeRow({
 
       <div aria-live="polite" className="justify-self-end md:order-3">
         {solved ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-0.75 text-xs font-bold md:px-3.5 md:py-1.5 md:text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-status-good-ink bg-status-good px-2.5 py-0.75 text-xs font-bold text-status-good-ink md:px-3.5 md:py-1.5 md:text-sm">
             <CheckIcon className="size-3 md:size-3.5" />
             Зөв!
           </span>
