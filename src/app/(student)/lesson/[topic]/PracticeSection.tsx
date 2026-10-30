@@ -61,7 +61,7 @@ function PracticeRow({
     <li
       className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-card border-2 p-3.5 md:flex md:flex-wrap md:gap-x-5 md:px-4.5 md:py-4 ${
         solved
-          ? "border-sky bg-[#f5fcff]"
+          ? "border-status-good-ink bg-status-good/40"
           : wrong
             ? "border-magenta bg-[#fffafd]"
             : "border-lavender"
