@@ -22,7 +22,11 @@ export const metadata: Metadata = {
   description: "Ойлгоогүйгээ өөрийн хурдаар нөх.",
   // Installed on an iPhone home screen, it opens full screen like an app.
   appleWebApp: { capable: true, title: "LevelUp", statusBarStyle: "default" },
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  // Setting icons here turns off the automatic link for app/icon.svg, so the tab icon is listed too.
+  icons: {
+    icon: { url: "/icon.svg", type: "image/svg+xml" },
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
