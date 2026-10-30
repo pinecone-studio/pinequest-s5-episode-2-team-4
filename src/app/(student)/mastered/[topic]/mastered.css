@@ -12,6 +12,18 @@
   );
 }
 
+/* Dark mode: the same glow in the night blue of the dark cards, so the
+   white text stays readable. */
+[data-theme="dark"] .mastered-panel {
+  background: radial-gradient(
+    circle at 60% 34%,
+    #2a3d6b 0%,
+    #1c2d4a 30%,
+    #13213a 72%,
+    #0f1a30 100%
+  );
+}
+
 /* Confetti flies in from the pet towards its spot. --dx/--dy are the
    desktop offsets; --s shrinks them on small screens. */
 .mastered-confetti {
@@ -84,6 +96,15 @@
     #ffffff 0%,
     #ffffff 40%,
     #f2f1ff 100%
+  );
+}
+
+[data-theme="dark"] .mastered-ring-inner {
+  background: radial-gradient(
+    circle at 50% 45%,
+    #2f4475 0%,
+    #24375f 40%,
+    #1c2d4a 100%
   );
 }
 
