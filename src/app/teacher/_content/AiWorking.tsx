@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
 type AiWorkingProps = {
@@ -60,7 +61,7 @@ export function AiWorking({ steps, activity, files = [], text, expected }: AiWor
                 <img src={p.url} alt="" className="size-full object-cover" />
               ) : (
                 <div className="flex size-full flex-col items-center justify-center gap-1 p-2 text-center">
-                  <span className="text-3xl">{p.kind === "pdf" ? "📄" : "📝"}</span>
+                  <PixelIcon name={p.kind === "pdf" ? "document" : "memo"} className="size-8" />
                   <span className="line-clamp-2 text-xs font-bold break-all">{p.name}</span>
                 </div>
               )}
