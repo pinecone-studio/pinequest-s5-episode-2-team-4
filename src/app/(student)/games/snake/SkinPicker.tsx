@@ -7,6 +7,10 @@ type SkinPickerProps = {
   onChange: (id: string) => void;
 };
 
+/** The skin as pixel stripes: one hard-edged band per colour. */
+const stripes = (colors: string[]) =>
+  `linear-gradient(90deg, ${colors.map((c, i) => `${c} ${(i * 100) / colors.length}% ${((i + 1) * 100) / colors.length}%`).join(", ")})`;
+
 /** Snake colours; locked ones show how many stars they need. */
 export function SkinPicker({ stars, value, onChange }: SkinPickerProps) {
   return (
@@ -24,17 +28,9 @@ export function SkinPicker({ stars, value, onChange }: SkinPickerProps) {
               aria-pressed={skin.id === value}
               aria-label={locked ? `${skin.name}, ${skin.need} од хэрэгтэй` : skin.name}
               onClick={() => onChange(skin.id)}
-              className={cn(
-                "game-chip relative grid size-[50px] cursor-pointer place-items-center rounded-[15px] border-2 disabled:cursor-not-allowed",
-                skin.id === value && "border-[var(--game-gold)] shadow-[0_0_0_3px_rgb(255_207_90/0.18)]",
-              )}
+              className="pixel-frame relative grid size-[50px] cursor-pointer place-items-center bg-[var(--game-panel)] disabled:cursor-not-allowed"
             >
-              <span
-                className={cn("size-[26px] rounded-full", locked && "brightness-50 grayscale")}
-                style={{
-                  background: `radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.7), transparent 45%), conic-gradient(${colors.join(",")},${colors[0]})`,
-                }}
-              />
+              <span className={cn("size-6", locked && "brightness-50 grayscale")} style={{ background: stripes(colors) }} />
               <em className={cn("absolute inset-x-0 -bottom-[17px] text-2xs font-bold not-italic", locked ? "text-[var(--game-gold)]" : "text-[var(--game-muted)]")}>
                 {locked ? `★${skin.need}` : skin.name}
               </em>
