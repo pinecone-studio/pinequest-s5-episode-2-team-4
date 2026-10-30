@@ -1,6 +1,6 @@
-import { roundRect, type Stage } from "../../_lib/canvas";
+import type { Stage } from "../../_lib/canvas";
 import { GAME_COLORS } from "../../_lib/palette";
-import { PIXEL as P, snap } from "../../_lib/pixel";
+import { PIXEL as P, pixelBox, snap } from "../../_lib/pixel";
 import { drawAnswer } from "../../_lib/shapes";
 import { WORLD, type Food } from "./types";
 
@@ -79,30 +79,33 @@ export function drawLights(ctx: CanvasRenderingContext2D, orbs: Orb[], tint: [st
   ctx.restore();
 }
 
-/** An answer pill: all look the same, so the player has to think. */
+/** An answer box: all look the same, so the player has to think. */
 export function drawFood(ctx: CanvasRenderingContext2D, f: Food, time: number, still: boolean) {
   const born = Math.min(1, Math.max(0, (time - f.born) / 0.35));
   if (!born) return;
   const die = f.dying ? Math.min(1, f.dying / 0.3) : 0;
   const s = (0.5 + 0.5 * born) * (1 + f.near * 0.12) * (1 + die * 0.6);
-  const bob = still ? 0 : Math.sin(time * 2.2 + f.x * 0.05) * 2.5;
+  // the bob moves a whole art pixel at a time
+  const bob = still ? 0 : snap(Math.sin(time * 2.2 + f.x * 0.05) * 3);
   const hot = f.near > 0.3;
+  const w = snap(f.w), h = snap(f.h), x = -w / 2, y = -h / 2;
   ctx.save();
   ctx.globalAlpha = 1 - die;
-  ctx.translate(f.x, f.y + bob);
+  ctx.translate(snap(f.x), snap(f.y) + bob);
   ctx.scale(s, s);
-  ctx.shadowColor = hot ? "rgba(255,207,90,.6)" : "rgba(139,92,255,.5)";
-  ctx.shadowBlur = 10 + f.near * 14;
-  const g = ctx.createLinearGradient(0, -f.h / 2, 0, f.h / 2);
-  g.addColorStop(0, "#2d2270");
-  g.addColorStop(1, "#1c1550");
-  roundRect(ctx, -f.w / 2, -f.h / 2, f.w, f.h, Math.min(18, f.h / 2));
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = hot ? GAME_COLORS.gold : "rgba(139,92,255,.75)";
-  ctx.stroke();
+  if (hot) {
+    // a ring of gold pixels instead of a blurred glow
+    ctx.fillStyle = "rgba(255,207,90,.3)";
+    pixelBox(ctx, x - P, y - P, w + 2 * P, h + 2 * P);
+  }
+  ctx.fillStyle = "rgba(0,0,0,.4)";
+  pixelBox(ctx, x + P, y + P, w, h);
+  ctx.fillStyle = hot ? GAME_COLORS.gold : GAME_COLORS.violetLight;
+  pixelBox(ctx, x, y, w, h);
+  ctx.fillStyle = "#1c1550";
+  pixelBox(ctx, x + P, y + P, w - 2 * P, h - 2 * P);
+  ctx.fillStyle = "#2d2270";
+  ctx.fillRect(x + 2 * P, y + P, w - 4 * P, P);
   drawAnswer(ctx, f.answer);
   ctx.restore();
 }
