@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Dock } from "@/components/layout/Dock";
 import { MenuPopover, menuItemClass } from "@/components/layout/MenuPopover";
 import { NavPill } from "@/components/layout/NavPill";
 import { BookIcon, ClockIcon, GridIcon, UsersIcon } from "@/components/layout/navIcons";
@@ -137,29 +138,26 @@ export function TeacherDock() {
   const pathname = usePathname();
   const current = activeSection(pathname);
   return (
-    <div className="sticky bottom-0 z-10 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
-      <div className="relative mx-auto max-w-md">
-        <div aria-hidden="true" className="absolute inset-0 rounded-full border border-line bg-white/90 shadow-float backdrop-blur-md" />
-        <nav aria-label="Багшийн цэс" style={{ viewTransitionName: "bottom-nav" }} className="relative grid grid-cols-4 gap-1 px-2 py-1.5">
-          {SECTIONS.map((section) => {
-            const active = section === current;
-            return (
-              <Link
-                key={section.label}
-                href={section.pages[0].href}
-                aria-current={active ? "page" : undefined}
-                className="flex min-h-15 flex-col items-center justify-end gap-0.5 rounded-card pb-1 text-xs font-bold text-ink no-underline hover:text-ink"
-              >
-                <span className={cn("relative isolate flex size-11 items-center justify-center rounded-full", active ? "-translate-y-3.5 text-white" : "text-ink")}>
-                  {active && <NavPill name="mobile-pill" className="inset-0 rounded-full bg-primary shadow-3d" />}
-                  {section.icon("size-5.5")}
-                </span>
-                <span className={active ? "text-primary" : undefined}>{section.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-    </div>
+    <Dock>
+      <nav aria-label="Багшийн цэс" style={{ viewTransitionName: "bottom-nav" }} className="relative grid grid-cols-4 gap-1 px-2 py-1.5">
+        {SECTIONS.map((section) => {
+          const active = section === current;
+          return (
+            <Link
+              key={section.label}
+              href={section.pages[0].href}
+              aria-current={active ? "page" : undefined}
+              className="flex min-h-15 flex-col items-center justify-end gap-0.5 rounded-card pb-1 text-xs font-bold text-ink no-underline hover:text-ink"
+            >
+              <span className={cn("relative isolate flex size-11 items-center justify-center rounded-full", active ? "-translate-y-3.5 text-white" : "text-ink")}>
+                {active && <NavPill name="mobile-pill" className="inset-0 rounded-full bg-primary shadow-3d" />}
+                {section.icon("size-5.5")}
+              </span>
+              <span className={active ? "text-primary" : undefined}>{section.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </Dock>
   );
 }
