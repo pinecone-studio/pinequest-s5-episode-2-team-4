@@ -12,7 +12,7 @@ const GAMES = [
     href: "/games/hangman",
     title: "Hangman",
     genre: "Үг таах",
-    text: "Монгол орчуулгыг ашиглан англи үгийг үсэг үсгээр таа. 6 удаа алдахаас өмнө бүх үсгийг олоорой!",
+    text: "Монгол орчуулгаар нь тусламж авч, англи үгийг үсэг үсгээр таагаарай. 6 удаа алдахаас өмнө бүх үсгийг олоорой!",
     shot: "/games/hangman.svg",
     focus: "50% 50%",
   },
@@ -37,7 +37,7 @@ const GAMES = [
     href: "/games/race",
     title: "Морин уралдаан",
     genre: "Уралдаан",
-    text: "Ботуудын морь зогсолтгүй давхина. Зөв хариулт бүрд чиний морь нэг нүүдэл урагшилна. Хурдан, зөв хариулж финишд түрүүл!",
+    text: "Ботуудын морь зогсолтгүй давхина. Зөв хариулт бүрд чиний морь нэг нүүдэл урагшилна. Хурдан, зөв хариулж барианд түрүүлж ороорой!",
     shot: "/games/race.jpg",
     focus: "50% 50%",
   },
@@ -106,7 +106,7 @@ export default async function GamesPage() {
     <div className="mx-auto max-w-7xl px-4 pt-2 pb-10 md:px-[clamp(16px,4vw,40px)]">
       <h1 className="type-page-title">Тоглоом</h1>
       <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
-        Нэг хичээлийн асуултыг өөр өөр тоглоомоор давт. Аль тоглоомд ч буруу хариулбал тайлбар нь гарна.
+        Хичээлийн асуултуудаа өөр өөр тоглоомоор давтаарай. Буруу хариулсан үед тайлбарыг уншиж, ойлголтоо бататгаарай.
       </p>
 
       <ul className="mt-6 grid gap-4 md:mt-8 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
@@ -138,7 +138,7 @@ export default async function GamesPage() {
       </ul>
 
       <h2 className="mt-10 text-2xl font-bold">Хичээлүүд</h2>
-      <p className="mt-1 text-ink-muted">Тоглоом бүр эдгээр хичээлийн асуултыг уншдаг. Хичээлээ тоглоом дотроо сонгоно.</p>
+      <p className="mt-1 text-ink-muted">Тоглоом дотроос хичээлээ сонгон, тухайн хичээлийн асуултаар тоглох боломжтой.</p>
       <ul className="mt-4 flex flex-wrap gap-2">
         {subjects.map((s) => (
           <li key={s.id} className="rounded-full bg-surface px-3.5 py-1.5 text-sm font-bold">

@@ -71,7 +71,7 @@ export function AppInstall() {
               Safari-ийн <b>Share ⎋</b> товч → <b>«Add to Home Screen»</b>
             </>
           ) : (
-            "LevelUp-ыг утсандаа апп болгож суулгаарай"
+            "LevelUp-ийг утсандаа суулгаад шууд нээх боломжтой."
           )}
         </p>
         <button
@@ -83,7 +83,7 @@ export function AppInstall() {
           }
           className="min-h-9 shrink-0 cursor-pointer rounded-full bg-primary px-3.5 text-[13px] font-bold text-white"
         >
-          {install ? "Суулгах" : open ? "Ойлголоо" : "Яаж?"}
+          {install ? "Суулгах" : open ? "Ойлголоо" : "Заавар"}
         </button>
         <button
           type="button"

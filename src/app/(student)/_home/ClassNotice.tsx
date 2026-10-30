@@ -15,7 +15,7 @@ export function ClassNotice() {
           Та ангид бүртгэлгүй байна
         </h2>
         <p className="mt-1 text-base text-ink-muted">
-          Багшдаа хэлж ангидаа бүртгүүлнэ үү. Тэр болтол хүссэн хичээлээ сонгоод тоглоом тоглож болно.
+          Багшдаа хандаж ангидаа бүртгүүлээрэй. Ангид бүртгүүлэх хүртлээ хүссэн хичээлээ сонгон бие даан суралцаж болно.
         </p>
       </div>
       <ButtonLink href="/subject" size="sm" className="self-start md:self-center">

@@ -22,7 +22,7 @@ export function MistakeNotebook({ items }: { items: NotebookItem[] }) {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pt-4 pb-12 md:px-8">
       <h1 className="type-page-title">Алдааны дэвтэр</h1>
-      <p className="mt-3 max-w-2xl text-ink-muted">Тест, дасгал, дахин тест болон boss тулаанд алдсан асуултаа давтаарай. Зөв хариулбал “Давтсан” хэсэгт орно.</p>
+      <p className="mt-3 max-w-2xl text-ink-muted">Тест, дасгал, давтан тест болон боссын тулаанд буруу хариулсан асуултуудаа давтаарай. Дахин бодож зөв хариулсан асуулт “Давтсан” хэсэгт шилжинэ.</p>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2" role="group" aria-label="Алдааны төлөв">
           <Button size="sm" variant={tab === "pending" ? "primary" : "secondary"} aria-pressed={tab === "pending"} onClick={() => setTab("pending")}>Давтах · {pending}</Button>
@@ -83,11 +83,11 @@ function ReviewCard({ item, onReviewed }: { item: NotebookItem; onReviewed: (cor
       <h2 className="mt-4 text-lg font-bold">{item.prompt}</h2>
       {item.expression && <Expression tokens={item.expression} className="mt-3 text-2xl font-bold" />}
       {item.display && <p className="mt-3 rounded-field bg-surface p-3 text-lg">{item.display}</p>}
-      {item.previousAnswer !== undefined && <p className="mt-3 text-sm text-ink-muted">Сүүлд өгсөн хариулт: <span className="font-semibold">{item.previousAnswer}</span></p>}
+      {item.previousAnswer !== undefined && <p className="mt-3 text-sm text-ink-muted">Өмнө буруу хариулсан нь: <span className="font-semibold">{item.previousAnswer}</span></p>}
       <form onSubmit={submit} className="mt-4">
         {item.options ? (
           <fieldset disabled={busy}>
-            <legend className="mb-2 text-sm font-semibold">Дахин бодоод хариултаа сонго</legend>
+            <legend className="mb-2 text-sm font-semibold">Дахин бодоод хариултаа сонгоорой</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {item.options.map((option, index) => <label key={index} className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-field border-2 p-3 ${answer === index ? "border-primary bg-surface" : "border-line"}`}>
                 <input type="radio" name={item.id} checked={answer === index} onChange={() => setAnswer(index)} value={index} required className="accent-primary" />
@@ -98,12 +98,12 @@ function ReviewCard({ item, onReviewed }: { item: NotebookItem; onReviewed: (cor
         ) : <label className="block text-sm font-semibold">Таны хариулт
           <input type="text" value={answer} onChange={(event) => setAnswer(event.target.value)} maxLength={300} disabled={busy} required autoComplete="off" className="mt-2 block min-h-12 w-full rounded-field border border-line bg-white px-3 font-normal text-ink" />
         </label>}
-        <Button type="submit" size="sm" disabled={busy || (item.options ? answer === -1 : !String(answer).trim())} className="mt-4">{busy ? "Шалгаж байна…" : "Хариу шалгах"}</Button>
+        <Button type="submit" size="sm" disabled={busy || (item.options ? answer === -1 : !String(answer).trim())} className="mt-4">{busy ? "Шалгаж байна…" : "Хариулт шалгах"}</Button>
       </form>
-      <p role="status" aria-live="polite" className="mt-3 text-sm font-semibold">{result?.error ?? (result?.correct === false ? "Буруу байна. Тайлбарыг уншаад дахин бодоорой." : "")}</p>
+      <p role="status" aria-live="polite" className="mt-3 text-sm font-semibold">{result?.error ?? (result?.correct === false ? "Хариулт буруу байна. Тайлбартай харьцуулж, дахин бодоорой." : "")}</p>
       <details className="mt-4 border-t border-line pt-4">
         <summary className="cursor-pointer text-sm font-semibold">Зөв хариу, тайлбар харах</summary>
-        <p className="mt-3 font-bold">Зөв хариу: {item.expected}</p>
+        <p className="mt-3 font-bold">Зөв хариулт: {item.expected}</p>
         <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink-muted">{item.explanation}</p>
         {item.lessonHref && <Link href={item.lessonHref} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold">Хичээлээ давтах →</Link>}
       </details>

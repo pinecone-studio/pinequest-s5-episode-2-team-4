@@ -87,7 +87,7 @@ export function InviteQr({ classTitle, disabled }: { classTitle: string; disable
           {classTitle} ангид нэгдэх
         </h2>
         <p className="mt-2 text-center text-sm font-semibold text-ink-muted">
-          Утасныхаа камераар уншуулаад «Нэгдэх» дээр дарна.
+          Сурагчид утасныхаа камераар QR кодыг уншуулаад “Нэгдэх” товчийг дарна.
         </p>
 
         <div className="mx-auto mt-5 flex aspect-square w-full max-w-90 items-center justify-center rounded-card bg-white p-3">
@@ -100,15 +100,15 @@ export function InviteQr({ classTitle, disabled }: { classTitle: string; disable
             />
           ) : (
             <p className="px-6 text-center text-sm font-semibold text-ink-muted">
-              {state === "loading" && "QR бэлдэж байна…"}
+              {state === "loading" && "QR код үүсгэж байна…"}
               {state === "expired" && "Урилгын хугацаа дууслаа."}
-              {state === "failed" && "QR үүсгэж чадсангүй."}
+              {state === "failed" && "QR код үүсгэж чадсангүй. Дахин оролдоно уу."}
             </p>
           )}
         </div>
 
         <p className="mt-4 text-center text-xs font-semibold text-ink-muted">
-          QR зөвхөн энэ цонх нээлттэй байх үед ажиллана. Хаавал хүчингүй болно.
+          Энэ QR урилга зөвхөн цонх нээлттэй байх хугацаанд хүчинтэй. Цонхыг хаавал урилга хүчингүй болно.
         </p>
         <div className="mt-5 flex justify-center gap-2">
           {(state === "expired" || state === "failed") && (

@@ -21,7 +21,7 @@ export function RoleToggle({ value, onChange, variant = "card", className }: Rol
   return (
     <div
       role="group"
-      aria-label="Би хэн бэ"
+      aria-label="Бүртгэлийн төрөл"
       className={cn(
         "grid grid-cols-2 gap-1.5 rounded-full p-1.5",
         variant === "card" ? "bg-surface" : "bg-white shadow-card",

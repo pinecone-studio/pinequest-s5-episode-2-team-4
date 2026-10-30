@@ -13,7 +13,7 @@ import type { ScenePalette, ShopEntry, ShopSlot } from "@/lib/types";
 
 const SECTIONS: { slot: ShopSlot; title: string; hint: string; defaultName: string }[] = [
   { slot: "scene", title: "Орчин", hint: "Тэжээврийн чинь амьдардаг газар", defaultName: "Нуга" },
-  { slot: "ring", title: "XP-ийн цагираг", hint: "Толгой хэсэгт тэжээврийн чинь эргэн тойрон", defaultName: "Нил ягаан" },
+  { slot: "ring", title: "XP-ийн цагираг", hint: "Тэжээврийн зураг тойрон харагдах XP-ийн цагираг", defaultName: "Нил ягаан" },
   { slot: "aura", title: "Гялбаа", hint: "Тэжээврийн чинь эргэн тойронд", defaultName: "Байхгүй" },
 ];
 
@@ -144,10 +144,10 @@ export function ShopView({ items, coins, petSprite }: { items: ShopEntry[]; coin
                 </div>
                 <div>
                   <h3 className="font-bold">{section.defaultName}</h3>
-                  <p className="text-xs text-ink-muted">Анхных, үнэгүй</p>
+                  <p className="text-xs text-ink-muted">Анхны загвар · үнэгүй</p>
                 </div>
                 {defaultWorn ? (
-                  <p className="mt-auto flex min-h-12 items-center justify-center font-bold text-ink-muted">✓ Өмссөн</p>
+                  <p className="mt-auto flex min-h-12 items-center justify-center font-bold text-ink-muted">✓ Хэрэглэж байна</p>
                 ) : (
                   <Button
                     variant="white"
@@ -156,7 +156,7 @@ export function ShopView({ items, coins, petSprite }: { items: ShopEntry[]; coin
                     onClick={() => run(() => equipItem(section.slot, null), `«${section.defaultName}» руу буцлаа.`)}
                     className="mt-auto"
                   >
-                    Өмсөх
+                    Хэрэглэх
                   </Button>
                 )}
               </li>
@@ -179,25 +179,25 @@ export function ShopView({ items, coins, petSprite }: { items: ShopEntry[]; coin
                       )}
                     </div>
                     {item.equipped ? (
-                      <p className="mt-auto flex min-h-12 items-center justify-center font-bold text-ink-muted">✓ Өмссөн</p>
+                      <p className="mt-auto flex min-h-12 items-center justify-center font-bold text-ink-muted">✓ Хэрэглэж байна</p>
                     ) : item.owned ? (
                       <Button
                         variant="white"
                         size="sm"
                         disabled={pending}
-                        onClick={() => run(() => equipItem(item.slot, item.id), `«${item.name}» өмслөө.`)}
+                        onClick={() => run(() => equipItem(item.slot, item.id), `«${item.name}» загварыг сонголоо.`)}
                         className="mt-auto"
                       >
-                        Өмсөх
+                        Хэрэглэх
                       </Button>
                     ) : (
                       <div className="mt-auto flex flex-col gap-1">
                         <Button
                           size="sm"
                           disabled={pending || short > 0}
-                          onClick={() => run(() => buyItem(item.id), `«${item.name}» авлаа, өмссөн!`)}
+                          onClick={() => run(() => buyItem(item.id), `«${item.name}» загварыг худалдан авч, хэрэглэж эхэллээ!`)}
                         >
-                          Авах
+                          Худалдаж авах
                         </Button>
                         {short > 0 && <p className="text-center text-xs font-semibold text-ink-muted">{short} зоос дутуу</p>}
                       </div>

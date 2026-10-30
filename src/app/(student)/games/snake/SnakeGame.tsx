@@ -24,7 +24,7 @@ type SnakeGameProps = {
 const STEPS = [
   { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Хуруугаараа чиглүүл" },
   { icon: <PixelIcon name="check" className="size-6" />, text: "Таарах 3-ыг ид" },
-  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Буруу бол тайлбар" },
+  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Алдааны тайлбар харна" },
 ];
 
 /** Knowledge snake: steer to the 3 answers that fit the task; a wrong bite pauses on its explanation. */

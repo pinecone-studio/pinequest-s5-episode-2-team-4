@@ -270,7 +270,7 @@ export function DiagnosticTest({
             onClick={() => setCurrent(current + 1)}
             className={`${primaryButtonClass} cursor-pointer`}
           >
-            Дараах
+            Дараагийн
             {ArrowRightIcon}
           </button>
         ) : isComplete ? (
@@ -325,7 +325,7 @@ export function DiagnosticTest({
         <h2 id="exit-title" className="text-xl leading-tight font-bold md:text-2xl">
           Тестээс гарах уу?
         </h2>
-        <p className="mt-2 text-ink-muted">Хариултууд хадгалагдахгүй.</p>
+        <p className="mt-2 text-ink-muted">Одоогоор бөглөсөн хариултууд хадгалагдахгүй.</p>
         <div className="mt-6 flex flex-col-reverse gap-3 md:flex-row md:justify-end">
           {/* Staying is the safe choice, so it gets the focus. */}
           <Button

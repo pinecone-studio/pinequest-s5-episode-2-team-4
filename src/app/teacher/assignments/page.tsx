@@ -20,9 +20,9 @@ export default async function AssignmentsPage() {
     <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-4 pt-1 md:gap-6 md:px-[clamp(16px,4vw,40px)] md:pt-2">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="type-page-title">Тоглоомон даалгавар</h1>
+          <h1 className="type-page-title">Тоглоомоор гүйцэтгэх даалгавар</h1>
           <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
-            Сэдэв эсвэл өөрийн материалаас асуулт гаргаад сурагчдын тоглодог тоглоомоор даалгавар өгнө.
+            Сэдэв эсвэл сургалтын материалаасаа асуулт бэлтгэж, сурагчдад тоглоомоор гүйцэтгэх даалгавар өгөөрэй.
           </p>
         </div>
         <ButtonLink href="/teacher/assignments/new" className="self-start md:self-auto">
@@ -33,7 +33,7 @@ export default async function AssignmentsPage() {
       {assignments.length === 0 ? (
         <Card className="flex flex-col items-start gap-2">
           <h2 className="text-xl font-bold">Даалгавар алга</h2>
-          <p className="text-ink-muted">Эхний даалгавраа үүсгэхэд 2–3 минут болно.</p>
+          <p className="text-ink-muted">Шинэ даалгавар үүсгэж, асуултуудаа хянаад ангидаа нийтлээрэй.</p>
         </Card>
       ) : (
         <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -58,7 +58,7 @@ export default async function AssignmentsPage() {
                 <span className="text-sm text-ink-muted">
                   {subjectLabel(a.subject)} · {a.gameMode === "interest" ? "Сонирхлоор" : a.games.map(gameTitle).join(", ")}
                 </span>
-                {a.dueAt && <span className="text-sm font-semibold">Хугацаа: {formatDay(a.dueAt)}</span>}
+                {a.dueAt && <span className="text-sm font-semibold">Дуусах хугацаа: {formatDay(a.dueAt)}</span>}
               </Link>
             </li>
           ))}

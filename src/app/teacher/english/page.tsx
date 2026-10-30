@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const percent = (correct: number, attempts: number) => (attempts > 0 ? Math.round((correct / attempts) * 100) : 0);
 
 const BATTLE_STATUS: Record<BattleStatus, string> = {
-  lobby: "Лобби",
+  lobby: "Нэгдэхийг хүлээж байна",
   active: "Явагдаж байна",
   paused: "Түр зогссон",
   won: "Ялалт",
@@ -55,7 +55,7 @@ export default async function ClassEnglishPage({ searchParams }: PageProps<"/tea
             {classLabel(view?.classCode ?? classCode)} ангийн англи хэл
           </h1>
           <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
-            Боссын тулаанд өгсөн хариултаас ангиар нь нэгтгэсэн. Сурагчийн нэр, эрэмбэ энд гарахгүй.
+            Англи хэлний боссын тулаанд өгсөн хариултыг ангиар нь нэгтгэн харуулна. Сурагчдын нэр, онооны эрэмбийг харуулахгүй.
           </p>
         </div>
         <form className="flex items-end gap-2">
@@ -77,7 +77,7 @@ export default async function ClassEnglishPage({ searchParams }: PageProps<"/tea
 
       {!view || (view.attempts === 0 && view.battles.length === 0) ? (
         <p className="rounded-panel bg-surface px-6 py-10 text-center text-lg font-bold">
-          Энэ ангийн хариулт одоогоор алга. Ангийн тулаан нээгээд эхлээрэй.
+          Энэ ангийн хариулт одоогоор бүртгэгдээгүй байна. Ангийн тулаан үүсгэж, сурагчдаа оролцуулаарай.
         </p>
       ) : (
         <>
@@ -86,7 +86,7 @@ export default async function ClassEnglishPage({ searchParams }: PageProps<"/tea
               ["Сурагч", view.students],
               ["Хариулсан сурагч", view.active],
               ["Хариулт", view.attempts],
-              ["Нарийвчлал", `${percent(view.correct, view.attempts)}%`],
+              ["Зөв хариултын хувь", `${percent(view.correct, view.attempts)}%`],
             ].map(([label, value]) => (
               <div key={label} className="rounded-card bg-white p-4 shadow-card">
                 <p className="text-sm text-ink-muted">{label}</p>

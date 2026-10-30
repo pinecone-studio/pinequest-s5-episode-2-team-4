@@ -17,7 +17,7 @@ export default async function EggsPage() {
         <div>
           <h1 className="type-page-title">Өндөг</h1>
           <p className="mt-3 text-ink-muted md:text-lg">
-            Боссыг ялахад өндөг олдож болно. Хагалж шинэ тэжээвэртэй болоорой.
+            Боссыг ялахад өндөг авах боломжтой. Өндгөө хагалж, ямар тэжээвэр гарахыг хараарай.
           </p>
         </div>
         <ButtonLink href="/pets" variant="secondary" size="sm">

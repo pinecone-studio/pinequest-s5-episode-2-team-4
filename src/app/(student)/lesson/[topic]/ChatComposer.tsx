@@ -29,7 +29,7 @@ export function ChatComposer({ onSend }: ChatComposerProps) {
         type="text"
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
-        placeholder="Нэргүй асуух…"
+        placeholder="Ойлгоогүй зүйлээ энд бичээрэй…"
         autoComplete="off"
         maxLength={500}
         className="h-12 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-muted md:h-11"

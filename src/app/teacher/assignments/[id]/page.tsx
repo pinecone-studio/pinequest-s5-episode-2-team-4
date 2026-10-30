@@ -64,7 +64,7 @@ export default async function AssignmentReportPage({ params }: PageProps<"/teach
           <p className="mt-3 text-ink-muted">
             {a.gameMode === "interest" ? "Сурагчийн сонирхлоор: " : "Тоглоом: "}
             {a.games.map(gameTitle).join(", ")}
-            {target && ` · Зөвхөн «${target}» дээр сул сурагчид`}
+            {target && ` · Зөвхөн «${target}» сэдвийг давтах шаардлагатай сурагчид`}
             {a.dueAt && ` · Хугацаа ${formatDay(a.dueAt)}`}
           </p>
         </div>
@@ -86,7 +86,7 @@ export default async function AssignmentReportPage({ params }: PageProps<"/teach
           {classSize > 0 && <ProgressBar value={Math.round((report.doneCount / classSize) * 100)} label="Биелүүлсэн хувь" />}
         </Card>
         <Card className="flex flex-col gap-2">
-          <span className="text-sm font-bold text-ink-muted">Дундаж зөв</span>
+          <span className="text-sm font-bold text-ink-muted">Зөв хариултын дундаж хувь</span>
           <span className="text-3xl font-bold">{report.attemptCount ? `${report.averageAccuracy}%` : "–"}</span>
         </Card>
         <Card className="flex flex-col gap-2">
@@ -96,9 +96,9 @@ export default async function AssignmentReportPage({ params }: PageProps<"/teach
       </div>
 
       <Card className="flex flex-col gap-3">
-        <h2 className="type-section-title">Хамгийн их алдсан асуулт</h2>
+        <h2 className="type-section-title">Хамгийн олон буруу хариулсан асуултууд</h2>
         {topMissed.length === 0 ? (
-          <p className="text-ink-muted">{report.attemptCount ? "Алдсан асуулт алга." : "Одоохондоо хэн ч тоглоогүй байна."}</p>
+          <p className="text-ink-muted">{report.attemptCount ? "Алдсан асуулт алга." : "Одоогоор энэ даалгаврыг тоглосон сурагч алга."}</p>
         ) : (
           <ol className="flex flex-col gap-2.5">
             {topMissed.map((m) => {
@@ -116,7 +116,7 @@ export default async function AssignmentReportPage({ params }: PageProps<"/teach
             })}
           </ol>
         )}
-        <p className="text-xs text-ink-muted">Сурагчийн нэр энд гарахгүй. Зөвхөн ангийн нийт дүн.</p>
+        <p className="text-xs text-ink-muted">Сурагчдын нэрийг харуулахгүй. Зөвхөн ангийн нэгтгэсэн дүн харагдана.</p>
       </Card>
 
       <Card className="flex flex-col gap-3">

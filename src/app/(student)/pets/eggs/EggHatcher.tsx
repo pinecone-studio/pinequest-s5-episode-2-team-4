@@ -45,7 +45,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
       if (!r) throw new Error("not hatched");
       setResult(r);
     } catch {
-      setError("Хагалж чадсангүй. Дахин оролдоно уу.");
+      setError("Өндгийг хагалж чадсангүй. Дахин оролдоно уу.");
     }
   }
 
@@ -103,7 +103,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
         {revealed ? (
           <p className="mt-2 text-ink-muted">
             {result.duplicate
-              ? `${line.stages[0].name} аль хэдийн байгаа тул +${result.bonusExp} EXP авлаа.`
+              ? `${line.stages[0].name} аль хэдийн байгаа тул +${result.bonusExp} XP авлаа.`
               : "Цуглуулгад нэмэгдлээ. Тэжээвэр хэсгээс тулаанд оруулж болно."}
           </p>
         ) : null}
@@ -114,7 +114,7 @@ export function EggHatcher({ eggs, bossNames, lines }: EggHatcherProps) {
         ) : null}
         {revealed || error ? (
           <Button className="mt-5 w-full" autoFocus onClick={close}>
-            Болсон
+            Хаах
           </Button>
         ) : null}
       </dialog>

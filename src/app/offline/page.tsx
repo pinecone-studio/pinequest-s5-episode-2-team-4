@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ButtonLink, PixelIcon } from "@/components/ui";
 
 export const metadata: Metadata = {
-  title: "Интернет алга · LevelUp",
+  title: "Интернет холболт тасарсан · LevelUp",
 };
 
 /**
@@ -13,12 +13,12 @@ export default function Offline() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-5 px-4 py-24 text-center">
       <PixelIcon name="offline" className="size-16" />
-      <h1 className="text-2xl font-bold md:text-3xl">Интернет алга байна</h1>
+      <h1 className="text-2xl font-bold md:text-3xl">Интернет холболт тасарсан байна</h1>
       <p className="max-w-100 text-ink-muted">
         Энэ хуудсыг өмнө нь нээж байгаагүй тул одоо харуулах боломжгүй. Өмнө
         нээсэн хичээлүүд чинь интернетгүй ч ажиллана.
       </p>
-      <ButtonLink href="/">Нүүр рүү буцах</ButtonLink>
+      <ButtonLink href="/">Нүүр хуудас руу буцах</ButtonLink>
     </main>
   );
 }

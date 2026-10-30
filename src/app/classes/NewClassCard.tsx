@@ -5,7 +5,7 @@ import { buttonClass } from "@/components/ui";
 import { createTeacherClass } from "@/lib/class-actions";
 
 const ERRORS = {
-  name: "Ангийн нэрээ бичээрэй, жишээ нь 7А.",
+  name: "Ангийн нэрийг оруулна уу. Жишээ нь: 7А.",
   demo: "Демо горимд анги нэмэх боломжгүй.",
   failed: "Анги нэмж чадсангүй. Дахин оролдоорой.",
 };
@@ -79,7 +79,7 @@ export function NewClassCard({ demo }: { demo: boolean }) {
           onClick={() => setOpen(false)}
           className={buttonClass({ variant: "white", size: "sm" })}
         >
-          Болих
+          Цуцлах
         </button>
       </div>
       {demo && <p className="text-xs font-semibold text-ink-muted">Демо горимд анги нэмэх боломжгүй.</p>}

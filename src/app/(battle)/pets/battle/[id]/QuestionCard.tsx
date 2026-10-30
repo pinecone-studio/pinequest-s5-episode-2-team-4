@@ -103,7 +103,7 @@ export function QuestionCard({ question, disabled, checking, onAnswer, onListen 
 
       {question.hint ? (
         <p className="mt-2 text-sm text-ink-muted">
-          <span className="font-bold">Сануулга:</span> <span lang="en">{question.hint}</span>
+          <span className="font-bold">Тусламж:</span> <span lang="en">{question.hint}</span>
         </p>
       ) : null}
 
@@ -165,7 +165,7 @@ export function QuestionCard({ question, disabled, checking, onAnswer, onListen 
               className="min-h-12 rounded-tile border-2 border-dashed border-line px-3 py-2 text-base font-bold md:text-lg"
             >
               {order.length > 0 ? order.map((i) => words[i]).join(" ") : (
-                <span className="font-semibold text-ink-muted">Үгсийг дарааллаар нь дар</span>
+                <span className="font-semibold text-ink-muted">Үгсийг зөв дарааллаар сонгоорой</span>
               )}
             </p>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Үгс">

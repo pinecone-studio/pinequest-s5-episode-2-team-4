@@ -21,7 +21,7 @@ export default async function VideosPage() {
         <div>
           <h1 className="type-page-title">Хичээлийн видео</h1>
           <p className="mt-3 max-w-160 text-ink-muted md:text-lg">
-            Номын хуудас, тэмдэглэлээсээ 1 минутын босоо видео бэлдэнэ. Та зөвшөөрч нийтэлсэн видеог л сурагчид харна.
+            Номын хуудас, тэмдэглэлээ ашиглан богино видео хичээл бэлтгээрэй. Зөвхөн таны хянаж нийтэлсэн видео сурагчдад харагдана.
           </p>
         </div>
         <ButtonLink href="/teacher/videos/new" className="self-start md:self-auto">
@@ -31,7 +31,7 @@ export default async function VideosPage() {
 
       {videos.length === 0 ? (
         <Card className="flex flex-col items-start gap-2">
-          <h2 className="text-xl font-bold">Видео алга</h2>
+          <h2 className="text-xl font-bold">Одоогоор видео хичээл алга</h2>
           <p className="text-ink-muted">Номын хуудасны зураг эсвэл текстээ оруулаад эхлээрэй.</p>
         </Card>
       ) : (

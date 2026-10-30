@@ -25,7 +25,7 @@ export default async function ProgressPage() {
         <div>
           <h2 className="type-section-title">Англи хэлний ахиц</h2>
           <p className="mt-2 text-ink-muted md:text-lg">
-            Боссын тулаанд өгсөн хариултаас тооцоолно.
+            Англи хэлний боссын тулаанд өгсөн хариултад үндэслэн ахицыг тооцно.
           </p>
         </div>
         <ButtonLink href="/pets/battle" size="sm">
@@ -44,7 +44,7 @@ export default async function ProgressPage() {
             {[
               ["Хариулсан", progress.attempts],
               ["Зөв", progress.correct],
-              ["Нарийвчлал", `${percent(progress.correct, progress.attempts)}%`],
+              ["Зөв хариултын хувь", `${percent(progress.correct, progress.attempts)}%`],
               ["Сурсан үг", `${progress.vocabulary.learned.length}/${progress.vocabulary.total}`],
             ].map(([label, value]) => (
               <div key={label} className="rounded-card bg-white p-4 shadow-card">
@@ -87,7 +87,7 @@ export default async function ProgressPage() {
                       track="white"
                       className="mt-2"
                     />
-                    {weakest ? <p className="mt-2 text-sm font-bold">Илүү дасгал хэрэгтэй</p> : null}
+                    {weakest ? <p className="mt-2 text-sm font-bold">Нэмэлт дасгалаар бататгаарай</p> : null}
                   </li>
                 );
               })}
@@ -122,7 +122,7 @@ export default async function ProgressPage() {
           {/* Vocabulary */}
           <section aria-labelledby="vocab-title" className="rounded-panel bg-white p-5 shadow-card md:p-7">
             <h3 id="vocab-title" className="text-2xl font-bold">
-              Сурсан үгс{" "}
+              Зөв хариулсан үгс{" "}
               <span className="text-base font-semibold text-ink-muted">
                 {progress.vocabulary.learned.length}/{progress.vocabulary.total}
               </span>
@@ -166,7 +166,7 @@ export default async function ProgressPage() {
                 ))}
               </ul>
             ) : (
-              <p className="mt-3 text-ink-muted">Засаагүй алдаа алга. Сайн байна!</p>
+              <p className="mt-3 text-ink-muted">Дахин давтах шаардлагатай алдаа одоогоор алга. Сайн байна!</p>
             )}
           </section>
         </div>

@@ -66,7 +66,7 @@ export function ScheduleEditor({ schedule }: { schedule: ClassSchedule }) {
 
       <section aria-labelledby="weekdays-title" className="glass-panel rounded-panel bg-card p-5 shadow-card md:p-7">
         <h2 id="weekdays-title" className="type-section-title">
-          {schedule.className} анги хичээл орох гарагууд
+          {schedule.className} ангийн хичээл орох гараг
         </h2>
         <div role="group" aria-labelledby="weekdays-title" className="mt-4 flex flex-wrap gap-2">
           {WEEKDAYS.map((w) => {
@@ -96,7 +96,7 @@ export function ScheduleEditor({ schedule }: { schedule: ClassSchedule }) {
           Ирэх хичээлүүд
         </h2>
         {schedule.upcoming.length === 0 ? (
-          <p className="mt-3 text-ink-muted">Дээрээс хичээл орох гарагуудаа сонгоход ирэх хичээлүүд энд гарна.</p>
+          <p className="mt-3 text-ink-muted">Хичээл орох гарагаа сонгосны дараа хуваарийн дагуух хичээлүүд энд харагдана.</p>
         ) : (
           <ul className="mt-4 flex flex-col divide-y divide-line">
             {/* Keyed by the plan too, so a saved topic resets the row. */}

@@ -129,7 +129,7 @@ export function ChatQuestion({
               onClick={() => setReplying(false)}
               className={cn(chip(), "border-2 border-lavender")}
             >
-              Болих
+              Цуцлах
             </button>
             <button
               type="submit"

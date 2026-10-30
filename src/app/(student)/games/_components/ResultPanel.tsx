@@ -35,7 +35,7 @@ export function ResultPanel({ result, onAgain, otherHref, children }: ResultPane
   useGamePlayed(!assignment);
   const stats = [
     { value: result.score, label: "оноо" },
-    { value: `${result.accuracy}%`, label: "нарийвчлал" },
+    { value: `${result.accuracy}%`, label: "зөв хариултын хувь" },
     { value: `x${result.bestCombo}`, label: "шилдэг комбо" },
   ];
   return (
@@ -56,7 +56,7 @@ export function ResultPanel({ result, onAgain, otherHref, children }: ResultPane
       </dl>
       {result.review ? (
         <p className="line-clamp-4 max-w-[330px] rounded-[14px] border border-[rgb(255_207_90/0.3)] bg-[rgb(255_207_90/0.08)] px-3 py-2 text-left text-sm text-[var(--game-muted)]">
-          <b className="text-[var(--game-gold)]">Давтах нь: </b>
+          <b className="text-[var(--game-gold)]">Давтах асуулт: </b>
           {result.review}
         </p>
       ) : null}

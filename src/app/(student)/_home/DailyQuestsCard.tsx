@@ -20,7 +20,7 @@ const ACTIVITY: Record<QuestEvent, { icon: PixelIconName; tint: string; href: st
 const ERRORS: Record<Exclude<ClaimResult, { ok: true }>["error"], string> = {
   notdone: "Энэ зорилт хараахан биелээгүй байна.",
   claimed: "Энэ урамшууллыг аль хэдийн авсан.",
-  failed: "Авч чадсангүй. Дахин оролдоорой.",
+  failed: "Урамшууллыг авч чадсангүй. Дахин оролдоорой.",
 };
 
 /**
@@ -63,7 +63,7 @@ export function DailyQuestsCard({ quests }: { quests: DailyQuest[] }) {
             <h2 id="quests-title" className="text-xl font-bold">
               Өдрийн зорилт
             </h2>
-            <p className="text-sm text-ink-muted">Биелүүлээд урамшуулал аваарай. Шөнө дунд шинэчлэгдэнэ.</p>
+            <p className="text-sm text-ink-muted">Зорилтоо биелүүлээд урамшууллаа аваарай. Улаанбаатарын цагаар өдөр бүр шөнө дунд шинэчлэгдэнэ.</p>
           </div>
         </div>
         <span className="rounded-full bg-surface px-3.5 py-1.5 text-sm font-bold">
@@ -102,7 +102,7 @@ export function DailyQuestsCard({ quests }: { quests: DailyQuest[] }) {
                   </p>
                 ) : q.done ? (
                   <Button size="sm" disabled={pending} onClick={() => claim(q)}>
-                    Авах
+                    Урамшуулал авах
                   </Button>
                 ) : (
                   <ButtonLink href={activity.href} variant="white" size="sm">

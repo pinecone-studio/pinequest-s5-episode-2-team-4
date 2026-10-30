@@ -19,7 +19,7 @@ export default async function ShopPage() {
         <div>
           <h1 className="type-page-title">Дэлгүүр</h1>
           <p className="mt-3 text-ink-muted md:text-lg">
-            Өдрийн зорилт, амжилтаас олсон зоосоо тэжээврийнхээ орчин, гялбаанд зарцуулаарай.
+            Өдрийн зорилт болон амжилтын шагналаар цуглуулсан зоосоороо тэжээврийнхээ орчин, гялбааг шинэчлээрэй.
           </p>
         </div>
         <p className="inline-flex items-center gap-2 self-start rounded-full bg-white px-4 py-2 text-lg font-bold shadow-card md:self-auto">

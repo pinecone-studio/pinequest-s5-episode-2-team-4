@@ -43,7 +43,7 @@ type CelebrationProps = {
   pet: PetLevelUp;
   /** Lesson title of the mastered subtopic */
   heading: string;
-  /** Where "Дараагийн түвшин" leads */
+  /** Where "Үргэлжлүүлэх" leads */
   nextHref: string;
 };
 
@@ -80,7 +80,7 @@ export function Celebration({ score, pet, heading, nextHref }: CelebrationProps)
       <p className="relative inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-base font-bold shadow-card md:gap-2 md:px-[18px] md:py-2">
         <StarIcon className="size-4 md:size-[18px]" />
         <span className="sr-only">
-          Дахин шалгалт: {score.correct}/{score.total} зөв, {percent} хувь
+          Давтан тестийн дүн: {score.correct}/{score.total} зөв, {percent} хувь
         </span>
         <span aria-hidden="true">
           {score.correct}/{score.total} · {percent}%
@@ -180,7 +180,7 @@ export function Celebration({ score, pet, heading, nextHref }: CelebrationProps)
       {/* Primary action first for keyboard order; shown second on desktop */}
       <div className="relative mt-5 flex flex-col gap-3 self-stretch md:mt-7 md:flex-row-reverse md:flex-wrap md:justify-center md:gap-4 md:self-auto">
         <ButtonLink href={nextHref}>
-          Дараагийн түвшин
+          Үргэлжлүүлэх
           <ArrowRightIcon className="size-[18px] md:size-5" />
         </ButtonLink>
         <ButtonLink href="/pets" variant="white">

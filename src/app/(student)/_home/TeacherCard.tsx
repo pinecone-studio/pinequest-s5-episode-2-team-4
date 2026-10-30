@@ -20,10 +20,10 @@ export function TeacherCard({ assignmentsLeft, videoCount }: TeacherCardProps) {
         </span>
         <div>
           <h2 id="teacher-card-title" className="text-xl font-bold">
-            Багшаас
+            Багшийн өгсөн хичээл, даалгавар
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
-            {assignmentsLeft > 0 ? `${assignmentsLeft} даалгавар хүлээж байна` : "Бүх даалгавраа биелүүлсэн"}
+            {assignmentsLeft > 0 ? `${assignmentsLeft} даалгавар хүлээж байна` : "Одоогоор дутуу даалгавар алга"}
             {videoCount > 0 && ` · ${videoCount} хичээлийн видео`}
           </p>
         </div>

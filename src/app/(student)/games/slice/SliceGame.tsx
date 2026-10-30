@@ -23,7 +23,7 @@ type SliceGameProps = {
 const STEPS = [
   { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Хуруугаараа шудар" },
   { icon: <PixelIcon name="check" className="size-6" />, text: "Таарах 3-ыг зүс" },
-  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Буруу бол тайлбар" },
+  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Алдааны тайлбар харна" },
 ];
 
 /** Knowledge slice: swipe the tossed answers that fit the task; a wrong slice pauses on its explanation. */

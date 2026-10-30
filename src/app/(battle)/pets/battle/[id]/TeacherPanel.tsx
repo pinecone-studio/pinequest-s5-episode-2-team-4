@@ -17,7 +17,7 @@ const ERRORS: Record<string, string> = {
   not_host: "Энэ тулааныг зөвхөн нээсэн багш удирдана.",
   started: "Тулаан аль хэдийн эхэлсэн.",
   not_active: "Тулаан явагдаагүй байна.",
-  not_paused: "Тулаан зогсоогүй байна.",
+  not_paused: "Тулааныг түр зогсоогоогүй байна.",
   over: "Тулаан дууссан байна.",
 };
 
@@ -40,7 +40,7 @@ export function TeacherPanel({ state, onChanged }: TeacherPanelProps) {
     endDialog.current?.close();
     startTransition(async () => {
       const r = await controlClassBossBattle(state.id, action);
-      if (r.error) setError(ERRORS[r.error] ?? "Болсонгүй. Дахин оролдоно уу.");
+      if (r.error) setError(ERRORS[r.error] ?? "Үйлдлийг гүйцэтгэж чадсангүй. Дахин оролдоно уу.");
       onChanged();
     });
   }
