@@ -40,7 +40,7 @@ export function StartOverlay({ title, steps, buttonLabel, onStart, onTick, child
           <ul className="flex flex-wrap justify-center gap-2.5">
             {steps.map((s) => (
               <li key={s.text} className="flex w-[92px] flex-col items-center gap-1.5 text-xs text-[var(--game-muted)]">
-                <span className="game-chip grid size-11 place-items-center rounded-[14px]">{s.icon}</span>
+                <span className="pixel-frame grid size-11 place-items-center bg-[var(--game-panel)]">{s.icon}</span>
                 {s.text}
               </li>
             ))}
