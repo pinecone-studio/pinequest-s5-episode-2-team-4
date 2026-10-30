@@ -1,6 +1,6 @@
 import { roundRect, type Stage } from "../../_lib/canvas";
 import { GAME_COLORS } from "../../_lib/palette";
-import { PIXEL as P } from "../../_lib/pixel";
+import { PIXEL as P, snap } from "../../_lib/pixel";
 import { drawAnswer } from "../../_lib/shapes";
 import { WORLD, type Food } from "./types";
 
@@ -43,7 +43,7 @@ export function buildFloor(stage: Stage): HTMLCanvasElement {
 type Orb = { x: number; y: number; r: number; color: string; phase: number; vx: number; vy: number };
 const ORB_COLORS = ["#ff4d6d", "#ffcf5a", "#8b5cff", "#e30ba6", "#38bdf8"];
 
-/** Small glowing lights drifting over the floor. */
+/** Small lights drifting over the floor. */
 export function makeOrbs(): Orb[] {
   return Array.from({ length: 22 }, (_, i) => ({
     x: Math.random() * WORLD.w, y: Math.random() * WORLD.h, r: 1.5 + Math.random() * 2.5,
@@ -59,28 +59,23 @@ export function moveOrbs(orbs: Orb[], dt: number) {
   }
 }
 
+/**
+ * The lights as blinking pixel sparkles: a white centre and a plus of colour
+ * that grows on the bigger ones. Every third one takes the snake's colours.
+ */
 export function drawLights(ctx: CanvasRenderingContext2D, orbs: Orb[], tint: [string, string], time: number) {
-  const { w: W, h: H } = WORLD;
   ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  tint.forEach((c, i) => {
-    const x = W / 2 + Math.sin(time * 0.25 + i * 2) * W * 0.35, y = H * 0.5 + Math.cos(time * 0.2 + i * 2) * H * 0.3;
-    const g = ctx.createRadialGradient(x, y, 0, x, y, 200);
-    g.addColorStop(0, c + "1f");
-    g.addColorStop(1, c + "00");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+  orbs.forEach((o, i) => {
+    const pulse = Math.sin(time * 1.5 + o.phase);
+    if (pulse < -0.4) return;
+    const x = snap(o.x), y = snap(o.y), arm = pulse > 0.4 && o.r > 2.5 ? 2 : 1;
+    ctx.globalAlpha = 0.45 + 0.35 * pulse;
+    ctx.fillStyle = i % 3 === 0 ? tint[i % 2] : o.color;
+    ctx.fillRect(x - arm * P, y, (2 * arm + 1) * P, P);
+    ctx.fillRect(x, y - arm * P, P, (2 * arm + 1) * P);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x, y, P, P);
   });
-  for (const o of orbs) {
-    const s = o.r * 6 * (0.75 + 0.25 * Math.sin(time * 2 + o.phase));
-    const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, s);
-    g.addColorStop(0, "#ffffff");
-    g.addColorStop(0.15, o.color);
-    g.addColorStop(1, o.color + "00");
-    ctx.globalAlpha = 0.55 + 0.35 * Math.sin(time * 1.5 + o.phase);
-    ctx.fillStyle = g;
-    ctx.fillRect(o.x - s, o.y - s, s * 2, s * 2);
-  }
   ctx.restore();
 }
 
