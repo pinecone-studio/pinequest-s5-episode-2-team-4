@@ -207,6 +207,36 @@ export const PIXEL_ICONS = {
   },
 
   // Colour icons, for achievements and the understanding signals.
+  hand: {
+    rows: [
+      "...S.S....",
+      ".S.S.S.S..",
+      ".S.S.S.S..",
+      ".S.S.S.S..",
+      ".SSSSSSS.S",
+      ".SSSSSSSSS",
+      ".SSSSSSSD.",
+      ".SSSSSSD..",
+      "..SSSSSD..",
+      "..SSSSD...",
+    ],
+    palette: { S: "#f6c89a", D: "#d99a62" },
+  },
+  clap: {
+    rows: [
+      "..Y..Y....",
+      "Y.........",
+      "....DD.Y..",
+      "...DDSS...",
+      "..DDSSSS..",
+      ".DDSSSSSS.",
+      ".DSSSSSSS.",
+      ".DSSSSSS..",
+      "..SSSSS...",
+      "...SSS....",
+    ],
+    palette: { S: "#f6c89a", D: "#d99a62", Y: "#ffd23f" },
+  },
   memo: {
     rows: [
       "OOOOOOO..P",
