@@ -36,11 +36,11 @@ export function StartOverlay({ title, steps, buttonLabel, onStart, onTick, child
         </p>
       ) : count === null ? (
         <>
-          <h2 className="text-2xl leading-tight font-extrabold">{title}</h2>
-          <ul className="flex flex-wrap justify-center gap-2.5">
+          <h2 className="pixel-title text-2xl leading-tight font-extrabold">{title}</h2>
+          <ul className="flex flex-wrap justify-center gap-2">
             {steps.map((s) => (
-              <li key={s.text} className="flex w-[92px] flex-col items-center gap-1.5 text-xs text-[var(--game-muted)]">
-                <span className="game-chip grid size-11 place-items-center rounded-[14px]">{s.icon}</span>
+              <li key={s.text} className="flex w-[84px] flex-col items-center gap-1.5 text-xs text-[var(--game-muted)]">
+                <span className="pixel-frame grid size-11 place-items-center bg-[var(--game-panel)]">{s.icon}</span>
                 {s.text}
               </li>
             ))}
@@ -49,7 +49,7 @@ export function StartOverlay({ title, steps, buttonLabel, onStart, onTick, child
           <button
             type="button"
             onClick={() => setCount(3)}
-            className="game-gradient mt-2 cursor-pointer rounded-[14px] px-7 py-3 text-lg font-extrabold text-white shadow-[0_10px_24px_-10px_var(--color-magenta)]"
+            className="pixel-button mt-3 cursor-pointer px-7 py-3 text-lg font-extrabold text-white"
           >
             {buttonLabel}
           </button>
