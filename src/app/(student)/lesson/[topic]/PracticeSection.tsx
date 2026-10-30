@@ -112,7 +112,7 @@ function PracticeRow({
               }
               className={`flex min-h-14 items-center justify-center gap-1 rounded-tile border-2 text-lg font-bold text-ink md:min-h-16 md:gap-2 md:text-xl ${
                 picked && solved
-                  ? "border-ink bg-sky"
+                  ? "border-status-good-ink bg-status-good"
                   : picked
                     ? "practice-nudge cursor-pointer border-magenta bg-pink"
                     : solved
@@ -121,7 +121,7 @@ function PracticeRow({
               }`}
             >
               {picked && solved ? (
-                <CheckIcon className="size-3.5 md:size-4.5" />
+                <CheckIcon className="size-3.5 text-status-good-ink md:size-4.5" />
               ) : picked ? (
                 <CrossIcon className="size-3.5 text-magenta md:size-4.5" />
               ) : null}
