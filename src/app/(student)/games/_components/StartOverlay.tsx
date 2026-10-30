@@ -36,7 +36,7 @@ export function StartOverlay({ title, steps, buttonLabel, onStart, onTick, child
         </p>
       ) : count === null ? (
         <>
-          <h2 className="text-2xl leading-tight font-extrabold">{title}</h2>
+          <h2 className="pixel-title text-2xl leading-tight font-extrabold">{title}</h2>
           <ul className="flex flex-wrap justify-center gap-2.5">
             {steps.map((s) => (
               <li key={s.text} className="flex w-[92px] flex-col items-center gap-1.5 text-xs text-[var(--game-muted)]">
