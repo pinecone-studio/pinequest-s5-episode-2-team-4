@@ -61,7 +61,8 @@ export function ResultsSection({
 
       <ul className="mt-4 flex min-w-0 flex-col gap-3 md:mt-0 md:flex-[1_1_520px] md:gap-3.5">
         {subtopics.map((s) => {
-          const percent = s.total ? (s.correct / s.total) * 100 : 0;
+          // A subtopic mastered through its retest is full, whatever its test score was.
+          const percent = s.status === "mastered" ? 100 : s.total ? (s.correct / s.total) * 100 : 0;
           return (
             <li key={s.subtopicId}>
               <Link
