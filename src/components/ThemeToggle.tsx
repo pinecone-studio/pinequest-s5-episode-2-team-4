@@ -53,8 +53,9 @@ export function ThemeToggle() {
 
   useEffect(() => {
     try {
+      // Dark unless light was chosen.
       document.documentElement.dataset.theme =
-        localStorage.getItem("levelup-theme") === "dark" ? "dark" : "light";
+        localStorage.getItem("levelup-theme") === "light" ? "light" : "dark";
     } catch {
       // Keep the current theme when browser storage is unavailable.
     }

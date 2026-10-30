@@ -5,8 +5,9 @@
 import { newlyReached } from "./achievements";
 import { getAchievementStats } from "./data";
 import { readSession, writeSession } from "./session";
+import type { Achievement } from "./types";
 
-export type Unlocked = { id: string; emoji: string; title: string; coins: number };
+export type Unlocked = Pick<Achievement, "id" | "icon" | "title" | "coins">;
 
 /**
  * Unlocks every achievement the student has newly reached and adds their
@@ -23,5 +24,5 @@ export async function checkAchievements(): Promise<Unlocked[]> {
     achievements: { ...session.achievements, ...Object.fromEntries(reached.map((a) => [a.id, now])) },
     coins: (session.coins ?? 0) + reached.reduce((sum, a) => sum + a.coins, 0),
   });
-  return reached.map(({ id, emoji, title, coins }) => ({ id, emoji, title, coins }));
+  return reached.map(({ id, icon, title, coins }) => ({ id, icon, title, coins }));
 }
