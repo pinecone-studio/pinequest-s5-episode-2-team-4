@@ -49,7 +49,7 @@ export function StartOverlay({ title, steps, buttonLabel, onStart, onTick, child
           <button
             type="button"
             onClick={() => setCount(3)}
-            className="game-gradient mt-2 cursor-pointer rounded-[14px] px-7 py-3 text-lg font-extrabold text-white shadow-[0_10px_24px_-10px_var(--color-magenta)]"
+            className="pixel-button mt-3 cursor-pointer px-7 py-3 text-lg font-extrabold text-white"
           >
             {buttonLabel}
           </button>
