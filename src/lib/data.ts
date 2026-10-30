@@ -25,7 +25,6 @@ import { listGroups, listQuestions, questionsStored } from "./questions";
 import { XP_PER_LEVEL, nextEvolutionLevel, petStage } from "./pets";
 import {
   countClassStudents,
-  finishedAssignmentIds,
   getClassAssignment,
   getClassVideo as getClassVideoRow,
   getMaterial as getMaterialRow,
@@ -775,17 +774,15 @@ export type StudentAssignment = Assignment & {
 export const getStudentAssignments = cache(async (): Promise<StudentAssignment[]> => {
   const session = await readSession();
   if (!session?.classCode || session.role !== "student") return [];
-  const [assignments, progress] = await Promise.all([listClassAssignments(normalClassCode(session.classCode)), getProgress()]);
+  const [assignments, progress] = await Promise.all([
+    listClassAssignments(normalClassCode(session.classCode), session.id),
+    getProgress(),
+  ]);
   const weak = new Set(progress.filter((p) => p.status === "weak" || p.status === "learning").map((p) => p.subtopicId));
   const visible = assignments.filter(
     (a) => a.target === "class" || !a.targetSubtopicId || weak.has(a.targetSubtopicId),
   );
-  const done = await finishedAssignmentIds(session.id, visible.map((a) => a.id));
-  return visible.map((a) => ({
-    ...a,
-    done: done.has(a.id),
-    playGame: pickGame(a, session.favoriteGames),
-  }));
+  return visible.map((a) => ({ ...a, playGame: pickGame(a, session.favoriteGames) }));
 });
 
 /** Assignments the student hasn't finished yet, for the menu badge. */
