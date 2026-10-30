@@ -17,13 +17,15 @@ type MenuPopoverProps = {
   onOpen?: () => void;
   children: React.ReactNode;
   className?: string;
+  /** Classes for the panel, e.g. a wider one */
+  panelClassName?: string;
 };
 
 /**
  * A button that opens a small panel below it. Closes on a click outside, on
  * Escape and when the page changes.
  */
-export function MenuPopover({ trigger, label, triggerClassName, align = "start", onOpen, children, className }: MenuPopoverProps) {
+export function MenuPopover({ trigger, label, triggerClassName, align = "start", onOpen, children, className, panelClassName }: MenuPopoverProps) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const id = useId();
@@ -70,6 +72,7 @@ export function MenuPopover({ trigger, label, triggerClassName, align = "start",
           className={cn(
             "absolute top-full z-30 mt-2 min-w-56 rounded-card border border-line bg-card p-1.5 shadow-float",
             align === "end" ? "right-0" : "left-0",
+            panelClassName,
           )}
         >
           {children}

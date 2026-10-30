@@ -71,7 +71,6 @@ import type {
   ShopEntry,
   ShopItem,
   Assignment,
-  AssignmentDraft,
   ClassSchedule,
   LessonDaySignals,
   LessonTopic,
@@ -127,7 +126,6 @@ import {
 } from "./mock/lessons";
 import { sampleTestAnswers, testQuestions } from "./mock/questions";
 import {
-  assignmentDraft,
   classGoal,
   classOverview,
   heatmap,
@@ -534,14 +532,13 @@ export async function getHeatmap(): Promise<HeatmapRow[]> {
   return real ? heatmapFrom(DASHBOARD_TOPIC, real.students) : heatmap;
 }
 
-/** The sample draft assignment, for demo accounts only. */
-export async function getAssignmentDraft(): Promise<AssignmentDraft | undefined> {
-  return (await realClassResults()) ? undefined : assignmentDraft;
-}
-
-/** Sample notifications for demo accounts; real classes have none yet. */
+/**
+ * Sample notifications for demo teachers (and servers without Supabase);
+ * real classes have none yet. Read in the header, so it stays cheap.
+ */
 export async function getNotifications(): Promise<TeacherNotification[]> {
-  return (await realClassResults()) ? [] : notifications;
+  const user = await getCurrentUser();
+  return user?.role === "teacher" && (user.demo || !classesStored()) ? notifications : [];
 }
 
 /** Per student, the XP the class goal asks for: two pet levels each. */

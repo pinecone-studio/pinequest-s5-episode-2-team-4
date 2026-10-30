@@ -1,5 +1,4 @@
 import type {
-  AssignmentDraft,
   ClassGoal,
   ClassOverview,
   HeatmapRow,
@@ -34,24 +33,6 @@ export const heatmap: HeatmapRow[] = [
   row("mixed-numbers", "MWMMNMLMMMWMMNMMMWMMMMMWMNMMWMNM"),
   row("same-denominator", "MMMMNMMMMMWMMNMMMMMMMMMWMNMMMMNM"),
 ];
-
-export const assignmentDraft: AssignmentDraft = {
-  id: "assignment-1",
-  subtopicId: "different-denominator",
-  status: "draft",
-  items: [
-    { question: "1/2 + 1/4 = ?", answer: "3/4" },
-    { question: "2/3 + 1/6 = ?", answer: "5/6" },
-    { question: "1/3 + 1/4 = ?", answer: "7/12" },
-    { question: "3/5 + 1/10 = ?", answer: "7/10" },
-    {
-      question: "Бат номынхоо 1/2-ийг, маргааш нь 1/3-ийг уншсан. Нийт хэд вэ?",
-      answer: "5/6",
-    },
-  ],
-  // students weak in different-denominator
-  assignedTo: [2, 3, 7, 9, 11, 16, 19, 21, 24, 27, 29, 32],
-};
 
 export const notifications: TeacherNotification[] = [
   {
