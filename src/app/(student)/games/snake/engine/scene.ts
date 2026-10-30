@@ -2,7 +2,7 @@ import { prefersReducedMotion, type Stage } from "../../_lib/canvas";
 import { Effects } from "../../_lib/effects";
 import { GAME_COLORS, gameFont } from "../../_lib/palette";
 import { buildFloor, drawFood, drawLights, makeOrbs, moveOrbs } from "./drawScene";
-import { clearShadeCache, drawSnake, SPACING } from "./drawSnake";
+import { drawSnake, SPACING } from "./drawSnake";
 import { WORLD, type Food, type Snake, type SnakeSkin } from "./types";
 
 export type SceneView = {
@@ -27,7 +27,6 @@ export class SnakeScene {
   private tongue = 1.5;
 
   resize(stage: Stage) {
-    clearShadeCache();
     this.floor = buildFloor(stage);
   }
 
