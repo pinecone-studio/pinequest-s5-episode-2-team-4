@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getCurrentUser, getCurriculum, getTeacherClassOptions } from "@/lib/data";
+import { LiveJoinQr } from "../../LiveJoinQr";
 import { NewVideoFlow } from "./NewVideoFlow";
 
 export const metadata: Metadata = {
@@ -15,7 +16,11 @@ export default async function NewVideoPage() {
         ← Хичээлийн видео
       </Link>
       <h1 className="type-page-title">Шинэ хичээлийн видео</h1>
-      <NewVideoFlow curriculum={curriculum} classes={classes} teacherSubject={user?.subject} />
+      {/* Students (or judges at a pitch) join by QR while the video is being made. */}
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px] md:gap-7">
+        <NewVideoFlow curriculum={curriculum} classes={classes} teacherSubject={user?.subject} demo={Boolean(user?.demo)} />
+        <LiveJoinQr autoStart={Boolean(user?.demo)} className="lg:sticky lg:top-4" />
+      </div>
     </div>
   );
 }

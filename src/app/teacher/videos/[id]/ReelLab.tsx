@@ -28,12 +28,14 @@ const KINDS: { id: ReelSectionKind; label: string }[] = [
 /**
  * The teacher's reel editor: fix each section, have the AI rewrite one,
  * check the formulas, approve (makes the narration) and publish.
+ * `formulasChecked`: the pitch demo's ready reel, whose formulas were checked
+ * when it was made, so they start ticked.
  */
-export function ReelLab({ video }: { video: LessonVideo }) {
+export function ReelLab({ video, formulasChecked = false }: { video: LessonVideo; formulasChecked?: boolean }) {
   const id = useId();
   const router = useRouter();
   const [script, setScript] = useState<ReelScript>(video.script);
-  const [checked, setChecked] = useState<number[]>([]);
+  const [checked, setChecked] = useState<number[]>(() => (formulasChecked ? video.script.sections.map((_, i) => i) : []));
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [rewritten, setRewritten] = useState<Record<number, "ai" | "demo">>({});
   const [busy, setBusy] = useState<string>();
@@ -99,8 +101,11 @@ export function ReelLab({ video }: { video: LessonVideo }) {
       router.refresh();
     });
 
+  // A horizontal reel needs the width: its player goes above the editor.
+  const wide = script.layout === "horizontal";
+
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-7">
+    <div className={cn("grid gap-5 lg:items-start lg:gap-7", !wide && "lg:grid-cols-[minmax(0,1fr)_360px]")}>
       <div className="flex flex-col gap-4">
         <Card className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -236,7 +241,7 @@ export function ReelLab({ video }: { video: LessonVideo }) {
         )}
       </div>
 
-      <aside className="flex flex-col items-center gap-3 lg:sticky lg:top-24">
+      <aside className={cn("flex flex-col items-center gap-3", wide ? "order-first" : "lg:sticky lg:top-24")}>
         <ReelPlayer script={script} timings={preview.timings} audioUrl={preview.audioUrl} />
         <p className="text-center text-xs text-ink-muted">
           {preview.audioUrl ? "Дуу хоолойтой" : changed || video.status === "draft" ? "Дуугүй урьдчилан харах. Зөвшөөрөхөд дуу хоолой үүснэ." : "Дуу хоолой үүсээгүй (ElevenLabs тохируулаагүй)."}

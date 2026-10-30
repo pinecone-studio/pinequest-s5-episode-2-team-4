@@ -1,6 +1,7 @@
 // Turns untrusted model JSON into typed, trimmed and length-limited values.
 // Each function returns undefined when the shape is wrong.
 
+import { toReelFrame } from "@/lib/reel-frame";
 import type { BookText, GameQuestion, Recognition, ReelScript, ReelSection, ReelSectionKind } from "@/lib/types";
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
@@ -52,7 +53,7 @@ export function toScript(v: unknown): ReelScript | undefined {
   if (!isObj(v)) return undefined;
   const sections = list(v.sections, 10, toSection);
   const title = str(v.title, 120);
-  return title && sections.length >= 3 ? { title, sections } : undefined;
+  return title && sections.length >= 3 ? { title, sections, ...toReelFrame(v) } : undefined;
 }
 
 export function toBook(v: unknown): BookText | undefined {

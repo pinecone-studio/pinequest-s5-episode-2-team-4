@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookView } from "@/components/BookView";
 import { ButtonLink, PixelIcon } from "@/components/ui";
-import { getTeacherVideo } from "@/lib/data";
+import { getCurrentUser, getTeacherVideo, isReadyDemoVideo } from "@/lib/data";
+import { LiveJoinQr } from "../../LiveJoinQr";
 import { ReelLab } from "./ReelLab";
 
 export const metadata: Metadata = {
@@ -12,8 +13,9 @@ export const metadata: Metadata = {
 
 export default async function VideoPage({ params }: PageProps<"/teacher/videos/[id]">) {
   const { id } = await params;
-  const video = await getTeacherVideo(id);
+  const [video, user] = await Promise.all([getTeacherVideo(id), getCurrentUser()]);
   if (!video) notFound();
+  const ready = await isReadyDemoVideo(video);
 
   return (
     <div className="mx-auto flex max-w-[1280px] flex-col gap-5 px-4 pt-1 md:gap-6 md:px-[clamp(16px,4vw,40px)] md:pt-2">
@@ -29,8 +31,11 @@ export default async function VideoPage({ params }: PageProps<"/teacher/videos/[
           </ButtonLink>
         )}
       </div>
-      {/* Remount after a save so the editor starts from what was stored. */}
-      <ReelLab key={video.updatedAt} video={video} />
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px] md:gap-7">
+        {/* Remount after a save so the editor starts from what was stored. */}
+        <ReelLab key={video.updatedAt} video={video} formulasChecked={ready} />
+        <LiveJoinQr autoStart={Boolean(user?.demo)} className="lg:sticky lg:top-4" />
+      </div>
       {video.book && (
         <details className="group">
           <summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">Номын хэлбэрээр (сурагчид харагдана)</summary>

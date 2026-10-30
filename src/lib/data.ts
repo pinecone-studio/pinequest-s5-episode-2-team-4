@@ -36,7 +36,7 @@ import {
   listTeacherAssignments,
   listTeacherVideos,
 } from "./content";
-import { isAssignmentGame } from "./gamefit";
+import { isAssignmentGame, spreadGame } from "./gamefit";
 import { grade7MathCurriculum } from "./mock/curriculum";
 import { DEMO_CLASS_CODE } from "./accounts";
 import {
@@ -48,6 +48,7 @@ import {
   listClassTestAnswers,
   listStudentClasses,
   listTeacherClasses,
+  memberIndex,
 } from "./classes";
 import { type AchievementStats, achievementList } from "./achievements";
 import { questsWithProgress } from "./quests";
@@ -132,6 +133,7 @@ import {
   notifications,
 } from "./mock/teacher";
 import { bosses } from "./mock/bosses";
+import { isDemoReelScript } from "./mock/demoReel";
 import { gameSubjects } from "./mock/games";
 import { anonQuestions, questionGroups } from "./mock/anonQuestions";
 import { BATTLE_SUBJECTS } from "./battle-questions";
@@ -161,6 +163,7 @@ export async function getCurrentUser(): Promise<User | undefined> {
     pet: session.pet,
     subject: session.subject,
     demo: session.demo,
+    guest: session.guest,
   };
 }
 
@@ -624,22 +627,23 @@ export async function getQuestionGroups(): Promise<QuestionGroup[]> {
 
 /**
  * Today's 🟢/🟡/🔴 counts for the teacher's class, one row per subtopic taught
- * today. Demo teachers see the sample lesson, as does a server without
- * Supabase. A real teacher only sees their class's signals: none without a
- * class or when loading fails.
+ * today. Demo teachers see their class's real signals and then the sample
+ * lesson; a server without Supabase shows the sample. A real teacher only
+ * sees their class's signals: none without a class or when loading fails.
  */
 export async function getTodaySignals(): Promise<SignalSummary[]> {
   // "Today" must use the request's date, never a prerendered date.
   await io();
   const user = await getCurrentUser();
-  if (user?.classCode && !user.demo && signalsStored()) {
+  const sample = user && !user.demo ? [] : summarizeSignals(signals);
+  if (user?.classCode && signalsStored()) {
     try {
-      return await listDaySignals(user.classCode, learningDay());
+      return [...(await listDaySignals(user.classCode, learningDay())), ...sample];
     } catch (error) {
       console.error(error);
     }
   }
-  return user && !user.demo ? [] : summarizeSignals(signals);
+  return sample;
 }
 
 /** The signal the logged-in student already sent for this lesson today, if any. */
@@ -779,7 +783,10 @@ export const getStudentAssignments = cache(async (): Promise<StudentAssignment[]
   const visible = assignments.filter(
     (a) => a.target === "class" || !a.targetSubtopicId || weak.has(a.targetSubtopicId),
   );
-  return visible.map((a) => ({ ...a, playGame: pickGame(a, session.favoriteGames) }));
+  // Only looked up when a teacher spread several games over the class.
+  const spread = visible.some((a) => a.gameMode === "fixed" && a.games.filter(isAssignmentGame).length > 1);
+  const index = spread ? await memberIndex(normalClassCode(session.classCode), session.id).catch(() => undefined) : undefined;
+  return visible.map((a) => ({ ...a, playGame: pickGame(a, session.favoriteGames, index) }));
 });
 
 /** Assignments the student hasn't finished yet, for the menu badge. */
@@ -787,12 +794,15 @@ export async function getOpenAssignmentCount(): Promise<number> {
   return (await getStudentAssignments()).filter((a) => !a.done).length;
 }
 
-/** "fixed": the first chosen game; "interest": the student's favourite among them. */
-function pickGame(a: Assignment, favorites: string[] = []): string {
+/**
+ * "fixed": one of the chosen games, spread over the class so students get
+ * different ones (spreadGame); "interest": the student's favourite among them.
+ */
+function pickGame(a: Assignment, favorites: string[] = [], memberIndex?: number): string {
   const allowed = a.games.filter(isAssignmentGame);
   const options = allowed.length ? allowed : ["snake"];
   if (a.gameMode === "interest") return favorites.find((g) => options.includes(g as never)) ?? options[0];
-  return options[0];
+  return memberIndex === undefined ? options[0] : spreadGame(options, a.id, memberIndex);
 }
 
 /**
@@ -811,6 +821,14 @@ export async function getAssignmentForPlay(
 export async function getTeacherVideos(): Promise<LessonVideo[]> {
   const id = await teacherId();
   return id ? listTeacherVideos(id) : [];
+}
+
+/**
+ * The video is the pitch demo's ready reel (made ahead, its narration
+ * unchanged): its formulas were checked when it was made.
+ */
+export async function isReadyDemoVideo(video: LessonVideo): Promise<boolean> {
+  return Boolean((await getCurrentUser())?.demo) && isDemoReelScript(video.script);
 }
 
 export async function getTeacherVideo(videoId: string): Promise<LessonVideo | undefined> {
@@ -891,16 +909,21 @@ function demoClass(user: User): SchoolClass {
   };
 }
 
-/** The logged-in teacher's classes; demo teachers (and servers without Supabase) get the demo class. */
+/**
+ * The logged-in teacher's classes. A demo teacher gets the real class made
+ * at log-in (older demo accounts, and servers without Supabase, get the
+ * sample one).
+ */
 export async function getTeacherClasses(): Promise<SchoolClass[]> {
   const user = await getCurrentUser();
   if (user?.role !== "teacher") return [];
-  if (user.demo || !classesStored()) return [demoClass(user)];
+  if (!classesStored()) return [demoClass(user)];
   try {
-    return await listTeacherClasses(user.id);
+    const own = await listTeacherClasses(user.id);
+    return user.demo && own.length === 0 ? [demoClass(user)] : own;
   } catch (error) {
     console.error(error);
-    return [];
+    return user.demo ? [demoClass(user)] : [];
   }
 }
 
@@ -1006,7 +1029,8 @@ export async function getClassSchedule(): Promise<ClassSchedule | undefined> {
   const active = await getActiveClass();
   if (!active) return undefined;
   const today = learningDay();
-  const editable = active.id !== "demo";
+  // Demo teachers see a sample schedule; their changes wouldn't be saved.
+  const editable = active.id !== "demo" && !(await getCurrentUser())?.demo;
   const lessonDays = editable ? await getLessonDays(active.id) : [1, 3, 5];
   const plans = editable ? await listPlans(active.id, today, shiftDay(today, PLAN_DAYS * 7)) : [];
   const days = [...new Set([...upcomingLessonDays(today, lessonDays, PLAN_DAYS), ...plans.map((p) => p.day)])].sort();
@@ -1022,7 +1046,8 @@ export async function getClassSchedule(): Promise<ClassSchedule | undefined> {
 /**
  * The open class's signals in one school week (`weeksBack` 0 is this week),
  * newest day first, with the topic titles; `beforeToday` leaves today out.
- * Demo teachers see the sample lesson on Monday, Wednesday and Friday.
+ * Demo teachers also see the sample lesson on Monday, Wednesday and Friday,
+ * after their class's real signals.
  */
 export async function getLessonDaySignals({ weeksBack = 0, beforeToday = false } = {}): Promise<WeekSignals> {
   await io();
@@ -1033,16 +1058,22 @@ export async function getLessonDaySignals({ weeksBack = 0, beforeToday = false }
   const user = await getCurrentUser();
   const active = await getActiveClass();
   const title = (key: string) => topicTitle(key) ?? key;
-  if (!active || user?.demo || active.id === "demo" || !signalsStored()) {
+  const sample = (): LessonDaySignals[] => {
     const rows = summarizeSignals(signals).map((s) => ({ ...s, title: title(s.subtopicId) }));
     const days = [4, 2, 0].map((offset) => shiftDay(week.from, offset)).filter((day) => day <= week.to);
-    return keep(days.map((day) => ({ day, rows })));
-  }
+    return days.map((day) => ({ day, rows }));
+  };
+  if (!active || active.id === "demo" || !signalsStored()) return keep(sample());
+  let real: LessonDaySignals[] = [];
   try {
     const days = await listSignalsBetween(active.code, week.from, week.to);
-    return keep(days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) })));
+    real = days.map((d) => ({ day: d.day, rows: d.summary.map((s) => ({ ...s, title: title(s.subtopicId) })) }));
   } catch (error) {
     console.error(error);
-    return keep([]);
   }
+  if (!user?.demo) return keep(real);
+  // Same day in both: the real topics first.
+  const byDay = new Map(real.map((d) => [d.day, d.rows]));
+  for (const d of sample()) byDay.set(d.day, [...(byDay.get(d.day) ?? []), ...d.rows]);
+  return keep([...byDay].map(([day, rows]) => ({ day, rows })).sort((a, b) => b.day.localeCompare(a.day)));
 }

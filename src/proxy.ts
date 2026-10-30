@@ -4,11 +4,13 @@ import { SESSION_COOKIE } from "@/lib/session";
 
 /** Pages a logged-out visitor may open; /offline is cached by the service worker (public/sw.js). */
 const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/offline"];
+/** A class QR people join with only their name: /q/<token>. */
+const NAME_JOIN = /^\/q\/[\w-]{20,40}$/;
 
 /** Sends visitors without a session to /login. Pages still check the session itself. */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (PUBLIC_PATHS.includes(pathname) || request.cookies.has(SESSION_COOKIE)) {
+  if (PUBLIC_PATHS.includes(pathname) || NAME_JOIN.test(pathname) || request.cookies.has(SESSION_COOKIE)) {
     return NextResponse.next();
   }
   const login = new URL("/login", request.url);

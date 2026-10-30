@@ -1,16 +1,21 @@
-// The vertical lesson reel, drawn by Remotion from the script and the word
-// timings. Played in the browser with <Player>, never rendered to a file.
+// The lesson reel, drawn by Remotion from the script and the word timings:
+// vertical for phones or horizontal for a classroom screen, over the plain
+// purple or a looping background video. Played in the browser with
+// <Player>, never rendered to a file.
 
 import { Fragment } from "react";
-import { AbsoluteFill, Html5Audio, Img, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Html5Audio, Html5Video, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { FormulaText } from "@/components/FormulaText";
 import { cn } from "@/lib/cn";
+import { reelBackground } from "@/lib/reel-frame";
 import { sectionAt } from "@/lib/reel-timing";
-import type { ReelScript, ReelSectionKind, ReelTimings } from "@/lib/types";
+import type { ReelLayout, ReelScript, ReelSectionKind, ReelTimings } from "@/lib/types";
 
-export const REEL_WIDTH = 1080;
-export const REEL_HEIGHT = 1920;
 export const REEL_FPS = 30;
+
+/** The composition's size: 1080×1920 for a phone, 1920×1080 for a screen. */
+export const reelSize = (layout: ReelLayout = "vertical") =>
+  layout === "horizontal" ? { width: 1920, height: 1080 } : { width: 1080, height: 1920 };
 
 export type ReelProps = {
   script: ReelScript;
@@ -28,14 +33,14 @@ const KIND_LABEL: Record<ReelSectionKind, string> = {
 };
 
 /** Words around the one being spoken, with that word highlighted. */
-function Subtitles({ timings, section, ms }: { timings: ReelTimings; section: number; ms: number }) {
+function Subtitles({ timings, section, ms, wide }: { timings: ReelTimings; section: number; ms: number; wide: boolean }) {
   const { start, end } = timings.sections[section] ?? { start: 0, end: 0 };
   const words = timings.words.filter((w) => w.start >= start && w.start < end);
   const current = words.findLastIndex((w) => w.start <= ms);
   // A window of up to 9 words so the subtitle stays two or three lines.
   const from = Math.max(0, Math.min(current - 3, words.length - 9));
   return (
-    <p className="mx-16 text-center text-[54px] leading-[1.3] font-bold text-white">
+    <p className={cn("text-center leading-[1.3] font-bold text-white", wide ? "mx-48 text-[48px]" : "mx-16 text-[54px]")}>
       {words.slice(from, from + 9).map((w, i) => (
         // The space between spans is where the line can wrap.
         <Fragment key={`${w.start}-${i}`}>
@@ -51,39 +56,11 @@ function Subtitles({ timings, section, ms }: { timings: ReelTimings; section: nu
   );
 }
 
-/** A pet running and jumping over fraction blocks along the bottom. */
-function Runner({ frame }: { frame: number }) {
-  const PERIOD = 100;
-  const SPEED = 12;
-  const phase = frame % PERIOD;
-  const blockX = 1200 - phase * SPEED;
-  const jump = phase > 72 && phase < 94 ? Math.sin((Math.PI * (phase - 72)) / 22) * 230 : 0;
-  const block = ["1/2", "3/4", "2/3", "5/6"][Math.floor(frame / PERIOD) % 4];
-  const ground = -((frame * SPEED) % 120);
-  return (
-    <div className="absolute inset-x-0 bottom-0 h-[380px] overflow-hidden">
-      <div
-        className="absolute inset-x-0 bottom-[110px] h-2 opacity-70"
-        style={{ backgroundImage: "repeating-linear-gradient(90deg, white 0 60px, transparent 60px 120px)", backgroundPositionX: ground }}
-      />
-      <div
-        className="absolute bottom-[118px] flex h-[120px] w-[120px] items-center justify-center rounded-[28px] bg-white text-[52px] font-bold text-primary shadow-[0_8px_0_var(--color-line)]"
-        style={{ left: blockX }}
-      >
-        <FormulaText text={block} />
-      </div>
-      <Img
-        src="/pets/agnite.png"
-        className="absolute bottom-[110px] left-[150px] h-[200px] w-[200px] [image-rendering:pixelated]"
-        style={{ transform: `translateY(${-jump}px)` }}
-      />
-    </div>
-  );
-}
-
 export function Reel({ script, timings, audioUrl }: ReelProps) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const wide = script.layout === "horizontal";
+  const background = reelBackground(script.background);
   const ms = (frame / fps) * 1000;
   const index = sectionAt(timings, ms);
   const section = script.sections[index];
@@ -95,38 +72,49 @@ export function Reel({ script, timings, audioUrl }: ReelProps) {
 
   return (
     <AbsoluteFill className="bg-linear-to-b from-primary to-primary-dark font-sans">
+      {background && (
+        <>
+          <Html5Video src={background.src} loop muted className="absolute inset-0 size-full object-cover" />
+          {/* Darkened so the white text stays readable over any video. */}
+          <div className="absolute inset-0 bg-linear-to-b from-primary-dark/70 via-primary-dark/45 to-primary-dark/80" />
+        </>
+      )}
       {audioUrl && <Html5Audio src={audioUrl} />}
 
       {/* Section progress */}
-      <div className="absolute inset-x-16 top-16 flex gap-3">
+      <div className={cn("absolute flex gap-3", wide ? "inset-x-24 top-12" : "inset-x-16 top-16")}>
         {script.sections.map((_, i) => (
           <span key={i} className={cn("h-3 flex-1 rounded-full", i <= index ? "bg-white" : "bg-white/30")} />
         ))}
       </div>
-      <p className="absolute inset-x-16 top-28 text-[40px] font-bold text-white/80">{script.title}</p>
+      <p className={cn("absolute text-[40px] font-bold text-white/80", wide ? "inset-x-24 top-22" : "inset-x-16 top-28")}>{script.title}</p>
 
       {section && (
         <div
-          className="absolute inset-x-16 top-[300px] flex flex-col items-start gap-8"
+          className={cn("absolute flex flex-col items-start", wide ? "top-[190px] left-24 w-[1180px] gap-6" : "inset-x-16 top-[300px] gap-8")}
           style={{ opacity: enter, transform: `translateY(${interpolate(enter, [0, 1], [60, 0])}px)` }}
         >
           <span className="rounded-full bg-magenta px-8 py-3 text-[40px] font-bold text-white">
             {KIND_LABEL[section.kind]}
             {section.kind === "step" && ` ${step}`}
           </span>
-          <h1 className="text-[92px] leading-[1.08] font-bold tracking-[-0.02em] text-white">{section.caption}</h1>
+          <h1 className={cn("leading-[1.08] font-bold tracking-[-0.02em] text-white", wide ? "text-[76px]" : "text-[92px]")}>{section.caption}</h1>
           {section.formula && (
-            <div className="mt-6 self-stretch rounded-[48px] bg-white px-12 py-14 text-center text-[96px] font-bold text-ink shadow-[0_14px_0_var(--color-line)]">
+            <div
+              className={cn(
+                "self-stretch rounded-[48px] bg-white text-center font-bold text-ink shadow-[0_14px_0_var(--color-line)]",
+                wide ? "mt-2 px-10 py-8 text-[80px]" : "mt-6 px-12 py-14 text-[96px]",
+              )}
+            >
               <FormulaText text={section.formula} className="justify-center" />
             </div>
           )}
         </div>
       )}
 
-      <div className="absolute inset-x-0 bottom-[420px]">
-        <Subtitles timings={timings} section={index} ms={ms} />
+      <div className={cn("absolute inset-x-0", wide ? "bottom-[110px]" : "bottom-[260px]")}>
+        <Subtitles timings={timings} section={index} ms={ms} wide={wide} />
       </div>
-      <Runner frame={frame} />
     </AbsoluteFill>
   );
 }

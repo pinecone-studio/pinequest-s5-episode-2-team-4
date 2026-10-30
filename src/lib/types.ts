@@ -143,6 +143,8 @@ export type User = {
   subject?: string;
   /** A throwaway «Демо нэвтрэх» account, which gets demo shortcuts. */
   demo?: boolean;
+  /** Joined a class from a QR with only a name (e.g. a judge at a pitch). */
+  guest?: boolean;
 };
 
 /** A class a teacher created; its content (assignments, videos, …) is keyed by `code`. */
@@ -625,9 +627,16 @@ export type ReelSection = {
   formula?: string;
 };
 
+/** A reel's shape: a phone video (9:16, the default) or a classroom screen (16:9). */
+export type ReelLayout = "vertical" | "horizontal";
+
 export type ReelScript = {
   title: string;
   sections: ReelSection[];
+  /** Vertical when unset */
+  layout?: ReelLayout;
+  /** A looping video behind it (reel-frame.ts); the plain purple when unset */
+  background?: string;
 };
 
 /** Textbook-style explanation students can read instead of watching. */

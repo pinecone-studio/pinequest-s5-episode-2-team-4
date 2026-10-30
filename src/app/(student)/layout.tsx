@@ -1,4 +1,5 @@
 import { AchievementWatcher } from "@/components/layout/AchievementWatcher";
+import { ClassNewsWatcher } from "@/components/layout/ClassNewsWatcher";
 import { LandscapeBackdrop } from "@/components/layout/LandscapeBackdrop";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { PageTransition } from "@/components/layout/PageTransition";
@@ -65,6 +66,7 @@ export default async function StudentLayout({
       <StudentFooter pets={footerPets} />
       <MobileNav counts={counts} />
       <AchievementWatcher />
+      <ClassNewsWatcher />
     </>
   );
 }

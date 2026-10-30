@@ -134,6 +134,34 @@ export async function createAccount(input: {
   return { account: toAccount(data) };
 }
 
+/** Longest username. */
+const USERNAME_MAX = 40;
+
+/** Guests' made-up emails end with this; it's never shown to anyone. */
+export const GUEST_EMAIL_DOMAIN = "@levelup.invalid";
+
+/**
+ * A student who joins from a QR with only their name (e.g. a judge at a
+ * pitch). It's a normal account, so it gets the class's real lessons, but
+ * with an email and password nobody knows: it lives in this browser's
+ * session and is deleted after a day like the demo accounts. A name that's
+ * taken gets a number: "Бат 2".
+ */
+export async function createGuestAccount(name: string, progress: AccountProgress): Promise<StoredAccount> {
+  for (let n = 1; n <= 20; n++) {
+    const suffix = n === 1 ? "" : ` ${n}`;
+    const result = await createAccount({
+      username: name.slice(0, USERNAME_MAX - suffix.length) + suffix,
+      email: `guest-${randomBytes(8).toString("hex")}${GUEST_EMAIL_DOMAIN}`,
+      password: randomBytes(18).toString("base64url"),
+      role: "student",
+      progress: { ...progress, guest: true },
+    });
+    if ("account" in result) return result.account;
+  }
+  throw new Error("Could not find a free name for a guest");
+}
+
 /** The class every demo account is in, so a demo teacher's work reaches demo students. */
 // Cyrillic, as class codes are compared after normalClassCode().
 export const DEMO_CLASS_CODE = "ДЕМО";
@@ -175,14 +203,18 @@ const DELETE_BATCH = 100;
  * go with it. Real accounts are never touched.
  */
 export async function deleteOldDemoAccounts() {
-  const { data, error } = await db()
+  const before = new Date(Date.now() - DEMO_LIFETIME_MS).toISOString();
+  const demos = await db().from("accounts").delete().eq("demo", true).lt("created_at", before).select("username");
+  if (demos.error) throw new Error(`Could not delete old demo accounts: ${demos.error.message}`);
+  // Guests who joined from a QR (createGuestAccount) go too.
+  const guests = await db()
     .from("accounts")
     .delete()
-    .eq("demo", true)
-    .lt("created_at", new Date(Date.now() - DEMO_LIFETIME_MS).toISOString())
+    .eq("progress->>guest", "true")
+    .lt("created_at", before)
     .select("username");
-  if (error) throw new Error(`Could not delete old demo accounts: ${error.message}`);
-  const names = (data ?? []).map((a: { username: string }) => a.username);
+  if (guests.error) throw new Error(`Could not delete old guest accounts: ${guests.error.message}`);
+  const names = [...(demos.data ?? []), ...(guests.data ?? [])].map((a: { username: string }) => a.username);
   for (let i = 0; i < names.length; i += DELETE_BATCH) {
     const players = await db().from("players").delete().in("username", names.slice(i, i + DELETE_BATCH));
     if (players.error) throw new Error(`Could not delete demo players: ${players.error.message}`);

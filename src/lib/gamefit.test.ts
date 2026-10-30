@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkQuestion, suggestGames } from "./gamefit";
+import { checkQuestion, spreadGame, suggestGames } from "./gamefit";
 
 const q = (correct: string[], wrong: string[], prompt = "1/2 + 1/4 = ?") => ({
   id: "q",
@@ -7,6 +7,23 @@ const q = (correct: string[], wrong: string[], prompt = "1/2 + 1/4 = ?") => ({
   correct,
   wrong,
   explanation: "",
+});
+
+describe("spreadGame", () => {
+  const games = ["snake", "mole", "cards"] as const;
+
+  it("gives the first students all different games", () => {
+    const got = [0, 1, 2].map((i) => spreadGame(games, "assignment-1", i));
+    expect(new Set(got).size).toBe(3);
+  });
+
+  it("starts again once every game is taken", () => {
+    expect(spreadGame(games, "assignment-1", 3)).toBe(spreadGame(games, "assignment-1", 0));
+  });
+
+  it("always gives the one game when there is only one", () => {
+    expect(spreadGame(["race"], "assignment-1", 5)).toBe("race");
+  });
 });
 
 describe("suggestGames", () => {
