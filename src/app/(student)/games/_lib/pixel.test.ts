@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PIXEL, pixelBox, pixelLine, snap } from "./pixel";
+import { PIXEL, pixelBox, pixelDisc, pixelLine, snap } from "./pixel";
 
 /** A stand-in canvas that records the boxes drawn on it. */
 function recorder() {
@@ -45,5 +45,23 @@ describe("pixelBox", () => {
       [4, 0, 32, 20],
       [0, 4, 40, 12],
     ]);
+  });
+});
+
+describe("pixelDisc", () => {
+  it("is symmetric and stays inside its radius", () => {
+    const { ctx, rects } = recorder();
+    pixelDisc(ctx, 0, 0, 12);
+    expect(rects).toHaveLength(6);
+    const widths = rects.map(([, , w]) => w);
+    expect(widths).toEqual([...widths].reverse());
+    expect(Math.max(...widths)).toBeLessThanOrEqual(24);
+    expect(rects.every(([x, , w]) => x === -w / 2)).toBe(true);
+  });
+
+  it("draws at least one row for a tiny dot", () => {
+    const { ctx, rects } = recorder();
+    pixelDisc(ctx, 0, 0, 3);
+    expect(rects.length).toBeGreaterThan(0);
   });
 });
