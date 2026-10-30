@@ -1,4 +1,5 @@
 import type { streakSummary } from "@/lib/streak";
+import { StreakMonthCalendar } from "./StreakMonthCalendar";
 import "./streak.css";
 
 type StreakSummary = ReturnType<typeof streakSummary>;
@@ -47,6 +48,7 @@ export function StreakCard({ streak }: { streak: StreakSummary }) {
         <h2 id="streak-title" className="streak-total"><span>{streak.current}</span> өдрийн streak</h2>
         <p className="streak-description">{streak.activeToday ? "Өнөөдрийн идэвх бүртгэгдлээ! Маргааш дахин орж streak-ээ үргэлжлүүлээрэй." : "Сайтад орж ашиглахад өдрийн идэвх автоматаар бүртгэгдэнэ."}</p>
         <p className="streak-timezone">Өдөрт нэг удаа · Улаанбаатарын цагаар</p>
+        <StreakMonthCalendar {...streak.calendar} />
       </div>
       <div className="streak-stat-grid">
         <div className="streak-stat">

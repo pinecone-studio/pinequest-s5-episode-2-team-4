@@ -6,6 +6,8 @@ export type LearningStreak = {
   longest: number;
   lastDate: string;
   recentDays: string[];
+  /** Earliest date with retained daily history (up to one year). */
+  historyStart?: string;
 };
 
 export function learningDay(now = new Date()): string {
@@ -28,7 +30,8 @@ export function recordLearningDay(previous?: LearningStreak, today = learningDay
     current,
     longest: Math.max(previous?.longest ?? 0, current),
     lastDate: today,
-    recentDays: [...(previous?.recentDays ?? []).filter((day) => day >= shiftDay(today, -6)), today],
+    recentDays: [...(previous?.recentDays ?? []).filter((day) => day >= shiftDay(today, -365)), today],
+    historyStart: [previous?.historyStart ?? previous?.recentDays[0] ?? today, shiftDay(today, -365)].sort()[1],
   };
 }
 
@@ -38,6 +41,11 @@ export function streakSummary(streak?: LearningStreak, today = learningDay()) {
     current,
     longest: streak?.longest ?? 0,
     activeToday: streak?.lastDate === today,
+    calendar: {
+      today,
+      activeDates: (streak?.recentDays ?? []).filter((day) => day >= shiftDay(today, -365) && day <= today),
+      availableFrom: [streak?.historyStart ?? streak?.recentDays[0] ?? today, shiftDay(today, -365)].sort()[1],
+    },
     days: Array.from({ length: 7 }, (_, i) => {
       const date = shiftDay(today, i - 6);
       return { date, active: streak?.recentDays.includes(date) ?? false };
