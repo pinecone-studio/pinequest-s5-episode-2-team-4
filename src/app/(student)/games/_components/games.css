@@ -101,8 +101,10 @@
 }
 
 .game-count {
-  text-shadow: 0 0 30px #8b5cff;
-  animation: game-pop 0.8s ease;
+  text-shadow:
+    5px 5px 0 var(--color-primary),
+    10px 10px 0 #1d1647;
+  animation: game-pop 0.8s steps(4);
 }
 
 .game-pop {
