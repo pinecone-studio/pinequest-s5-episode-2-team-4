@@ -1,9 +1,14 @@
 import { roundRect, type Stage } from "../../_lib/canvas";
 import { GAME_COLORS } from "../../_lib/palette";
+import { PIXEL as P } from "../../_lib/pixel";
 import { drawAnswer } from "../../_lib/shapes";
 import { WORLD, type Food } from "./types";
 
-/** Dark hexagon floor with a vignette, drawn once per resize. */
+/** Floor tiles, 5 art pixels square with a 1-pixel seam. */
+const TILE = 5 * P;
+const TILES = ["#16112f", "#1a1440"];
+
+/** Dark floor of pixel tiles with a stepped vignette, drawn once per resize. */
 export function buildFloor(stage: Stage): HTMLCanvasElement {
   const { w: W, h: H } = WORLD;
   const floor = document.createElement("canvas");
@@ -14,28 +19,24 @@ export function buildFloor(stage: Stage): HTMLCanvasElement {
   f.setTransform(stage.dpr * stage.scale, 0, 0, stage.dpr * stage.scale, 0, 0);
   f.fillStyle = "#0b0820";
   f.fillRect(0, 0, W, H);
-  const R = 15, hw = Math.sqrt(3) * R;
-  for (let row = -1; row * R * 1.5 < H + R; row++) {
-    for (let col = -1; col * hw < W + hw; col++) {
-      const cx = col * hw + (row % 2 ? hw / 2 : 0), cy = row * R * 1.5;
-      f.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const a = Math.PI / 6 + (i * Math.PI) / 3;
-        f.lineTo(cx + Math.cos(a) * (R - 1.6), cy + Math.sin(a) * (R - 1.6));
-      }
-      f.closePath();
-      const g = f.createLinearGradient(cx, cy - R, cx, cy + R);
-      g.addColorStop(0, "#221a48");
-      g.addColorStop(1, "#16112f");
-      f.fillStyle = g;
-      f.fill();
+  for (let y = 0; y < H; y += TILE) {
+    for (let x = 0; x < W; x += TILE) {
+      f.fillStyle = TILES[(x / TILE + y / TILE) % 2];
+      f.fillRect(x, y, TILE - P, TILE - P);
+      // a lighter top edge, so each tile reads as a raised block
+      f.fillStyle = "#221a48";
+      f.fillRect(x, y, TILE - P, P);
     }
   }
-  const v = f.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, H * 0.75);
-  v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,.55)");
-  f.fillStyle = v;
-  f.fillRect(0, 0, W, H);
+  // vignette in steps: each band darkens the edges a little more
+  f.fillStyle = "rgba(0,0,0,.14)";
+  for (let i = 1; i <= 4; i++) {
+    const d = i * 3 * P;
+    f.fillRect(0, 0, W, d);
+    f.fillRect(0, H - d, W, d);
+    f.fillRect(0, d, d, H - 2 * d);
+    f.fillRect(W - d, d, d, H - 2 * d);
+  }
   return floor;
 }
 
