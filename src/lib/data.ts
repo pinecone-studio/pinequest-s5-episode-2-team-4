@@ -215,6 +215,7 @@ export async function getAchievementStats(): Promise<AchievementStats | undefine
     petLevel: session.pet?.level ?? 0,
     videosSeen: session.videosSeen?.length ?? 0,
     assignmentsDone: session.assignmentsRewarded?.length ?? 0,
+    questDays: session.questDays ?? 0,
   };
 }
 
