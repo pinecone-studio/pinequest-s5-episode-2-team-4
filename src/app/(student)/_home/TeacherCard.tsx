@@ -1,4 +1,4 @@
-import { ButtonLink } from "@/components/ui";
+import { ButtonLink, PixelIcon } from "@/components/ui";
 
 type TeacherCardProps = {
   /** Assignments not finished yet */
@@ -15,8 +15,8 @@ export function TeacherCard({ assignmentsLeft, videoCount }: TeacherCardProps) {
       className="mb-6 flex flex-col gap-4 rounded-panel border border-line bg-white p-5 shadow-card md:mb-10 md:flex-row md:items-center md:justify-between md:p-7"
     >
       <div className="flex items-center gap-3">
-        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender text-3xl">
-          📬
+        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender">
+          <PixelIcon name="mail" className="size-8" />
         </span>
         <div>
           <h2 id="teacher-card-title" className="text-xl font-bold">

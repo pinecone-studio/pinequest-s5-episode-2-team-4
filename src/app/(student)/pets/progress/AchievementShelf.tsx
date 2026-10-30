@@ -1,5 +1,5 @@
 import { CoinIcon } from "@/components/layout/CoinChip";
-import { ProgressBar } from "@/components/ui";
+import { PixelIcon, ProgressBar } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { learningDay } from "@/lib/streak";
 import type { AchievementProgress } from "@/lib/types";
@@ -36,11 +36,11 @@ export function AchievementShelf({ achievements, className }: { achievements: Ac
             <span
               aria-hidden="true"
               className={cn(
-                "flex size-16 items-center justify-center rounded-full text-3xl",
+                "flex size-16 items-center justify-center rounded-full",
                 a.unlocked ? "bg-tint-sand ring-4 ring-[#f5c542]" : "bg-surface opacity-50 grayscale",
               )}
             >
-              {a.emoji}
+              <PixelIcon name={a.icon} className="size-10" />
             </span>
             <h3 className="font-bold">{a.title}</h3>
             <p className="text-sm text-ink-muted">{a.description}</p>

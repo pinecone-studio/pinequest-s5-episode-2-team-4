@@ -2,14 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { PixelIcon, type PixelIconName } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { sendLessonSignal, type SignalResult } from "@/lib/signal-actions";
 import type { LessonTopic, SignalLevel, TodayLesson } from "@/lib/types";
 
-const OPTIONS: { level: SignalLevel; emoji: string; label: string }[] = [
-  { level: "got", emoji: "🟢", label: "Ойлгосон" },
-  { level: "unsure", emoji: "🟡", label: "Сайн мэдэхгүй" },
-  { level: "lost", emoji: "🔴", label: "Ойлгосонгүй" },
+const OPTIONS: { level: SignalLevel; icon: PixelIconName; label: string }[] = [
+  { level: "got", icon: "signal-got", label: "Ойлгосон" },
+  { level: "unsure", icon: "signal-unsure", label: "Сайн мэдэхгүй" },
+  { level: "lost", icon: "signal-lost", label: "Ойлгосонгүй" },
 ];
 
 const ERRORS: Record<Exclude<SignalResult, { ok: true }>["error"], string> = {
@@ -59,8 +60,8 @@ export function LessonCheckCard({ lesson }: { lesson: TodayLesson }) {
       className="my-6 flex flex-col gap-4 rounded-panel border-2 border-primary/30 bg-card p-5 shadow-card md:my-10 md:p-7"
     >
       <div className="flex items-start gap-3">
-        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender text-3xl">
-          📚
+        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender">
+          <PixelIcon name="books" className="size-8" />
         </span>
         <div className="min-w-0">
           <h2 id="lesson-check-title" className="text-xl font-bold">
@@ -115,9 +116,7 @@ export function LessonCheckCard({ lesson }: { lesson: TodayLesson }) {
               sent === o.level ? "border-primary bg-surface" : "border-lavender bg-card hover:border-primary",
             )}
           >
-            <span aria-hidden="true" className="text-2xl">
-              {o.emoji}
-            </span>
+            <PixelIcon name={o.icon} className="size-6" />
             {o.label}
           </button>
         ))}
