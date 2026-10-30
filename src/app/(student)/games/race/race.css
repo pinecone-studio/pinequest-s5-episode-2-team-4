@@ -1,120 +1,127 @@
-/* Horse race scene: stands with a crowd, grass, railed dirt lanes, a start
-   gate and a checkered finish. */
+/* Horse race scene in pixel art: stands with a crowd of square heads, grass,
+   railed dirt lanes, a start gate and a checkered finish. Everything has
+   square corners and moves in frames (steps) like a sprite. */
 
 .race-sky {
-  background:
-    radial-gradient(40% 120% at 85% 0%, rgb(255 207 90 / 0.35), transparent 70%),
-    linear-gradient(#2b1f6b, #4a2f9a);
+  background: linear-gradient(#2b1f6b 0 34%, #3a2788 34% 67%, #4a2f9a 67%);
 }
 
 .race-stands {
   background:
     repeating-linear-gradient(90deg, rgb(255 255 255 / 0.08) 0 2px, transparent 2px 22px),
-    linear-gradient(#5a3fb0, #3d2a85);
+    linear-gradient(#5a3fb0 0 50%, #3d2a85 50%);
   box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.25);
 }
 
 .race-field {
-  background:
-    radial-gradient(circle at 20% 0%, rgb(255 255 255 / 0.2), transparent 45%),
-    repeating-linear-gradient(90deg, #3f9a4f 0 40px, #398d48 40px 80px);
+  background: repeating-linear-gradient(90deg, #3f9a4f 0 40px, #398d48 40px 80px);
 }
 
 /* White rail above each lane */
 .race-lane {
-  background:
-    linear-gradient(rgb(0 0 0 / 0.08), transparent 30%, rgb(0 0 0 / 0.12)),
-    #b97a43;
+  background: #b97a43;
   box-shadow:
-    inset 0 -3px 0 #8f5b2e,
-    0 -3px 0 #f4efe6;
+    inset 0 -4px 0 #8f5b2e,
+    inset 0 4px 0 rgb(0 0 0 / 0.1),
+    0 -4px 0 #f4efe6;
 }
 
 .race-lane-player {
-  background:
-    linear-gradient(rgb(255 255 255 / 0.14), transparent 40%, rgb(0 0 0 / 0.08)),
-    #d4945a;
+  background: #d4945a;
   box-shadow:
-    inset 0 -3px 0 #8f5b2e,
-    0 -3px 0 #f4efe6,
-    0 0 0 2px var(--game-gold),
-    0 0 18px rgb(255 207 90 / 0.45);
+    inset 0 -4px 0 #8f5b2e,
+    inset 0 4px 0 rgb(255 255 255 / 0.15),
+    0 -4px 0 #f4efe6,
+    0 0 0 3px var(--game-gold),
+    0 0 0 6px rgb(255 207 90 / 0.3);
 }
 
 /* Faint marks at every step */
 .race-ticks {
   background: repeating-linear-gradient(
     90deg,
-    rgb(255 255 255 / 0.18) 0 1px,
-    transparent 1px calc(100% / var(--race-steps))
+    rgb(255 255 255 / 0.18) 0 2px,
+    transparent 2px calc(100% / var(--race-steps))
   );
 }
 
 .race-gate {
-  background: repeating-linear-gradient(180deg, #ffffff 0 5px, #e2ddd2 5px 10px);
+  background: repeating-linear-gradient(180deg, #ffffff 0 6px, #e2ddd2 6px 12px);
 }
 
 .race-finish {
   background: conic-gradient(#111 25%, #fff 0 50%, #111 0 75%, #fff 0) 0 0 / 8px 8px;
 }
 
-/* Legs swing in two pairs for a few strides after every step. */
-.race-running .race-leg {
-  animation: race-leg 0.22s ease-in-out 4 alternate;
+/* Each step moves the horse in a few hops instead of a glide. */
+.race-move {
+  transition-timing-function: steps(5, end);
 }
 
-.race-running .race-leg-b {
-  animation-delay: -0.11s;
+/* The two leg frames swap for a few strides after every step. */
+.race-frame-b {
+  visibility: hidden;
 }
 
-@keyframes race-leg {
-  from {
-    transform: rotate(28deg);
+.race-running .race-frame-a {
+  animation: race-frame-a 0.44s steps(1, end) 2;
+}
+
+.race-running .race-frame-b {
+  animation: race-frame-b 0.44s steps(1, end) 2;
+}
+
+@keyframes race-frame-a {
+  50% {
+    visibility: hidden;
   }
-  to {
-    transform: rotate(-28deg);
+}
+
+@keyframes race-frame-b {
+  50% {
+    visibility: visible;
   }
 }
 
 .race-running {
-  animation: race-bounce 0.22s ease-in-out 4 alternate;
+  animation: race-bounce 0.22s steps(1, end) 4 alternate;
 }
 
 @keyframes race-bounce {
   to {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
   }
 }
 
-/* Rows of heads in the stands */
+/* Rows of square heads in the stands */
 .race-crowd {
   background:
-    radial-gradient(circle at 6px 6px, #ffcf5a 4px, transparent 4.5px) 0 0 / 16px 14px,
-    radial-gradient(circle at 14px 6px, #f6f3ff 4px, transparent 4.5px) 0 0 / 22px 14px,
-    radial-gradient(circle at 4px 6px, #e30ba6 4px, transparent 4.5px) 6px 0 / 26px 14px,
-    radial-gradient(circle at 8px 6px, #38bdf8 4px, transparent 4.5px) 3px 0 / 30px 14px;
-  animation: race-cheer 0.8s ease-in-out infinite alternate;
+    conic-gradient(at 8px 8px, transparent 75%, #ffcf5a 0) 0 2px / 16px 14px,
+    conic-gradient(at 8px 8px, transparent 75%, #f6f3ff 0) 10px 2px / 22px 14px,
+    conic-gradient(at 8px 8px, transparent 75%, #e30ba6 0) 6px 2px / 26px 14px,
+    conic-gradient(at 8px 8px, transparent 75%, #38bdf8 0) 3px 2px / 30px 14px;
+  animation: race-cheer 0.8s steps(1, end) infinite alternate;
 }
 
 @keyframes race-cheer {
   to {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 }
 
 .race-banner {
-  background: linear-gradient(90deg, #ffcf5a, #ffe39a, #ffcf5a);
-  box-shadow: 0 2px 0 #b8892a;
+  background: #ffcf5a;
+  box-shadow: 0 4px 0 #b8892a;
 }
 
 .race-flag {
   transform-origin: 0 50%;
-  animation: race-wave 0.9s ease-in-out infinite alternate;
+  animation: race-wave 0.9s steps(1, end) infinite alternate;
 }
 
 @keyframes race-wave {
   to {
-    transform: skewY(-10deg) scaleX(0.85);
+    transform: scaleX(0.75);
   }
 }
 
@@ -123,7 +130,7 @@
 }
 
 .race-confetti {
-  animation: race-confetti 2.6s ease-in both;
+  animation: race-confetti 2.6s steps(12, end) both;
 }
 
 @keyframes race-confetti {
