@@ -43,6 +43,8 @@ export type Account = {
   favoriteGames?: string[];
   /** Lesson video ids the student has opened; the rest count as new in the menu. */
   videosSeen?: string[];
+  /** Lesson videos bookmarked for later; persisted in account progress. */
+  bookmarkedVideos?: string[];
   /** Assignment ids that already gave XP, so replays don't farm it. */
   assignmentsRewarded?: string[];
   /** Coins earned from daily quests and achievements, spent in the pet shop. */
