@@ -7,6 +7,7 @@ import { requireTeacher } from "@/lib/auth";
 import { selectClass } from "@/lib/class-actions";
 import { getCurrentUser, getTeacherClasses } from "@/lib/data";
 import { subjectTitle } from "@/lib/subjects";
+import { ClassButton } from "./ClassButton";
 import { NewClassCard } from "./NewClassCard";
 
 export const metadata: Metadata = {
@@ -49,20 +50,7 @@ export default async function ClassesPage() {
           {classes.map((c) => (
             <li key={c.id}>
               <form action={selectClass.bind(null, c.id)} className="h-full">
-                <button
-                  type="submit"
-                  className="flex h-full min-h-36 w-full cursor-pointer flex-col items-start justify-between gap-4 rounded-panel bg-card p-6 text-left shadow-card transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-float"
-                >
-                  <span className="text-5xl leading-none font-bold tracking-tight">{c.name}</span>
-                  <span className="flex w-full items-center justify-between gap-3 text-sm font-semibold text-ink-muted">
-                    <span>
-                      {subjectTitle(c.subject)} · {c.studentCount ?? 0} сурагч
-                    </span>
-                    <span aria-hidden="true" className="text-lg text-primary">
-                      →
-                    </span>
-                  </span>
-                </button>
+                <ClassButton name={c.name} detail={`${subjectTitle(c.subject)} · ${c.studentCount ?? 0} сурагч`} />
               </form>
             </li>
           ))}
