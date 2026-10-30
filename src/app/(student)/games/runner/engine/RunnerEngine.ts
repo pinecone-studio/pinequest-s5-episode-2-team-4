@@ -122,11 +122,11 @@ export class RunnerEngine {
         if (ok) {
           this.fx.burst(this.x, hy, GAME_COLORS.good, 26, 180);
           this.fx.ring(this.x, FEET_Y, GAME_COLORS.gold);
-          this.fx.float(this.x, hy - 40, `+${gain} ⚡`, GAME_COLORS.gold);
+          this.fx.float(this.x, hy - 40, `+${gain}`, GAME_COLORS.gold, false, "lightning");
         } else {
           this.hurt = 0.5;
           this.fx.burst(this.x, hy, GAME_COLORS.bad, 18, 140);
-          this.fx.float(this.x, hy - 40, `${gain} ⚡`, GAME_COLORS.bad);
+          this.fx.float(this.x, hy - 40, `${gain}`, GAME_COLORS.bad, false, "lightning");
         }
         this.next++;
         this.callbacks!.onNext(this.next < this.gates.length ? this.next : -1);

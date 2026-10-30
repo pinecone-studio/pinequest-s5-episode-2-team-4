@@ -8,6 +8,7 @@ import { requireStudent } from "@/lib/auth";
 import {
   getCoins,
   getCurrentPet,
+  getEquippedItems,
   getOpenAssignmentCount,
   getPetLines,
   getStudentSubject,
@@ -24,7 +25,7 @@ export default async function StudentLayout({
   children: React.ReactNode;
 }) {
   await requireStudent();
-  const [pet, petLines, videos, assignments, subject, lesson, coins] = await Promise.all([
+  const [pet, petLines, videos, assignments, subject, lesson, coins, equipped] = await Promise.all([
     getCurrentPet(),
     getPetLines(),
     getUnseenVideoCount(),
@@ -32,6 +33,7 @@ export default async function StudentLayout({
     getStudentSubject(),
     getTodayLesson(),
     getCoins(),
+    getEquippedItems(),
   ]);
   const counts = { videos, assignments, lesson: lesson && !lesson.answered ? 1 : 0 };
   const footerPets = FOOTER_PET_IDS.flatMap((id) => {
@@ -52,6 +54,8 @@ export default async function StudentLayout({
             level: pet.level,
             xpPercent: pet.xp,
             imageSrc: pet.stage.sprite,
+            ringColors: equipped.ring?.colors,
+            aura: equipped.aura,
           }
         }
       />
@@ -59,7 +63,7 @@ export default async function StudentLayout({
         <PageTransition>{children}</PageTransition>
       </main>
       <StudentFooter pets={footerPets} />
-      <MobileNav petSprite={pet?.stage.sprite} counts={counts} />
+      <MobileNav counts={counts} />
       <AchievementWatcher />
     </>
   );

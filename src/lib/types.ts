@@ -1,5 +1,7 @@
 // Shared data types. Mock data in src/lib/mock/ follows these; a real API should too.
 
+import type { PixelIconName } from "@/components/ui/PixelIcon";
+
 /** A fraction, optionally with a whole part: 2 1/3 → { whole: 2, num: 1, den: 3 }. */
 export type FractionValue = {
   whole?: number;
@@ -832,12 +834,13 @@ export type AchievementStat =
   | "petsCollected"
   | "petLevel"
   | "videosSeen"
-  | "assignmentsDone";
+  | "assignmentsDone"
+  | "questDays";
 
 /** A milestone: reach `goal` of `stat` once for its coins. */
 export type Achievement = {
   id: string;
-  emoji: string;
+  icon: PixelIconName;
   title: string;
   /** What to do, e.g. "10 боссыг ял". */
   description: string;

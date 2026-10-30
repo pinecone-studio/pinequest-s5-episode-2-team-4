@@ -11,9 +11,12 @@ export const metadata: Metadata = {
 const DECOR = [
   { id: "dollfin", left: 7, top: 26 },
   { id: "agnite", left: 14, top: 60 },
-  { id: "anoleaf", left: 82, top: 30 },
+  { id: "tweesher", left: 82, top: 30 },
   { id: "cardiling", left: 76, top: 64 },
 ];
+
+/** The card's pet when nobody is logged in: the demo's pet, Anoleaf. */
+const CARD_PET_ID = "anoleaf";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const [petLines, pet, { next }] = await Promise.all([getPetLines(), getCurrentPet(), searchParams]);
@@ -21,11 +24,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     const line = petLines.find((l) => l.id === id);
     return line ? [{ stage: line.stages[0], left, top }] : [];
   });
+  const cardLine = petLines.find((l) => l.id === CARD_PET_ID) ?? petLines[0];
 
   return (
     <main className="relative flex flex-1 items-center justify-center px-4 pt-22 pb-16">
       <FloatingPets pets={decor} size="lg" />
-      <LoginForm pet={pet?.stage ?? petLines[0].stages[0]} next={typeof next === "string" ? next : undefined} />
+      <LoginForm pet={pet?.stage ?? cardLine.stages[0]} next={typeof next === "string" ? next : undefined} />
     </main>
   );
 }

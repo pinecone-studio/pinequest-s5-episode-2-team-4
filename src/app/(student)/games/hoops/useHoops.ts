@@ -127,7 +127,7 @@ export function useHoops(questions: GameQuestion[]) {
       next = advance(next, false);
     } else if (scored) {
       soundRef.current?.bad();
-      setExplain({ kind: "bad", title: "Буруу бөмбөг сагсанд орлоо! −1 ❤️", text: q.explanation, seconds: 3.5 });
+      setExplain({ kind: "bad", title: "Буруу бөмбөг сагсанд орлоо! −1", icon: "heart", text: q.explanation, seconds: 3.5 });
       next = advance({ ...g, combo: 0, hearts: g.hearts - 1, wrong: g.wrong + 1, missed: g.missed.includes(q) ? g.missed : [...g.missed, q] }, false);
     } else {
       // A miss: a right ball comes back later, a wrong one is just gone.

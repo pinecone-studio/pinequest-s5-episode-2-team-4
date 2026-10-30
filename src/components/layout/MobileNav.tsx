@@ -2,38 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PetSprite } from "@/components/pet/PetSprite";
-import { usePetPreview } from "@/components/pet/petPreview";
 import { cn } from "@/lib/cn";
 import { NavBadge } from "./NavBadge";
 import { NavPill } from "./NavPill";
 import { HomeIcon, PlayIcon, TaskIcon, VideoIcon } from "./navIcons";
 import type { NavCounts } from "./SiteHeader";
 
-function petIcon(sprite?: string) {
-  return sprite ? (
-    <PetSprite stage={{ name: "", sprite }} size={24} className="animate-bob" />
-  ) : (
-    <span aria-hidden="true" className="size-6 rounded-full bg-lavender" />
-  );
-}
-
 /**
  * Bottom navigation for student pages on phones and tablets: a floating dock
  * whose current item rises into a purple circle. It stays in the page flow
  * (sticky), so at the end of the page it sits below the footer instead of
- * covering it, and it keeps clear of the iPhone home bar.
+ * covering it, and it keeps clear of the iPhone home bar. The pet page is in
+ * the header's account menu, not here.
  */
-export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: string; counts?: NavCounts }) {
-  // The /pets evolution demo shows each stage here too.
-  const petSprite = usePetPreview()?.sprite ?? realSprite;
+export function MobileNav({ counts = {} }: { counts?: NavCounts }) {
   const pathname = usePathname();
   const LINKS = [
     { href: "/", label: "Нүүр", icon: <HomeIcon className="size-5.5" />, count: counts.lesson, countLabel: "өнөөдрийн хичээлийн асуулт" },
     { href: "/games", label: "Тоглоом", icon: <PlayIcon className="size-5.5" /> },
     { href: "/videos", label: "Видео", icon: <VideoIcon className="size-5.5" />, count: counts.videos, countLabel: "шинэ видео" },
     { href: "/assignments", label: "Даалгавар", icon: <TaskIcon className="size-5.5" />, count: counts.assignments, countLabel: "биелүүлээгүй даалгавар" },
-    { href: "/pets", label: "Тэжээвэр", icon: petIcon(petSprite) },
   ];
 
   return (
@@ -49,7 +37,7 @@ export function MobileNav({ petSprite: realSprite, counts = {} }: { petSprite?: 
         <nav
           aria-label="Үндсэн цэс"
           style={{ viewTransitionName: "bottom-nav" }}
-          className="relative grid grid-cols-5 gap-1 px-2 py-1.5"
+          className="relative grid grid-cols-4 gap-1 px-2 py-1.5"
         >
           {LINKS.map((link) => {
             const active =

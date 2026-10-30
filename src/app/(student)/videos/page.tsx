@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui";
+import { ButtonLink, PixelIcon } from "@/components/ui";
 import { getClassVideos, getSeenVideoIds } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -35,8 +35,8 @@ export default async function StudentVideosPage() {
                 href={`/videos/${v.id}`}
                 className="glass-panel flex h-full items-center gap-4 rounded-panel border border-line bg-white p-4 text-ink no-underline shadow-card hover:text-ink hover:ring-2 hover:ring-primary"
               >
-                <span aria-hidden="true" className="flex h-20 w-12 shrink-0 items-center justify-center rounded-tile bg-linear-to-b from-primary to-primary-dark text-xl text-white">
-                  ▶
+                <span aria-hidden="true" className="flex h-20 w-12 shrink-0 items-center justify-center rounded-tile bg-linear-to-b from-primary to-primary-dark text-white">
+                  <PixelIcon name="play" className="size-6" />
                 </span>
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="flex flex-wrap items-center gap-2 text-lg leading-snug font-bold">

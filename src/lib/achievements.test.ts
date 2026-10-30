@@ -13,6 +13,7 @@ const none: AchievementStats = {
   petLevel: 0,
   videosSeen: 0,
   assignmentsDone: 0,
+  questDays: 0,
 };
 
 describe("ACHIEVEMENTS", () => {
@@ -31,6 +32,10 @@ describe("newlyReached", () => {
     const ids = newlyReached({ ...none, bossWins: 10, longestStreak: 3 }).map((a) => a.id);
     expect(ids).toEqual(expect.arrayContaining(["boss-1", "boss-10", "streak-3"]));
     expect(ids).not.toContain("streak-7");
+  });
+
+  it("unlocks «Өдрийн баатар» after a day with all quests claimed", () => {
+    expect(newlyReached({ ...none, questDays: 1 }).map((a) => a.id)).toEqual(["quests-all"]);
   });
 
   it("skips what is already unlocked", () => {

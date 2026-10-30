@@ -51,6 +51,8 @@ export type Account = {
   quests?: QuestLog;
   /** Games played to the end, ever (daily quests only count today's). */
   gamesPlayed?: number;
+  /** Days on which all three daily quests were claimed, ever. */
+  questDays?: number;
   /** Unlocked achievement ids and when (ISO date); each gave its coins once. */
   achievements?: Record<string, string>;
   /** Pet shop items bought and the ones worn. */

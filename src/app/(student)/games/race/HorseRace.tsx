@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon, type PixelIconName } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
 import { ChoiceGrid } from "../_components/ChoiceGrid";
@@ -19,15 +20,19 @@ type HorseRaceProps = {
   questions: GameQuestion[];
 };
 
-const MEDALS = ["🥇", "🥈", "🥉"];
-const CONFETTI = ["🎉", "⭐", "🎊", "✨", "🏆", "⭐", "🎉", "✨"];
+const MEDALS: PixelIconName[] = ["medal-gold", "medal-silver", "medal-bronze"];
+const CONFETTI: PixelIconName[] = ["star", "sparkle", "trophy", "star", "sparkle", "trophy", "star", "sparkle"];
 
 /** One line of race commentary from the standings. */
 function commentary(ranking: ReturnType<typeof standings>) {
   const leaders = ranking.filter((h) => h.place === 1);
   const me = ranking.find((h) => h.id === PLAYER)!;
   if (leaders[0].pos === 0) return "Морьд гарааны хашаанд бэлэн байна…";
-  if (me.place === 1 && leaders.length === 1) return "Чи тэргүүлж байна! Ингээд л давхи 🔥";
+  if (me.place === 1 && leaders.length === 1) return (
+      <>
+        Чи тэргүүлж байна! Ингээд л давхи <PixelIcon name="fire" className="inline-block size-4 align-[-0.15em]" />
+      </>
+    );
   if (me.place === 1) return `Чи ${leaders.filter((h) => h.id !== PLAYER).map((h) => h.name).join(", ")}-тэй мөр зэрэгцэж байна!`;
   const gap = leaders[0].pos - me.pos;
   return `${leaders.map((h) => h.name).join(", ")} тэргүүлж байна. Чи ${gap} нүүдлээр хоцорч байна.`;
@@ -64,9 +69,9 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
             <StartOverlay
               title="Морин уралдаан"
               steps={[
-                { icon: "✅", text: "Зөв хариулбал +1 нүүдэл" },
+                { icon: <PixelIcon name="check" className="size-6" />, text: "Зөв хариулбал +1 нүүдэл" },
                 { icon: <HorseSprite silk="#ffcf5a" coat="#8a5a34" number={1} className="h-8 w-10" />, text: "Ботууд зогсохгүй давхина" },
-                { icon: "🏁", text: `${FINISH} нүүдэлд түрүүлж хүр` },
+                { icon: <PixelIcon name="finish" className="size-6" />, text: `${FINISH} нүүдэлд түрүүлж хүр` },
               ]}
               buttonLabel="Уралдаан эхлэх"
               onStart={start}
@@ -76,7 +81,7 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
         </div>
 
         <p aria-live="polite" className="game-glass flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold">
-          <span aria-hidden="true">📣</span>
+          <PixelIcon name="megaphone" className="size-5" />
           {commentary(ranking)}
         </p>
 
@@ -100,12 +105,16 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
                     className="race-confetti pointer-events-none absolute top-0 text-2xl"
                     style={{ left: `${6 + i * 12}%`, animationDelay: `${i * 0.15}s` }}
                   >
-                    {c}
+                    <PixelIcon name={c} className="size-6" />
                   </span>
                 ))
               : null}
             <p className="text-sm font-extrabold text-[var(--game-gold)]">
-              {place === 1 ? "🏆 Чи түрүүлж финишд хүрлээ!" : `${ranking[0].name} түрүүллээ. Чи ${place}-р байр.`}
+              {place === 1 ? (
+                <>
+                  <PixelIcon name="trophy" className="inline-block size-4 align-[-0.15em]" /> Чи түрүүлж финишд хүрлээ!
+                </>
+              ) : `${ranking[0].name} түрүүллээ. Чи ${place}-р байр.`}
             </p>
             <ol className="flex flex-wrap justify-center gap-1.5 text-xs">
               {ranking.map((h) => (
@@ -113,7 +122,12 @@ export function HorseRace({ subjects, subjectId, questions }: HorseRaceProps) {
                   key={h.id}
                   className={cn("game-chip rounded-full px-2.5 py-1 font-bold", h.id === PLAYER && "border-[var(--game-gold)]")}
                 >
-                  {MEDALS[h.place - 1] ?? `${h.place}.`} {h.name} · {h.pos}
+                  {h.place <= MEDALS.length ? (
+                    <PixelIcon name={MEDALS[h.place - 1]} className="inline-block size-4 align-[-0.2em]" />
+                  ) : (
+                    `${h.place}.`
+                  )}{" "}
+                  {h.name} · {h.pos}
                 </li>
               ))}
             </ol>

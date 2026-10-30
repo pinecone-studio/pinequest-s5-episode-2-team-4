@@ -3,18 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { CoinIcon } from "@/components/layout/CoinChip";
-import { Button, ButtonLink, ProgressBar } from "@/components/ui";
+import { Button, ButtonLink, PixelIcon, type PixelIconName, ProgressBar } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { type ClaimResult, claimQuest } from "@/lib/quest-actions";
 import type { DailyQuest, QuestEvent } from "@/lib/types";
 
 /** Each activity's icon, tint and where to go to do it. */
-const ACTIVITY: Record<QuestEvent, { emoji: string; tint: string; href: string }> = {
-  game: { emoji: "🎮", tint: "bg-tint-blue", href: "/games" },
-  practice: { emoji: "✏️", tint: "bg-tint-sand", href: "/lesson/fractions" },
-  battle: { emoji: "⚔️", tint: "bg-tint-pink", href: "/pets/battle" },
-  video: { emoji: "🎬", tint: "bg-tint-violet", href: "/videos" },
-  assignment: { emoji: "📋", tint: "bg-tint-periwinkle", href: "/assignments" },
+const ACTIVITY: Record<QuestEvent, { icon: PixelIconName; tint: string; href: string }> = {
+  game: { icon: "gamepad", tint: "bg-tint-blue", href: "/games" },
+  practice: { icon: "pencil", tint: "bg-tint-sand", href: "/lesson/fractions" },
+  battle: { icon: "swords", tint: "bg-tint-pink", href: "/pets/battle" },
+  video: { icon: "clapper", tint: "bg-tint-violet", href: "/videos" },
+  assignment: { icon: "clipboard", tint: "bg-tint-periwinkle", href: "/assignments" },
 };
 
 const ERRORS: Record<Exclude<ClaimResult, { ok: true }>["error"], string> = {
@@ -56,8 +56,8 @@ export function DailyQuestsCard({ quests }: { quests: DailyQuest[] }) {
     <section aria-labelledby="quests-title" className="glass-panel my-6 rounded-panel border border-line bg-white p-5 shadow-card md:my-10 md:p-7">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender text-3xl">
-            🎯
+          <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-card bg-lavender">
+            <PixelIcon name="target" className="size-8" />
           </span>
           <div>
             <h2 id="quests-title" className="text-xl font-bold">
@@ -78,8 +78,8 @@ export function DailyQuestsCard({ quests }: { quests: DailyQuest[] }) {
           return (
             <li key={q.id} className="flex flex-col gap-3 rounded-card bg-surface p-4">
               <div className="flex items-center gap-3">
-                <span aria-hidden="true" className={cn("flex size-11 shrink-0 items-center justify-center rounded-full text-xl", activity.tint)}>
-                  {activity.emoji}
+                <span aria-hidden="true" className={cn("flex size-11 shrink-0 items-center justify-center rounded-full", activity.tint)}>
+                  <PixelIcon name={activity.icon} className="size-6" />
                 </span>
                 <h3 className="font-bold">{q.title}</h3>
               </div>

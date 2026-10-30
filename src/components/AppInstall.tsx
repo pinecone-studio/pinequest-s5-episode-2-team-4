@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PixelIcon } from "@/components/ui/PixelIcon";
 
 /** Chrome's install event; not in the DOM typings yet. */
 type InstallEvent = Event & { prompt: () => Promise<void> };
@@ -63,7 +64,7 @@ export function AppInstall() {
   return (
     <div className="border-b border-line bg-surface px-4 py-2 text-sm">
       <div className="mx-auto flex max-w-7xl items-center gap-2">
-        <span aria-hidden="true">📲</span>
+        <PixelIcon name="phone" className="size-5" />
         <p className="min-w-0 flex-1 font-semibold">
           {open && iosHint ? (
             <>

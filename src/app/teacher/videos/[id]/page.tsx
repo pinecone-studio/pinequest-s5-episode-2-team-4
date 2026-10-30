@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookView } from "@/components/BookView";
-import { ButtonLink } from "@/components/ui";
+import { ButtonLink, PixelIcon } from "@/components/ui";
 import { getTeacherVideo } from "@/lib/data";
 import { ReelLab } from "./ReelLab";
 
@@ -24,7 +24,8 @@ export default async function VideoPage({ params }: PageProps<"/teacher/videos/[
         <h1 className="type-page-title">{video.script.title}</h1>
         {video.materialId && (
           <ButtonLink href={`/teacher/assignments/new?video=${video.id}`} variant="secondary" size="sm" className="shrink-0 self-start md:self-auto">
-            🎮 Энэ видеоноос даалгавар үүсгэх
+            <PixelIcon name="gamepad" className="size-5" />
+            Энэ видеоноос даалгавар үүсгэх
           </ButtonLink>
         )}
       </div>

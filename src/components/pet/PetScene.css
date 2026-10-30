@@ -1,6 +1,7 @@
 /* The pet's habitat (design: Тэжээвэр). The mood class on .pet-scene picks
    the pet's animation and the sky: happy hops, awake bobs, sleepy dims and
-   breathes under a night sky with «z Z». */
+   breathes under a night sky with «z Z». In dark mode the sky is at night
+   for every mood. */
 
 .pet-scene-pet {
   transform-origin: 50% 100%;
@@ -50,6 +51,25 @@
 
 .pet-scene--sleepy .pet-scene-stars {
   opacity: 1;
+}
+
+/* Dark mode: the habitat is at night too, whatever the mood or the scene. */
+[data-theme="dark"] .pet-scene-sun {
+  opacity: 0.2;
+}
+
+/* A little deeper than the sleepy night, to sit with the dark page. */
+[data-theme="dark"] .pet-scene-night {
+  opacity: 0.65;
+}
+
+[data-theme="dark"] .pet-scene-stars {
+  opacity: 1;
+}
+
+/* «z Z» stays readable on the night sky. */
+[data-theme="dark"] .pet-scene-zz {
+  color: #f1edff;
 }
 
 .pet-scene-drift {

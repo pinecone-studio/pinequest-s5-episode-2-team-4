@@ -1,4 +1,4 @@
-import { ProgressBar } from "@/components/ui";
+import { PixelIcon, ProgressBar } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { ClassGoal } from "@/lib/types";
 
@@ -38,9 +38,8 @@ export function ClassGoalCard({ goal, className }: ClassGoalCardProps) {
         className="mt-3"
       />
       <p className="mt-2.5 text-sm font-bold text-ink-muted md:text-base">
-        {left > 0
-          ? `${xp(left)} XP үлдлээ · 🎁 ${goal.reward}`
-          : `Зорилгод хүрлээ! 🎁 ${goal.reward}`}
+        {left > 0 ? `${xp(left)} XP үлдлээ · ` : "Зорилгод хүрлээ! "}
+        <PixelIcon name="gift" className="inline-block size-4 align-[-0.125em]" /> {goal.reward}
       </p>
     </section>
   );

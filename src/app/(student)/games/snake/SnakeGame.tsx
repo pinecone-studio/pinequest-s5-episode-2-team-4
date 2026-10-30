@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, useSyncExternalStore } from "react";
+import { PixelIcon } from "@/components/ui";
 import type { GameQuestion } from "@/lib/types";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
@@ -21,9 +22,9 @@ type SnakeGameProps = {
 };
 
 const STEPS = [
-  { icon: "👆", text: "Хуруугаараа чиглүүл" },
-  { icon: "✅", text: "Таарах 3-ыг ид" },
-  { icon: "💡", text: "Буруу бол тайлбар" },
+  { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Хуруугаараа чиглүүл" },
+  { icon: <PixelIcon name="check" className="size-6" />, text: "Таарах 3-ыг ид" },
+  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Буруу бол тайлбар" },
 ];
 
 /** Knowledge snake: steer to the 3 answers that fit the task; a wrong bite pauses on its explanation. */

@@ -34,15 +34,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // Dark until a student picks light (the script below reads their choice).
     <html
       lang="mn"
+      data-theme="dark"
       suppressHydrationWarning
       className={`${nunito.variable} h-full antialiased`}
     >
       {/* Pages read the session cookie, which streams in at request time. */}
       <body className="min-h-full flex flex-col">
         <Script id="levelup-theme" strategy="beforeInteractive">
-          {`try{var theme=localStorage.getItem('levelup-theme');document.documentElement.dataset.theme=theme==='dark'?'dark':'light'}catch{}`}
+          {`try{var theme=localStorage.getItem('levelup-theme');document.documentElement.dataset.theme=theme==='light'?'light':'dark'}catch{}`}
         </Script>
         <AppInstall />
         <Suspense fallback={<PageLoading />}>{children}</Suspense>
