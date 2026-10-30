@@ -769,9 +769,10 @@ export type StudentAssignment = Assignment & {
 
 /**
  * Published assignments for the student's class, unless one is only for
- * students weak in a subtopic and this student isn't.
+ * students weak in a subtopic and this student isn't. Cached per request:
+ * the layout's menu badge and the page both read it.
  */
-export async function getStudentAssignments(): Promise<StudentAssignment[]> {
+export const getStudentAssignments = cache(async (): Promise<StudentAssignment[]> => {
   const session = await readSession();
   if (!session?.classCode || session.role !== "student") return [];
   const [assignments, progress] = await Promise.all([listClassAssignments(normalClassCode(session.classCode)), getProgress()]);
@@ -785,7 +786,7 @@ export async function getStudentAssignments(): Promise<StudentAssignment[]> {
     done: done.has(a.id),
     playGame: pickGame(a, session.favoriteGames),
   }));
-}
+});
 
 /** Assignments the student hasn't finished yet, for the menu badge. */
 export async function getOpenAssignmentCount(): Promise<number> {
@@ -828,11 +829,11 @@ export async function getTeacherMaterial(materialId: string): Promise<Material |
   return id ? getMaterialRow(id, materialId) : undefined;
 }
 
-/** Published lesson videos for the student's class. */
-export async function getClassVideos(): Promise<LessonVideo[]> {
+/** Published lesson videos for the student's class; cached per request like getStudentAssignments. */
+export const getClassVideos = cache(async (): Promise<LessonVideo[]> => {
   const session = await readSession();
   return session?.classCode ? listClassVideos(normalClassCode(session.classCode)) : [];
-}
+});
 
 /** Ids of the class videos the student has opened. */
 export async function getSeenVideoIds(): Promise<string[]> {
@@ -917,8 +918,8 @@ export async function getClassMembers(): Promise<ClassMember[]> {
   return listClassMembers(active.id);
 }
 
-/** The classes the logged-in student is in; demo students are in the demo class. */
-export async function getStudentClasses(): Promise<SchoolClass[]> {
+/** The classes the logged-in student is in; demo students are in the demo class. Cached per request. */
+export const getStudentClasses = cache(async (): Promise<SchoolClass[]> => {
   const user = await getCurrentUser();
   if (user?.role !== "student") return [];
   if (user.demo || !classesStored()) return user.classCode ? [demoClass(user)] : [];
@@ -928,7 +929,7 @@ export async function getStudentClasses(): Promise<SchoolClass[]> {
     console.error(error);
     return [];
   }
-}
+});
 
 /**
  * What the student is studying now: their current class's subject, or for a
