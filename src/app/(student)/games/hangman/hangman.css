@@ -1,3 +1,8 @@
+.hangman {
+  font-family: var(--font-hangman-pixel), var(--font-sans);
+  font-synthesis: none;
+}
+
 /* Hangman shares the games' night palette; sprites remain crisp at every size. */
 .hangman-board {
   --color-primary: #8c5bff;
@@ -18,26 +23,26 @@
 .hangman-mode-choice { display: grid; gap: 7px; min-height: 88px; width: 100%; padding: 14px 16px; border: 2px solid #684caa; border-radius: 4px; background: #261b50; color: #f6f3ff; text-align: left; cursor: pointer; box-shadow: 0 5px 0 #110d24, inset 0 2px 0 rgb(255 255 255 / .06); transition: background-color 120ms, transform 120ms; }
 .hangman-mode-choice:hover { background: #352268; border-color: #ad8aff; transform: translateY(-2px); }
 .hangman-mode-choice:active { transform: translateY(4px); box-shadow: 0 1px 0 #110d24; }
-.hangman-mode-name { display: flex; justify-content: space-between; font: 800 23px ui-monospace, monospace; letter-spacing: 2px; }
+.hangman-mode-name { display: flex; justify-content: space-between; font: 700 25px var(--font-hangman-pixel), monospace; letter-spacing: 2px; }
 .hangman-mode-choice:nth-child(1) .hangman-mode-name { color: #64e4c4; }
 .hangman-mode-choice:nth-child(2) .hangman-mode-name { color: #ffcf5a; }
 .hangman-mode-choice:nth-child(3) .hangman-mode-name { color: #ff83c1; }
-.hangman-mode-description { font-size: 11px; line-height: 1.6; color: #b4a9e3; }
+.hangman-mode-description { font-size: 14px; line-height: 1.6; color: #b4a9e3; }
 .hangman-start-scene { min-width: 0; }
 .hangman-board-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: rgb(29 22 71 / .65); border-bottom: 2px solid #33296b; }
-.hangman-board-header h1 { font: 800 19px ui-monospace, monospace; letter-spacing: 3px; color: #ffcf5a; text-shadow: 2px 2px 0 #4c287f; }
+.hangman-board-header h1 { font: 700 24px var(--font-hangman-pixel), monospace; letter-spacing: 3px; color: #ffcf5a; text-shadow: 2px 2px 0 #4c287f; }
 .hangman-board .hangman-back { display: grid; place-items: center; min-width: 44px; min-height: 44px; color: #c4afff; font-size: 24px; text-decoration: none; }
-.hangman-level { margin-left: auto; color: #c5b6ee; white-space: nowrap; font: 12px ui-monospace, monospace; }
-.hangman-change-mode { min-height: 44px; cursor: pointer; color: #c5b6ee; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+.hangman-level { margin-left: auto; color: #c5b6ee; white-space: nowrap; font: 14px var(--font-hangman-pixel), monospace; }
+.hangman-change-mode { min-height: 44px; cursor: pointer; color: #c5b6ee; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
 .hangman-word-area { padding: 22px 24px 18px; text-align: center; }
 .hangman-translation { font-size: 20px; font-weight: 700; }
 .hangman-word-slots { display: flex; justify-content: center; gap: clamp(3px, 1vw, 8px); margin: 18px auto 0; max-width: 600px; }
-.hangman-letter { display: grid; place-items: center; flex: 0 1 36px; min-width: 0; height: 46px; color: #dfd2ff; background: #211842; border: 1px solid #443478; border-bottom: 3px solid #8b5cff; font: 700 clamp(18px, 4vw, 28px) ui-monospace, monospace; }
+.hangman-letter { display: grid; place-items: center; flex: 0 1 36px; min-width: 0; height: 46px; color: #dfd2ff; background: #211842; border: 1px solid #443478; border-bottom: 3px solid #8b5cff; font: 700 clamp(18px, 4vw, 28px) var(--font-hangman-pixel), monospace; }
 .hangman-letter.is-revealed { color: #ffdc83; border-bottom-color: #ffcf5a; }
 .hangman-letter.is-missing { color: #ff83ac; border-color: #b5497d; }
 .hangman-play-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 28px; padding: 0 28px 24px; }
 .hangman-keyboard { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-.hangman-key { min-height: 46px; border: 2px solid #5a468b; border-top-color: #8060b6; border-radius: 3px; background: #271e4c; color: #eee5ff; font: 700 21px ui-monospace, monospace; cursor: pointer; box-shadow: 0 3px 0 #100b22; touch-action: manipulation; }
+.hangman-key { min-height: 46px; border: 2px solid #5a468b; border-top-color: #8060b6; border-radius: 3px; background: #271e4c; color: #eee5ff; font: 700 21px var(--font-hangman-pixel), monospace; cursor: pointer; box-shadow: 0 3px 0 #100b22; touch-action: manipulation; }
 .hangman-key:enabled:hover { background: #483075; border-color: #ae8dff; }
 .hangman-key:enabled:active { transform: translateY(3px); box-shadow: none; }
 .hangman-key:disabled { cursor: default; }
@@ -55,19 +60,19 @@
 .hangman-confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .hangman-confetti i { position: absolute; top: -16px; width: 4px; height: 8px; opacity: 0; }
 .hangman-board-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; padding: 16px 24px; background: #17112e; border-top: 2px solid #33296b; }
-.hangman-result { font-size: 12px; line-height: 1.7; color: #b4a9e3; }
-.hangman-result-title { color: #ffcf5a; font-weight: 700; font-size: 15px; }
+.hangman-result { font-size: 15px; line-height: 1.7; color: #b4a9e3; }
+.hangman-result-title { color: #ffcf5a; font-weight: 700; font-size: 18px; }
 .hangman-board-footer button { border-radius: 4px; }
 .hangman-board :focus-visible { outline-color: #ffcf5a; }
 
 @media (max-width: 600px) {
   .hangman-start-layout { gap: 10px; }
   .hangman-mode-choice { min-height: 74px; padding: 10px; }
-  .hangman-mode-name { font-size: 17px; letter-spacing: 1px; }
-  .hangman-mode-description { font-size: 10px; }
+  .hangman-mode-name { font-size: 22px; letter-spacing: 1px; }
+  .hangman-mode-description { font-size: 13px; }
   .hangman-board-header { padding: 10px; gap: 7px; flex-wrap: wrap; }
-  .hangman-board-header h1 { font-size: 15px; letter-spacing: 2px; }
-  .hangman-level, .hangman-change-mode { font-size: 10px; }
+  .hangman-board-header h1 { font-size: 20px; letter-spacing: 2px; }
+  .hangman-level, .hangman-change-mode { font-size: 12px; }
   .hangman-word-area { padding: 16px 12px; }
   .hangman-translation { font-size: 18px; }
   .hangman-word-slots { margin-top: 12px; }
