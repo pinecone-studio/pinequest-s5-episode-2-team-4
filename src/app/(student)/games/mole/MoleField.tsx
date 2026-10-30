@@ -1,4 +1,5 @@
 import { PixelIcon } from "@/components/ui";
+import { pixelPaths } from "@/components/ui/PixelIcon";
 import { cn } from "@/lib/cn";
 import { AnswerView } from "../_components/AnswerView";
 import type { Mole } from "./useWhackAMole";
@@ -12,44 +13,49 @@ type MoleFieldProps = {
   disabled: boolean;
 };
 
-/** A mole holding up its answer sign; squashed when hit. */
-function MoleSprite({ hit }: { hit?: "good" | "bad" }) {
+// Pixel art, like PixelIcon: each letter is a palette colour, "." is empty.
+
+/** The mole: brown fur, a lighter belly, paws holding the sign's pole, buck teeth. */
+const MOLE = [
+  "......DDDDDDDD......", "....DDBBBBBBBBDD....", "...DBBBBBBBBBBBBD...", "..DBBBBBBBBBBBBBBD..",
+  "..DBBBKKBBBBKKBBBD..", ".DBBBBKWBBBBKWBBBBD.", ".DBBBBKKBBBBKKBBBBD.", ".DBBBBBBBNNBBBBBBBD.",
+  "DBBBBBBBNNNNBBBBBBBD", "DBBBBBBBBKKBBBBBBBBD", "DBBBPPBBWWWWBBPPBBBD", "DBBPPPPLLLLLLPPPPBBD",
+  "DBBBPPLLLLLLLLPPBBBD", "DBBBBLLLLLLLLLLBBBBD", "DBBBBLLLLLLLLLLBBBBD", "DBBBBBLLLLLLLLBBBBBD",
+  "DBBBBBBBBBBBBBBBBBBD", "DBBBBBBBBBBBBBBBBBBD",
+];
+/** Hit: the eyes turn into crosses. */
+const MOLE_HIT = [
+  ...MOLE.slice(0, 4),
+  "..DBBKBKBBBBKBKBBD..", ".DBBBBKBBBBBBKBBBBD.", ".DBBBKBKBBBBKBKBBBD.",
+  ...MOLE.slice(7),
+];
+const MOLE_COLORS = { D: "#4e321f", B: "#7a5236", L: "#b98a5e", P: "#f1b3a8", K: "#1d1647", W: "#fff", N: "#ff8fb1" };
+
+const HAMMER = [
+  ".VVHHHHHHVV.", ".VVHHHHHHVV.", ".VVHHHHHHVV.", ".VVHHHHHHVV.",
+  ".....WW.....", ".....WW.....", ".....WW.....", ".....WW.....",
+  ".....WW.....", ".....WW.....", ".....WW.....", ".....WW.....",
+];
+const HAMMER_COLORS = { V: "#8b5cff", H: "#b4a9e3", W: "#8a5a34" };
+
+function PixelSprite({ rows, palette, className }: { rows: string[]; palette: Record<string, string>; className: string }) {
   return (
-    <svg viewBox="0 0 100 90" aria-hidden="true" className="block w-full">
-      <path d="M14 90C10 48 26 18 50 18s40 30 36 72z" fill={hit === "bad" ? "#a3304e" : "#7a5236"} />
-      <ellipse cx="50" cy="66" rx="20" ry="18" fill="#b98a5e" />
-      {/* paws holding the sign's pole */}
-      <ellipse cx="34" cy="56" rx="7" ry="5" fill="#f1b3a8" />
-      <ellipse cx="66" cy="56" rx="7" ry="5" fill="#f1b3a8" />
-      {hit ? (
-        <>
-          <path d="m33 34 8 6m0-6-8 6M59 34l8 6m0-6-8 6" stroke="#1d1647" strokeWidth="3" strokeLinecap="round" />
-        </>
-      ) : (
-        <>
-          <circle cx="38" cy="38" r="5" fill="#1d1647" />
-          <circle cx="62" cy="38" r="5" fill="#1d1647" />
-          <circle cx="39.5" cy="36.5" r="1.6" fill="#fff" />
-          <circle cx="63.5" cy="36.5" r="1.6" fill="#fff" />
-        </>
-      )}
-      <ellipse cx="50" cy="48" rx="7" ry="5" fill="#ff8fb1" />
-      <path d="M44 55q6 5 12 0" fill="none" stroke="#1d1647" strokeWidth="2.5" strokeLinecap="round" />
-      <rect x="45" y="56" width="4" height="5" rx="1" fill="#fff" />
-      <rect x="51" y="56" width="4" height="5" rx="1" fill="#fff" />
+    <svg viewBox={`0 0 ${rows[0].length} ${rows.length}`} shapeRendering="crispEdges" aria-hidden="true" className={className}>
+      {pixelPaths({ rows, palette }).map(([fill, d]) => (
+        <path key={fill} fill={fill} d={d} />
+      ))}
     </svg>
   );
 }
 
+/** A mole holding up its answer sign; squashed when hit, red when it was the wrong one. */
+function MoleSprite({ hit }: { hit?: "good" | "bad" }) {
+  const palette = hit === "bad" ? { ...MOLE_COLORS, B: "#a3304e", D: "#6b1a30" } : MOLE_COLORS;
+  return <PixelSprite rows={hit ? MOLE_HIT : MOLE} palette={palette} className="block w-full" />;
+}
+
 function Hammer() {
-  return (
-    <svg viewBox="0 0 60 60" aria-hidden="true" className="block size-full">
-      <rect x="27" y="22" width="7" height="34" rx="3" fill="#8a5a34" />
-      <rect x="10" y="6" width="40" height="20" rx="6" fill="#b4a9e3" />
-      <rect x="10" y="6" width="9" height="20" rx="3" fill="#8b5cff" />
-      <rect x="41" y="6" width="9" height="20" rx="3" fill="#8b5cff" />
-    </svg>
-  );
+  return <PixelSprite rows={HAMMER} palette={HAMMER_COLORS} className="block size-full" />;
 }
 
 /** 3×3 field of holes; moles pop up with an answer sign and go back down. */
@@ -66,14 +72,14 @@ export function MoleField({ moles, swing, onHit, disabled }: MoleFieldProps) {
           className="relative aspect-[1/1.12] cursor-pointer touch-none select-none disabled:cursor-default"
         >
           {/* back of the hole */}
-          <span aria-hidden="true" className="mole-hole absolute inset-x-[6%] bottom-[8%] h-[24%] rounded-[50%]" />
+          <span aria-hidden="true" className="mole-hole absolute inset-x-[6%] bottom-[8%] h-[24%]" />
           {/* the mole rises from inside the hole */}
           <span className="absolute inset-x-0 bottom-[18%] top-0 overflow-hidden">
             {mole ? (
               <span key={mole.id} className={cn("mole-up absolute inset-x-[12%] bottom-0 flex flex-col items-center", mole.hit && "mole-hit")}>
                 <span
                   className={cn(
-                    "mole-sign relative z-10 mb-[-6%] flex min-h-9 w-[112%] items-center justify-center rounded-lg border-2 px-1 py-1 text-sm leading-tight font-extrabold text-[var(--game-ink)]",
+                    "mole-sign relative z-10 mb-[-6%] flex min-h-9 w-[112%] items-center justify-center border-[3px] px-1 py-1 text-sm leading-tight font-extrabold text-[var(--game-ink)]",
                     mole.hit === "good" && "border-[var(--game-good)] bg-[#0f3d33]",
                     mole.hit === "bad" && "border-[var(--game-bad)] bg-[#4a1030]",
                     !mole.hit && "border-[var(--game-line)] bg-[#1d1647]",
@@ -86,7 +92,7 @@ export function MoleField({ moles, swing, onHit, disabled }: MoleFieldProps) {
             ) : null}
           </span>
           {/* front lip of the hole, over the mole */}
-          <span aria-hidden="true" className="mole-lip absolute inset-x-[2%] bottom-[4%] h-[18%] rounded-[50%]" />
+          <span aria-hidden="true" className="mole-lip absolute inset-x-[2%] bottom-[4%] h-[9%]" />
           {mole?.hit === "good" ? (
             <span aria-hidden="true" className="mole-stars pointer-events-none absolute inset-x-0 top-[20%] z-20 flex justify-center gap-0.5">
               <PixelIcon name="star" className="size-5" />
