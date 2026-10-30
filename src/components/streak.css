@@ -158,3 +158,23 @@
     backdrop-filter: none;
   }
 }
+
+.streak-month { margin-top: 20px; border-top: 1px solid var(--streak-border); padding-top: 14px; }
+.streak-month > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; cursor: pointer; list-style: none; font-size: 13px; font-weight: 700; }
+.streak-month > summary::-webkit-details-marker { display: none; }
+.streak-month[open] > summary > span { transform: rotate(180deg); }
+.streak-month-header { display: flex; align-items: center; justify-content: space-between; margin: 8px 0 12px; }
+.streak-month-header h3 { font-size: 14px; font-weight: 700; }
+.streak-month-header button, .streak-month-footer button { min-height: 44px; min-width: 44px; border-radius: 10px; cursor: pointer; color: var(--streak-text); }
+.streak-month-header button:enabled:hover, .streak-month-footer button:enabled:hover { background: var(--streak-tile); }
+.streak-month button:disabled { opacity: .3; cursor: default; }
+.streak-month-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; margin-bottom: 5px; }
+.streak-month-weekday { text-align: center; padding: 8px 0; color: var(--streak-muted); font-size: 11px; }
+.streak-month-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 44px; padding-top: 7px; border: 1px solid transparent; border-radius: 10px; color: var(--streak-label); font-size: 13px; font-variant-numeric: tabular-nums; }
+.streak-month-cell.is-active { background: var(--streak-active-background); color: var(--streak-active-text); }
+.streak-month-cell.is-today { border-color: var(--streak-accent); font-weight: 800; }
+.streak-month-cell.is-muted { opacity: .35; }
+.streak-month-mark { display: block; height: 13px; font-size: 6px; color: var(--streak-accent); }
+.streak-month-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 11px; color: var(--streak-muted); }
+.streak-month-footer button { padding: 0 10px; font-size: 11px; }
+.streak-month-legend { margin-right: 5px; color: var(--streak-accent); }
