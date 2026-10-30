@@ -3,14 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Card } from "@/components/ui";
+import { DEMO_PAGE } from "@/lib/demo-reel";
 import { createVideoAction, recognizeMaterialAction } from "@/lib/teacher-actions";
 import type { CurriculumChapter, Recognition, ClassOption } from "@/lib/types";
 import { AiWorking } from "../../_content/AiWorking";
 import { MaterialForm } from "../../_content/MaterialForm";
+import { type ReelFrame, ReelFrameChooser } from "../../_content/ReelFrameChooser";
 import { RecognitionEditor } from "../../_content/RecognitionEditor";
 import { ErrorNote, SourceBadge, StepTitle } from "../../_content/ui";
 
 type Recognized = {
+  /** From the pitch demo's ready page */
+  demoMaterial?: boolean;
   materialId: string;
   classCode: string;
   recognition: Recognition;
@@ -23,22 +27,27 @@ export function NewVideoFlow({
   curriculum,
   classes,
   teacherSubject,
+  demo = false,
 }: {
   curriculum: CurriculumChapter[];
   classes: ClassOption[];
   /** The subject the teacher teaches */
   teacherSubject?: string;
+  /** A demo teacher: offers the pitch demo's ready textbook page */
+  demo?: boolean;
 }) {
   const router = useRouter();
   const [recognized, setRecognized] = useState<Recognized>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
+  // The pitch demo's ready reel is vertical over the pixel run.
+  const [frame, setFrame] = useState<ReelFrame>({ layout: "vertical", background: demo ? "pixel-run" : undefined });
 
   async function writeScript() {
     if (!recognized) return;
     setBusy(true);
     setError(undefined);
-    const result = await createVideoAction(recognized).catch(() => undefined);
+    const result = await createVideoAction({ ...recognized, ...frame }).catch(() => undefined);
     if (!result?.ok) {
       setBusy(false);
       return setError(result?.error ?? "Скрипт бичиж чадсангүй. Дахин оролдоно уу.");
@@ -69,9 +78,11 @@ export function NewVideoFlow({
             withClass
             teacherSubject={teacherSubject}
             submitLabel="✦ AI-аар уншуулах"
+            demoPage={demo ? DEMO_PAGE : undefined}
             onSubmit={async (input) => {
               const { materialId, recognition, topicDetected } = await recognizeMaterialAction(input);
               setRecognized({
+                demoMaterial: input.demoMaterial,
                 materialId,
                 classCode: input.classCode ?? "",
                 recognition: recognition.value,
@@ -113,6 +124,7 @@ export function NewVideoFlow({
               expected="10–40 секунд"
             />
           )}
+          <ReelFrameChooser value={frame} onChange={setFrame} />
           <Button onClick={writeScript} disabled={busy} aria-busy={busy} className="self-start">
             {busy ? "Скрипт бичиж байна…" : "✦ Видеоны скрипт бичүүлэх"}
           </Button>

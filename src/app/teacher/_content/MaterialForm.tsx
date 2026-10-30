@@ -24,6 +24,8 @@ type MaterialFormProps = {
   onSubmit: (input: MaterialInput, progress: Progress) => Promise<void>;
   /** The subject the teacher teaches; fixed when set. */
   teacherSubject?: string;
+  /** The pitch demo's textbook page, added with one button (demo teachers only) */
+  demoPage?: { src: string; name: string };
 };
 
 export type Progress = (step: string, activity: string[]) => void;
@@ -48,7 +50,7 @@ const kb = (n: number) => (n > 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB
  * A lesson topic plus any mix of text, book page photos, screenshots, PDFs
  * and .txt files. Files go to Storage when the teacher submits.
  */
-export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSubmit, teacherSubject }: MaterialFormProps) {
+export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSubmit, teacherSubject, demoPage }: MaterialFormProps) {
   const id = useId();
   const [topic, setTopic] = useState("");
   const [grade, setGrade] = useState(7);
@@ -70,6 +72,18 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
     if (!problem) setFiles(next);
   }
 
+  /** Adds the demo page as if the teacher had picked the file. */
+  async function addDemoPage() {
+    if (!demoPage) return;
+    try {
+      const blob = await (await fetch(demoPage.src)).blob();
+      setFiles([...files.filter((f) => f.name !== demoPage.name), new File([blob], demoPage.name, { type: blob.type || "image/jpeg" })]);
+      setError(undefined);
+    } catch {
+      setError("Демо зургийг нээж чадсангүй");
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     // With text or files the AI finds the topic; with neither there is nothing to go on.
@@ -84,7 +98,8 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
     try {
       const uploaded = await uploadMaterialFiles(files);
       addStep(readStep(files.some((f) => f.type.startsWith("image/"))));
-      await onSubmit({ topicTitle: topic, grade, subject, classCode, text, files: uploaded }, (label, activity) =>
+      const demoMaterial = Boolean(demoPage && files.some((f) => f.name === demoPage.name));
+      await onSubmit({ demoMaterial, topicTitle: topic, grade, subject, classCode, text, files: uploaded }, (label, activity) =>
         addStep({ label, activity }),
       );
     } catch (err) {
@@ -200,6 +215,15 @@ export function MaterialForm({ curriculum, classes, withClass, submitLabel, onSu
           </button>
           . Хамгийн ихдээ {MAX_UPLOAD_FILES} файл, зураг 5 MB, PDF 10 MB.
         </p>
+        {demoPage && (
+          <button
+            type="button"
+            onClick={addDemoPage}
+            className="mt-1 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-4 text-sm font-bold text-white hover:bg-primary-dark"
+          >
+            Бэлэн демо зураг оруулах
+          </button>
+        )}
         <input
           ref={input}
           type="file"

@@ -18,7 +18,7 @@ export default async function NewVideoPage() {
       <h1 className="type-page-title">Шинэ хичээлийн видео</h1>
       {/* Students (or judges at a pitch) join by QR while the video is being made. */}
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px] md:gap-7">
-        <NewVideoFlow curriculum={curriculum} classes={classes} teacherSubject={user?.subject} />
+        <NewVideoFlow curriculum={curriculum} classes={classes} teacherSubject={user?.subject} demo={Boolean(user?.demo)} />
         <LiveJoinQr autoStart={Boolean(user?.demo)} className="lg:sticky lg:top-4" />
       </div>
     </div>

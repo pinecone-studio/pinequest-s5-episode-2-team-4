@@ -133,6 +133,7 @@ import {
   notifications,
 } from "./mock/teacher";
 import { bosses } from "./mock/bosses";
+import { isDemoReelScript } from "./mock/demoReel";
 import { gameSubjects } from "./mock/games";
 import { anonQuestions, questionGroups } from "./mock/anonQuestions";
 import { BATTLE_SUBJECTS } from "./battle-questions";
@@ -820,6 +821,14 @@ export async function getAssignmentForPlay(
 export async function getTeacherVideos(): Promise<LessonVideo[]> {
   const id = await teacherId();
   return id ? listTeacherVideos(id) : [];
+}
+
+/**
+ * The video is the pitch demo's ready reel (made ahead, its narration
+ * unchanged): its formulas were checked when it was made.
+ */
+export async function isReadyDemoVideo(video: LessonVideo): Promise<boolean> {
+  return Boolean((await getCurrentUser())?.demo) && isDemoReelScript(video.script);
 }
 
 export async function getTeacherVideo(videoId: string): Promise<LessonVideo | undefined> {

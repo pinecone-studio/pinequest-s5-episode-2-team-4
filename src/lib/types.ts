@@ -627,9 +627,16 @@ export type ReelSection = {
   formula?: string;
 };
 
+/** A reel's shape: a phone video (9:16, the default) or a classroom screen (16:9). */
+export type ReelLayout = "vertical" | "horizontal";
+
 export type ReelScript = {
   title: string;
   sections: ReelSection[];
+  /** Vertical when unset */
+  layout?: ReelLayout;
+  /** A looping video behind it (reel-frame.ts); the plain purple when unset */
+  background?: string;
 };
 
 /** Textbook-style explanation students can read instead of watching. */

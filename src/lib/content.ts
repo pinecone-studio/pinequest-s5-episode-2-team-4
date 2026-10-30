@@ -159,7 +159,9 @@ type VideoRow = {
 
 async function toVideo(r: VideoRow): Promise<LessonVideo> {
   let audioUrl: string | undefined;
-  if (r.audio_path) {
+  // A public file (the pitch demo's ready narration), or one in the private bucket.
+  if (r.audio_path?.startsWith("/")) audioUrl = r.audio_path;
+  else if (r.audio_path) {
     const { data } = await db().storage.from(AUDIO_BUCKET).createSignedUrl(r.audio_path, SIGNED_URL_SECONDS);
     audioUrl = data?.signedUrl;
   }
@@ -225,10 +227,14 @@ export async function saveVideoScript(teacherId: string, id: string, title: stri
   if (error) fail("Save script", error);
 }
 
-/** Uploads narration audio and stores it with its timings, marking the video approved. */
-export async function approveVideo(teacherId: string, id: string, audio: Buffer | undefined, timings: ReelTimings) {
-  let audioPath: string | null = null;
-  if (audio) {
+/**
+ * Uploads narration audio and stores it with its timings, marking the video
+ * approved. A string is a public file's path instead (the pitch demo's ready
+ * narration), stored as it is.
+ */
+export async function approveVideo(teacherId: string, id: string, audio: Buffer | string | undefined, timings: ReelTimings) {
+  let audioPath: string | null = typeof audio === "string" ? audio : null;
+  if (audio instanceof Buffer) {
     audioPath = `${teacherId}/${id}-${Date.now()}.mp3`;
     const { error } = await db().storage.from(AUDIO_BUCKET).upload(audioPath, audio, { contentType: "audio/mpeg", upsert: true });
     if (error) fail("Upload audio", error);
