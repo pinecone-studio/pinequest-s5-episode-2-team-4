@@ -1,4 +1,3 @@
-import { LandscapeBackdrop } from "@/components/layout/LandscapeBackdrop";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { redirect } from "next/navigation";
@@ -15,7 +14,6 @@ export default async function TeacherLayout({ children }: LayoutProps<"/teacher"
 
   return (
     <>
-      <LandscapeBackdrop />
       <TeacherHeader />
       <main className="flex-1">
         <PageTransition>{children}</PageTransition>

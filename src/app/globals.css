@@ -8,7 +8,7 @@
      is the soft purple tint for active pills; sky marks "good"; magenta is
      the signal colour for weak and alerts. All text pairs pass 4.5:1.
      ink-muted is darker than the design's #6b6585 so it also passes over
-     the pixel landscape behind student and teacher pages (LandscapeBackdrop).
+     the pixel landscape behind student and login pages (LandscapeBackdrop).
      The page, surfaces and lines are a step darker than the design and cards
      an off-white, so the light theme isn't glaring and cards stand out. */
   --color-primary: #5b00ed;

@@ -1,7 +1,7 @@
 import "./LandscapeBackdrop.css";
 
 /**
- * A pixel-art mountain lake behind student and teacher pages (drawn in landscape.ts,
+ * A pixel-art mountain lake behind student and login pages (drawn in landscape.ts,
  * a day lake or a night one by theme). It is fixed to the screen, so the page
  * scrolls over it.
  */
