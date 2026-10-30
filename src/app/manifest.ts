@@ -11,7 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#ffffff",
+    // The splash screen matches the dark page the app opens on.
+    background_color: "#171320",
     theme_color: "#5b00ed",
     icons: [
       {
