@@ -30,6 +30,18 @@ export const isAssignmentGame = (id: string): id is AssignmentGameId =>
 
 export const gameTitle = (id: string) => ASSIGNMENT_GAMES.find((g) => g.id === id)?.title ?? id;
 
+/**
+ * The game a student gets when the teacher picked several: students take
+ * them in turn by the order they joined the class, so up to `games.length`
+ * students all get different ones. Where the turn starts depends on the
+ * assignment, so the same student doesn't always get the first game.
+ */
+export function spreadGame<T extends string>(games: readonly T[], assignmentId: string, memberIndex: number): T {
+  let start = 0;
+  for (const char of assignmentId) start = (start * 31 + char.charCodeAt(0)) % 1_000_003;
+  return games[(start + Math.max(0, memberIndex)) % games.length];
+}
+
 /** Longest answer, in characters, that each kind of game shows well. */
 const COMFORT = { canvas: 8, dom: 28 } as const;
 /** Hard limit for any answer. */

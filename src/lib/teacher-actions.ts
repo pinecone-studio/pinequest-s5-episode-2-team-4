@@ -189,7 +189,7 @@ export async function saveAssignmentAction(
   }));
   if (questions.length === 0) return { ok: false, error: "Дор хаяж нэг асуулт хэрэгтэй" };
 
-  const games = [...new Set((input.games ?? []).filter(isAssignmentGame))].slice(0, 3);
+  const games = [...new Set((input.games ?? []).filter(isAssignmentGame))];
   if (games.length === 0) return { ok: false, error: "Дор хаяж нэг тоглоом сонгоно уу" };
 
   if (options.publish) {

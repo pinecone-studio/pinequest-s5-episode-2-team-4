@@ -359,8 +359,8 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
           </div>
           <p className="text-sm text-ink-muted">
             {gameMode === "fixed"
-              ? "1–3 тоглоом сонгоно. Сурагч эхнийхийг нь нээнэ."
-              : "1–3 тоглоом сонгоно. Сурагч бүр эдгээрээс өөрийн дуртайгаар нь тоглоно."}
+              ? "Нэг буюу хэд хэдэн тоглоом сонгоно. Олон тоглоом сонговол сурагч бүрт өөр тоглоом очно."
+              : "Нэг буюу хэд хэдэн тоглоом сонгоно. Сурагч бүр эдгээрээс өөрийн дуртайгаар нь тоглоно."}
           </p>
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
             {fits.map((g) => {
@@ -370,7 +370,6 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
                   <button
                     type="button"
                     aria-pressed={on}
-                    disabled={!on && games.length >= 3}
                     onClick={() => setGames(on ? games.filter((x) => x !== g.id) : [...games, g.id])}
                     className={cn(
                       "flex h-full w-full cursor-pointer flex-col items-start gap-1 rounded-card border-2 p-3 text-left disabled:cursor-default disabled:opacity-50",

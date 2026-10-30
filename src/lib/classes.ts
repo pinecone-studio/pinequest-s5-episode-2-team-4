@@ -144,6 +144,22 @@ export async function listClassMembers(classId: string): Promise<ClassMember[]> 
     .sort((a, b) => a.username.localeCompare(b.username));
 }
 
+/**
+ * The student's place in the class with this code by when they joined (0 is
+ * the first); undefined when the code is no class or they aren't in it.
+ */
+export async function memberIndex(classCode: string, studentId: string): Promise<number | undefined> {
+  const { data, error } = await db()
+    .from("classes")
+    .select("class_members(student_id, added_at)")
+    .eq("code", classCode)
+    .order("added_at", { referencedTable: "class_members" })
+    .maybeSingle<{ class_members: { student_id: string }[] }>();
+  if (error) throw new Error(`Could not load students: ${error.message}`);
+  const index = data?.class_members.findIndex((m) => m.student_id === studentId) ?? -1;
+  return index < 0 ? undefined : index;
+}
+
 /** Adds a student; false if they were already in the class. */
 export async function addMember(classId: string, studentId: string): Promise<boolean> {
   const { error } = await db().from("class_members").insert({ class_id: classId, student_id: studentId });

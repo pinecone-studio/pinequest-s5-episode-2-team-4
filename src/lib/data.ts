@@ -36,7 +36,7 @@ import {
   listTeacherAssignments,
   listTeacherVideos,
 } from "./content";
-import { isAssignmentGame } from "./gamefit";
+import { isAssignmentGame, spreadGame } from "./gamefit";
 import { grade7MathCurriculum } from "./mock/curriculum";
 import { DEMO_CLASS_CODE } from "./accounts";
 import {
@@ -48,6 +48,7 @@ import {
   listClassTestAnswers,
   listStudentClasses,
   listTeacherClasses,
+  memberIndex,
 } from "./classes";
 import { type AchievementStats, achievementList } from "./achievements";
 import { questsWithProgress } from "./quests";
@@ -780,7 +781,10 @@ export const getStudentAssignments = cache(async (): Promise<StudentAssignment[]
   const visible = assignments.filter(
     (a) => a.target === "class" || !a.targetSubtopicId || weak.has(a.targetSubtopicId),
   );
-  return visible.map((a) => ({ ...a, playGame: pickGame(a, session.favoriteGames) }));
+  // Only looked up when a teacher spread several games over the class.
+  const spread = visible.some((a) => a.gameMode === "fixed" && a.games.filter(isAssignmentGame).length > 1);
+  const index = spread ? await memberIndex(normalClassCode(session.classCode), session.id).catch(() => undefined) : undefined;
+  return visible.map((a) => ({ ...a, playGame: pickGame(a, session.favoriteGames, index) }));
 });
 
 /** Assignments the student hasn't finished yet, for the menu badge. */
@@ -788,12 +792,15 @@ export async function getOpenAssignmentCount(): Promise<number> {
   return (await getStudentAssignments()).filter((a) => !a.done).length;
 }
 
-/** "fixed": the first chosen game; "interest": the student's favourite among them. */
-function pickGame(a: Assignment, favorites: string[] = []): string {
+/**
+ * "fixed": one of the chosen games, spread over the class so students get
+ * different ones (spreadGame); "interest": the student's favourite among them.
+ */
+function pickGame(a: Assignment, favorites: string[] = [], memberIndex?: number): string {
   const allowed = a.games.filter(isAssignmentGame);
   const options = allowed.length ? allowed : ["snake"];
   if (a.gameMode === "interest") return favorites.find((g) => options.includes(g as never)) ?? options[0];
-  return options[0];
+  return memberIndex === undefined ? options[0] : spreadGame(options, a.id, memberIndex);
 }
 
 /**
