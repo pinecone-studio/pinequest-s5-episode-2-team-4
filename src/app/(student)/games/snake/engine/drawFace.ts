@@ -1,5 +1,5 @@
 import { GAME_COLORS } from "../../_lib/palette";
-import { PIXEL as P, pixelLine, snap } from "../../_lib/pixel";
+import { blit, PIXEL as P, pixelLine, snap, sprite } from "../../_lib/pixel";
 import { SNAKE_RADIUS as RADIUS, type Snake, type SnakeLook } from "./types";
 
 /** Eyes that follow the target, blink and go dizzy; tongue or open mouth; crown on a streak. */
@@ -39,19 +39,19 @@ export function drawFace(ctx: CanvasRenderingContext2D, snake: Snake, look: Snak
   if (look.crown) drawCrown(ctx, hx, hy - 21 + Math.sin(look.time * 5) * 1.5);
 }
 
+const CROWN = [
+  "k.k..k..k.k",
+  "kgk.kgk.kgk",
+  "kggkgggkggk",
+  "kggggmggggk",
+  "kgggggggggk",
+  "kkkkkkkkkkk",
+];
+const CROWN_COLORS = { k: "#7a4b00", g: GAME_COLORS.gold, m: GAME_COLORS.magenta };
+
+/** A pixel crown, 11 art pixels wide, centred on (cx, cy). */
 function drawCrown(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
-  ctx.fillStyle = GAME_COLORS.gold;
-  ctx.strokeStyle = "#7a4b00";
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  [[-10, 5], [-11, -5], [-5, 0], [0, -8], [5, 0], [11, -5], [10, 5]].forEach(([x, y], i) =>
-    i ? ctx.lineTo(cx + x, cy + y) : ctx.moveTo(cx + x, cy + y),
-  );
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = GAME_COLORS.magenta;
-  ctx.beginPath();
-  ctx.arc(cx, cy + 1, 1.8, 0, Math.PI * 2);
-  ctx.fill();
+  const img = sprite(CROWN, CROWN_COLORS);
+  const cell = P / 2;
+  blit(ctx, img, cx - (img.width * cell) / 2, cy - (img.height * cell) / 2, cell);
 }
