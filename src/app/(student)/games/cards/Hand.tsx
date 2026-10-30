@@ -1,3 +1,4 @@
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { Power } from "./arena/ArenaEngine";
 import { POWER, type BattleCard } from "./deck";
@@ -33,7 +34,7 @@ export function Hand({ cards, disabled, onOpen }: HandProps) {
           >
             <span className="text-2xs font-extrabold tracking-wide uppercase">{POWER[card.power].label}</span>
             <span aria-hidden="true" className="text-3xl">
-              {card.power === "easy" ? "🍃" : card.power === "medium" ? "⚔️" : "🔥"}
+              <PixelIcon name={card.power === "easy" ? "leaf" : card.power === "medium" ? "swords" : "fire"} className="size-8" />
             </span>
             <span className="flex flex-col items-center leading-none">
               <b className="text-2xl font-extrabold">{POWER[card.power].damage}</b>

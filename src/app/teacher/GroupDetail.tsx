@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { MaterialLink } from "@/components/MaterialLink";
+import { PixelIcon } from "@/components/ui";
 import { parseMaterial } from "@/lib/answer-material";
 import {
   answerQuestionGroup,
@@ -68,7 +69,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
             <span>“{q.text}”</span>
             {q.meToo > 0 ? (
               <span className="shrink-0 text-xs font-bold text-ink-muted">
-                🙋 +{q.meToo}
+                <PixelIcon name="hand" className="inline-block size-3.5 align-[-0.15em]" /> +{q.meToo}
               </span>
             ) : null}
           </li>
@@ -95,7 +96,7 @@ export function GroupDetail({ group: g, onClose }: GroupDetailProps) {
           onClick={() => setRenaming(true)}
           className="cursor-pointer self-start text-sm font-bold text-ink-muted underline-offset-2 hover:text-ink hover:underline"
         >
-          ✏️ Нэр солих
+          <PixelIcon name="pencil" className="inline-block size-4 align-[-0.15em]" /> Нэр солих
         </button>
       )}
 

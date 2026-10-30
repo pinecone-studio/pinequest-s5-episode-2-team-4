@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { GroupDetail } from "./GroupDetail";
 import {
@@ -53,7 +54,7 @@ export function GroupRow({ group: g, open, onToggle }: GroupRowProps) {
                 !open && "line-clamp-1",
               )}
             >
-              🤖 {misconception}
+              <PixelIcon name="robot" className="inline-block size-4 align-[-0.15em]" /> {misconception}
             </span>
           ) : (
             <span className="text-sm text-ink-muted">

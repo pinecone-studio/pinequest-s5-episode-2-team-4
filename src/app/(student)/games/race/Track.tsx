@@ -1,3 +1,4 @@
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { HorseSprite } from "./HorseSprite";
 import "./race.css";
@@ -65,7 +66,7 @@ export function Track({ horses, positions, steps, player }: TrackProps) {
                   >
                     {leading ? (
                       <span aria-hidden="true" className="race-crown absolute -top-3 left-[52%] text-2xs leading-none">
-                        👑
+                        <PixelIcon name="crown" className="size-3.5" />
                       </span>
                     ) : null}
                     <HorseSprite key={pos} {...LOOKS[i]} number={i + 1} running={pos > 0} className="h-[58px] w-[72px]" />

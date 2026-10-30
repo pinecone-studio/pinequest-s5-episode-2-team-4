@@ -1,13 +1,14 @@
+import { PixelIcon, type PixelIconName } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { WEEKDAYS, isoWeekday } from "@/lib/lesson-topics";
 import type { SignalLevel, SignalSummary, SignalWeek, WeekSignals } from "@/lib/types";
 import { WeekPicker } from "./WeekPicker";
 
 // The 🟢🟡🔴 the students sent, in the same status colours as the heatmap.
-const LEVELS: { level: SignalLevel; emoji: string; label: string; className: string }[] = [
-  { level: "got", emoji: "🟢", label: "Ойлгосон", className: "bg-status-good text-status-good-ink" },
-  { level: "unsure", emoji: "🟡", label: "Сайн мэдэхгүй", className: "bg-status-mid text-status-mid-ink" },
-  { level: "lost", emoji: "🔴", label: "Ойлгоогүй", className: "bg-status-weak text-status-weak-ink" },
+const LEVELS: { level: SignalLevel; icon: PixelIconName; label: string; className: string }[] = [
+  { level: "got", icon: "signal-got", label: "Ойлгосон", className: "bg-status-good text-status-good-ink" },
+  { level: "unsure", icon: "signal-unsure", label: "Сайн мэдэхгүй", className: "bg-status-mid text-status-mid-ink" },
+  { level: "lost", icon: "signal-lost", label: "Ойлгоогүй", className: "bg-status-weak text-status-weak-ink" },
 ];
 
 /** Share of 🔴 at which a subtopic is flagged to explain again. */
@@ -147,7 +148,7 @@ function TopicList({ rows, open = false }: { rows: Row[]; open?: boolean }) {
                   {LEVELS.map((l) => (
                     <div key={l.level} className={cn("flex flex-col rounded-tile px-3 py-2.5", l.className)}>
                       <dt className="order-last text-xs font-semibold">
-                        <span aria-hidden="true" className="hidden sm:inline">{l.emoji} </span>
+                        <span className="hidden sm:inline"><PixelIcon name={l.icon} className="inline-block size-3.5 align-[-0.15em]" /> </span>
                         {l.label}
                       </dt>
                       <dd className="text-3xl leading-none font-bold tabular-nums">

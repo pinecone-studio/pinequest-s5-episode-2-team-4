@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { GroupRow } from "./GroupRow";
 import {
@@ -55,7 +56,7 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
           Нэргүй асуултууд
         </h2>
         <p className="text-sm font-semibold text-ink-muted">
-          🤖 AI бүлэглэж, буруу ойлголтыг олсон
+          <PixelIcon name="robot" className="inline-block size-4 align-[-0.15em]" /> AI бүлэглэж, буруу ойлголтыг олсон
         </p>
       </div>
 
@@ -86,9 +87,14 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
 
       {lists[tab].length === 0 ? (
         <p className="mt-5 text-base text-ink-muted">
-          {tab === "open"
-            ? "Бүх асуултад хариулсан байна 🎉"
-            : "Хариулсан асуулт алга."}
+          {tab === "open" ? (
+            <>
+              Бүх асуултад хариулсан байна{" "}
+              <PixelIcon name="clap" className="inline-block size-4 align-[-0.15em]" />
+            </>
+          ) : (
+            "Хариулсан асуулт алга."
+          )}
         </p>
       ) : (
         byLesson(lists[tab]).map(([lesson, items]) => (
@@ -113,7 +119,7 @@ export function QuestionGroups({ groups, className }: QuestionGroupsProps) {
       {tab === "open" && offTopic.length > 0 ? (
         <details className="mt-6 rounded-card border-2 border-dashed border-line px-4 py-3">
           <summary className="cursor-pointer text-sm font-bold">
-            ⚠ Шалгах шаардлагатай ({offTopic.length})
+            <PixelIcon name="warning" className="inline-block size-4 align-[-0.15em]" /> Шалгах шаардлагатай ({offTopic.length})
             <span className="ml-1 font-semibold text-ink-muted">
               · хичээлтэй хамааралгүй байж магадгүй
             </span>

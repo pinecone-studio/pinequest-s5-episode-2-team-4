@@ -10,9 +10,9 @@ import { useGamePlayed } from "../_lib/played";
 import "./hangman.css";
 
 const DIFFICULTIES = [
-  { id: "easy", title: "Easy", description: "4–6 үсэгтэй өдөр тутмын үгс", startLevel: 1, levels: 3, icon: "🌱" },
-  { id: "hard", title: "Hard", description: "7–9 үсэгтэй, илүү урт үгс", startLevel: 4, levels: 3, icon: "🔥" },
-  { id: "expert", title: "Expert", description: "10–11 үсэгтэй хамгийн хэцүү үгс", startLevel: 7, levels: 2, icon: "💎" },
+  { id: "easy", title: "Easy", description: "4–6 үсэгтэй өдөр тутмын үгс", startLevel: 1, levels: 3 },
+  { id: "hard", title: "Hard", description: "7–9 үсэгтэй, илүү урт үгс", startLevel: 4, levels: 3 },
+  { id: "expert", title: "Expert", description: "10–11 үсэгтэй хамгийн хэцүү үгс", startLevel: 7, levels: 2 },
 ] as const;
 type Difficulty = (typeof DIFFICULTIES)[number];
 

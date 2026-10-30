@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { PixelIcon } from "@/components/ui";
 import type { GameQuestion } from "@/lib/types";
 import { ExplainCard } from "../_components/ExplainCard";
 import { GameShell } from "../_components/GameShell";
@@ -19,9 +20,9 @@ type FlightGameProps = {
 };
 
 const STEPS = [
-  { icon: "👆", text: "Товшиж дүүл" },
-  { icon: "🚪", text: "Зөв хариулттай завсраар нис" },
-  { icon: "💡", text: "Буруу бол тайлбар" },
+  { icon: <PixelIcon name="pointer-up" className="size-6" />, text: "Товшиж дүүл" },
+  { icon: <PixelIcon name="door" className="size-6" />, text: "Зөв хариулттай завсраар нис" },
+  { icon: <PixelIcon name="bulb" className="size-6" />, text: "Буруу бол тайлбар" },
 ];
 
 /** Knowledge flight: flap a falcon through the gap with the right answer; a wrong gap pauses on its explanation. */

@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
 import { ChoiceGrid } from "../_components/ChoiceGrid";
@@ -21,11 +22,20 @@ type TugOfWarProps = {
 /** One line of commentary from the flag position. */
 function commentary(rope: number, started: boolean) {
   if (!started) return "Хоёр баг олсоо барьж бэлэн байна…";
-  if (rope > LIMIT * 0.6) return "Ялалт ойрхон байна! Нэг л татчих 🔥";
+  if (rope > LIMIT * 0.6)
+    return (
+      <>
+        Ялалт ойрхон байна! Нэг л татчих <PixelIcon name="fire" className="inline-block size-4 align-[-0.15em]" />
+      </>
+    );
   if (rope > 10) return "Чиний баг давуу байна. Үргэлжлүүл!";
   if (rope >= -10) return "Тэнцүү байна. Хэн нь хүчтэй вэ?";
   if (rope >= -LIMIT * 0.6) return "Ботууд татаж байна. Хурдан, зөв хариул!";
-  return "Аюул! Туг ботуудын шугамд ойртлоо 😬";
+  return (
+    <>
+      Аюул! Туг ботуудын шугамд ойртлоо <PixelIcon name="worried" className="inline-block size-4 align-[-0.15em]" />
+    </>
+  );
 }
 
 /** Real-time tug of war: the bot team never stops pulling; every right answer pulls the rope back. */
@@ -69,9 +79,9 @@ export function TugOfWar({ subjects, subjectId, questions }: TugOfWarProps) {
             <StartOverlay
               title="Олс таталт"
               steps={[
-                { icon: "✅", text: "Зөв хариулбал олсыг татна" },
-                { icon: "🤖", text: "Ботууд зогсохгүй татна" },
-                { icon: "🚩", text: "Тугийг шугамаас давуул" },
+                { icon: <PixelIcon name="check" className="size-6" />, text: "Зөв хариулбал олсыг татна" },
+                { icon: <PixelIcon name="robot" className="size-6" />, text: "Ботууд зогсохгүй татна" },
+                { icon: <PixelIcon name="flag" className="size-6" />, text: "Тугийг шугамаас давуул" },
               ]}
               buttonLabel="Татаж эхлэх"
               onStart={start}
@@ -81,7 +91,7 @@ export function TugOfWar({ subjects, subjectId, questions }: TugOfWarProps) {
         </div>
 
         <p aria-live="polite" className={cn("game-glass flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold", rope < -LIMIT * 0.6 && "border-[var(--game-bad)]")}>
-          <span aria-hidden="true">📣</span>
+          <PixelIcon name="megaphone" className="size-5" />
           {commentary(rope, tug !== null)}
           {tug && tug.combo >= 2 ? <b className="ml-auto text-[var(--game-gold)]">x{tug.combo}</b> : null}
         </p>
@@ -99,7 +109,11 @@ export function TugOfWar({ subjects, subjectId, questions }: TugOfWarProps) {
         {result ? (
           <ResultPanel result={result} onAgain={start} otherHref="/games">
             <p className="text-sm font-extrabold text-[var(--game-gold)]">
-              {won ? "🏆 Чиний баг яллаа!" : "Ботууд энэ удаа яллаа. Дахиад нэг үз!"}
+              {won ? (
+                <>
+                  <PixelIcon name="trophy" className="inline-block size-4 align-[-0.15em]" /> Чиний баг яллаа!
+                </>
+              ) : "Ботууд энэ удаа яллаа. Дахиад нэг үз!"}
             </p>
           </ResultPanel>
         ) : null}

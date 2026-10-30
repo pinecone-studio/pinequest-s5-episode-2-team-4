@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useId, useMemo, useState } from "react";
-import { Button, Card } from "@/components/ui";
+import { Button, Card, PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { MAX_ANSWER_LENGTH, checkQuestion, suggestGames } from "@/lib/gamefit";
 import {
@@ -163,7 +163,7 @@ export function AssignmentEditor({ curriculum, classes, subtopics, initial, teac
         {linkedVideo && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-surface px-4 py-3">
             <p className="font-semibold">
-              🎬 «{linkedVideo}» видеоны материалаас асуулт гаргана. «AI асуулт гаргах» дээр дарна уу.
+              <PixelIcon name="clapper" className="inline-block size-4 align-[-0.15em]" /> «{linkedVideo}» видеоны материалаас асуулт гаргана. «AI асуулт гаргах» дээр дарна уу.
             </p>
             <button
               type="button"

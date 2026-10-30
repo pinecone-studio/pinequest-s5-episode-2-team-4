@@ -1,5 +1,6 @@
 "use client";
 
+import { PixelIcon } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { GameQuestion } from "@/lib/types";
 import { ChoiceGrid } from "../_components/ChoiceGrid";
@@ -82,9 +83,9 @@ export function Shootout({ subjects, subjectId, questions }: ShootoutProps) {
             <StartOverlay
               title="Пенальти"
               steps={[
-                { icon: "⚽", text: "Зөв булан руу өшиглө" },
-                { icon: "🧤", text: `${DEFEND_SECONDS} секундэд хариулж хамгаал` },
-                { icon: "🏆", text: `${KICKS} өшиглөлтөөр бот багийг ял` },
+                { icon: <PixelIcon name="ball" className="size-6" />, text: "Зөв булан руу өшиглө" },
+                { icon: <PixelIcon name="glove" className="size-6" />, text: `${DEFEND_SECONDS} секундэд хариулж хамгаал` },
+                { icon: <PixelIcon name="trophy" className="size-6" />, text: `${KICKS} өшиглөлтөөр бот багийг ял` },
               ]}
               buttonLabel="Тоглолт эхлэх"
               onStart={start}
@@ -120,7 +121,11 @@ export function Shootout({ subjects, subjectId, questions }: ShootoutProps) {
         {result ? (
           <ResultPanel result={result} onAgain={start} otherHref="/games">
             <p className="text-sm font-extrabold text-[var(--game-gold)]">
-              {won ? `🏆 ${goals.you} : ${goals.bot}. Чи яллаа!` : goals.you === goals.bot ? `${goals.you} : ${goals.bot}. Тэнцлээ!` : `${goals.you} : ${goals.bot}. Бот баг яллаа. Дахиад нэг!`}
+              {won ? (
+                <>
+                  <PixelIcon name="trophy" className="inline-block size-4 align-[-0.15em]" /> {goals.you} : {goals.bot}. Чи яллаа!
+                </>
+              ) : goals.you === goals.bot ? `${goals.you} : ${goals.bot}. Тэнцлээ!` : `${goals.you} : ${goals.bot}. Бот баг яллаа. Дахиад нэг!`}
             </p>
           </ResultPanel>
         ) : null}

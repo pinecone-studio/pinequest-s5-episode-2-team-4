@@ -119,7 +119,7 @@ export function useTugOfWar(questions: GameQuestion[]) {
     );
     setExplain(
       ok
-        ? { kind: "good", title: combo >= 3 ? `Хүчтэй татлаа! Комбо ${combo} 🔥` : "Зөв! Олсыг татлаа 💪", seconds: RIGHT_SECONDS }
+        ? { kind: "good", title: combo >= 3 ? `Хүчтэй татлаа! Комбо ${combo}` : "Зөв! Олсыг татлаа", icon: combo >= 3 ? "fire" : "dumbbell", seconds: RIGHT_SECONDS }
         : { kind: "bad", title: "Буруу. Ботууд олсыг татаж байна!", text: round.question.explanation },
     );
   }
